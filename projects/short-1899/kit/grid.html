@@ -1,0 +1,26 @@
+<!doctype html><html><body><script src="common.js"></script><script>
+(async () => {
+  const cut = await prepareSheet();
+  window.still = (arg) => {
+    const [x0, y0, x1, y1, s] = (arg || '0,0,2000,1116,1').split(',').map(Number);
+    const w = (x1 - x0) * s, h = (y1 - y0) * s;
+    const c = mk(w, h), g = c.getContext('2d');
+    g.fillStyle = '#e040e0'; g.fillRect(0, 0, w, h);
+    g.imageSmoothingEnabled = false;
+    g.drawImage(cut, x0, y0, x1 - x0, y1 - y0, 0, 0, w, h);
+    g.font = '11px sans-serif';
+    for (let X = Math.ceil(x0 / 20) * 20; X < x1; X += 20) {
+      g.strokeStyle = X % 100 ? 'rgba(0,255,0,0.25)' : 'rgba(255,255,0,0.8)';
+      g.beginPath(); g.moveTo((X - x0) * s + .5, 0); g.lineTo((X - x0) * s + .5, h); g.stroke();
+      if (X % 100 === 0) { g.fillStyle = '#ff0'; g.fillText(X, (X - x0) * s + 2, 10); }
+    }
+    for (let Y = Math.ceil(y0 / 20) * 20; Y < y1; Y += 20) {
+      g.strokeStyle = Y % 100 ? 'rgba(0,255,0,0.25)' : 'rgba(255,255,0,0.8)';
+      g.beginPath(); g.moveTo(0, (Y - y0) * s + .5); g.lineTo(w, (Y - y0) * s + .5); g.stroke();
+      if (Y % 100 === 0) { g.fillStyle = '#ff0'; g.fillText(Y, 2, (Y - y0) * s - 2); }
+    }
+    return c.toDataURL('image/png');
+  };
+  window.ready = true;
+})();
+</script></body></html>

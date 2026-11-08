@@ -1,0 +1,6 @@
+<!DOCTYPE html><html><body><canvas id="c" width="1080" height="1920"></canvas><script>
+const c=document.getElementById('c'),g=c.getContext('2d');
+window.frame=i=>{g.fillStyle='#123';g.fillRect(0,0,1080,1920);g.fillStyle='#fc0';g.font='bold 120px "Nirmala UI"';g.fillText('টেস্ট '+i,200,900);return c.toDataURL('image/jpeg',0.9);};
+window.still=()=>window.frame(0);
+window.ready=true;
+</script></body></html>

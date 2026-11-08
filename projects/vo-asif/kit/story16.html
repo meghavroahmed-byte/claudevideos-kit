@@ -1,0 +1,688 @@
+<!doctype html><html><body style="margin:0;background:#000">
+<script>window.VW = 1920; window.VH = 1080;</script>
+<script src="common.js"></script><script src="rigcore.js"></script><script src="world.js"></script><script src="kit16.js"></script>
+<script src="env_full.js"></script><script src="sent_full.js"></script>
+<script src="part2.js" defer></script><script>
+const FPS = 30, AUDIO_END = 1098.88, DUR = 1101.5, NF = Math.round(DUR * FPS), P1END = 530.56;
+// ---------- script anchors -> time ----------
+const ANC = {};
+function T(str) {
+  if (ANC[str] != null) return ANC[str];
+  const two = str[0] === '§', key = two ? str.slice(1) : str;
+  for (const s of (two ? SENT2 : SENT)) { const k = s.text.indexOf(key); if (k >= 0) { const r = k / s.text.length; return ANC[str] = s.s + (s.e - s.s) * r; } }
+  console.log('MISSING ANCHOR: ' + str); return ANC[str] = 0;
+}
+window.POPS = new Set();
+const P = (t, str, d = 0.35) => { const a = T(str); POPS.add(+a.toFixed(2)); return easeOutBack(seg(t, a, a + d)); };
+const S = (t, str, d = 0.6) => { const a = T(str); return ease(seg(t, a, a + d)); };
+function mouthAt(t) {
+  const i = Math.round(t * FPS); if (i < 0 || i >= ENV.length) return 0;
+  const v = j => ENV[Math.max(0, Math.min(ENV.length - 1, j))];
+  const db = (v(i - 1) + 2 * v(i) + v(i + 1)) / 4;
+  return clamp((db + 44) / 22) * (0.7 + 0.3 * Math.abs(Math.sin(t * 17)));
+}
+let CL, CG;
+function lit(g, tint, fn) {
+  CG.setTransform(1, 0, 0, 1, 0, 0); CG.clearRect(0, 0, W, H); fn(CG);
+  if (tint) { CG.setTransform(1, 0, 0, 1, 0, 0); CG.globalCompositeOperation = 'source-atop'; CG.fillStyle = tint; CG.fillRect(0, 0, W, H); CG.globalCompositeOperation = 'source-over'; }
+  g.drawImage(CL, 0, 0);
+}
+const GROUND = 1010;
+const front = (g, t, x, o = {}) => lit(g, o.tint, c => { if (!o.close) shadow(c, x, GROUND, 105); drawFront(c, x, o.close ? (o.y || 690) : GROUND, o.s || (o.close ? 1.5 : 0.82), Object.assign({ t, mouth: mouthAt(t) }, o), o.close ? [280, 520] : undefined); });
+const chinta = (g, t, x, o = {}) => lit(g, o.tint, c => drawChinta(c, x, o.y || 1140, o.z || 2.05, { t, mouth: mouthAt(t) }));
+const phoneP = (g, t, x, o = {}) => lit(g, o.tint, c => { shadow(c, x, GROUND, 110); drawPhone(c, x, GROUND, 0.82, { t, mouth: mouthAt(t) }); });
+const sideW = (g, t, x, o = {}) => lit(g, o.tint, c => { shadow(c, x, GROUND, 100); drawSide(c, x, GROUND, o.s || 0.82, { p: o.p || 0, e: o.e != null ? o.e : 1, mouth: mouthAt(t), flip: o.flip }); });
+const cave = (g, x, y, s, t, o = {}) => caveman(g, x, y, s, Object.assign({ t, col: '#2e211a', cloth: '#7a5534', skin: '#8a5a3a' }, o));
+const lying = (g, x, y, s, t, k) => { g.save(); g.translate(x, y); g.rotate(-Math.PI / 2 * (1 - k)); cave(g, 0, 0, s, t + 2, { pose: 'stand' }); g.restore(); };
+function pill(g, s, x, y, k, col = '#ffd23f', size = 64, tc = '#111') { btext(g, s, x, y, size, tc, k, { pill: col, stroke: col }); }
+function big(g, s, x, y, k, size = 110, col = '#fff') { btext(g, s, x, y, size, col, k); }
+function xMark(g, x, y, r, k) { if (k <= 0) return; ink(g, RED, r * 0.22); const a = r * clamp(k * 2); g.beginPath(); g.moveTo(x - r, y - r); g.lineTo(x - r + a * 2, y - r + a * 2); g.stroke(); const b = r * clamp(k * 2 - 1); if (b > 0) { g.beginPath(); g.moveTo(x + r, y - r); g.lineTo(x + r - b * 2, y - r + b * 2); g.stroke(); } }
+function check(g, x, y, r, k) { if (k <= 0) return; ink(g, GOOD, r * 0.24); g.beginPath(); g.moveTo(x - r, y); g.lineTo(x - r * 0.3, y + r * 0.7 * clamp(k * 2)); if (k > 0.5) g.lineTo(x - r * 0.3 + r * 1.3 * clamp(k * 2 - 1), y + r * 0.7 - r * 1.5 * clamp(k * 2 - 1)); g.stroke(); }
+const dayLand = (g, t, o = {}) => { land(g, L(Object.assign({ t, pan: o.pan || 0 }, o))); };
+const vg = (g, a = 0.35, c) => vignette(g, a, c);
+const questionMark = (g, x, y, k, t, size = 200) => symbolText(g, '?', x, y + Math.sin(t * 3 + x) * 8, size, '#ffd23f', k, Math.sin(t * 2 + x) * 0.1);
+function stamp(g, s, x, y, k, col = RED) { if (k <= 0) return; g.save(); g.translate(x, y); g.rotate(-0.18); g.scale(lerp(2.2, 1, easeOut(k)), lerp(2.2, 1, easeOut(k))); g.globalAlpha = clamp(k * 3); g.strokeStyle = col; g.lineWidth = 12; g.font = 'bold 120px "Nirmala UI"'; const w = g.measureText(s).width + 80; rr(g, -w / 2, -85, w, 170, 20); g.stroke(); g.fillStyle = col; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(s, 0, 8); g.restore(); }
+function camp(g, t, o = {}) {
+  dayLand(g, t, Object.assign({ pan: 300, dawn: o.dawn || 0, night: o.night || 0, noVolcano: true }, o));
+  // huts (skin tents)
+  for (const [x, s] of [[260, 1], [1660, 0.85]]) { g.fillStyle = mood('#8a6a4a', '#7a5a4a', '#1a1510', o); g.beginPath(); g.moveTo(x - 140 * s, 860); g.lineTo(x, 640 * s + 220); g.lineTo(x + 140 * s, 860); g.closePath(); g.fill(); g.fillStyle = 'rgba(0,0,0,0.4)'; g.beginPath(); g.moveTo(x - 30 * s, 860); g.lineTo(x, 760); g.lineTo(x + 30 * s, 860); g.fill(); ink(g, '#4a3420', 6); g.beginPath(); g.moveTo(x - 20, 650 * s + 200); g.lineTo(x + 30, 600 * s + 200); g.moveTo(x + 20, 650 * s + 200); g.lineTo(x - 30, 600 * s + 200); g.stroke(); }
+}
+function embers(g, x, y, s, t, a = 1) {
+  g.save(); g.globalAlpha = a; g.strokeStyle = '#4a2a16'; g.lineCap = 'round'; g.lineWidth = 22 * s; g.beginPath(); g.moveTo(x - 70 * s, y + 10 * s); g.lineTo(x + 60 * s, y - 14 * s); g.moveTo(x - 60 * s, y - 14 * s); g.lineTo(x + 70 * s, y + 12 * s); g.stroke();
+  glow(g, x, y - 10 * s, 120 * s, 'rgba(255,120,40,A)', 0.5 + 0.2 * Math.sin(t * 7));
+  for (let i = 0; i < 6; i++) { const life = (t * 0.25 + i / 6) % 1; g.fillStyle = `rgba(160,160,160,${0.4 * (1 - life)})`; g.beginPath(); g.arc(x + Math.sin(life * 5 + i) * 30 * s, y - 40 * s - life * 260 * s, (14 + life * 40) * s, 0, 7); g.fill(); }
+  g.restore();
+}
+function meatRack(g, x, y, s, n) {
+  ink(g, '#5a3a20', 10 * s); g.beginPath(); g.moveTo(x - 120 * s, y); g.lineTo(x - 120 * s, y - 220 * s); g.moveTo(x + 120 * s, y); g.lineTo(x + 120 * s, y - 220 * s); g.moveTo(x - 140 * s, y - 210 * s); g.lineTo(x + 140 * s, y - 210 * s); g.stroke();
+  for (let i = 0; i < n; i++) { const mx = x - 90 * s + i * 45 * s; ink(g, '#5a3a20', 3); g.beginPath(); g.moveTo(mx, y - 210 * s); g.lineTo(mx, y - 180 * s); g.stroke(); g.fillStyle = '#a0402a'; g.strokeStyle = '#4a1a10'; g.lineWidth = 3; g.beginPath(); g.ellipse(mx, y - 140 * s, 16 * s, 40 * s, 0, 0, 7); g.fill(); g.stroke(); }
+}
+// farmer bending at the hip over a grinding stone (bend 0..1)
+function farmerBend(g, x, y, s, bend, t) {
+  const skin = '#6a4430', cloth = '#5a3a24';
+  g.save(); g.translate(x, y); g.scale(s, s); g.lineCap = 'round'; g.lineJoin = 'round';
+  const limb = (pts, w, c) => { g.strokeStyle = c; g.lineWidth = w; g.beginPath(); pts.forEach(([a, b], i) => i ? g.lineTo(a, b) : g.moveTo(a, b)); g.stroke(); };
+  limb([[-10, -95], [-14, -45], [-16, 0]], 18, skin); limb([[10, -95], [18, -45], [20, 0]], 18, skin);
+  g.fillStyle = '#7d7a72'; rr(g, -190, -30, 120, 30, 12); g.fill();
+  g.save(); g.translate(0, -95); g.rotate(-bend * 1.25);
+  g.fillStyle = cloth; g.beginPath(); g.moveTo(-34, -110); g.lineTo(34, -110); g.lineTo(40, 6); g.lineTo(-40, 6); g.closePath(); g.fill();
+  const reach = 60 + bend * 30;
+  limb([[-20, -95], [-30, -40 + bend * 10], [-32 - bend * 10, reach - 70]], 15, skin); limb([[20, -95], [8, -40], [-4, reach - 70]], 15, skin);
+  g.fillStyle = '#9a9a92'; g.beginPath(); g.arc(-18, reach - 64, 14, 0, 7); g.fill();
+  g.fillStyle = skin; g.beginPath(); g.arc(0, -138, 28, 0, 7); g.fill(); g.fillStyle = '#1a120d'; g.beginPath(); g.arc(0, -146, 31, Math.PI * 0.9, Math.PI * 2.1); g.fill();
+  g.restore(); g.restore();
+}
+function basketWalker(g, x, y, s, t, flip) { cave(g, x, y, s, t, { walk: true, flip }); g.fillStyle = '#b08040'; g.strokeStyle = '#5a3a1a'; g.lineWidth = 3; g.beginPath(); g.ellipse(x + (flip ? -40 : 40) * s, y - 120 * s, 26 * s, 20 * s, 0, 0, 7); g.fill(); g.stroke(); }
+
+// ================= BEATS =================
+const B = [];
+const beat = (anchor, fn, o = {}) => B.push(Object.assign({ anchor, fn }, o));
+
+// ---------- HOOK ----------
+beat('আপনি কি জানেন প্রাচীনযুগের', (g, t) => {
+  dayLand(g, t, { pan: t * 8 });
+  g.fillStyle = '#7b6f62'; g.beginPath(); g.moveTo(1380, 900); g.quadraticCurveTo(1460, 520, 1760, 560); g.quadraticCurveTo(1920, 640, 1930, 900); g.closePath(); g.fill();
+  g.fillStyle = '#1d1712'; g.beginPath(); g.ellipse(1620, 880, 110, 170, 0, Math.PI, 0); g.fill(); fire(g, 1620, 890, 0.4, t);
+  cave(g, 1450, 900, 0.9, t, { pose: 'spear', beard: true }); cave(g, 1790, 905, 0.75, t, { pose: 'sit' });
+  front(g, t, 760, { up: ease(seg(t, 0.6, 1.0)) * (1 - ease(seg(t, 2.4, 2.8))), wave: Math.sin(t * 9) * 10 });
+  foregroundGrass(g, t, {});
+  iconTile(g, 300, 260, 120, P(t, 'চাকরি'), ICON.briefcase, S(t, 'ছিলোনা', 0.5));
+  big(g, 'চাকরি?', 300, 450, P(t, 'চাকরি'), 70);
+  questionMark(g, 1080, 240, P(t, 'কি করতো'), t);
+  vg(g);
+});
+beat('মানুষের জীবন কি শুরু থেকেই', (g, t, b) => {
+  studio(g, '#2a2f4a', '#0b0d18', t, 3);
+  const k = P(t, 'মানুষের জীবন কি শুরু');
+  g.save(); g.translate(W / 2, 520); g.scale(k, k); iconTile(g, 0, 0, 330, 1, (gg, r) => ICON.clock(gg, r, t * 8)); g.restore();
+  // chains
+  if (S(t, 'ঘড়ির কাঁটায়') > 0) { const c = S(t, 'ঘড়ির কাঁটায়'); ink(g, '#9aa0aa', 16); for (let i = 0; i < 26 * c; i++) { const x = 260 + i * 54, y = 520 + Math.sin(i * 0.5) * 30; g.beginPath(); g.ellipse(x, y, 26, 14, i % 2 ? 0 : 0.3, 0, 7); g.stroke(); } }
+  lit(g, null, c => drawChinta(c, 1600, 1200, 1.4, { t, mouth: mouthAt(t) }));
+  pill(g, 'ঘড়ির কাঁটায় বাঁধা?', W / 2, 960, P(t, 'বাঁধা'), '#ffd23f', 60);
+});
+beat('নাকি আমাদের অজান্তেই', (g, t) => {
+  studio(g, '#3a1f2a', '#0b0508', t, 4);
+  front(g, t, 620, { tint: 'rgba(40,0,20,0.25)' });
+  // hourglass of time + sneaky hand
+  const hk = S(t, 'চুরি করে', 0.8);
+  const hx = lerp(1200, 1500, hk), hy = 520;
+  iconTile(g, hx, hy, 110, 1, (gg, r) => ICON.hourglass(gg, r, t));
+  g.save(); g.fillStyle = '#111'; g.translate(lerp(2100, hx + 140, ease(seg(t, T('নাকি আমাদের অজান্তেই') + 0.3, T('চুরি করে')))) + hk * 300, hy); g.beginPath(); g.ellipse(0, 0, 70, 45, 0, 0, 7); g.fill(); for (let f = 0; f < 4; f++) { g.beginPath(); g.ellipse(-70, -30 + f * 20, 50, 10, 0, 0, 7); g.fill(); } g.fillRect(0, -30, 500, 60); g.restore();
+  pill(g, 'চুরি?', 1300, 230, P(t, 'চুরি করে'), RED, 90, '#fff');
+  vg(g, 0.6, '20,0,10');
+});
+beat('একটু চারপাশে তাকিয়ে', (g, t) => {
+  modernRoom(g, t);
+  front(g, t, 960, { up: S(t, 'একটু চারপাশে') * (1 - S(t, 'আপনার ঘরে', 0.5)), upAng: 40, loAng: 100 });
+  [['washer', 'ওয়াশিং মেশিন', 360, 600], ['microwave', 'মাইক্রোওয়েভ', 620, 300], ['car', 'গাড়ি', 1300, 300], ['phone', 'স্মার্টফোন', 1560, 620]].forEach(([ic, a, x, y]) => {
+    iconTile(g, x, y, 105, P(t, a), ICON[ic]); btext(g, a, x, y + 150, 44, '#111', P(t, a), { stroke: '#fff' });
+  });
+});
+beat('বিজ্ঞান ও প্রযুক্তির এই', (g, t) => {
+  studio(g, '#1f3a4a', '#081218', t, 5);
+  ['washer', 'microwave', 'car', 'phone'].forEach((ic, i) => iconTile(g, 300 + i * 150, 230, 62, P(t, 'বিজ্ঞান ও প্রযুক্তির', 0.3 + i * 0.1), ICON[ic]));
+  const k = S(t, 'পরিশ্রম কমানোর', 1.2), k2 = S(t, 'অবসর সময় তুলে', 1.2);
+  barChart(g, 900, 860, 800, 520, [{ v: lerp(10, 3, k), label: 'পরিশ্রম', col: '#e8402c', val: k > 0.5 ? '↓' : '' }, { v: lerp(3, 10, k2), label: 'অবসর', col: '#2ecc71', val: k2 > 0.5 ? '↑' : '' }], 1, { max: 10 });
+  pill(g, 'প্রত্যাশা', 1300, 140, P(t, 'আবিষ্কার করা'), '#5ab8ff', 56);
+  front(g, t, 330, { s: 0.6 });
+});
+beat('কিন্তু সত্যি করে বলুন', (g, t) => {
+  modernRoom(g, t); g.fillStyle = 'rgba(0,0,0,0.25)'; g.fillRect(0, 0, W, H);
+  chinta(g, t, 960);
+  questionMark(g, 1400, 300, P(t, 'অবসর সময় আছে'), t, 240); pill(g, 'অবসর?', 560, 300, P(t, 'অবসর সময় আছে'), '#ffd23f', 80);
+});
+beat('নাকি আজকের মানুষ ইতিহাসের', (g, t) => {
+  g.drawImage(CITY16, 0, 0);
+  for (let i = 0; i < 6; i++) { const a = t * (1 + i * 0.3) + i; iconTile(g, 960 + Math.cos(a) * (500 + i * 40), 480 + Math.sin(a) * 260, 60, 1, (gg, r) => ICON.clock(gg, r, t * 10)); }
+  phoneP(g, t, 960, { tint: 'rgba(80,0,0,0.12)' });
+  pill(g, 'ক্লান্ত', 420, 200, P(t, 'ক্লান্ত'), RED, 70, '#fff'); pill(g, 'ব্যস্ত', 960, 140, P(t, 'বেশি ব্যস্ত'), RED, 70, '#fff'); pill(g, 'দিশেহারা', 1500, 200, P(t, 'দিশেহারা'), RED, 70, '#fff');
+  vg(g, 0.6, '60,0,0');
+});
+beat('তাহলে এবার আরও বড়', (g, t, b) => {
+  const lt = t - b.t0, sp = ease(lt / (b.t1 - b.t0));
+  g.fillStyle = '#0b0820'; g.fillRect(0, 0, W, H);
+  for (let i = 0; i < 26; i++) { const r = ((i * 70 + lt * 900 * (0.3 + sp)) % 1900); g.strokeStyle = `hsla(${(i * 25 + lt * 120) % 360},90%,62%,${0.15 + 0.5 * (r / 1900)})`; g.lineWidth = 6 + r / 60; g.beginPath(); g.ellipse(W / 2, H / 2, r, r * 0.6, lt * (0.5 + sp * 3) + i * 0.3, 0, Math.PI * 1.6); g.stroke(); }
+  big(g, BN(Math.round(sp * sp * 500) * 100 + '') + ' বছর আগে', W / 2, H / 2, P(t, 'তাহলে এবার'), 110, '#ffd23f');
+});
+beat('আজ থেকে ৫০ হাজার বছর আগে', (g, t, b) => {
+  const k = ease(seg(t, b.t0, b.t0 + 1.4));
+  const Sm = drawMap(g, { lon: lerp(60, 50, k), lat: lerp(15, 15, k), zoom: lerp(0.5, 0.85, k) }, t);
+  const [ax, ay] = Sm([33, 2]); glow(g, ax, ay, 170, 'rgba(210,60,30,A)', 0.55);
+  ROUTES16.forEach((r, i) => route(g, Sm, r, ease(seg(t, b.t0 + 0.3 + i * 0.2, b.t1)), '#a3201a', 8));
+  pinDot(g, ax, ay, 16, t);
+  btext(g, '৫০,০০০ বছর আগে', W / 2, 110, 76, '#fff8ea', P(t, 'আজ থেকে ৫০ হাজার'), { pill: '#7a2a14', stroke: '#3a1408' });
+});
+beat('যে মানুষটার কাছে কোনো প্রযুক্তি', (g, t) => {
+  dayLand(g, t, { pan: 600 + t * 5 });
+  cave(g, 960, 1000, 2.6, t, { pose: 'spear', beard: true });
+  [['phone', 'কোনো প্রযুক্তি', 420, 260], ['washer', 'কোনো যন্ত্র', 300, 520], ['car', 'কোনো গাড়ি', 1500, 260], ['clock', 'বা ঘড়ি', 1620, 520]].forEach(([ic, a, x, y]) => iconTile(g, x, y, 95, P(t, a), (gg, r) => ICON[ic](gg, r, t), S(t, a, 0.5)));
+  if (S(t, 'কাঠের বর্শা') > 0) { glow(g, 1095, 500, 260, 'rgba(255,220,80,A)', 0.5 * S(t, 'কাঠের বর্শা')); pill(g, 'শুধু একটি বর্শা', 1340, 900, P(t, 'কাঠের বর্শা'), '#ffd23f', 56); }
+  foregroundGrass(g, t, {});
+});
+beat('সেই আদিম মানুষটার কাছে আপনার চেয়ে', (g, t) => {
+  studio(g, '#1f4a2f', '#07140c', t, 6);
+  front(g, t, 330, { s: 0.62 });
+  cave(g, 1640, 1000, 1.9, t, { pose: 'spear' });
+  barChart(g, 650, 900, 700, 560, [{ v: 1, label: 'আপনি', col: '#5ab8ff', val: '১×' }, { v: 3, label: 'আদিম মানুষ', col: '#2ecc71', val: '৩×' }], S(t, 'তিন গুণ', 1.2), { max: 3 });
+  pill(g, 'অবসর সময়', 1000, 160, P(t, 'অবসর সময় থাকতো'), '#ffd23f', 64);
+});
+beat('আপনার হয়তো বিশ্বাস করতে', (g, t) => { studio(g, '#2a2a4a', '#0a0a18', t, 7); chinta(g, t, 960); questionMark(g, 1420, 300, P(t, 'তাই না'), t); });
+beat('ছোটবেলা থেকে বইয়ের পাতায়', (g, t, b) => {
+  studio(g, '#4a3a2a', '#140e08', t, 8);
+  // open textbook
+  const k = P(t, 'ছোটবেলা থেকে');
+  g.save(); g.translate(W / 2, 560); g.scale(k, k);
+  g.fillStyle = '#7a4a2a'; rr(g, -720, -380, 1440, 760, 20); g.fill();
+  g.fillStyle = '#f6ecd2'; rr(g, -700, -360, 690, 720, 10); g.fill(); rr(g, 10, -360, 690, 720, 10); g.fill();
+  ink(g, '#c8b890', 6); for (let i = 0; i < 9; i++) { g.beginPath(); g.moveTo(-640, -250 + i * 60); g.lineTo(-80, -250 + i * 60); g.stroke(); }
+  // scary picture: caveman vs beast
+  g.fillStyle = '#e8dcc0'; rr(g, 60, -320, 590, 520, 8); g.fill(); cave(g, 220, 160, 1.4, t, { pose: 'throw', k: 0.5, col: '#3a2a1a', cloth: '#3a2a1a', skin: '#3a2a1a' }); wolf(g, 520, 170, 1.4, '#3a2a1a', 0);
+  btext(g, 'গুহামানবের কষ্ট', 355, 270, 46, '#3a2a1a', 1, { stroke: '#e8dcc0' });
+  g.restore();
+});
+beat('তাদের নাকি প্রতিটা সেকেন্ড', (g, t) => {
+  dayLand(g, t, { night: 0.55, dawn: 0.5, pan: 900 });
+  const sh = noise(t * 15) * 6;
+  cave(g, 700 + sh, 1000, 2.2, t, { pose: 'spear' }); wolf(g, 1300 - sh, 1000, 2.4, '#1a1410', 0.2 + 0.2 * Math.sin(t * 4));
+  pill(g, 'ক্ষুধা', 500, 200, P(t, 'ক্ষুধা'), '#e0862a', 70, '#fff'); pill(g, 'হিংস্র প্রাণী', 1400, 200, P(t, 'হিংস্র প্রাণী'), RED, 70, '#fff');
+  vg(g, 0.6, '40,0,0');
+});
+beat('কিন্তু বিজ্ঞানীরা মাটির নিচে', (g, t, b) => {
+  soil(g, t, 0);
+  const k = S(t, 'মাটির নিচে', 1);
+  g.save(); g.globalAlpha = k; skeleton(g, 700, 960, { h: 520, t }); g.restore();
+  [[1250, 760], [1500, 900], [400, 820]].forEach(([x, y], i) => { glow(g, x, y, 90, 'rgba(255,230,150,A)', 0.4 * k); iconTile(g, x, y, 55, P(t, 'প্রমাণ খুঁজে', 0.3 + i * 0.1), ICON.bone); });
+  stamp(g, 'মিথ্যা!', 1300, 420, S(t, 'মিথ্যা', 0.4));
+});
+beat('কিন্তু কী সেই প্রমাণ?', (g, t) => {
+  studio(g, '#3a2a4a', '#0c0814', t, 9);
+  const cards = [['হাড় ও দাঁত', 'কেনো একজন আদিম শিকারির', (c, w, h) => { c.fillStyle = '#1a2a3a'; c.fillRect(0, 0, w, h); skeleton(c, w / 2, h - 80, { h: 380, t }); }],
+  ['সপ্তাহে ২–২.৫ দিন', 'কীভাবে তারা সপ্তাহে', (c, w, h) => { c.fillStyle = '#1a3a2a'; c.fillRect(0, 0, w, h); weekCalendar(c, 30, 200, 52, 260, (t * 1.5) % 4, '#2ecc71', t); big(c, '?', w / 2, 100, 1, 90, '#ffd23f'); }],
+  ['বাকি ৫ দিন?', 'আর সপ্তাহের বাকি ৫ দিন', (c, w, h) => { c.fillStyle = '#2a3a1a'; c.fillRect(0, 0, w, h); for (let i = 0; i < 6; i++) palm(c, 40 + i * 90, h - 60, 260 + hash(i) * 80, '#1f4a2a', t, i); big(c, '?', w / 2, h / 2, 1, 200, '#ffd23f'); }]];
+  cards.forEach(([lb, a, fn], i) => card(g, 380 + i * 580, 520, 520, 700, P(t, a, 0.45), lb, fn, (i - 1) * 0.2));
+});
+beat('সবচেয়ে বড় রহস্য হলো', (g, t) => {
+  studio(g, '#4a3a1a', '#120c04', t, 10);
+  const k = S(t, 'রাজার মতো', 0.6), k2 = S(t, '৯টা-৫টার', 0.6);
+  big(g, 'সবচেয়ে বড় রহস্য', W / 2, 180, P(t, 'সবচেয়ে বড় রহস্য') * (1 - k * 0.3), 90, '#ffd23f');
+  questionMark(g, W / 2, 480, P(t, 'সবচেয়ে বড় রহস্য') * (1 - k), t, 260);
+  iconTile(g, 560, 480, 170, P(t, 'রাজার মতো'), ICON.crown);
+  if (k2 > 0) { ink(g, '#fff', 12); g.beginPath(); g.moveTo(800, 480); g.lineTo(800 + 300 * k2, 480); g.stroke(); }
+  iconTile(g, 1360, 480, 170, P(t, '৯টা-৫টার'), (gg, r) => ICON.clock(gg, r, t * 6));
+  if (k2 > 0) { ink(g, '#9aa0aa', 14); for (let i = 0; i < 9; i++) { g.beginPath(); g.ellipse(1190 + i * 42, 680 + Math.sin(i) * 8, 22, 12, i % 2 ? 0 : 0.4, 0, 7); g.stroke(); } }
+  pill(g, 'স্বাধীন জীবন', 560, 760, P(t, 'স্বাধীন জীবন'), '#2ecc71', 56); pill(g, '৯টা–৫টা', 1360, 800, P(t, '৯টা-৫টার'), RED, 64, '#fff');
+});
+beat('কে পাতলো সেই অদৃশ্য ফাঁদ', (g, t, b) => {
+  studio(g, '#1a1a2a', '#05050a', t, 11);
+  // globe + net closing
+  const gx = W / 2, gy = 560, r = 330;
+  const gg = g.createRadialGradient(gx - 100, gy - 100, 50, gx, gy, r); gg.addColorStop(0, '#5ab0e0'); gg.addColorStop(1, '#1a4a7a'); g.fillStyle = gg; g.beginPath(); g.arc(gx, gy, r, 0, 7); g.fill();
+  g.save(); g.beginPath(); g.arc(gx, gy, r, 0, 7); g.clip(); g.fillStyle = '#3a8a4a'; for (let i = 0; i < 6; i++) { g.beginPath(); g.ellipse(gx - 200 + hash(i) * 400 + Math.sin(t * 0.3) * 40, gy - 200 + hash(i + 4) * 400, 90 + hash(i + 1) * 80, 60 + hash(i + 2) * 60, i, 0, 7); g.fill(); } g.restore();
+  const nk = ease(seg(t, T('অদৃশ্য ফাঁদ'), T('অদৃশ্য ফাঁদ') + 2));
+  ink(g, `rgba(255,255,255,${0.7 * nk})`, 3); for (let i = -8; i <= 8; i++) { g.beginPath(); g.moveTo(gx + i * 45, gy - r - 60 + (1 - nk) * -400); g.lineTo(gx + i * 45 * 0.6, gy + r * nk); g.stroke(); g.beginPath(); g.moveTo(gx - r - 40, gy + i * 45 * nk); g.lineTo(gx + r + 40, gy + i * 45 * nk); g.stroke(); }
+  pill(g, 'অদৃশ্য ফাঁদ', W / 2, 980, P(t, 'অদৃশ্য ফাঁদ'), RED, 64, '#fff');
+});
+beat('এই সবগুলো প্রশ্নের উত্তর', (g, t) => {
+  studio(g, '#2b1d3f', '#0e0a1a', t, 12); dust(g, t, 50, '220,200,255', 0.4);
+  front(g, t, 960, { close: true, up: S(t, 'দৃষ্টিভঙ্গি') * (1 - S(t, 'চিরতরে বদলে', 1.5)), upAng: 50, loAng: 110, wave: Math.sin(t * 5) * 6 });
+  pill(g, 'দৃষ্টিভঙ্গি বদলে যাবে', W / 2, 980, P(t, 'চিরতরে বদলে'), '#8a3fd0', 60, '#fff');
+});
+beat('আর এই রহস্যের জট খুলতে হলে', (g, t, b) => {
+  const k = ease(seg(t, T('তাকাতে হবে মাটির নিচে'), b.t1));
+  g.save(); g.translate(0, -k * 900);
+  dayLand(g, t, { pan: 1200 });
+  g.translate(0, 1080); soil(g, t, 0); g.translate(0, -1080);
+  g.restore();
+  if (k < 0.4) front(g, t, 960, { tint: null });
+  if (k > 0.5) { glow(g, W / 2, H / 2, 380, 'rgba(255,230,150,A)', (k - 0.5) * 1.4); big(g, 'সবচেয়ে বড় সত্য', W / 2, H / 2, P(t, 'সবচেয়ে বড় সত্য'), 90, '#ffd23f'); }
+});
+
+// ---------- PART 1: skeletons ----------
+beat('মধ্যপ্রাচ্যের একটি অঞ্চলে', (g, t, b) => {
+  const lt = t - b.t0;
+  if (lt < 2.2) {
+    const k = ease(seg(lt, 0, 2.2)); const Sm = drawMap(g, { lon: lerp(45, 38, k), lat: lerp(25, 32, k), zoom: lerp(1.0, 3.2, k) }, t);
+    const [px, py] = Sm([36.5, 32.5]); pinDot(g, px, py, 18, t); btext(g, 'মধ্যপ্রাচ্য', px, py - 70, 56, '#5a3a1a', P(t, 'মধ্যপ্রাচ্যের'), { stroke: '#f3e2bd' });
+    chapterCard(g, 'পর্ব ১', 'মাটির নিচের প্রমাণ', 1 - ease(seg(lt, 0.9, 1.4)), t);
+  } else {
+    soil(g, t, ease(seg(lt, 2.2, 3.4)));
+    for (let i = 0; i < 3; i++) researcher(g, 560 + i * 400, 262, 0.75, t + i, { pose: i === 1 ? 'hammer' : 'stand', flip: i === 2 });
+    for (let i = 0; i < 12; i++) { const life = (t * 0.9 + i / 12) % 1; g.fillStyle = `rgba(160,120,70,${1 - life})`; g.beginPath(); g.arc(960 + Math.sin(i * 3) * 300 * life, 600 - Math.sin(life * Math.PI) * 200, 8, 0, 7); g.fill(); }
+  }
+});
+beat('বছরের পর বছর ধরে একই এলাকা', (g, t, b) => {
+  soil(g, t, 1);
+  const k1 = S(t, 'দুটি মানুষের কঙ্কাল', 1), k2 = S(t, 'কঙ্কাল উদ্ধার', 1);
+  [[620, k1], [1300, k2]].forEach(([x, k]) => { g.save(); g.globalAlpha = k; g.translate(x, 640); g.rotate(-Math.PI / 2); skeleton(g, 0, 260, { h: 520, t, damage: x > 1000 ? 0.8 : 0, thick: x > 1000 ? 0.85 : 1.2 }); g.restore(); glow(g, x, 640, 280, 'rgba(255,230,150,A)', 0.3 * k); });
+  btext(g, 'কঙ্কাল ১', 620, 330, 54, '#fff', P(t, 'দুটি মানুষের')); btext(g, 'কঙ্কাল ২', 1300, 330, 54, '#fff', P(t, 'কঙ্কাল উদ্ধার'));
+});
+beat('এই দুজন মানুষ বেঁচে ছিলো', (g, t) => {
+  studio(g, '#3a2a1a', '#100a04', t, 13);
+  skeleton(g, 360, 980, { h: 600, t, thick: 1.2 }); skeleton(g, 1560, 980, { h: 520, t, damage: 0.8, thick: 0.85 });
+  const k = S(t, 'কয়েক হাজার বছরের', 1.2); ink(g, '#ffd23f', 10); g.beginPath(); g.moveTo(560, 520); g.lineTo(560 + 800 * k, 520); g.stroke();
+  pill(g, 'কয়েক হাজার বছরের ব্যবধান', 960, 430, P(t, 'কয়েক হাজার বছরের'), '#ffd23f', 54);
+});
+beat('সময়ের এই ব্যবধানটা', (g, t) => {
+  g.save(); g.beginPath(); g.rect(0, 0, W / 2, H); g.clip(); dayLand(g, t, { pan: 100 }); cave(g, 480, 1000, 2.0, t, { pose: 'spear' }); g.restore();
+  g.save(); g.beginPath(); g.rect(W / 2, 0, W / 2, H); g.clip(); dayLand(g, t, { pan: 2000, noVolcano: true });
+  g.fillStyle = '#9a7a44'; g.fillRect(W / 2, 820, W / 2, 260); for (let r = 0; r < 4; r++) for (let i = 0; i < 12; i++) wheat(g, W / 2 + 30 + i * 80, 860 + r * 60, 100, t, '#e2b23a', r * 12 + i); cave(g, 1450, 1000, 2.0, t, { pose: 'hammer' }); g.restore();
+  ink(g, '#fff', 8); g.beginPath(); g.moveTo(W / 2, 0); g.lineTo(W / 2, H); g.stroke();
+  pill(g, 'শিকারি যুগ', 480, 120, P(t, 'সময়ের এই'), '#2ecc71', 60); pill(g, 'কৃষি যুগ', 1440, 120, P(t, 'ভিন্ন দুটি যুগে'), '#e2b23a', 60);
+});
+beat('প্রথম কঙ্কালটি ছিলো বেশ লম্বা', (g, t) => {
+  studio(g, '#1f3a2a', '#06120a', t, 14);
+  const k = P(t, 'প্রথম কঙ্কালটি');
+  skeleton(g, 960, 1000, { h: 820 * Math.max(0.01, k), t, thick: 1.3, hl: S(t, 'চওড়া') > 0 ? 'bones' : null });
+  ruler(g, 1300, 1000, 820, S(t, 'বেশ লম্বা', 1), 'লম্বা');
+  pill(g, 'চওড়া ও মজবুত হাড়', 480, 300, P(t, 'চওড়া'), '#2ecc71', 56);
+});
+beat('দাঁতগুলো বয়সের কারণে', (g, t) => {
+  studio(g, '#1f3a2a', '#06120a', t, 15);
+  teeth(g, W / 2, 520, 1.25 * P(t, 'দাঁতগুলো বয়সের'), 0, t);
+  check(g, 1600, 220, 70, S(t, 'সম্পূর্ণ সুস্থ')); pill(g, 'ক্যাভিটি নেই', W / 2, 920, P(t, 'ক্যাভিটি বা পচনের'), '#2ecc71', 64);
+});
+beat('শরীরের জয়েন্ট বা হাড়ের', (g, t) => {
+  studio(g, '#1f3a2a', '#06120a', t, 16);
+  knee(g, 760, 540, 1.3 * P(t, 'শরীরের জয়েন্ট'), 0, t);
+  pill(g, 'জয়েন্ট নিখুঁত', 1400, 400, P(t, 'নিখুঁত'), '#2ecc71', 64); check(g, 1400, 600, 80, S(t, 'নিখুঁত'));
+});
+beat('কঙ্কালটি দেখলেই স্পষ্ট', (g, t) => {
+  dayLand(g, t, { pan: 400 + t * 10 });
+  card(g, 380, 480, 520, 600, P(t, 'পুষ্টিকর'), 'পুষ্টিকর খাবার', (c, w, h) => miniFruit(c, w, h, t));
+  card(g, 960, 480, 520, 600, P(t, 'নানা ধরনের'), 'নানা নড়াচড়া', (c, w, h) => { c.fillStyle = '#8fd0f2'; c.fillRect(0, 0, w, h); c.fillStyle = '#6aa84f'; c.fillRect(0, h * 0.75, w, h); cave(c, w * 0.3, h * 0.82, 0.9, t, { walk: true }); cave(c, w * 0.72, h * 0.82, 0.9, t, { pose: 'throw', k: (t % 1) }); });
+  card(g, 1540, 480, 520, 600, P(t, 'ভেঙে পড়েনি'), 'শরীর ভাঙেনি', (c, w, h) => { c.fillStyle = '#1f3a2a'; c.fillRect(0, 0, w, h); iconTile(c, w / 2, h / 2 - 20, 150, 1, ICON.shield); });
+});
+beat('অন্যদিকে দ্বিতীয় কঙ্কালটি', (g, t) => {
+  studio(g, '#4a1a1a', '#140404', t, 17);
+  skeleton(g, 960, 1000, { h: 700, t, thick: 0.85, damage: 0.9 });
+  pill(g, 'করুণ গল্প', 1450, 300, P(t, 'করুণ'), RED, 70, '#fff'); vg(g, 0.6, '60,0,0');
+});
+beat('তার দাঁতগুলো ছিলো অসংখ্য', (g, t, b) => {
+  studio(g, '#4a1a1a', '#140404', t, 18);
+  teeth(g, W / 2, 500, 1.25, ease(seg(t, b.t0, b.t0 + 2.5)), t);
+  pill(g, 'ক্ষয় ও ক্যাভিটি', W / 2, 920, P(t, 'ক্যাভিটিতে'), RED, 64, '#fff');
+});
+beat('মেরুদণ্ডে ছিলো মারাত্মক', (g, t, b) => {
+  studio(g, '#4a1a1a', '#140404', t, 19);
+  spine(g, 800, 560, 0.8, ease(seg(t, b.t0, b.t0 + 2)), 0.15, t);
+  pill(g, 'মেরুদণ্ডে আর্থ্রাইটিস (বাত)', 1400, 300, P(t, 'আর্থ্রাইটিস'), RED, 54, '#fff');
+  iconTile(g, 1400, 620, 110, P(t, 'বাতের চিহ্ন'), ICON.bone);
+});
+beat('বছরের পর বছর ধরে প্রতিদিন হাজারবার', (g, t, b) => {
+  studio(g, '#3a2a1a', '#100a04', t, 20);
+  // bending farmer (grinding grain) + spine overlay
+  const bend = 0.5 + 0.5 * Math.sin(t * 3.2);
+  farmerBend(g, 560, 980, 2.3, bend, t);
+  spine(g, 1350, 560, 0.62, 0.9, bend, t);
+  big(g, '×' + BN(Math.min(1000, Math.round(seg(t, b.t0, b.t1) * 1000))), 1350, 140, P(t, 'হাজারবার'), 80, '#ffd23f');
+  pill(g, 'একই কাজ বারবার', 520, 160, P(t, 'কোমর বাঁকিয়ে'), RED, 54, '#fff');
+});
+beat('আর এই মানুষটি মারাও গিয়েছিলো', (g, t) => {
+  studio(g, '#2a2a3a', '#08080e', t, 21);
+  timelineBar(g, 300, 380, 1320, [{ len: 1, col: '#2ecc71', label: 'শিকারি' }], S(t, 'আর এই মানুষটি', 1));
+  timelineBar(g, 300, 600, 1320 * 0.55, [{ len: 1, col: RED, label: 'কৃষক', tcol: '#fff' }], S(t, 'কম বয়সে', 1));
+  pill(g, 'আয়ু কম', 1450, 640, P(t, 'কম বয়সে'), RED, 60, '#fff');
+});
+beat('এখন আপনার কী মনে হয়', (g, t, b) => {
+  studio(g, '#2a2f4a', '#0b0d18', t, 22);
+  skeleton(g, 560, 1000, { h: 680, t, thick: 1.25 }); skeleton(g, 1360, 1000, { h: 560, t, damage: 0.85, thick: 0.85 });
+  questionMark(g, 560, 220, P(t, 'কোন কঙ্কালটি'), t, 150); questionMark(g, 1360, 300, P(t, 'কার ছিলো'), t, 150);
+  // countdown ring
+  const k = seg(t, b.t0, b.t1); ink(g, '#ffd23f', 12); g.beginPath(); g.arc(960, 140, 60, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * k); g.stroke();
+});
+beat('সাধারণ মানুষ লম্বা ও সুস্থ', (g, t) => {
+  studio(g, '#2a2f4a', '#0b0d18', t, 22);
+  skeleton(g, 560, 1000, { h: 680, t, thick: 1.25 }); skeleton(g, 1360, 1000, { h: 560, t, damage: 0.85, thick: 0.85 });
+  pill(g, 'কৃষক?', 560, 220, P(t, 'কৃষকের কঙ্কাল'), '#e2b23a', 70);
+  [['উন্নত হাতিয়ার', 'spear', 860, 330], ['গোলাভরা শস্য', 'wheat', 860, 520], ['নিরাপদ ছাদ', 'shop', 860, 710]].forEach(([a, ic, x, y]) => iconTile(g, x, y, 70, P(t, a), (gg, r) => ICON[ic](gg, r, t)));
+});
+beat('আর ওই খাটো, ভাঙাচোরা', (g, t) => {
+  studio(g, '#2a2f4a', '#0b0d18', t, 22);
+  skeleton(g, 560, 1000, { h: 680, t, thick: 1.25 }); skeleton(g, 1360, 1000, { h: 560, t, damage: 0.85, thick: 0.85 });
+  pill(g, 'কৃষক?', 560, 220, 1, '#e2b23a', 70); pill(g, 'গুহামানব?', 1360, 300, P(t, 'আদিম গুহামানবের'), '#8a5a2a', 70, '#fff');
+  iconTile(g, 1660, 520, 70, P(t, 'বর্শা হাতে'), ICON.spear);
+});
+beat('কিন্তু বিজ্ঞানীদের রিপোর্ট', (g, t) => {
+  studio(g, '#3a3a3a', '#0a0a0a', t, 23);
+  const k = P(t, 'বিজ্ঞানীদের রিপোর্ট');
+  g.save(); g.translate(W / 2, 540); g.rotate(-0.05); g.scale(k, k); g.fillStyle = '#fbf6e8'; rr(g, -380, -460, 760, 920, 12); g.fill(); ink(g, '#ccc', 6); for (let i = 0; i < 10; i++) { g.beginPath(); g.moveTo(-300, -300 + i * 60); g.lineTo(300 - (i % 3) * 80, -300 + i * 60); g.stroke(); } btext(g, 'রিপোর্ট', 0, -380, 60, '#222', 1, { stroke: '#fbf6e8' }); g.restore();
+  stamp(g, 'উল্টো!', 1250, 640, S(t, 'সম্পূর্ণ উল্টো', 0.4));
+  if (seg(t, T('চমকে উঠলো'), T('চমকে উঠলো') + 0.12) > 0 && seg(t, T('চমকে উঠলো'), T('চমকে উঠলো') + 0.12) < 1) { g.fillStyle = 'rgba(255,255,255,0.5)'; g.fillRect(0, 0, W, H); }
+});
+beat('লম্বা এবং শক্তিশালী কঙ্কালটি ছিলো', (g, t) => {
+  studio(g, '#1f3a2a', '#06120a', t, 24);
+  const sw = S(t, 'লম্বা এবং শক্তিশালী', 0.8);
+  skeleton(g, 560, 1000, { h: 680, t, thick: 1.25, hl: 'bones' }); skeleton(g, 1360, 1000, { h: 560, t, damage: 0.85, thick: 0.85 });
+  pill(g, 'শিকারি-সংগ্রাহক ✓', 560, 220, P(t, 'শিকারি-সংগ্রাহক'), '#2ecc71', 60);
+  cave(g, 260, 1000, 1.3 * sw, t, { pose: 'spear' });
+});
+beat('আর রোগাক্রান্ত, ভাঙাচোরা কঙ্কালটি', (g, t) => {
+  studio(g, '#3a2a1a', '#100a04', t, 25);
+  skeleton(g, 560, 1000, { h: 680, t, thick: 1.25 }); skeleton(g, 1360, 1000, { h: 560, t, damage: 0.85, thick: 0.85, hl: 'spine' });
+  pill(g, 'শিকারি-সংগ্রাহক ✓', 560, 220, 1, '#2ecc71', 60); pill(g, 'কৃষক', 1360, 300, P(t, 'কৃষিকাজ শুরু হওয়ার'), RED, 70, '#fff');
+  pill(g, '"অগ্রগতি"?', 1360, 160, P(t, 'অগ্রগতি'), '#ffd23f', 54);
+  iconTile(g, 1700, 600, 80, P(t, 'কৃষিকাজ শুরু'), (gg, r) => ICON.wheat(gg, r, t));
+});
+beat('আর এটি কেবল একটি বা দুটি', (g, t, b) => {
+  const Sm = drawMap(g, { lon: 30, lat: 20, zoom: 0.48 }, t);
+  const pins = [[36, 32], [44, 34], [31, 30], [-90, 18], [-75, -12], [110, 34], [80, 26], [10, 48], [-100, 40], [105, 15], [30, 0], [-60, -20], [140, 36], [20, 42], [70, 30], [-5, 40]];
+  pins.forEach((p, i) => { const [x, y] = Sm(p); const k = easeOutBack(seg(t, b.t0 + 0.4 + i * 0.25, b.t0 + 0.7 + i * 0.25)); if (k > 0) { g.save(); g.translate(x, y); g.scale(k, k); pinDot(g, 0, 0, 12, t + i); g.restore(); } });
+  pill(g, 'পৃথিবীর প্রায় প্রতিটি প্রান্তে', W / 2, 100, P(t, 'প্রায় প্রতিটি প্রান্তে'), '#7a2a14', 56, '#fff8ea');
+});
+beat('পৃথিবীর যেখানেই মানুষ শিকার ছেড়ে', (g, t) => {
+  studio(g, '#2a2a3a', '#08080e', t, 26);
+  iconTile(g, 560, 500, 160, P(t, 'শিকার ছেড়ে'), ICON.spear); ink(g, '#fff', 12); const k = S(t, 'কৃষিকাজ শুরু করেছে', 0.8); g.beginPath(); g.moveTo(780, 500); g.lineTo(780 + 360 * k, 500); g.stroke();
+  iconTile(g, 1360, 500, 160, P(t, 'কৃষিকাজ শুরু করেছে'), (gg, r) => ICON.wheat(gg, r, t));
+  pill(g, 'একই চিত্র', W / 2, 860, P(t, 'একই চিত্র'), RED, 64, '#fff');
+});
+beat('মানুষ আগের প্রজন্মের চেয়ে উচ্চতায়', (g, t) => {
+  studio(g, '#3a1a1a', '#100404', t, 27);
+  [['উচ্চতা ↓', 'মানুষ আগের প্রজন্মের', (c, w, h) => { c.fillStyle = '#2a1a1a'; c.fillRect(0, 0, w, h); for (let i = 0; i < 4; i++) { const s = 1.6 - i * 0.18 * S(t, 'উচ্চতায় খাটো', 1.5); cave(c, 70 + i * 100, h - 80, s * 0.6, t, { col: '#ddd', cloth: '#ddd', skin: '#ddd' }); } }],
+  ['দাঁত পচে গেছে', 'দাঁত পচে', (c, w, h) => { c.fillStyle = '#2a1a1a'; c.fillRect(0, 0, w, h); teeth(c, w / 2, h / 2 - 30, 0.62, 0.9, t); }],
+  ['মেরুদণ্ড ক্ষয়', 'মেরুদণ্ড ক্ষয়ে', (c, w, h) => { c.fillStyle = '#2a1a1a'; c.fillRect(0, 0, w, h); spine(c, w / 2 - 20, h / 2 - 20, 0.4, 0.9, 0.3, t); }],
+  ['গড় আয়ু ↓', 'গড় আয়ু', (c, w, h) => { c.fillStyle = '#2a1a1a'; c.fillRect(0, 0, w, h); barChart(c, 60, h - 140, w - 120, h - 300, [{ v: 10, label: 'আগে', col: '#2ecc71' }, { v: 10 - 5 * S(t, 'গড় আয়ু', 1), label: 'পরে', col: RED }], 1, { max: 10, ls: 32 }); }]].forEach(([lb, a, fn], i) => card(g, 255 + i * 470, 520, 430, 640, P(t, a), lb, fn, 0.2));
+});
+beat('একটু গভীরভাবে চিন্তা করে', (g, t) => { studio(g, '#2b1d3f', '#0e0a1a', t, 28); front(g, t, 960, { close: true }); questionMark(g, 1420, 260, P(t, 'এর অর্থ কী'), t); });
+beat('মানুষের কঙ্কাল হলো একটি ডায়েরির', (g, t, b) => {
+  studio(g, '#4a3a2a', '#140e08', t, 29);
+  const k = S(t, 'ডায়েরির মতো', 1);
+  g.save(); g.translate(W / 2, 540);
+  if (k < 0.5) { g.scale(1 - k, 1); iconTile(g, 0, 0, 260, 1, ICON.bone); }
+  else { const o = (k - 0.5) * 2; g.scale(o, o); g.fillStyle = '#6b3a1a'; rr(g, -560, -360, 1120, 720, 20); g.fill(); g.fillStyle = '#f6ecd2'; rr(g, -540, -340, 530, 680, 8); g.fill(); rr(g, 10, -340, 530, 680, 8); g.fill();
+    const w1 = seg(t, T('কঠোর পরিশ্রম'), T('ব্যবহার করেছেন') + 2); ink(g, '#5a3a2a', 5); for (let i = 0; i < 9; i++) { const lw = clamp(w1 * 9 - i) * 420; if (lw > 0) { g.beginPath(); g.moveTo(-500, -280 + i * 64); g.lineTo(-500 + lw, -280 + i * 64); g.stroke(); } }
+    [['পরিশ্রম', 'কঠোর পরিশ্রম', 'sweat'], ['খাবার', 'কেমন খাবার', 'food'], ['শরীর', 'শরীরকে কীভাবে', 'bone']].forEach(([lb, a, ic], i) => { iconTile(g, 160 + (i % 2) * 220, -180 + i * 190, 70, P(t, a), ICON[ic]); btext(g, lb, 380 - (i % 2) * 0, -180 + i * 190, 44, '#5a3a2a', P(t, a), { stroke: '#f6ecd2' }); }); }
+  g.restore();
+  pill(g, 'হাড় = ডায়েরি', W / 2, 990, P(t, 'ডায়েরির মতো'), '#ffd23f', 60);
+});
+beat('আর মাটির নিচের সেই ডায়েরিগুলো', (g, t) => {
+  g.save(); g.beginPath(); g.rect(0, 0, W / 2, H); g.clip(); dayLand(g, t, { pan: 500 }); cave(g, 480, 1000, 2.1, t, { pose: 'spear' }); g.restore();
+  g.save(); g.beginPath(); g.rect(W / 2, 0, W / 2, H); g.clip(); g.drawImage(CITY16, 0, 0); phoneP(g, t, 1440, { tint: 'rgba(80,0,0,0.15)' }); g.restore();
+  ink(g, '#fff', 8); g.beginPath(); g.moveTo(W / 2, 0); g.lineTo(W / 2, H); g.stroke();
+  pill(g, 'সুস্থ ও চাপমুক্ত', 480, 120, P(t, 'চাপমুক্ত'), '#2ecc71', 60); pill(g, 'তথাকথিত সভ্য', 1440, 120, P(t, 'তথাকথিত সভ্য'), RED, 56, '#fff');
+});
+
+// ---------- PART 2: a day ----------
+beat('কিন্তু এবার পরের প্রশ্নটির', (g, t) => { studio(g, '#2a2a4a', '#0a0a18', t, 30); chinta(g, t, 960); iconTile(g, 380, 300, 100, P(t, 'হাড় দেখে'), ICON.bone); iconTile(g, 1540, 300, 100, P(t, 'সারাদিন আসলে'), (gg, r) => ICON.clock(gg, r, t * 4)); questionMark(g, 1540, 520, P(t, 'কীভাবে কাটতো'), t, 140); });
+beat('চলুন, সেই প্রাচীন যুগের একটি', (g, t, b) => {
+  const lt = t - b.t0;
+  dayLand(g, t, { dawn: 0.8, pan: lt * 300, sunY: 520, sunX: 1500 });
+  sideW(g, t, 1100, { p: lt / 0.95, tint: 'rgba(255,150,80,0.1)' }); foregroundGrass(g, t, {}, lt * 300);
+  chapterCard(g, 'পর্ব ২', 'প্রাচীন মানুষের একটি দিন', seg(lt, 0.4, 0.9) * (1 - seg(lt, 2.4, 3)), t);
+});
+beat('ভোরের আলো ফোটার সাথে', (g, t, b) => {
+  camp(g, t, { dawn: 0.9, sunY: lerp(760, 560, seg(t, b.t0, b.t1)), sunX: 1500 });
+  embers(g, 960, 900, 1, t);
+  const wake = S(t, 'ঘুম ভাঙলো', 1.5); lying(g, 700, 960, 1.6, t, wake);
+  iconTile(g, 1450, 300, 110, P(t, 'অ্যালার্মের'), (gg, r) => ICON.alarm(gg, r, t), S(t, 'চিৎকারে নয়', 0.5));
+  pill(g, 'নিজের ইচ্ছায়', 700, 220, P(t, 'নিজের ইচ্ছায়'), '#2ecc71', 60);
+});
+beat('কারণ আপনার শরীর ঠিক ততোটুকুই', (g, t) => {
+  studio(g, '#3a2a4a', '#0c0814', t, 31);
+  // body battery
+  const k = S(t, 'কারণ আপনার শরীর', 1.6);
+  g.fillStyle = '#fff'; g.strokeStyle = '#fff'; g.lineWidth = 10; rr(g, 560, 380, 700, 300, 40); g.stroke(); g.fillRect(1270, 470, 40, 120);
+  g.fillStyle = '#2ecc71'; rr(g, 585, 405, 650 * k, 250, 26); g.fill();
+  big(g, BN(Math.round(k * 100)) + '%', 910, 530, 1, 90, '#111');
+  pill(g, 'যতোটুকু প্রয়োজন', 910, 820, P(t, 'প্রয়োজন ছিলো'), '#ffd23f', 56);
+  iconTile(g, 360, 530, 100, P(t, 'ঘুমিয়েছে'), ICON.bed);
+});
+beat('ঘুম থেকে উঠে মানুষটি আড়মোড়া', (g, t) => {
+  camp(g, t, { dawn: 0.6, sunY: 520, sunX: 1500 }); embers(g, 1200, 900, 0.9, t);
+  const st = S(t, 'আড়মোড়া', 0.8);
+  g.save(); g.translate(760, 1000); cave(g, 0, 0, 2.2, t, { pose: st > 0.5 ? 'throw' : 'stand', k: 0.0 }); g.restore();
+  const bk = P(t, 'আজ আমি কী করবো');
+  if (bk > 0) { g.save(); g.translate(1150, 330); g.scale(bk, bk); g.fillStyle = '#fff'; g.strokeStyle = '#111'; g.lineWidth = 6; g.beginPath(); g.ellipse(0, 0, 330, 130, 0, 0, 7); g.fill(); g.stroke(); for (const [x, y, r] of [[-240, 150, 26], [-300, 210, 14]]) { g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); g.stroke(); } btext(g, '"আজ আমি কী করবো?"', 0, 0, 56, '#111', 1, { stroke: '#fff' }); g.restore(); }
+  pill(g, 'স্বাধীনতা', 420, 200, P(t, 'স্বাধীনতা'), '#2ecc71', 60);
+});
+beat('ক্যাম্পের মাঝখানে গত রাতের', (g, t) => {
+  camp(g, t, { dawn: 0.4 }); embers(g, 960, 920, 1.4, t);
+  for (const [x, f] of [[620, false], [1300, true], [960, false]]) cave(g, x, x === 960 ? 1060 : 960, 1.5, t + x, { pose: 'sit', flip: f });
+  pill(g, 'নিভু নিভু আগুন', W / 2, 160, P(t, 'নিভু নিভু'), '#e0862a', 60, '#fff');
+});
+beat('তারা আগের দিনের বেঁচে যাওয়া', (g, t) => {
+  camp(g, t, { dawn: 0.3 }); embers(g, 960, 920, 1.4, t);
+  for (const [x, f] of [[620, false], [1300, true], [960, false]]) cave(g, x, x === 960 ? 1060 : 960, 1.5, t + x, { pose: 'sit', flip: f });
+  iconTile(g, 560, 300, 100, P(t, 'পোড়া মাংস'), (gg, r) => { gg.fillStyle = '#a0402a'; gg.strokeStyle = '#4a1a10'; gg.lineWidth = 5; gg.beginPath(); gg.ellipse(0, 0, r * 0.45, r * 0.3, 0.4, 0, 7); gg.fill(); gg.stroke(); ink(gg, BONE, 12); gg.beginPath(); gg.moveTo(r * 0.3, r * 0.2); gg.lineTo(r * 0.6, r * 0.45); gg.stroke(); });
+  iconTile(g, 1360, 300, 100, P(t, 'বনের বাদাম'), (gg, r) => { for (let i = 0; i < 3; i++) { gg.fillStyle = '#b07a3a'; gg.strokeStyle = '#4a2a10'; gg.lineWidth = 4; gg.beginPath(); gg.ellipse(-r * 0.25 + i * r * 0.25, (i % 2) * 14, r * 0.17, r * 0.24, 0.3, 0, 7); gg.fill(); gg.stroke(); } });
+});
+beat('খেতে খেতে তারা নিজেদের মধ্যে', (g, t) => {
+  camp(g, t, { dawn: 0.2 }); embers(g, 960, 920, 1.4, t);
+  for (const [x, f] of [[620, false], [1300, true], [960, false]]) cave(g, x, x === 960 ? 1060 : 960, 1.5, t + x, { pose: 'sit', flip: f });
+  [[560, 'ভালো পানি', (gg, r) => ICON.glass(gg, r)], [1360, 'পায়ের ছাপ', (gg, r) => { gg.fillStyle = '#5a3a1a'; for (let i = 0; i < 4; i++) { gg.beginPath(); gg.ellipse(-r * 0.3 + i * r * 0.2, (i % 2 ? -1 : 1) * r * 0.15, r * 0.08, r * 0.14, 0, 0, 7); gg.fill(); } }]].forEach(([x, a, ic]) => { const k = P(t, a); if (k > 0) { g.save(); g.translate(x, 330); g.scale(k, k); g.fillStyle = '#fff'; g.strokeStyle = '#111'; g.lineWidth = 6; g.beginPath(); g.ellipse(0, 0, 170, 120, 0, 0, 7); g.fill(); g.stroke(); g.beginPath(); g.moveTo(-30, 110); g.lineTo(x < 900 ? 20 : -80, 200); g.lineTo(30, 112); g.fill(); g.stroke(); ic(g, 110); g.restore(); } });
+});
+beat('ব্যস, এটুকুই হলো তাদের', (g, t) => {
+  camp(g, t, { dawn: 0.1 }); embers(g, 960, 920, 1.4, t);
+  for (const [x, f] of [[620, false], [1300, true], [960, false]]) cave(g, x, x === 960 ? 1060 : 960, 1.5, t + x, { pose: 'sit', flip: f });
+  pill(g, 'সারাদিনের মিটিং ✓', W / 2, 220, P(t, 'মিটিং'), '#2ecc71', 70);
+});
+beat('আর যে সিদ্ধান্তই নেওয়া', (g, t) => {
+  studio(g, '#1f3a2a', '#06120a', t, 32);
+  iconTile(g, 420, 500, 150, P(t, 'বসের আদেশে'), ICON.boss, S(t, 'বসের আদেশে নয়', 0.6));
+  // circle of equals
+  for (let i = 0; i < 7; i++) { const a = i / 7 * Math.PI * 2 + t * 0.2, k = P(t, 'সবাই মিলে', 0.3 + i * 0.05); g.save(); g.translate(1250 + Math.cos(a) * 260, 560 + Math.sin(a) * 200); g.scale(k, k); cave(g, 0, 90, 0.7, t + i, { col: '#e8dcc0', cloth: '#e8dcc0', skin: '#e8dcc0' }); g.restore(); }
+  pill(g, 'সবাই মিলে', 1250, 900, P(t, 'সবাই মিলে'), '#2ecc71', 64);
+});
+beat('ধরা যাক, আজ কাউকে শিকারে', (g, t) => {
+  camp(g, t, {}); meatRack(g, 960, 960, 1.6, 5);
+  pill(g, '২ দিন আগের শিকার', 560, 200, P(t, 'দুই দিন আগেই'), '#ffd23f', 56); pill(g, 'যথেষ্ট মাংস ✓', 1400, 200, P(t, 'যথেষ্ট মাংস'), '#2ecc71', 56);
+});
+beat('তাই দলের কয়েকজন সদস্য', (g, t, b) => {
+  const lt = t - b.t0;
+  dayLand(g, t, { pan: 800 + lt * 120 });
+  for (let i = 0; i < 3; i++) basketWalker(g, 600 + i * 260 + lt * 60, 1000, 1.6, t + i, false);
+  [['ফলমূল', 'ফলমূল', 1500, 260], ['লতাপাতা', 'লতাপাতা', 1720, 460]].forEach(([lb, a, x, y]) => pill(g, lb, x, y, P(t, a), '#2ecc71', 54));
+  foregroundGrass(g, t, {}, 800 + lt * 160);
+});
+beat('আর আপনি সকালের সময়টা', (g, t) => {
+  camp(g, t, {}); embers(g, 1500, 920, 0.8, t);
+  front(g, t, 760, { up: S(t, 'হাতিয়ারগুলো') * 0.7, upAng: 40, loAng: 80 });
+  iconTile(g, 1250, 360, 110, P(t, 'হাতিয়ারগুলো'), ICON.spear);
+});
+beat('আপনি পাথরের টুকরো দিয়ে', (g, t) => {
+  studio(g, '#4a3a2a', '#140e08', t, 33);
+  card(g, 560, 520, 760, 760, P(t, 'পাথরের টুকরো'), 'বর্শা ধারালো', (c, w, h) => miniTool(c, w, h, t));
+  card(g, 1380, 520, 760, 760, P(t, 'চামড়া'), 'চামড়া নরম', (c, w, h) => { c.fillStyle = '#c9a77a'; c.fillRect(0, 0, w, h); c.fillStyle = '#8a5a3a'; c.beginPath(); c.ellipse(w / 2, h * 0.62, 260, 120, 0, 0, 7); c.fill(); const rub = Math.sin(t * 8) * 80; cave(c, w / 2 + rub * 0.3, h * 0.55, 1.1, t, { pose: 'sit' }); c.fillStyle = '#7d7a72'; c.beginPath(); c.arc(w / 2 + rub, h * 0.6, 24, 0, 7); c.fill(); });
+});
+beat('আপনি এই কাজগুলো করছেন কারণ', (g, t) => {
+  studio(g, '#2a3a1a', '#0a1204', t, 34);
+  for (let i = 0; i < 5; i++) { const k = P(t, 'দারুণ সম্মান', 0.3 + i * 0.08); g.save(); g.translate(560 + i * 200, 360); g.scale(k, k); g.rotate(t + i); g.fillStyle = '#ffd23f'; g.beginPath(); for (let j = 0; j < 10; j++) { const r = j % 2 ? 26 : 60, a = j * Math.PI / 5; g.lineTo(Math.cos(a) * r, Math.sin(a) * r); } g.fill(); g.restore(); }
+  pill(g, 'দক্ষতার সম্মান', W / 2, 600, P(t, 'দক্ষতার'), '#2ecc71', 70);
+  iconTile(g, W / 2, 860, 90, P(t, 'বাধ্য করেছে'), ICON.boss, S(t, 'বাধ্য করেছে', 0.5));
+});
+beat('আর দুপুর গড়ানোর আগেই', (g, t, b) => {
+  const k = seg(t, b.t0, b.t1);
+  dayLand(g, t, { pan: 1000, sunX: lerp(300, 960, k), sunY: lerp(600, 180, k) });
+  [['বর্শা ✓', 0], ['খাবার ✓', 0.3], ['চামড়া ✓', 0.6]].forEach(([lb, d], i) => { const kk = easeOutBack(seg(k, d, d + 0.2)); pill(g, lb, 360, 360 + i * 140, kk, '#2ecc71', 54); });
+  iconTile(g, 1550, 360, 110, P(t, 'দুপুর গড়ানোর'), (gg, r) => ICON.clock(gg, r, 2 + k * 2));
+  pill(g, 'সব কাজ শেষ!', 1550, 600, P(t, 'সব কাজ শেষ'), '#ffd23f', 64);
+  foregroundGrass(g, t, {});
+});
+beat('এর দুই দিন পর ক্যাম্পে', (g, t) => { camp(g, t, {}); meatRack(g, 960, 960, 1.6, 0); pill(g, 'মাংস শেষ!', 960, 200, P(t, 'মাংসের টান'), RED, 70, '#fff'); pill(g, 'শিকারের দিন', 960, 340, P(t, 'শিকারে বের হতে'), '#ffd23f', 60); });
+beat('তবে সিনেমায় যেভাবে', (g, t) => {
+  studio(g, '#1a1a1a', '#000', t, 35);
+  card(g, W / 2, 500, 1100, 700, P(t, 'সিনেমায়'), 'সিনেমা', (c, w, h) => miniHunt(c, w, h, t * 2.5));
+  xMark(g, W / 2, 500, 280, S(t, 'মোটেও তেমন', 0.6));
+});
+beat('প্রাচীন মানুষ কখনোই পশুর পেছনে', (g, t, b) => {
+  dayLand(g, t, { pan: (t - b.t0) * 900, c3: '#c8b060', g1: '#d9c070', g2: '#b09048', sparse: true });
+  antelope(g, 1450, 1000, 1.8, t, 1.5); cave(g, 600, 1000, 1.9, t * 2, { walk: true, pose: 'spear' });
+  xMark(g, 1000, 420, 160, S(t, 'তাড়া করতো না', 0.6));
+});
+beat('কারণ তারা খুব ভালো করেই জানতো', (g, t) => {
+  studio(g, '#4a3a1a', '#120c04', t, 36);
+  const k = S(t, 'অনেক বেশি দ্রুতগতির', 1.2);
+  g.fillStyle = '#e2b23a'; rr(g, 360, 380, 1200 * k, 110, 20); g.fill(); g.fillStyle = '#5ab8ff'; rr(g, 360, 640, 540 * k, 110, 20); g.fill();
+  antelope(g, 360 + 1200 * k + 110, 520, 0.9, t, 1.5); cave(g, 360 + 540 * k + 70, 780, 0.75, t * 2, { walk: true });
+  btext(g, 'হরিণ', 250, 435, 50, '#fff'); btext(g, 'মানুষ', 250, 695, 50, '#fff');
+  pill(g, 'দৌড়ে ধরা অসম্ভব', W / 2, 920, P(t, 'কখনোই ধরা যাবে না'), RED, 60, '#fff');
+});
+beat('তাই মানুষ ব্যবহার করতো', (g, t) => {
+  studio(g, '#1f3a2a', '#06120a', t, 37);
+  bodyOutline(g, 960, 960, 1.4, '#e0b48a', t);
+  pill(g, 'ধৈর্য', 520, 360, P(t, 'ধৈর্য'), '#ffd23f', 90); pill(g, 'শারীরিক গঠন', 1420, 360, P(t, 'শারীরিক গঠন'), '#2ecc71', 80);
+  glow(g, 960, 600, 420, 'rgba(255,220,80,A)', 0.3 * S(t, 'প্রাকৃতিক অস্ত্র'));
+});
+beat('তারা শিকারকে তাড়া না করে', (g, t, b) => {
+  const lt = t - b.t0;
+  dayLand(g, t, { pan: lt * 140, c3: '#c8b060', g1: '#d9c070', g2: '#b09048', sparse: true, sunY: 200 });
+  heatHaze(g, t, 0.4);
+  antelope(g, 1450 + Math.sin(lt * 0.7) * 120, 1000, 1.6, t * 0.6, 0.5);
+  cave(g, 620, 1000, 1.8, t * 0.6, { walk: true, pose: 'stand' });
+  big(g, BN(Math.min(6, Math.floor(1 + seg(t, b.t0, b.t1) * 5))) + ' ঘণ্টা...', 960, 160, P(t, 'ঘণ্টার পর ঘণ্টা'), 80, '#ffd23f');
+});
+beat('মানুষের শরীর হাঁটার বা দৌড়ানোর', (g, t, b) => {
+  studio(g, '#4a2a1a', '#140804', t, 38);
+  ink(g, 'rgba(255,255,255,0.5)', 6); g.beginPath(); g.moveTo(W / 2, 120); g.lineTo(W / 2, 1000); g.stroke();
+  // human: sweat cools
+  const k1 = P(t, 'মানুষের শরীর হাঁটার');
+  g.save(); g.globalAlpha = clamp(k1); bodyOutline(g, 480, 960, 1.35, '#e0b48a', t, 0.5); g.restore();
+  if (S(t, 'ঘামের মাধ্যমে') > 0) { sweatDrops(g, 480, 560, 1.4, t, 10); heatArrows(g, 480, 560, 200, t, 'rgba(255,120,60,0.9)', false); }
+  thermometer(g, 800, 760, 420, 0.42 + 0.02 * Math.sin(t * 3), '#2ecc71');
+  pill(g, 'ঘাম = ঠান্ডা', 480, 150, P(t, 'ঘামের মাধ্যমে'), '#5ab8ff', 60);
+  // animal: heat builds
+  const k2 = P(t, 'চারপায়ে চলা'), heat = S(t, 'তা পারে না', 3);
+  g.save(); g.globalAlpha = clamp(k2); antelope(g, 1380, 860, 2.2, t, 0.6, heat); g.restore();
+  if (heat > 0) heatArrows(g, 1380, 660, 220, t, 'rgba(255,60,30,0.9)', true);
+  thermometer(g, 1760, 760, 420, 0.42 + 0.5 * heat, RED);
+  pill(g, 'তাপ জমছে', 1380, 150, P(t, 'তা পারে না'), RED, 60, '#fff');
+});
+beat('ফলে পশুটি ভয় পেয়ে বারবার', (g, t, b) => {
+  studio(g, '#4a2a1a', '#140804', t, 39);
+  // heat graph with sprint spikes
+  const k = seg(t, b.t0, b.t1);
+  ink(g, 'rgba(255,255,255,0.6)', 4); g.beginPath(); g.moveTo(200, 900); g.lineTo(1720, 900); g.moveTo(200, 900); g.lineTo(200, 200); g.stroke();
+  ink(g, RED, 9); g.beginPath(); for (let i = 0; i <= 200 * k; i++) { const u = i / 200, y = 860 - u * 520 - Math.max(0, Math.sin(u * 30)) * 70 * u; i ? g.lineTo(200 + u * 1520, y) : g.moveTo(200, y); } g.stroke();
+  ink(g, '#5ab8ff', 9); g.beginPath(); for (let i = 0; i <= 200 * k; i++) { const u = i / 200; i ? g.lineTo(200 + u * 1520, 800 - Math.sin(u * 40) * 6) : g.moveTo(200, 800); } g.stroke();
+  btext(g, 'শরীরের তাপ', 330, 160, 46, '#fff'); btext(g, 'সময় →', 1640, 950, 42, '#fff');
+  pill(g, 'হরিণ', 200 + 1520 * k, 860 - k * 520 - 70, k > 0.1 ? 1 : 0, RED, 44, '#fff'); pill(g, 'মানুষ', 200 + 1520 * k, 740, k > 0.1 ? 1 : 0, '#5ab8ff', 44);
+});
+beat('এভাবে কয়েক ঘণ্টা চলার পর', (g, t, b) => {
+  dayLand(g, t, { pan: 400, c3: '#c8b060', g1: '#d9c070', g2: '#b09048', sparse: true, sunY: 260, dawn: 0.3 });
+  heatHaze(g, t, 0.5);
+  antelope(g, 1200, 1000, 1.8, t, 0.2, 1, S(t, 'মাটিতে লুটিয়ে', 0.8));
+  pill(g, 'অতিরিক্ত তাপ ও ক্লান্তি', 960, 180, P(t, 'অতিরিক্ত তাপে'), RED, 60, '#fff');
+});
+beat('আর মানুষ তখন ধীর পায়ে', (g, t, b) => {
+  const lt = t - b.t0;
+  dayLand(g, t, { pan: 400, c3: '#c8b060', g1: '#d9c070', g2: '#b09048', sparse: true, sunY: 260, dawn: 0.3 });
+  antelope(g, 1400, 1000, 1.8, t, 0, 0.6, 1);
+  cave(g, 500 + lt * 140, 1000, 1.9, t * 0.6, { walk: true, pose: 'spear' });
+});
+beat('মানুষ বনের সবচেয়ে দ্রুতগতির', (g, t) => {
+  studio(g, '#1a2a3a', '#050a10', t, 40);
+  for (let i = 0; i < 6; i++) { const x = ((t * 140 + i * 360) % 2200) - 140; cave(g, x, 900, 1.1, t * 0.6 + i, { walk: true, col: 'rgba(255,255,255,0.25)', cloth: 'rgba(255,255,255,0.25)', skin: 'rgba(255,255,255,0.25)' }); }
+  cave(g, 960, 960, 2.2, t * 0.6, { walk: true, pose: 'spear' });
+  pill(g, 'সবচেয়ে দ্রুত নয়', 600, 200, P(t, 'দ্রুতগতির প্রাণী ছিলো না'), '#888', 56, '#fff'); pill(g, 'কিন্তু কখনো থামে না', 1320, 200, P(t, 'থামতে হতো না'), '#2ecc71', 60);
+  symbolText(g, '∞', 1600, 520, 220, '#ffd23f', P(t, 'থামতে হতো না'));
+});
+beat('এই শিকারে পুরো একটি দিন', (g, t) => {
+  studio(g, '#3a2a1a', '#100a04', t, 41);
+  timelineBar(g, 260, 400, 1400, [{ len: 1, col: '#e0862a', label: 'শিকার: পুরো একটি দিন' }], S(t, 'পুরো একটি দিন', 1.2));
+  pill(g, 'সবচেয়ে কঠিন কাজ', W / 2, 700, P(t, 'সবচেয়ে কঠিন'), RED, 64, '#fff');
+});
+beat('কিন্তু একটি সফল শিকার মানে', (g, t) => {
+  camp(g, t, {}); meatRack(g, 700, 960, 1.6, 5 * S(t, 'সফল শিকার', 1));
+  g.fillStyle = 'rgba(10,20,15,0.75)'; rr(g, 1020, 290, 800, 360, 30); g.fill();
+  weekCalendar(g, 1060, 380, 90, 220, S(t, 'কয়েক দিনের খাবারের', 1.5) * 4, '#2ecc71', t);
+  pill(g, 'কয়েক দিনের খাবার ✓', 1380, 760, P(t, 'নিশ্চিত ব্যবস্থা'), '#2ecc71', 56);
+});
+beat('ফলে পরদিন সকাল থেকেই আবার', (g, t) => {
+  dayLand(g, t, { pan: 1600 });
+  // relaxing under a tree
+  palm(g, 760, 960, 520, '#2f6b3a', t, 3);
+  g.save(); g.translate(820, 990); g.rotate(-1.2); cave(g, 0, 0, 1.6, t, { pose: 'stand' }); g.restore();
+  for (let i = 0; i < 3; i++) symbolText(g, 'z', 1000 + i * 50, 700 - i * 60 - ((t * 30) % 40), 50 + i * 14, '#fff', 1);
+  pill(g, 'অখণ্ড অবসর', 1400, 260, P(t, 'অখণ্ড অবসর'), '#2ecc71', 80);
+  foregroundGrass(g, t, {});
+});
+
+// ---------- PART 3: Kalahari ----------
+beat('এখন আপনার মনে নিশ্চয়ই প্রশ্ন', (g, t) => { studio(g, '#2a2a4a', '#0a0a18', t, 42); chinta(g, t, 960); pill(g, 'অনুমান?', 1450, 300, P(t, 'অনুমান'), '#ffd23f', 80); questionMark(g, 470, 300, P(t, 'এতো কম কাজ'), t); });
+beat('ঠিক এই প্রশ্নটির উত্তর খুঁজতেই', (g, t, b) => {
+  const lt = t - b.t0;
+  if (t < T('কালাহারি মরুভূমিতে') - 0.3) {
+    studio(g, '#4a3a2a', '#140e08', t, 43);
+    chapterCard(g, 'পর্ব ৩', 'কালাহারির হিসাব', seg(lt, 0, 0.4) * (1 - seg(lt, 1.6, 2.1)), t);
+    big(g, '১৯৬৩', W / 2, 420, P(t, '১৯৬৩ সালে'), 200, '#ffd23f');
+    researcher(g, W / 2, 1000, 1.6, t, { notebook: true });
+    pill(g, 'রিচার্ড লি', W / 2, 640, P(t, 'রিচার্ড লি'), '#fff', 60);
+  } else {
+    const k = ease(seg(t, T('কালাহারি মরুভূমিতে') - 0.3, T('কালাহারি মরুভূমিতে') + 1.2));
+    const Sm = drawMap(g, { lon: lerp(20, 23, k), lat: lerp(0, -22, k), zoom: lerp(0.9, 3.0, k) }, t);
+    const [px, py] = Sm([22, -22]); glow(g, px, py, 160, 'rgba(230,160,60,A)', 0.6); pinDot(g, px, py, 18, t);
+    btext(g, 'কালাহারি (বোতসোয়ানা)', px, py - 80, 56, '#5a3a1a', P(t, 'কালাহারি মরুভূমিতে'), { stroke: '#f3e2bd' });
+  }
+});
+beat('পৃথিবীর সবচেয়ে রুক্ষ', (g, t, b) => {
+  desertLand(g, { t, pan: (t - b.t0) * 40, sunY: 180 }); heatHaze(g, t, 0.6);
+  ink(g, 'rgba(120,80,40,0.5)', 3); for (let i = 0; i < 30; i++) { const x = hash(i) * W, y = 820 + hash(i + 1) * 240; g.beginPath(); g.moveTo(x, y); g.lineTo(x + 40, y + 10); g.lineTo(x + 70, y - 8); g.stroke(); }
+  pill(g, 'রুক্ষ', 480, 220, P(t, 'রুক্ষ'), '#e0862a', 64, '#fff'); pill(g, 'শুষ্ক', 960, 180, P(t, 'শুষ্ক'), '#e0862a', 64, '#fff'); pill(g, 'বসবাসের অযোগ্য', 1440, 220, P(t, 'অযোগ্য'), RED, 60, '#fff');
+});
+beat('তিনি সেখানে গিয়েছিলেন জু-হোয়ানসি', (g, t, b) => {
+  desertLand(g, { t, pan: 200, sunY: 200 }); heatHaze(g, t, 0.3);
+  for (let i = 0; i < 5; i++) cave(g, 520 + i * 180, 1000, 1.4, t + i, { pose: i === 2 ? 'spear' : 'stand', col: '#3a2418', cloth: '#7a5534', skin: '#6a4430' });
+  researcher(g, 1500, 1000, 1.4, t, { notebook: true, flip: true });
+  pill(g, 'জু-হোয়ানসি', 880, 220, P(t, 'জু-হোয়ানসি'), '#ffd23f', 70);
+});
+beat('তারা ছিলো পৃথিবীর শেষ কয়েকটি', (g, t, b) => {
+  const Sm = drawMap(g, { lon: 20, lat: 5, zoom: 0.55 }, t);
+  for (let i = 0; i < 40; i++) { const [x, y] = Sm([-120 + hash(i) * 260, -40 + hash(i + 3) * 100]); const fade = 1 - S(t, 'শেষ কয়েকটি', 1.5) * (i > 3 ? 1 : 0); if (fade > 0.02) { g.globalAlpha = fade; pinDot(g, x, y, 9, t + i, '#7a5a3a'); g.globalAlpha = 1; } }
+  const [kx, ky] = Sm([22, -22]); pinDot(g, kx, ky, 16, t);
+  pill(g, 'শেষ কয়েকটি দল', W / 2, 110, P(t, 'শেষ কয়েকটি'), '#7a2a14', 60, '#fff8ea');
+});
+beat('তাদের কোনো কৃষিজমি ছিলো না', (g, t) => {
+  desertLand(g, { t, pan: 300, sunY: 200 });
+  [['land', 'কৃষিজমি', 480], ['shop', 'দোকানপাট', 960], ['fridge', 'খাবার জমানোর', 1440]].forEach(([ic, a, x]) => { iconTile(g, x, 380, 130, P(t, a), (gg, r) => ICON[ic](gg, r, t), S(t, a, 0.6)); btext(g, a, x, 580, 50, '#fff', P(t, a)); });
+});
+beat('তারা কেবল বনের পশু শিকার', (g, t, b) => {
+  desertLand(g, { t, pan: 400 + (t - b.t0) * 30, sunY: 220, dawn: seg(t, b.t0, P1END) * 0.6 });
+  card(g, 620, 500, 640, 640, P(t, 'পশু শিকার'), 'শিকার', (c, w, h) => miniHunt(c, w, h, t));
+  card(g, 1300, 500, 640, 640, P(t, 'খাবার সংগ্রহ'), 'সংগ্রহ', (c, w, h) => miniFruit(c, w, h, t));
+}, {});
+
+
+// ---------- routes for 16:9 map ----------
+const ROUTES16 = [
+  [[36, 2], [42, 11], [48, 18], [56, 24], [66, 25], [77, 20], [88, 23], [98, 18], [104, 5], [112, -4], [124, -9], [133, -20], [142, -27]],
+  [[36, 2], [36, 18], [35, 30], [32, 38], [24, 43], [14, 47], [4, 48]],
+  [[56, 24], [62, 35], [72, 42], [90, 42], [104, 38], [116, 36]],
+];
+
+// ---------- runtime ----------
+let OUT, OG;
+function prep() {
+  B.forEach(b => b.t0 = b.anchor === 'আপনি কি জানেন প্রাচীনযুগের' ? 0 : T(b.anchor) - 0.12);
+  B.sort((a, b) => a.t0 - b.t0);
+  B.forEach((b, i) => b.t1 = i < B.length - 1 ? B[i + 1].t0 : DUR);
+  window.CUTS = B.slice(1).map(b => +b.t0.toFixed(2));
+  window.CHAPTERS = [T('মধ্যপ্রাচ্যের একটি অঞ্চলে'), T('চলুন, সেই প্রাচীন যুগের'), T('ঠিক এই প্রশ্নটির উত্তর খুঁজতেই'), T('§তাহলে এবার সেই বড় প্রশ্নটির'), T('§এবার আসা যাক আমাদের সবশেষ')];
+}
+function render(i) {
+  const t = i / FPS, g = OG;
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.clearRect(0, 0, W, H);
+  let bi = B.findIndex(b => t >= b.t0 && t < b.t1); if (bi < 0) bi = B.length - 1;
+  const b = B[bi], d = t - b.t0, len = b.t1 - b.t0;
+  const whip = bi > 0 ? 1 - easeOut(seg(d, 0, 0.28)) : 0;
+  const push = 1 + 0.035 * seg(d, 0, len);
+  g.save(); g.translate(W / 2, H / 2); g.scale(push + whip * 0.12, push + whip * 0.12); g.rotate(whip * 0.02 * (bi % 2 ? 1 : -1)); g.translate(-W / 2 + whip * 60 * (bi % 2 ? 1 : -1), -H / 2);
+  b.fn(g, t, b);
+  g.restore();
+  if (bi > 0 && d < 0.12) { g.fillStyle = `rgba(255,255,255,${0.35 * (1 - d / 0.12)})`; g.fillRect(0, 0, W, H); }
+  progressBar(g, Math.min(t, AUDIO_END), AUDIO_END, CHAPTERS);
+  const fade = Math.max(1 - seg(t, 0, 0.25), seg(t, DUR - 0.6, DUR));
+  if (fade > 0) { g.fillStyle = `rgba(0,0,0,${fade})`; g.fillRect(0, 0, W, H); }
+}
+(async () => {
+  await new Promise(r => document.readyState === 'complete' ? r() : addEventListener('load', r));
+  const S0 = await prepareSheet();
+  buildRig(S0); PARCH = buildParchment(); CITY16 = buildCity16(); prep();
+  CL = mk(W, H); CG = CL.getContext('2d'); OUT = mk(W, H); OG = OUT.getContext('2d');
+  await document.fonts.load('bold 40px "Nirmala UI"');
+  window.frame = i => { render(i); return OUT.toDataURL('image/jpeg', 0.9); };
+  window.still = arg => {
+    if (arg === 'beats') return [['beats.json', 'data:application/json;base64,' + btoa(unescape(encodeURIComponent(JSON.stringify(B.map(b => [b.anchor, +b.t0.toFixed(2), +b.t1.toFixed(2)])))))]];
+    return arg.split(',').map(Number).map(t => [`v_${t}.jpg`, (render(Math.round(t * FPS)), OUT.toDataURL('image/jpeg', 0.8))]);
+  };
+  window.ready = true;
+})();
+</script></body></html>

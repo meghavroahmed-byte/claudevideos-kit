@@ -1,0 +1,8 @@
+﻿<!doctype html><body><script>
+const cache = {};
+async function tile(tx, ty) { const k = tx + '_' + ty; if (cache[k]) return cache[k]; const i = new Image(); i.src = `file:///D:/ClaudeVideos/cache/maps/elev/tiles/el_${tx}_${ty}.png`; await i.decode(); const c = document.createElement('canvas'); c.width = 3600; c.height = 3600; const g = c.getContext('2d'); g.drawImage(i, 0, 0); return cache[k] = g; }
+async function v(lon, lat) { const gx = (lon + 180) / 360 * 21600, gy = (90 - lat) / 180 * 10800; const tx = Math.floor(gx / 3600), ty = Math.floor(gy / 3600); const g = await tile(tx, ty); return g.getImageData(Math.floor(gx - tx * 3600), Math.floor(gy - ty * 3600), 1, 1).data.slice(0, 4).join('/'); }
+window.still = async () => { const pts = { orinocoDelta0m: [-61, 8.6], iquitos100m: [-73.25, -3.75], manaus90m: [-60.0, -3.1], titicaca3812m: [-69.4, -15.8], chimborazo6263m: [-78.8, -1.47], aconcagua6960m: [-70.01, -32.65], santiago570m: [-70.65, -33.45], pampas50m: [-62, -34], pacificDeep: [-100, -10], coastShelf: [-72.5, -33.2], everest8848m: [86.925, 27.988], dead_sea: [35.5, 31.5], sahara400m: [10, 25] };
+ const o = {}; for (const k in pts) o[k] = await v(...pts[k]); console.log(JSON.stringify(o)); return []; };
+window.ready = true;
+</script></body>

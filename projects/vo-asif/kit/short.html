@@ -1,0 +1,217 @@
+<!doctype html><html><body style="margin:0;background:#000">
+<script>window.VW = 1920; window.VH = 1080;</script>
+<script src="common.js"></script><script src="rigcore.js"></script><script src="world.js"></script><script src="kit16.js"></script><script src="wkit.js"></script><script src="wpro.js"></script>
+<script src="env_s.js"></script>
+<script>
+// ===== 9:16 short: world scenes (1920x1080) cropped into a 1080x1920 frame + portrait UI + face-cam =====
+const FPS = 30, PW = 1080, PH = 1920;
+let TL = null, DUR = 50.75, NF = 1523;
+const FACE = {};
+let SENT = [];
+let CUR_FROM = -1; const ANC = {};
+function T(str) { const key = str + '|' + CUR_FROM.toFixed(1); if (ANC[key] != null) return ANC[key]; let first = null; for (const s of SENT) { let k = -1; while ((k = s.text.indexOf(str, k + 1)) >= 0) { const tt = s.s + (s.e - s.s) * k / s.text.length; if (first == null) first = tt; if (tt >= CUR_FROM - 0.6) return ANC[key] = tt; } } if (first == null) console.log('MISSING ANCHOR: ' + str); return ANC[key] = first || 0; }
+window.POPS = new Set();
+const P = (t, str, d = 0.35) => { const a = T(str); POPS.add(+a.toFixed(2)); return easeOutBack(seg(t, a, a + d)); };
+const S = (t, str, d = 0.6) => ease(seg(t, T(str), T(str) + d));
+function mouthAt(t) { const i = Math.round(t * FPS); if (i < 0 || i >= ENV.length) return 0; const v = j => ENV[Math.max(0, Math.min(ENV.length - 1, j))]; const db = (v(i - 1) + 2 * v(i) + v(i + 1)) / 4; return clamp((db + 44) / 22) * (0.7 + 0.3 * Math.abs(Math.sin(t * 17))); }
+let CL, CG;
+function lit(g, tint, fn) { CG.setTransform(1, 0, 0, 1, 0, 0); CG.clearRect(0, 0, W, H); fn(CG); if (tint) { CG.setTransform(1, 0, 0, 1, 0, 0); CG.globalCompositeOperation = 'source-atop'; CG.fillStyle = tint; CG.fillRect(0, 0, W, H); CG.globalCompositeOperation = 'source-over'; } g.drawImage(CL, 0, 0); }
+function hero(g, t, x, o = {}) { const m = mouthAt(t); lit(g, o.tint, c => { shadow(c, x, o.gy || 1000, 105, 0.3); drawFront(c, x, o.gy || 1000, o.s || 0.82, Object.assign({ t, mouth: m }, o)); }); if (o.cold) { const s = o.s || 0.82; breath(g, x + 12, (o.gy || 1000) - 725 * s + 8, t, m * o.cold); } }
+function crowd(g, t, list, light, lx) { list.forEach(([x, act, s, o]) => person(g, x, o && o.y || 1000, s || 1.15, t, Object.assign({ act, light, lx }, o || {}))); }
+function xMark(g, x, y, r, k) { if (k <= 0) return; g.save(); g.shadowColor = 'rgba(0,0,0,0.6)'; g.shadowBlur = 16; const a = r * clamp(k * 2), b = r * clamp(k * 2 - 1); const path = () => { g.beginPath(); g.moveTo(x - r, y - r); g.lineTo(x - r + a * 2, y - r + a * 2); if (b > 0) { g.moveTo(x + r, y - r); g.lineTo(x + r - b * 2, y - r + b * 2); } }; ink(g, INK, r * 0.34); path(); g.stroke(); g.shadowColor = 'transparent'; ink(g, RED, r * 0.22); path(); g.stroke(); g.restore(); }
+function panelP(g, x, y, w, h, a = 0.72, col = 'rgba(255,207,90,0.45)') { g.save(); g.shadowColor = 'rgba(0,0,0,0.5)'; g.shadowBlur = 40; g.fillStyle = `rgba(10,12,18,${a})`; rr(g, x, y, w, h, 34); g.fill(); g.shadowColor = 'transparent'; const sg = g.createLinearGradient(0, y, 0, y + h); sg.addColorStop(0, 'rgba(255,255,255,0.10)'); sg.addColorStop(0.3, 'rgba(255,255,255,0)'); g.fillStyle = sg; rr(g, x, y, w, h, 34); g.fill(); g.strokeStyle = col; g.lineWidth = 3; rr(g, x, y, w, h, 34); g.stroke(); g.restore(); }
+// a glass card that shows a mini world scene (drawn in world coords, cropped)
+function sceneCard(g, x, y, w, h, k, label, fn, rot = 0, col = '#ffcf5a', cam = { fx: 960, fy: 640, z: 0.62 }) {
+  if (k <= 0) return; const e = clamp(k); g.save(); g.translate(x, y + (1 - e) * 120); g.rotate(rot * e); const sc = 0.82 + 0.18 * e; g.scale(sc, sc); g.globalAlpha = clamp(e * 2);
+  g.shadowColor = 'rgba(0,0,0,0.6)'; g.shadowBlur = 50; g.shadowOffsetY = 22; g.fillStyle = '#0e0c0a'; rr(g, -w / 2 - 10, -h / 2 - 10, w + 20, h + 20, 30); g.fill(); g.shadowColor = 'transparent';
+  const [c, cx] = tmpC('SC'); cx.setTransform(1, 0, 0, 1, 0, 0); cx.clearRect(0, 0, W, H); fn(cx);
+  g.save(); g.beginPath(); g.roundRect(-w / 2, -h / 2, w, h, 24); g.clip(); const z = cam.z * (h / 600); g.drawImage(c, cam.fx - w / 2 / z, cam.fy - h / 2 / z, w / z, h / z, -w / 2, -h / 2, w, h); g.restore();
+  const sg = g.createLinearGradient(-w / 2, -h / 2, w / 2, h / 2); sg.addColorStop(0, 'rgba(255,255,255,0.18)'); sg.addColorStop(0.4, 'rgba(255,255,255,0)'); g.fillStyle = sg; rr(g, -w / 2, -h / 2, w, h, 24); g.fill(); g.strokeStyle = col; g.lineWidth = 5; rr(g, -w / 2, -h / 2, w, h, 24); g.stroke(); g.restore();
+  if (label) tag(g, label, x, y + h / 2 + 34, k, col, 54);
+}
+// small props drawn in world coords
+function blanket(g, x, y, s) { g.save(); g.translate(x, y); g.scale(s, s); g.beginPath(); g.moveTo(-160, -90); g.quadraticCurveTo(0, -120, 160, -90); g.lineTo(150, 90); g.quadraticCurveTo(0, 70, -150, 90); g.closePath(); inkPath(g, cel(g, -160, 160, '#c0392b'), 6); g.strokeStyle = 'rgba(255,230,200,0.6)'; g.lineWidth = 8; for (let i = -2; i <= 2; i++) { g.beginPath(); g.moveTo(-150, i * 32); g.quadraticCurveTo(0, i * 32 - 20, 150, i * 32); g.stroke(); } g.restore(); }
+function heater(g, x, y, s, t) { g.save(); g.translate(x, y); g.scale(s, s); rr(g, -150, -200, 300, 280, 30); inkPath(g, cel(g, -150, 150, '#e8e4dc'), 6); for (let i = 0; i < 6; i++) { g.save(); g.shadowColor = '#ff6a1a'; g.shadowBlur = 20; ink(g, `rgba(255,${90 + 40 * Math.sin(t * 6 + i)},30,1)`, 14); g.beginPath(); g.moveTo(-110 + i * 44, -160); g.lineTo(-110 + i * 44, 30); g.stroke(); g.restore(); } rr(g, -120, 90, 30, 40, 6); inkPath(g, '#555', 4); rr(g, 90, 90, 30, 40, 6); inkPath(g, '#555', 4); g.restore(); g.save(); g.globalCompositeOperation = 'screen'; glow(g, x, y - 60 * s, 260 * s, 'rgba(255,120,40,A)', 0.5); g.restore(); }
+function shopFront(g, x, y, s, t) { g.save(); g.translate(x, y); g.scale(s, s); rr(g, -230, -280, 460, 380, 14); inkPath(g, cel(g, -230, 230, '#3a5a8a'), 6); for (let i = 0; i < 6; i++) { g.fillStyle = i % 2 ? '#ffffff' : '#e8262c'; g.beginPath(); g.moveTo(-230 + i * 77, -280); g.lineTo(-230 + (i + 1) * 77, -280); g.lineTo(-230 + (i + 1) * 77 + 6, -210); g.quadraticCurveTo(-230 + i * 77 + 41, -190, -230 + i * 77 - 6, -210); g.closePath(); g.fill(); } ink(g, INK, 5); g.strokeRect(-230, -280, 460, 70); g.fillStyle = '#fff3c8'; rr(g, -190, -180, 380, 240, 8); g.fill(); const cols = ['#c0392b', '#2a6aa0', '#e0a030']; for (let i = 0; i < 3; i++) { const cx = -120 + i * 120; g.save(); g.translate(cx, -60); g.rotate(Math.sin(t * 2 + i) * 0.05); g.beginPath(); g.moveTo(-40, -50); g.lineTo(-18, -62); g.lineTo(18, -62); g.lineTo(40, -50); g.lineTo(46, 60); g.lineTo(-46, 60); g.closePath(); inkPath(g, cols[i], 4); g.restore(); } g.restore(); }
+function meatChunk(g, x, y, s, cooked) { g.save(); g.translate(x, y); g.scale(s, s); g.beginPath(); g.ellipse(0, 0, 60, 40, -0.3, 0, 7); inkPath(g, cooked ? '#8a3a1a' : '#c0504a', 5); g.fillStyle = '#f2e8d8'; g.beginPath(); g.ellipse(56, -26, 18, 12, -0.3, 0, 7); g.fill(); ink(g, INK, 4); g.stroke(); g.restore(); }
+function spit(g, x, y, s, t) { g.save(); g.translate(x, y); g.scale(s, s); ink(g, '#3a2414', 10); g.beginPath(); g.moveTo(-170, 30); g.lineTo(-150, -130); g.moveTo(170, 30); g.lineTo(150, -130); g.stroke(); ink(g, '#5a3a20', 9); g.beginPath(); g.moveTo(-180, -120); g.lineTo(180, -120); g.stroke(); g.save(); g.translate(0, -120); g.rotate(t * 0.8); meatChunk(g, 0, 0, 1.1, true); g.restore(); g.restore(); }
+function storeCache(g, x, y, s, t) { g.save(); g.translate(x, y); g.scale(s, s); g.beginPath(); g.ellipse(0, 0, 260, 70, 0, 0, 7); inkPath(g, '#2a2024', 6); g.fillStyle = '#a8c8e0'; g.beginPath(); g.ellipse(0, -6, 230, 56, 0, 0, 7); g.fill(); for (let i = 0; i < 5; i++) meatChunk(g, -160 + i * 80, -10 + (i % 2) * 14, 0.8, false); for (let i = 0; i < 9; i++) { g.fillStyle = ['#7a3a6a', '#c0392b', '#3a6a2a'][i % 3]; g.beginPath(); g.arc(-180 + i * 45, 30, 12, 0, 7); g.fill(); } g.restore(); }
+function commentBox(g, x, y, w, k, t) {
+  if (k <= 0) return; const lt = tAge('CB', k), e = easeOutBack(clamp(lt / 0.5)); g.save(); g.translate(x, y + (1 - e) * 220); g.globalAlpha = clamp(lt * 3);
+  g.shadowColor = 'rgba(0,0,0,0.5)'; g.shadowBlur = 40; g.fillStyle = 'rgba(250,250,252,0.97)'; rr(g, -w / 2, -110, w, 220, 40); g.fill(); g.shadowColor = 'transparent';
+  g.fillStyle = '#ffcf5a'; g.beginPath(); g.arc(-w / 2 + 90, -10, 48, 0, 7); g.fill(); g.fillStyle = '#3a2410'; g.font = 'bold 50px "Nirmala UI"'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('আ', -w / 2 + 90, -6);
+  const msg = 'আমি হলে আগুন জ্বালাতাম…'; const n = Math.floor(clamp((lt - 0.4) / 1.6) * msg.length); g.textAlign = 'left'; g.fillStyle = '#222'; g.font = 'bold 44px "Nirmala UI"'; g.fillText(msg.slice(0, n) + ((Math.floor(t * 3) % 2 && n < msg.length) ? '|' : ''), -w / 2 + 165, -30);
+  g.fillStyle = '#8a8a90'; g.font = '32px "Nirmala UI"'; g.fillText('কমেন্ট করুন', -w / 2 + 165, 40);
+  g.fillStyle = '#e8262c'; rr(g, w / 2 - 150, -40, 110, 80, 40); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.moveTo(w / 2 - 110, -20); g.lineTo(w / 2 - 66, 0); g.lineTo(w / 2 - 110, 20); g.closePath(); g.fill();
+  g.restore();
+}
+let SCN = {};
+function caveMouth(g, x, y, s, t, glowA = 0.4) { g.save(); g.translate(x, y); g.scale(s, s); g.beginPath(); g.moveTo(-420, 120); g.lineTo(-300, -280); g.quadraticCurveTo(0, -480, 340, -260); g.lineTo(460, 120); g.closePath(); inkPath(g, cel(g, -420, 460, '#5a4c50'), 6); g.fillStyle = 'rgba(245,250,255,0.9)'; g.beginPath(); g.moveTo(-310, -260); g.quadraticCurveTo(0, -500, 330, -250); g.quadraticCurveTo(0, -400, -310, -230); g.fill(); g.beginPath(); g.ellipse(20, 120, 200, 300, 0, Math.PI, 0); inkPath(g, '#120a0c', 5); g.restore(); if (glowA) { g.save(); g.globalCompositeOperation = 'screen'; glow(g, x + 20 * s, y + 20 * s, 220 * s, 'rgba(255,190,90,A)', glowA); g.restore(); } }
+// ---------- beats ----------
+// beat(from, gr, {face, w(world), u(portrait ui), cam:{fx,fy,z}, mv, tr})
+const B = []; const beat = (from, gr, o) => B.push(Object.assign({ from, gr }, o));
+const ICY = '#9fe8ff', GOLD = '#ffcf5a';
+// 0 hook face
+beat(0, 'face', { face: true, u: (g, t) => { tag(g, 'প্রাচীন যুগে শীত', 540, 1250, P(t, 'প্রাচীন যুগে'), GOLD, 68); } });
+// 0b blizzard question
+beat('কীভাবে শীতকালে নিজেকে', 'danger', { cam: { fx: 960, fy: 620, z: 1 }, mv: 0, tr: 'zoom',
+  w: (g, t) => { tundra(g, { t, time: 'dusk', pan: 300 + t * 30, storm: 0.7 }); snowfall(g, t, { blizzard: true, wind: 1.4, n: 260 }); crowd(g, t, [[870, 'shiver', 1.35, { y: 1000, mood: 'cold', light: 'dusk' }], [1060, 'shiver', 0.95, { y: 1000, kid: true, mood: 'cold', light: 'dusk', flip: true }]], 'dusk'); breath(g, 900, 560, t, 0.9); },
+  u: (g, t) => { title(g, 'শীতে কীভাবে', 540, 420, P(t, 'কীভাবে শীতকালে'), 120, '#ffffff'); title(g, 'বাঁচতো?', 540, 580, P(t, 'বাঁচিয়ে'), 150, ICY); } });
+// 1 face "jaust kolpona korun"
+beat('জাস্ট কল্পনা', 'night', { cam: { fx: 960, fy: 600, z: 1.0 }, mv: 0, tr: 'whip',
+  w: (g, t) => { tundra(g, { t, time: 'night', pan: 600, aurora: true }); snowfall(g, t, { n: 90 }); hero(g, t, 960, { cold: 1, up: 0.6, upAng: 40, loAng: 95 }); },
+  u: (g, t) => { title(g, 'কল্পনা করুন…', 540, 420, P(t, 'কল্পনা করুন'), 110, ICY); } });
+// 1b map fly to ice-age europe + temp drop
+beat('আজকে যদি পাথর', 'map', { cam: { fx: 960, fy: 540, z: 1 }, mv: 'none', tr: 'zoom', nofg: true,
+  w: (g, t, b) => { const k = ease(seg(t, b.t0, b.t1)); mapPro(g, { lon: lerp(40, 15, k), lat: lerp(20, 52, k), zoom: lerp(0.7, 1.5, k), tilt: lerp(0.5, 0.95, k), rot: lerp(0.05, -0.04, k) }, t, (mg, SP) => { const [x, y] = SP([15, 55]); mg.save(); mg.globalCompositeOperation = 'screen'; glow(mg, x, y, 520, 'rgba(160,220,255,A)', 0.5 * k); mg.restore(); }, { through: 1 - seg(t, b.t0, b.t0 + 1.2) }); const fr = S(t, 'প্রচণ্ড শীত', 1.2); if (fr > 0) { g.save(); g.globalAlpha = fr * 0.35; g.fillStyle = '#bfe6ff'; g.fillRect(0, 0, W, H); g.restore(); snowfall(g, t, { n: Math.round(220 * fr), wind: 0.8 }); } },
+  u: (g, t) => { yearBadge(g, 'পাথর যুগ', P(t, 'পাথর যুগে'), 540, 300); bigNum(g, '−৪০°', 540, 760, 220, ICY, P(t, 'প্রচণ্ড শীত'), 'হঠাৎ প্রচণ্ড শীত'); } });
+// 1c how would they survive
+beat('তাহলে মানুষ কীভাবে', 'arctic', { cam: { fx: 900, fy: 600, z: 1.08 }, mv: 1, tr: 'dissolve',
+  w: (g, t) => { tundra(g, { t, time: 'day', pan: 900, storm: 0.5 }); snowfall(g, t, { blizzard: true, wind: 1, n: 220 }); person(g, 900, 1000, 1.55, t, { act: 'shiver', mood: 'cold' }); breath(g, 930, 520, t, 1); },
+  u: (g, t) => { title(g, 'কীভাবে বেঁচে থাকতো?', 540, 420, P(t, 'বেঁচে থাকতো'), 96, '#ffffff'); } });
+// 2 nothing modern
+beat('তখন ছিল না', 'night', { tr: 'flash', nofg: true,
+  w: (g, t) => { blurLayer(g, 10, x => tundra(x, { t, time: 'night', pan: 1500, aurora: true })); },
+  cam: { fx: 960, fy: 540, z: 1 }, mv: 0,
+  u: (g, t) => { const items = [['কম্বল', 'কম্বল', (c) => { c.fillStyle = '#2a1e2a'; c.fillRect(0, 0, W, H); blanket(c, 960, 640, 1.6); }], ['হিটার', 'হিটার', (c) => { c.fillStyle = '#20242c'; c.fillRect(0, 0, W, H); heater(c, 960, 700, 1.5, t); }], ['গরম কাপড়ের দোকান', 'কাপড়ের দোকান', (c) => { cityWinter(c, t, { pan: 400 }); shopFront(c, 960, 800, 1.25, t); }]];
+    items.forEach(([lb, a, fn], i) => { const y = 470 + i * 420, k = P(t, a); sceneCard(g, 540 + (i - 1) * 40, y, 620, 330, k, null, fn, (i - 1) * 0.03, '#ff6a5a', { fx: 960, fy: 620, z: 1 }); tag(g, lb, 540 + (i - 1) * 40, y + 200, k, '#ff6a5a', 50); xMark(g, 540 + (i - 1) * 40 + 250, y - 120, 46, S(t, a, 0.4)); });
+    title(g, 'কিছুই ছিল না', 540, 200, P(t, 'ছিল না'), 92, '#ff8a7a'); } });
+// 3 animal hides
+beat('তখনকার সময়ে শীত', 'golden', { cam: { fx: 760, fy: 620, z: 0.95 }, mv: 0, tr: 'whip',
+  w: (g, t) => { hutInside(g, t, { fx: 1350, pan: 300 }); person(g, 760, 1020, 1.6, t, { act: 'scrape', light: 'fire', lx: 1350, mood: 'focus' }); },
+  u: (g, t) => { tag(g, 'পশুর চামড়া', 540, 360, P(t, 'পশুর চামড়া'), GOLD, 64); } });
+beat('নিজেদের শরীর ঢেকে', 'golden', { cam: { fx: 960, fy: 600, z: 1.0 }, mv: 0, tr: 'dissolve',
+  w: (g, t) => { tundra(g, { t, time: 'golden', pan: 700 }); snowfall(g, t, { n: 90 }); crowd(g, t, [[860, 'stand', 1.5, { drape: true, coat: '#a0703a', hood: true, mood: 'happy', light: 'golden', lx: 1500 }], [1080, 'stand', 1.05, { kid: true, drape: true, coat: '#8a5a30', hood: true, light: 'golden', lx: 1500 }]], 'golden', 1500); },
+  u: (g, t) => { title(g, 'শরীর ঢেকে রাখতো', 540, 400, P(t, 'শরীর ঢেকে'), 100, GOLD); } });
+// cave shelter
+beat('এমনকি গুহার', 'fire', { cam: { fx: 960, fy: 620, z: 1.0 }, mv: 3, tr: 'zoom',
+  w: (g, t) => { caveInside(g, t, { fx: 960 }); crowd(g, t, [[820, 'sit', 1.25, { light: 'fire', female: true }], [1100, 'warm', 1.25, { light: 'fire', flip: true }], [960, 'sleep', 0.9, { light: 'fire', kid: true, y: 1050 }]], 'fire', 960); },
+  u: (g, t) => { tag(g, 'গুহায় আশ্রয়', 540, 360, P(t, 'গুহার ভিতরে'), GOLD, 64); } });
+// 4 wind blocked
+beat('ঠান্ডা বাতাস থেকে', 'night', { cam: { fx: 960, fy: 600, z: 1.0 }, mv: 1, tr: 'dissolve',
+  w: (g, t) => { tundra(g, { t, time: 'night', pan: 1200, aurora: false, storm: 0.6 }); snowfall(g, t, { blizzard: true, wind: 2.2, n: 280 }); g.save(); g.translate(960, 980); g.scale(1.25, 1.25); g.translate(-960, -980); const sx = 960; g.restore(); },
+  u: (g, t) => { /* cave mouth drawn in portrait for size */ g.save(); g.translate(540, 1430); caveMouth(g, 0, 0, 1.25, t, 0.9); g.restore(); for (let i = 0; i < 12; i++) { const p = (t * 1.1 + i / 12) % 1, side = i % 2 ? 1 : -1, yy = 900 + (i % 6) * 70; const x = 540 + side * lerp(620, 300, Math.min(1, p * 1.3)); const yd = p > 0.75 ? (p - 0.75) * 520 * (i % 4 < 2 ? 1 : -1) : 0; g.save(); g.globalAlpha = Math.sin(p * Math.PI); g.translate(x, yy - yd * 0.6); g.rotate(side > 0 ? Math.PI : 0); g.shadowColor = ICY; g.shadowBlur = 16; g.fillStyle = ICY; g.beginPath(); g.moveTo(44, 0); g.lineTo(0, -16); g.lineTo(0, 16); g.fill(); rr(g, -70, -6, 72, 12, 6); g.fill(); g.restore(); }
+    title(g, 'ঠান্ডা বাতাস', 540, 380, P(t, 'ঠান্ডা বাতাস'), 110, ICY); stamp2(g, 'আটকে গেল', 540, 600, S(t, 'রক্ষা করতো', 0.4), '#2ecc71'); } });
+// 5 biggest hope — darkness
+beat('কিন্তু তাদের সবচেয়ে', 'night', { cam: { fx: 960, fy: 620, z: 1.0 }, mv: 0, tr: 'whip',
+  w: (g, t) => { tundra(g, { t, time: 'night', pan: 400, aurora: false }); g.fillStyle = 'rgba(0,0,6,0.55)'; g.fillRect(0, 0, W, H); crowd(g, t, [[860, 'shiver', 1.4, { light: 'night', mood: 'worried' }], [1060, 'shiver', 1.0, { kid: true, light: 'night', flip: true, mood: 'cold' }]], 'night'); glowingEyes(g, 600, 760, 1, 0.8, t, 1); glowingEyes(g, 1330, 720, 1, 0.8, t, 2); },
+  u: (g, t) => { title(g, 'সবচেয়ে বড় ভরসা', 540, 430, P(t, 'সবচেয়ে বড়'), 100, '#ffffff'); } });
+// 6 FIRE
+beat('আগুন।', 'fire', { cam: { fx: 960, fy: 640, z: 1.05 }, mv: 0, tr: 'flash',
+  w: (g, t, b) => { const lt = t - b.t0, k = ease(seg(lt, 0, 0.35)); tundra(g, { t, time: 'night', pan: 400, aurora: false }); g.fillStyle = `rgba(0,0,6,${0.55 - k * 0.3})`; g.fillRect(0, 0, W, H); firePit(g, 960, 990, 0.3 + k * 0.9, t); fireLight(g, 960, 900, 300 + k * 800, t, k); embers(g, 960, 900, 1.2, t, k); crowd(g, t, [[800, 'warm', 1.3, { mood: 'happy' }], [1120, 'warm', 1.3, { flip: true, female: true, mood: 'happy' }]], 'fire', 960); },
+  u: (g, t) => { title(g, 'আগুন', 540, 520, P(t, 'আগুন।', 0.2), 260, '#ffb04a'); } });
+// 7 fire uses — 3 stages
+beat('আগুন জ্বালিয়ে তারা', 'fire', { cam: { fx: 960, fy: 640, z: 1.0 }, mv: 'none', tr: 'dissolve',
+  w: (g, t) => { const kc = S(t, 'খাবার রান্না', 0.6), kw = S(t, 'হিংস্র প্রাণী', 0.8); tundra(g, { t, time: 'night', pan: 600, aurora: true }); g.fillStyle = 'rgba(0,0,6,0.3)'; g.fillRect(0, 0, W, H); firePit(g, 960, 990, 1.0, t); fireLight(g, 960, 900, 900, t, 1); if (kc > 0) { g.save(); g.globalAlpha = kc; spit(g, 960, 960, 1, t); g.restore(); } const kr = S(t, 'দূরে সরিয়ে', 1.2); crowd(g, t, [[790, kc > 0.5 ? 'eat' : 'warm', 1.3, { mood: 'happy' }], [1110, 'warm', 1.3, { flip: true, female: true, mood: 'happy' }]], 'fire', 960); if (kw > 0) { g.save(); g.globalAlpha = 1 - kr * 0.6; wolf(g, lerp(1330, 1640, kr), 1000, 1.15, '#141820', 0.5 + 0.5 * Math.sin(t * 3)); g.restore(); glowingEyes(g, lerp(1300, 1600, kr), 760, 1, 1 - kr, t, 4); } },
+  cam2: (t) => { const kc = S(t, 'খাবার রান্না', 0.8), kw = S(t, 'হিংস্র প্রাণী', 0.8); return { fx: lerp(lerp(860, 960, kc), 1200, kw), fy: 640, z: lerp(1.0, 0.92, kw) }; },
+  u: (g, t) => { const list = [['শরীর গরম', 'শরীর গরম', '#ffb04a'], ['খাবার রান্না', 'খাবার রান্না', GOLD], ['হিংস্র প্রাণী দূরে', 'হিংস্র প্রাণী', '#ff6a5a']]; list.forEach(([lb, a, c], i) => { tag(g, (i + 1) + '. ' + lb, 540, 300 + i * 130, P(t, a), c, 56); }); } });
+// 8 hunger question
+beat('কিন্তু খাবারের অভাব', 'arctic', { cam: { fx: 900, fy: 620, z: 1.05 }, mv: 1, tr: 'whip',
+  w: (g, t) => { tundra(g, { t, time: 'dusk', pan: 1300 }); snowfall(g, t, { n: 120 }); dryingRack(g, 1150, 1000, 0.75, t, 0, 0); person(g, 880, 1000, 1.45, t, { act: 'sit', light: 'dusk', mood: 'worried' }); },
+  u: (g, t) => { title(g, 'খাবার শেষ?', 540, 430, P(t, 'খাবারের অভাব'), 130, '#ff8a7a'); } });
+// 9 hunted meat + stored food
+beat('তারা আগে থেকে', 'golden', { cam: { fx: 1000, fy: 620, z: 1.0 }, mv: 2, tr: 'zoom',
+  w: (g, t, b) => { const lt = t - b.t0; tundra(g, { t, time: 'golden', pan: 400 + lt * 40 }); snowfall(g, t, { n: 60 }); mammoth(g, 1300 - lt * 30, 1000, 0.95, t * 0.6, '#5a3a24', 0.6); crowd(g, t, [[880, 'spear', 1.45, { light: 'golden', lx: 1500, mood: 'focus' }]], 'golden', 1500); },
+  cam2: (t, b) => ({ fx: lerp(900, 1180, ease(seg(t, b.t0, b.t0 + 2.2))), fy: 620, z: 0.92 }),
+  u: (g, t) => { tag(g, 'আগে থেকে শিকার', 540, 340, P(t, 'শিকার করা'), GOLD, 62); } });
+beat('সংগ্রহ করা খাবারের', 'golden', { cam: { fx: 960, fy: 640, z: 1.0 }, mv: 0, tr: 'dissolve',
+  w: (g, t) => { hutInside(g, t, { fx: 1350, pan: 600 }); dryingRack(g, 790, 960, 0.8, t, 6, 1); storeCache(g, 1130, 960, 0.75, t); person(g, 980, 1010, 1.4, t, { act: 'lift', light: 'fire', lx: 1350, mood: 'happy', item: 'bone' }); },
+  u: (g, t) => { tag(g, 'জমানো খাবার', 540, 340, P(t, 'সংগ্রহ করা'), GOLD, 62); stamp2(g, 'নির্ভরতা', 540, 560, S(t, 'নির্ভর করতো', 0.4), '#2ecc71'); } });
+// 10 thousands of years — map with marchers
+beat('তবে সবচেয়ে অবাক', 'map', { cam: { fx: 960, fy: 540, z: 1 }, mv: 'none', tr: 'flash', nofg: true,
+  w: (g, t, b) => { const k = ease(seg(t, b.t0, b.t1)); const routes = [[[36, 2], [36, 18], [35, 31], [30, 40], [20, 46], [8, 48]], [[35, 31], [45, 40], [60, 48], [80, 55], [100, 60], [120, 62]]]; const kr = S(t, 'হাজার হাজার', 2.6); const Sx = mapPro(g, { lon: lerp(45, 60, k), lat: lerp(30, 45, k), zoom: lerp(0.5, 0.75, k), tilt: 0.9, rot: -0.03 }, t, (mg, SP) => { glowRoute(mg, SP, routes[0], kr, GOLD, 9); glowRoute(mg, SP, routes[1], kr, GOLD, 9); }, { through: 1 - seg(t, b.t0, b.t0 + 1) }); marchers(g, Sx, routes[0], kr, t); marchers(g, Sx, routes[1], kr, t); },
+  u: (g, t) => { title(g, 'সবচেয়ে অবাক করা', 540, 300, P(t, 'সবচেয়ে অবাক'), 84, '#ffffff'); bigNum(g, 'হাজার হাজার', 540, 1240, 140, GOLD, P(t, 'হাজার হাজার'), 'বছর ধরে টিকে ছিল'); } });
+// 11 in this cold
+beat('এই ঠান্ডার ভিতরেই', 'aurora', { cam: { fx: 960, fy: 620, z: 1.0 }, mv: 1, tr: 'dissolve',
+  w: (g, t) => { tundra(g, { t, time: 'night', pan: 800, aurora: true }); snowfall(g, t, { n: 140, wind: 0.8 }); firePit(g, 960, 990, 0.8, t); fireLight(g, 960, 900, 700, t, 0.9); crowd(g, t, [[760, 'sit', 1.25, { light: 'fire', elder: true }], [1160, 'sit', 1.25, { light: 'fire', flip: true, female: true }], [960, 'sit', 0.9, { kid: true, light: 'fire', y: 1030 }]], 'fire', 960); },
+  u: (g, t) => { title(g, 'এই ঠান্ডার ভিতরেই', 540, 420, P(t, 'এই ঠান্beat(47.1, 'face', { face: true, tr: 'whip', u: (g, t) => { title(g, 'আপনি কী করতেন?', 540, 300, P(t, 'কী কী করতেন'), 96, GOLD); commentBox(g, 540, 1300, 960, seg(t, 48.0, 48.3), t); } });
+রাচীন যুগের'), '#ffffff', 56); } });
+beat('তাহলে নিজেকে শীতকালে', 'golden', { cam: { fx: 960, fy: 600, z: 1.0 }, mv: 0, tr: 'whip',
+  w: (g, t) => { tundra(g, { t, time: 'golden', pan: 1400 }); snowfall(g, t, { n: 80 }); firePit(g, 1250, 990, 0.6, t); fireLight(g, 1250, 900, 500, t, 0.7); hero(g, t, 900, { cold: 1, up: 0.7, upAng: 50, loAng: 100 }); },
+  u: (g, t) => { title(g, 'আপনি কী করতেন?', 540, 360, P(t, 'কী কী করতেন'), 104, GOLD); commentBox(g, 540, 1220, 960, seg(t, T('কী কী করতেন') + 0.9, T('কী কী করতেন') + 1.2), t); } });
+</script>
+<script>
+// ---------- runtime ----------
+let WC, WG, PREVW, PWG, OUTP, OG, PREVP, PG2, FINP, FG;
+function prep() {
+  let prevT = 0; B.forEach((b, i) => { if (typeof b.from === 'number') b.t0 = b.from; else { CUR_FROM = prevT; b.t0 = T(b.from) - 0.12; } prevT = b.t0 + 0.12; }); CUR_FROM = -1; B.sort((a, b) => a.t0 - b.t0);
+  B.forEach((b, i) => b.t1 = i < B.length - 1 ? B[i + 1].t0 : DUR);
+  window.CUTS = B.slice(1).map(b => +b.t0.toFixed(2));
+}
+function gradeP(src, dst, gname, t) {
+  const gd = GRADES[gname] || GRADES.arctic;
+  dst.setTransform(1, 0, 0, 1, 0, 0); dst.globalCompositeOperation = 'source-over'; dst.globalAlpha = 1;
+  dst.filter = `contrast(${gd.con}) saturate(${gd.sat})`; dst.drawImage(src, 0, 0); dst.filter = 'none';
+  dst.globalCompositeOperation = 'soft-light'; dst.globalAlpha = 0.35; const sg = dst.createLinearGradient(0, PH, PW, 0); sg.addColorStop(0, gd.shadow); sg.addColorStop(1, gd.high); dst.fillStyle = sg; dst.fillRect(0, 0, PW, PH);
+  dst.globalCompositeOperation = 'screen'; dst.globalAlpha = 0.12; dst.filter = 'blur(18px) brightness(1.2)'; dst.drawImage(src, 0, 0); dst.filter = 'none';
+  dst.globalCompositeOperation = 'source-over'; dst.globalAlpha = 1;
+  const v = dst.createRadialGradient(PW / 2, PH * 0.5, PW * 0.45, PW / 2, PH / 2, PH * 0.62); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, `rgba(0,0,0,${gd.vig})`); dst.fillStyle = v; dst.fillRect(0, 0, PW, PH);
+  const lx = PW * (0.15 + 0.7 * (0.5 + 0.5 * Math.sin(t * 0.13))), ll = dst.createRadialGradient(lx, -80, 10, lx, -80, 800); ll.addColorStop(0, 'rgba(255,170,90,0.10)'); ll.addColorStop(1, 'rgba(255,170,90,0)'); dst.globalCompositeOperation = 'screen'; dst.fillStyle = ll; dst.fillRect(0, 0, PW, PH);
+  dst.globalCompositeOperation = 'overlay'; dst.globalAlpha = 0.08; const ox = Math.floor(hash(Math.floor(t * 24)) * 512), oy = Math.floor(hash(Math.floor(t * 24) + 7) * 512); dst.save(); dst.translate(-ox, -oy); dst.fillStyle = dst.createPattern(GRAIN, 'repeat'); dst.fillRect(ox, oy, PW, PH); dst.restore();
+  dst.globalCompositeOperation = 'source-over'; dst.globalAlpha = 1;
+}
+GRADES.face = null;
+function faceImg(t) { let i = Math.round(t * FPS); for (let d = 0; d < 40; d++) { if (FACE[i - d]) return FACE[i - d]; if (FACE[i + d]) return FACE[i + d]; } return null; }
+// draw one beat into a portrait canvas g
+function drawBeat(g, bi, t) {
+  const b = B[bi], d = t - b.t0, len = Math.max(0.5, b.t1 - b.t0);
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.filter = 'none'; g.clearRect(0, 0, PW, PH);
+  SCN = {}; CURB = bi; HUDON = false; CUR_FROM = b.t0;
+  const u = 1 - Math.pow(1 - clamp(d / Math.min(len, 6)), 2.2), side = bi % 2 ? 1 : -1;
+  if (b.face) {
+    const img = faceImg(t); const z = 1.0 + 0.06 * u + (bi === 0 ? 0.05 * (1 - ease(clamp(d / 0.5))) : 0);
+    g.save(); g.translate(PW / 2, PH * 0.42); g.scale(z, z); g.translate(-PW / 2, -PH * 0.42); if (img) g.drawImage(img, 0, 0, PW, PH); g.restore();
+    // cinematic face finish: soft top/bottom gradient for text, warm rim
+    const tg = g.createLinearGradient(0, 0, 0, 560); tg.addColorStop(0, 'rgba(0,0,0,0.55)'); tg.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = tg; g.fillRect(0, 0, PW, 560);
+    const bg2 = g.createLinearGradient(0, PH - 600, 0, PH); bg2.addColorStop(0, 'rgba(0,0,0,0)'); bg2.addColorStop(1, 'rgba(0,0,0,0.45)'); g.fillStyle = bg2; g.fillRect(0, PH - 600, PW, 600);
+    g.save(); g.globalCompositeOperation = 'screen'; glow(g, PW * 0.95, PH * 0.15, 700, 'rgba(255,170,90,A)', 0.12); g.restore();
+  } else {
+    // world scene
+    WG.setTransform(1, 0, 0, 1, 0, 0); WG.globalAlpha = 1; WG.globalCompositeOperation = 'source-over'; WG.filter = 'none'; WG.clearRect(0, 0, W, H);
+    b.w(WG, t, b);
+    if (!b.nofg && b.gr !== 'map') { if (['fire'].includes(b.gr)) bokeh(WG, t, 8, 'rgba(255,160,70,A)', 0.35); else lensSnow(WG, t, 7, 0.4); }
+    const c = b.cam2 ? b.cam2(t, b) : b.cam; let Z = 1920 / 1080 * (c.z || 1), fx = c.fx, fy = c.fy, rot = 0;
+    if (b.mv !== 'none') switch (b.mv) { case 0: Z *= 1.0 + 0.07 * u; break; case 1: Z *= 1.08 - 0.07 * u; break; case 2: Z *= 1.05; fx += lerp(-45, 45, u) * side; break; case 3: Z *= 1.02 + 0.05 * u; fy += lerp(20, -20, u); break; default: Z *= 1.02 + 0.05 * u; rot = 0.012 * u * side; }
+    fx = clamp(fx, PW / 2 / Z, W - PW / 2 / Z) || 960; fy = Math.min(Math.max(fy, PH / 2 / Z), H - PH / 2 / Z);
+    g.save(); g.translate(PW / 2, PH / 2); g.rotate(rot); g.scale(Z, Z); g.translate(-fx + Math.sin(t * 0.5) * 3, -fy + Math.cos(t * 0.4) * 2); g.drawImage(WC, 0, 0); g.restore();
+  }
+  if (b.u) b.u(g, t, b);
+  CUR_FROM = -1;
+}
+function render(i) {
+  const t = i / FPS; NOW = t;
+  let bi = B.findIndex(b => t >= b.t0 && t < b.t1); if (bi < 0) bi = B.length - 1;
+  const b = B[bi], d = t - b.t0;
+  drawBeat(OG, bi, t);
+  const TR = 0.35;
+  if (bi > 0 && d < TR && (b.tr === 'dissolve' || b.tr === 'zoom')) {
+    drawBeat(PG2, bi - 1, t); CURB = bi; NOW = t; const a = 1 - ease(d / TR);
+    OG.save(); OG.setTransform(1, 0, 0, 1, 0, 0); OG.globalAlpha = a;
+    if (b.tr === 'zoom') { const s = 1 + (1 - a) * 0.35; OG.translate(PW / 2, PH / 2); OG.scale(s, s); OG.translate(-PW / 2, -PH / 2); OG.filter = `blur(${(1 - a) * 8}px)`; }
+    OG.drawImage(PREVP, 0, 0); OG.restore();
+  }
+  if (bi > 0 && b.tr === 'whip' && d < 0.28) { const w = 1 - easeOut(d / 0.28), dir = bi % 2 ? 1 : -1; const [c, x] = tmpC('WHP'); if (c.width !== PW) { c.width = PW; c.height = PH; } x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, PW, PH); x.drawImage(OUTP, 0, 0); OG.save(); OG.setTransform(1, 0, 0, 1, 0, 0); OG.clearRect(0, 0, PW, PH); OG.filter = `blur(${w * 22}px)`; OG.translate(PW / 2 + dir * w * 120, PH / 2); OG.scale(1 + w * 0.12, 1 + w * 0.12); OG.drawImage(c, -PW / 2, -PH / 2); OG.restore(); }
+  if (b.gr === 'face') { FG.setTransform(1, 0, 0, 1, 0, 0); FG.globalAlpha = 1; FG.globalCompositeOperation = 'source-over'; FG.filter = 'none'; FG.drawImage(OUTP, 0, 0); }
+  else gradeP(OUTP, FG, b.gr, t);
+  if (bi > 0 && b.tr === 'flash' && d < 0.18) { FG.fillStyle = `rgba(255,248,235,${0.75 * (1 - d / 0.18)})`; FG.fillRect(0, 0, PW, PH); }
+  else if (bi > 0 && d < 0.1) { FG.fillStyle = `rgba(255,250,240,${0.15 * (1 - d / 0.1)})`; FG.fillRect(0, 0, PW, PH); }
+  // thin progress bar at very top
+  FG.fillStyle = 'rgba(255,255,255,0.18)'; FG.fillRect(0, 0, PW, 8); FG.fillStyle = '#ffcf5a'; FG.fillRect(0, 0, PW * clamp(t / DUR), 8);
+  const fade = seg(t, DUR - 0.4, DUR); if (fade > 0) { FG.fillStyle = `rgba(0,0,0,${fade})`; FG.fillRect(0, 0, PW, PH); }
+}
+(async () => {
+  await new Promise(r => document.readyState === 'complete' ? r() : addEventListener('load', r));
+  TL = await (await fetch('../temp/timeline.json')).json(); DUR = TL.dur; NF = Math.round(DUR * FPS);
+  SENT = TL.segs.map(s => ({ s: s.s, e: s.e, text: s.text }));
+  const ff = await (await fetch('../temp/face/list.json')).json();
+  await Promise.all(ff.map(n => loadImg('../temp/face/' + n).then(im => { FACE[+n.match(/\d+/)[0]] = im; })));
+  const S0 = await prepareSheet(); buildRig(S0); buildMap3D(); buildPost();
+  CL = mk(W, H); CG = CL.getContext('2d'); WC = mk(W, H); WG = WC.getContext('2d');
+  OUTP = mk(PW, PH); OG = OUTP.getContext('2d'); PREVP = mk(PW, PH); PG2 = PREVP.getContext('2d'); FINP = mk(PW, PH); FG = FINP.getContext('2d');
+  prep();
+  await document.fonts.load('bold 40px "Nirmala UI"');
+  window.frame = i => { render(i); return FINP.toDataURL('image/jpeg', 0.92); };
+  window.still = arg => { if (arg === 'beats') return [['beats_s.json', 'data:application/json;base64,' + btoa(unescape(encodeURIComponent(JSON.stringify(B.map(b => [b.from, +b.t0.toFixed(2), +b.t1.toFixed(2)])))))]]; return arg.split(',').map(Number).map(t => { try { render(Math.round(t * FPS)); } catch (e) { console.log('ERR at ' + t + ': ' + e.message + ' | ' + (e.stack || '').split('\n')[1]); } return [`s_${t}.jpg`, FINP.toDataURL('image/jpeg', 0.8)]; }); };
+  window.ready = true;
+})();
+</script></body></html>

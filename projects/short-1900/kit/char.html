@@ -1,0 +1,23 @@
+<!doctype html><html><head><meta charset="utf-8"></head><body style="margin:0">
+<script src="char/common.js"></script><script src="char/rigcore.js"></script><script src="../temp/env.js"></script>
+<script>
+// Renders the user's character (cut-out rig from their sheet) as transparent PNG sprites for given windows.
+const FPS = 30, CW = 600, CH = 880;
+const WIN = window.WIN_DEF || [];
+function mouthAt(t) { const i = Math.round(t * FPS); if (i < 0 || i >= ENV.length) return 0; const v = j => ENV[Math.max(0, Math.min(ENV.length - 1, j))]; const db = (v(i - 1) + 2 * v(i) + v(i + 1)) / 4; return clamp((db + 40) / 20) * (0.7 + 0.3 * Math.abs(Math.sin(t * 17))); }
+let C, G;
+(async () => {
+  await new Promise(r => document.readyState === 'complete' ? r() : addEventListener('load', r));
+  const S0 = await prepareSheet(); buildRig(S0); C = mk(CW, CH); G = C.getContext('2d');
+  window.frame = (i, w) => {
+    const t = i / FPS; G.setTransform(1, 0, 0, 1, 0, 0); G.clearRect(0, 0, CW, CH); const m = mouthAt(t), lt = t - w.t0;
+    if (w.pose === 'front') {
+      const up = ease(clamp((t - w.up) / 0.45)) * (w.down ? 1 - ease(clamp((t - w.down) / 0.4)) : 1);
+      drawFront(G, 300, 860, 0.86, { t, mouth: m, up, upAng: 128, loAng: 18, wave: Math.sin(t * 5) * 4 * up, headRot: Math.sin(t * 1.7) * 2 + up * 4 });
+    } else if (w.pose === 'chinta') { drawChinta(G, 300, 860, 1.55, { t, mouth: m }); G.clearRect(0, 822, CW, CH); G.save(); G.globalCompositeOperation = 'destination-out'; const fg = G.createLinearGradient(0, 700, 0, 822); fg.addColorStop(0, 'rgba(0,0,0,0)'); fg.addColorStop(1, 'rgba(0,0,0,1)'); G.fillStyle = fg; G.fillRect(0, 700, CW, 122); G.restore(); }
+    else if (w.pose === 'phone') { drawPhone(G, 300, 860, 0.86, { t, mouth: m }); }
+    return C.toDataURL('image/png');
+  };
+  window.ready = true;
+})();
+</script></body></html>

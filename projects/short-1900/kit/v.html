@@ -1,0 +1,175 @@
+<!doctype html><html><head><meta charset="utf-8"></head><body style="margin:0;background:#000">
+<script src="../node_modules/topojson-client/dist/topojson-client.min.js"></script>
+<script src="core.js"></script><script src="scenes.js"></script><script src="fx.js"></script><script src="fx2.js"></script>
+<script>
+let TL, DUR, NF, TLS; const FACE = {};
+const B = []; const beat = (from, look, tr, d, o = {}) => B.push(Object.assign({ from, look, tr, d }, o));
+const faceImg = t => { let i = Math.round(t * FPS); for (let k = 0; k < 40; k++) { if (FACE[i - k]) return FACE[i - k]; if (FACE[i + k]) return FACE[i + k]; } return null; };
+function face(g, t, b) { const img = faceImg(t), z = 1.02 + 0.05 * ease(clamp((t - b.t0) / Math.max(0.5, b.t1 - b.t0))); g.save(); g.translate(PW / 2, PH * 0.4); g.scale(z, z); g.translate(-PW / 2, -PH * 0.4); if (img) g.drawImage(img, 0, 0, PW, PH); g.restore();
+  const tg = g.createLinearGradient(0, PH - 800, 0, PH); tg.addColorStop(0, 'rgba(0,0,0,0)'); tg.addColorStop(1, 'rgba(0,0,0,0.5)'); g.fillStyle = tg; g.fillRect(0, PH - 800, PW, 800); lightLeak(g, t, 0.6); bokeh(g, t, '255,230,200', 8, 0.18, 7); cornersAnim(g, t, 'rgba(255,255,255,0.85)', seg(t, b.t0, b.t0 + 0.35)); }
+function mapLbl(g, txt, lon, lat, k, o = {}) { if (k <= 0) return; const [x, y] = toScreen(geoV(lon, lat, o.h || 0.07), SC.map.cam); g.save(); g.globalAlpha = clamp(k) * (o.a || 0.85); font(g, o.w || 600, o.size || 42); g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineWidth = 8; g.strokeStyle = o.halo || 'rgba(255,255,255,0.85)'; g.translate(x, y + (1 - easeOut(clamp(k))) * 20); g.strokeText(txt, 0, 0); g.fillStyle = o.col || '#5b6266'; g.fillText(txt, 0, 0); g.restore(); }
+const scr = (v, cam) => toScreen(v, cam || SC.map.cam);
+function softBg(g, c1, c2) { const gr = g.createLinearGradient(0, 0, 0, PH); gr.addColorStop(0, c1); gr.addColorStop(1, c2); g.fillStyle = gr; g.fillRect(0, 0, PW, PH); }
+function cloud2d(g, x, y, s, a) { g.save(); g.globalAlpha = a; g.fillStyle = '#ffffff'; g.shadowColor = 'rgba(0,0,0,0.08)'; g.shadowBlur = 30; g.shadowOffsetY = 10; [[0, 0, 70], [70, -20, 90], [150, 0, 70], [80, 20, 80]].forEach(([dx, dy, r]) => { g.beginPath(); g.arc(x + dx * s, y + dy * s, r * s, 0, 7); g.fill(); }); g.restore(); }
+function statCard(g, x, y, k, kn, small) { if (k <= 0) return; const e = easeOutBack(clamp(k)); g.save(); g.translate(x, y); g.scale(e, e); g.globalAlpha = clamp(k * 2); g.shadowColor = 'rgba(0,0,0,0.22)'; g.shadowBlur = 30; g.shadowOffsetY = 10; g.fillStyle = '#fff'; g.beginPath(); g.roundRect(-330, -95, 660, 190, 36); g.fill(); g.shadowColor = 'transparent';
+  g.fillStyle = '#1d2326'; g.beginPath(); g.moveTo(-250, -50); g.bezierCurveTo(-210, 0, -200, 20, -200, 35); g.arc(-250, 35, 50, 0, Math.PI); g.bezierCurveTo(-300, 20, -290, 0, -250, -50); g.fill(); g.fillStyle = 'rgba(255,255,255,0.5)'; g.beginPath(); g.ellipse(-268, 30, 9, 16, 0.3, 0, 7); g.fill();
+  font(g, 800, 92, F_HEAD, 'condensed'); g.fillStyle = COL.red; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillText('~' + BN(Math.round(20 * easeOut(clamp(kn)))) + '%', -160, -18); font(g, 600, 38); g.fillStyle = '#5b6266'; g.fillText(small, -160, 52);
+  g.fillStyle = '#e8ecee'; g.fillRect(-160, 82, 440, 8); g.fillStyle = COL.red; g.fillRect(-160, 82, 440 * 0.2 * easeOut(clamp(kn)) * 5 * 0.2 + 440 * 0.0, 8); g.restore(); }
+function stamp(g, txt, x, y, size, k, col, rot = -0.12) { if (k <= 0) return; const e = clamp(k), s = lerp(2.4, 1, easeOut(e)); g.save(); g.translate(x, y); g.rotate(rot); g.scale(s, s); g.globalAlpha = clamp(e * 3); font(g, 800, size, F_HEAD, 'condensed'); g.textAlign = 'center'; g.textBaseline = 'middle'; const w = g.measureText(txt).width; g.shadowColor = 'rgba(0,0,0,0.25)'; g.shadowBlur = 20; g.fillStyle = 'rgba(255,255,255,0.92)'; g.beginPath(); g.roundRect(-w / 2 - 40, -size * 0.62, w + 80, size * 1.2, 24); g.fill(); g.shadowColor = 'transparent'; g.strokeStyle = col; g.lineWidth = 12; g.stroke(); g.fillStyle = col; g.fillText(txt, 0, size * 0.04); g.restore(); }
+function commentBox(g, x, y, w, kv, t0, t, msg) { if (kv <= 0) return; const lt = t - t0; const e = easeOutBack(clamp(kv)); g.save(); g.translate(x, y + (1 - e) * 160); g.globalAlpha = clamp(kv * 2);
+  g.shadowColor = 'rgba(0,0,0,0.25)'; g.shadowBlur = 40; g.shadowOffsetY = 14; g.fillStyle = '#ffffff'; g.beginPath(); g.roundRect(-w / 2, -95, w, 190, 40); g.fill(); g.shadowColor = 'transparent';
+  g.fillStyle = COL.purple; g.beginPath(); g.arc(-w / 2 + 90, 0, 46, 0, 7); g.fill(); font(g, 700, 46); g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('আ', -w / 2 + 90, 4);
+  const n = Math.floor(clamp((lt - 0.3) / 1.2) * msg.length); font(g, 600, 42); g.textAlign = 'left'; g.fillStyle = '#222'; g.fillText(msg.slice(0, n) + ((Math.floor(t * 3) % 2 && n < msg.length) ? '|' : ''), -w / 2 + 160, -22); font(g, 500, 30); g.fillStyle = '#8a8a90'; g.fillText('একটি কমেন্ট যোগ করুন…', -w / 2 + 160, 38);
+  const kp = clamp((lt - 1.6) / 0.3), sc = 1 + Math.sin(kp * Math.PI) * 0.25; g.save(); g.translate(w / 2 - 95, 0); g.scale(sc, sc); g.fillStyle = COL.red; g.beginPath(); g.roundRect(-55, -40, 110, 80, 40); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.moveTo(-15, -20); g.lineTo(29, 0); g.lineTo(-15, 20); g.fill(); g.restore(); g.restore(); }
+let PAPERC = null;
+function newspaper(g, x, y, k, t) { if (k <= 0) return; const w = 780, h = 1000; g.save(); const e = easeOut(clamp(k)); g.translate(x, y); g.rotate((1 - e) * Math.PI * 4 - 0.045 + Math.sin(t * 1.2) * 0.006); g.scale(lerp(0.04, 1, e), lerp(0.04, 1, e)); g.globalAlpha = clamp(k * 4);
+  g.shadowColor = 'rgba(0,0,0,0.35)'; g.shadowBlur = 50; g.shadowOffsetY = 26; g.fillStyle = '#f3f0e8'; g.fillRect(-w / 2, -h / 2, w, h); g.shadowColor = 'transparent';
+  const pg = g.createLinearGradient(-w / 2, 0, w / 2, 0); pg.addColorStop(0, 'rgba(0,0,0,0.06)'); pg.addColorStop(0.5, 'rgba(255,255,255,0)'); pg.addColorStop(0.52, 'rgba(0,0,0,0.07)'); pg.addColorStop(1, 'rgba(0,0,0,0.02)'); g.fillStyle = pg; g.fillRect(-w / 2, -h / 2, w, h);
+  g.fillStyle = '#1d2326'; font(g, 800, 76, F_HEAD, 'condensed'); g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.fillText('বিশ্ব সংবাদ', 0, -h / 2 + 100); g.fillRect(-w / 2 + 40, -h / 2 + 122, w - 80, 4); g.fillRect(-w / 2 + 40, -h / 2 + 132, w - 80, 1.5);
+  g.fillStyle = COL.red; g.fillRect(-w / 2 + 40, -h / 2 + 152, 210, 52); font(g, 700, 34); g.fillStyle = '#fff'; g.textAlign = 'left'; g.fillText('ব্রেকিং', -w / 2 + 62, -h / 2 + 190);
+  font(g, 800, 84, F_HEAD, 'condensed'); g.fillStyle = '#1d2326'; g.fillText('বিপদের মুখে', -w / 2 + 40, -h / 2 + 300); g.fillText('পুরো বিশ্ব', -w / 2 + 40, -h / 2 + 390);
+  if (PAPERC) { g.save(); g.filter = 'grayscale(0.85) contrast(1.15)'; g.drawImage(PAPERC, -w / 2 + 40, -h / 2 + 430, 440, 440); g.restore(); g.strokeStyle = '#1d2326'; g.lineWidth = 2; g.strokeRect(-w / 2 + 40, -h / 2 + 430, 440, 440); }
+  g.fillStyle = 'rgba(29,35,38,0.35)'; for (let i = 0; i < 22; i++) { const yy = -h / 2 + 440 + i * 20; g.fillRect(-w / 2 + 510, yy, 230 * (i % 5 === 4 ? 0.6 : 1), 7); }
+  for (let i = 0; i < 4; i++) { const yy = -h / 2 + 900 + i * 20; g.fillRect(-w / 2 + 40, yy, (w - 80) * (i === 3 ? 0.5 : 1), 7); } g.restore(); }
+function hormuzLabels(g, t) { const k = clamp((t - TLS[5].s - 0.6) / 0.5); mapLbl(g, 'ইরান', 57.2, 27.75, k, { size: 40, w: 700, col: '#ffffff', halo: 'rgba(158,42,34,0.85)', h: 0.2 }); mapLbl(g, 'ওমান', 56.15, 25.75, k, { size: 36 }); mapLbl(g, 'পারস্য উপসাগর', 54.6, 26.95, k, { size: 30, col: '#3d7f78', halo: 'rgba(220,245,240,0.7)', h: 0.01 }); mapLbl(g, 'ওমান উপসাগর', 58.4, 24.75, k, { size: 30, col: '#3d7f78', halo: 'rgba(220,245,240,0.7)', h: 0.01 }); }
+function lanePx() { return SC.map.lane.getPoints(40).map(p => { const v = p.clone(); v.y = 0.03; const [x, y] = scr(v); return [x, y]; }); }
+// crimson tension atmosphere for the globe section (no navy)
+function globeBg(g, t) { softBg(g, '#1e0709', '#4a170f'); g.save(); g.globalCompositeOperation = 'screen'; const r = g.createRadialGradient(540, 960, 300, 540, 960, 760); r.addColorStop(0, 'rgba(255,140,80,0.55)'); r.addColorStop(0.35, 'rgba(255,90,50,0.2)'); r.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = r; g.fillRect(0, 0, PW, PH); g.restore(); smokeLayer(g, t, '120,40,30', 0.55, 6, [100, 600], 3); smokeLayer(g, t, '90,30,20', 0.6, 6, [1400, 1900], 4); }
+
+// ======================= BEATS =======================
+function defineBeats() {
+  const s = i => TLS[i].s;
+  // 1 HOOK — editorial card, slam words, flags whip in
+  beat(0, 'light', 'none', (g, t) => { stage(g, t); bokeh(g, t, '255,255,255', 10, 0.25); lightSweep(g, t, 3, 0.25, 0.4);
+    const kw = clamp(t / 0.22); if (kw > 0) { g.save(); g.translate(540, 500); const sc = lerp(1.7, 1, easeOut(kw)); g.scale(sc, sc); g.filter = `blur(${(1 - kw) * 10}px)`; g.translate(-540, -500); words(g, [{ w: 'কী', at: -1 }, { w: 'হবে', at: -1 }, { w: 'যদি…', accent: true, at: -1 }], PW / 2, 520, 120, t, 0); g.restore(); }
+    speedLines(g, 540, 950, t, clamp(1 - Math.abs(t - 0.6) / 0.35), 'rgba(40,40,50,A)');
+    flag(g, 'usa', lerp(-300, 320, easeOut(seg(t, 0.32, 0.62))), 920, 400, t, seg(t, 0.32, 0.62) > 0 ? 1 : 0, { rot: -0.07 }); flag(g, 'iran', lerp(1400, 760, easeOut(seg(t, 0.5, 0.8))), 980, 400, t, seg(t, 0.5, 0.8) > 0 ? 1 : 0, { rot: 0.06 });
+    const kv = seg(t, 0.82, 1.05); if (kv > 0) { const e = easeOutBack(kv); g.save(); g.translate(540, 950); g.strokeStyle = `rgba(229,57,47,${1 - kv})`; g.lineWidth = 10; g.beginPath(); g.arc(0, 0, 70 + kv * 200, 0, 7); g.stroke(); g.scale(e, e); g.fillStyle = COL.red; g.shadowColor = 'rgba(0,0,0,0.3)'; g.shadowBlur = 20; g.beginPath(); g.arc(0, 0, 74, 0, 7); g.fill(); font(g, 800, 66, F_HEAD, 'condensed'); g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('VS', 0, 4); g.restore(); }
+    words(g, [{ w: 'আমেরিকা', accent: true }, { w: 'বনাম' }, { w: 'ইরান', accent: true, col: COL.red }], PW / 2, 1330, 84, t, 0.6, 0.12); }, { nocap: true });
+  // 2 face (straight look only)
+  beat(1.55, 'face', 'zoom', (g, t, b) => face(g, t, b));
+  // 3 MAP + bomb + character presenting
+  beat(s(1), 'light', 'whip', (g, t, b) => { render3D(g, 'map', t); const A = SC.map.A; mapGrid(g, t, 0.12);
+    [['ইরাক', 43.5, 33], ['সৌদি আরব', 45, 24.5], ['তুরস্ক', 35, 39], ['আফগানিস্তান', 65.5, 33.5], ['পাকিস্তান', 68.5, 28.5], ['সিরিয়া', 38.5, 35.2]].forEach(([n, lo, la], i) => mapLbl(g, n, lo, la, seg(t, s(1) + 0.6 + i * 0.1, s(1) + 1.0 + i * 0.1), { size: 40 }));
+    const ki = P(t, 'ইরানের উপরে'); if (ki > 0) { const [rx, ry] = scr(geoV(53.6, 32.4, 0.14)); radar(g, rx, ry, 330, t, ki); const [x, y] = scr(geoV(56.5, 30, 0.35)); pill(g, 'ইরান', x + 60, y - 110, ki, { style: 'red', size: 46, ax: x, ay: y }); }
+    pill(g, 'আমেরিকা  ›  ইরান', 540, 250, P(t, 'আমেরিকা'), { style: 'yellow', size: 42 });
+    const kb = P(t, 'পারমাণবিক বোমা', 0.35, 0.25); if (kb > 0 && SC.map.bomb.visible) { const [x, y] = scr(SC.map.bomb.position.clone().add(new THREE.Vector3(0, 0.6, 0))); pill(g, 'পারমাণবিক বোমা', clamp(x - 230, 220, 860), y - 150, kb, { style: 'dark', size: 40, ax: x - 20, ay: y - 20 }); }
+    const kt = seg(t, A.b3e - 1.6, A.b3e - 1.2); if (kt > 0) { const [x, y] = scr(geoV(53.6, 32.4, 0.14)); hud(g, x, y, 260, 200, kt, '#e5392f', 'TARGET'); }
+    drawChar(g, t, 860, 1895, 0.82, { k: seg(t, b.t0 + 0.4, b.t0 + 0.9), fromX: 420 }); cloudPass(g, seg(t, b.t0, b.t0 + 0.9)); }, { capY: 1170 });
+  // 4 CITY blast (drama)
+  beat(s(2), 'drama', 'zoom', (g, t) => { render3D(g, 'city', t); const A = SC.city.A; const kb = seg(t, A.blast, A.blast + 3);
+    shockwave(g, t, A.blast); debris(g, t, A.blast); embers(g, t, 70, '255,150,60', kb); smokeLayer(g, t, '30,18,22', 0.7 * kb, 6, [1500, 1950], 1); lightLeak(g, t, 0.5 + kb * 0.5, '255,140,70');
+    const fl = t >= A.blast ? Math.exp(-(t - A.blast) * 5) : 0; if (fl > 0.01) { g.fillStyle = `rgba(255,246,228,${fl})`; g.fillRect(0, 0, PW, PH); }
+    headline(g, 'মুহূর্তেই', 'ধ্বংস', S(t, 'মুহূর্তের', 0.45), P(t, 'ধ্বংস', 0.4), '#ff8a3d'); });
+  // 5 CROWD
+  beat('প্রাণ হারাতে', 'light', 'whip', (g, t) => { render3D(g, 'crowd', t); { const tg = g.createLinearGradient(0, 120, 0, 640); tg.addColorStop(0, 'rgba(227,243,240,0.95)'); tg.addColorStop(1, 'rgba(227,243,240,0)'); g.fillStyle = tg; g.fillRect(0, 0, PW, 640); } bokeh(g, t, '255,255,255', 12, 0.3, 2); ecg(g, t, 1470, SC.crowd.A.loss + 1.4);
+    headline(g, 'প্রাণ হারাতে পারে', 'অসংখ্য মানুষ', S(t, 'প্রাণ হারাতে', 0.45), P(t, 'অসংখ্য', 0.45), COL.red, { col1: COL.ink, s1: 70, s2: 120 }); });
+  // 6 IRAN won't stay silent — editorial + worried character
+  beat(s(3), 'light', 'bars', (g, t) => { stage(g, t); lightSweep(g, t, 3.5, 0.2); flag(g, 'iran', 540, 640, 560, t, seg(t, s(3) + 0.05, s(3) + 0.5), { rot: -0.04 });
+    words(g, [{ w: 'ইরানও', at: T('ইরানও যে') }, { w: 'চুপ', accent: true, at: T('চুপ') }, { w: 'থাকবে?', at: T('থাকবে') }], PW / 2, 1080, 100, t, 0);
+    drawChar(g, t, 800, 1612, 0.6, { k: seg(t, s(3) + 0.2, s(3) + 0.6), fromY: 300, shadow: false });
+    stamp(g, 'না!', 380, 1340, 210, seg(t, T('তা না') + 0.1, T('তা না') + 0.35), COL.red); POPS.add(+(T('তা না') + 0.1).toFixed(2)); }, { nocap: true });
+  // 7 MAP — counter attack
+  beat('ইরানও পাল্টা', 'light', 'zoom', (g, t, b) => { render3D(g, 'map', t); pill(g, 'পাল্টা আক্রমণ', 540, 250, P(t, 'পাল্টা'), { style: 'red', size: 44 });
+    SC.map.MS.forEach(m => { if (![0, 2, 5, 6].includes(m.i)) return; const [x, y] = scr(m.e.clone().add(new THREE.Vector3(0, 0.42, 0))); const base = m.kind === 'base'; pill(g, base ? 'মার্কিন ঘাঁটি' : 'মিত্র দেশ', x, y - 70, P(t, base ? 'সামরিক ঘাঁটি' : 'মিত্রদের', 0.35, (m.i % 4) * 0.1), { style: base ? 'blue' : 'dark', size: 38 }); });
+    mapLbl(g, 'ইরান', 54.5, 32.5, 1, { size: 44, w: 700, col: '#ffffff', halo: 'rgba(158,42,34,0.8)', h: 0.3 }); mapGrid(g, t, 0.1);
+    missilePanel(g, t, SC.map.MS.map(m => SC.map.A.pal + 0.2 + m.i * 0.32), seg(t, b.t0 + 0.2, b.t0 + 0.6)); cloudPass(g, seg(t, b.t0, b.t0 + 0.8)); });
+  // 8 WAR (drama)
+  beat(s(4), 'drama', 'glitch', (g, t) => { render3D(g, 'map', t); { const [x, y] = scr(geoV(53, 32, 0.1)); ripples(g, x, y, t, seg(t, s(4), s(4) + 0.6)); } smokeLayer(g, t, '35,25,25', 0.75, 7, [1450, 1950], 5); smokeLayer(g, t, '50,35,30', 0.5, 5, [-100, 500], 6); embers(g, t, 60, '255,140,60', seg(t, s(4), s(4) + 1));
+    headline(g, 'পুরো মধ্যপ্রাচ্য', 'ভয়াবহ যুদ্ধে', P(t, 'পুরো মধ্যপ্রাচ্য', 0.45), P(t, 'ভয়াবহ এক', 0.45), '#ff6a3d', { s1: 92, s2: 136 }); });
+  // 9 HORMUZ — fly in through clouds
+  beat(s(5), 'light', 'circle', (g, t, b) => { render3D(g, 'map', t); hormuzLabels(g, t); const [x, y] = scr(geoV(56.4, 26.5, 0.02)); hud(g, x, y, 300, 220, seg(t, T('হরমুজ') + 0.1, T('হরমুজ') + 0.45), COL.ink); pill(g, 'হরমুজ প্রণালী', x - 120, y - 280, P(t, 'হরমুজ', 0.4, 0.15), { style: 'yellow', size: 46, ax: x, ay: y - 110, line: COL.ink }); cloudPass(g, seg(t, b.t0, b.t0 + 1.0)); });
+  // 10 tankers + stat count-up
+  beat(s(6), 'light', 'none', (g, t) => { render3D(g, 'map', t); oilFlow(g, t, lanePx(), seg(t, s(6), s(6) + 0.5), 999); hormuzLabels(g, t); const k = P(t, 'বিপুল পরিমাণ', 0.45); statCard(g, 540, 330, k, seg(t, T('বিপুল পরিমাণ'), T('বিপুল পরিমাণ') + 1.2), 'বিশ্বের তেল এই পথে যায়'); });
+  // 11 route closed — alarm
+  beat('এই পথ বন্ধ', 'light', 'none', (g, t) => { render3D(g, 'map', t); oilFlow(g, t, lanePx(), 1, T('বন্ধ হয়ে')); hormuzLabels(g, t); alarm(g, t, seg(t, T('বন্ধ হয়ে'), T('বন্ধ হয়ে') + 0.3)); const [x, y] = scr(SC.map.barrier.position.clone().add(new THREE.Vector3(0, 0.3, 0))); stamp(g, 'পথ বন্ধ', x, y - 170, 90, seg(t, T('বন্ধ হয়ে'), T('বন্ধ হয়ে') + 0.25), COL.red, -0.06);
+    statCard(g, 540, 330, 1 - seg(t, T('এই পথ বন্ধ'), T('এই পথ বন্ধ') + 0.3), 1, 'বিশ্বের তেল এই পথে যায়'); });
+  // 12 OIL PRICE — warm sand section, barrel shoots up, worried character, 'already happened' stamp
+  beat('বিশ্বজুড়ে', 'light', 'bars', (g, t, b) => { const A = SC.barrel.A, ku = ease(seg(t, A.up, A.up + 1.1)); softBg(g, '#fbe9c8', '#f3cf92'); bokeh(g, t, '255,250,235', 12, 0.35, 4);
+    cloud2d(g, 120, lerp(-200, 260, ku), 1.3, ku); cloud2d(g, 700, lerp(-120, 380, ku), 1.0, ku * 0.9); cloud2d(g, 380, lerp(-260, 120, ku), 0.8, ku * 0.8);
+    const kc = clamp((t - b.t0) / 2.2); g.save(); g.strokeStyle = 'rgba(229,57,47,0.85)'; g.lineWidth = 12; g.lineJoin = 'round'; g.shadowColor = 'rgba(229,57,47,0.5)'; g.shadowBlur = 20; g.beginPath(); const pts = [[60, 1650], [220, 1600], [360, 1630], [500, 1500], [640, 1420], [780, 1150], [900, 800], [1020, 420]]; const n = kc * (pts.length - 1);
+    for (let i = 0; i <= Math.floor(n); i++) { const [x, y] = pts[i]; i ? g.lineTo(x, y) : g.moveTo(x, y); } const i0 = Math.floor(n), f = n - i0; if (i0 < pts.length - 1) g.lineTo(lerp(pts[i0][0], pts[i0 + 1][0], f), lerp(pts[i0][1], pts[i0 + 1][1], f)); g.stroke(); g.restore();
+    upArrows(g, t, ku); render3D(g, 'barrel', t); gauge(g, 540, 430, 170, lerp(0.15, 0.97, ease(seg(t, b.t0 + 0.2, A.up + 0.9))) + Math.sin(t * 30) * 0.008 * ku, seg(t, b.t0, b.t0 + 0.4), 'তেলের দাম');
+    pill(g, 'আকাশছোঁয়া ↑', 820, 760, P(t, 'আকাশ', 0.4), { style: 'red', size: 44 }); drawChar(g, t, 230, 1985, 0.85, { k: seg(t, b.t0 + 0.2, b.t0 + 0.6), fromX: -400, shadow: false });
+    stamp(g, 'অলরেডি বেড়েছে!', 600, 1080, 92, seg(t, T('অলরেডি'), T('অলরেডি') + 0.25), COL.red, -0.08); POPS.add(+T('অলরেডি').toFixed(2)); });
+  // 13 RADIATION (vintage olive, hazard tape)
+  beat(s(7), 'drama', 'glitch', (g, t) => { const gr = g.createRadialGradient(540, 900, 50, 540, 900, 1300); gr.addColorStop(0, '#5d6b2c'); gr.addColorStop(0.55, '#2c3618'); gr.addColorStop(1, '#141a0c'); g.fillStyle = gr; g.fillRect(0, 0, PW, PH);
+    g.save(); g.globalCompositeOperation = 'screen'; const hz = g.createRadialGradient(540, 960, 0, 540, 960, 700); hz.addColorStop(0, 'rgba(190,255,120,0.25 )'); hz.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = hz; g.fillRect(0, 0, PW, PH); g.restore();
+    render3D(g, 'rad', t); embers(g, t, 50, '170,255,110', 0.8); gauge(g, 540, 1420, 150, 0.82 + Math.sin(t * 23) * 0.05 + Math.sin(t * 57) * 0.03, seg(t, s(7) + 0.5, s(7) + 0.9), 'বিকিরণ'); hazardTape(g, t, 1640, -0.05, seg(t, s(7), s(7) + 0.4)); hazardTape(g, -t, 130, 0.04, seg(t, s(7) + 0.1, s(7) + 0.5));
+    headline(g, 'পারমাণবিক বিস্ফোরণে', 'তেজস্ক্রিয়তা', S(t, 'পারমাণবিক বিস্ফোরণে', 0.45), P(t, 'তেজস্ক্রিয়তা', 0.45), COL.yellow, { s1: 66, s2: 140 }); });
+  // 14 GLOBE — global tension (crimson)
+  beat('সম্ভাব্য বৈশ্বিক', 'dark', 'zoom', (g, t) => { globeBg(g, t); orbitRing(g, t); render3D(g, 'globe', t); embers(g, t, 40, '255,120,60', 0.7); const tm = T('মানবজাতির');
+    if (t < tm) headline(g, 'বৈশ্বিক', 'উত্তেজনা', P(t, 'বৈশ্বিক', 0.4), P(t, 'উত্তেজনা', 0.4), '#ff6a45'); else headline(g, 'মানবজাতির জন্য', 'ভয়াবহ সংকট', seg(t, tm, tm + 0.4), P(t, 'ভয়াবহ সংকট', 0.45), '#ff6a45', { s1: 76 }); });
+  // 15 GLOBE — not only Iran, whole world; character steps in and points
+  beat(s(8), 'dark', 'none', (g, t) => { globeBg(g, t); orbitRing(g, t); render3D(g, 'globe', t); ripples(g, 540, 1040, t, seg(t, T('ইরান নয়'), T('ইরান নয়') + 0.5), '255,90,60'); embers(g, t, 40, '255,120,60', 0.7);
+    headline(g, 'শুধু ইরান নয়', 'পুরো বিশ্ব', P(t, 'শুধু ইরান', 0.4), S(t, 'ইরান নয়', 0.45, 0.45), '#ff6a45', { s1: 88 }); drawChar(g, t, 860, 1895, 0.82, { k: seg(t, 48.95, 49.4), fromX: 420, rim: 'rgba(255,120,60,0.7)' }); }, { capY: t => t > 48.9 ? 1170 : 1395 });
+  // 16 NEWSPAPER spin-in
+  beat(50.4, 'light', 'whip', (g, t, b) => { stage(g, t); lightSweep(g, t, 2.5, 0.25); words(g, [{ w: 'পুরো' }, { w: 'বিশ্ব' }, { w: 'বিপদের মুখে', accent: true, col: COL.red }], PW / 2, 330, 84, t, b.t0 + 0.45, 0.12); newspaper(g, 540, 960, seg(t, b.t0, b.t0 + 0.6), t); }, { nocap: true });
+  // 17 CTA — which side? character on phone
+  beat(s(9), 'light', 'circle', (g, t, b) => { stage(g, t); lightSweep(g, t, 3.2, 0.2); words(g, [{ w: 'আপনি', at: b.t0 + 0.05 }, { w: 'কোন', at: b.t0 + 0.2 }, { w: 'পক্ষে?', accent: true, at: b.t0 + 0.35 }], PW / 2, 340, 104, t, 0);
+    flag(g, 'iran', 300, 620, 340, t, seg(t, T('ইরানের পক্ষে'), T('ইরানের পক্ষে') + 0.4), { rot: -0.06 }); flag(g, 'usa', 780, 620, 340, t, seg(t, T('আমেরিকার পক্ষে'), T('আমেরিকার পক্ষে') + 0.4), { rot: 0.06 });
+    pill(g, 'ইরান', 300, 800, P(t, 'ইরানের পক্ষে', 0.35, 0.15), { style: 'red', size: 44 }); pill(g, 'আমেরিকা', 780, 800, P(t, 'আমেরিকার পক্ষে', 0.35, 0.15), { style: 'blue', size: 44 });
+    const tc = T('কমেন্ট বক্সে'); bubbles(g, t, T('ইরানের পক্ষে'), [['ইরানের পক্ষে', COL.red, 760, 0.2], ['আমেরিকার পক্ষে', COL.blue, 820, 0.8], ['যুদ্ধ চাই না', '#3cc47c', 700, 1.4], ['শান্তি চাই', '#3cc47c', 860, 2.0]]); commentBox(g, 540, 1010, 900, seg(t, tc, tc + 0.4), tc, t, 'আমার মত হলো…');
+    drawChar(g, t, 230, 1900, 0.78, { k: seg(t, b.t0 + 0.3, b.t0 + 0.7), fromX: -400 }); }, { capY: 1175 });
+  // 18 face end (straight)
+  beat(55.18, 'face', 'zoom', (g, t, b) => { face(g, t, b); pill(g, 'কমেন্টে জানান', 540, 300, seg(t, b.t0 + 0.05, b.t0 + 0.3), { style: 'yellow', size: 46 }); });
+}
+
+// ======================= RENDER =======================
+let OUTP, OG, PREVP, PG, TMP, TG, SHK, SG, FINP, FG;
+function prep() {
+  let prev = 0; B.forEach(b => { if (typeof b.from === 'number') b.t0 = b.from; else { CUR_FROM = prev; b.t0 = T(b.from) - 0.1; } prev = b.t0 + 0.1; }); CUR_FROM = -1; B.sort((a, b) => a.t0 - b.t0);
+  B.forEach((b, i) => b.t1 = i < B.length - 1 ? B[i + 1].t0 : DUR); window.CUTS = B.slice(1).filter(b => b.tr !== 'none').map(b => +b.t0.toFixed(2));
+  const s = i => TLS[i].s;
+  const M = SC.map.A; Object.assign(M, { iran: T('ইরানের উপরে'), bomb: T('পারমাণবিক বোমা'), b3e: s(2), pal: T('ইরানও পাল্টা') - 0.1, base: T('সামরিক ঘাঁটি'), ally: T('মিত্রদের'), war: s(4), yud: T('ভয়াবহ এক'), hor: s(5), close: T('এই পথ বন্ধ') - 0.1, price: T('বিশ্বজুড়ে') - 0.1 });
+  SC.map.keys = [[0, M.b3e, [51, 30.5, 15, 55, 4], [53, 31, 12.5, 56, -8]], [M.pal, M.war, [48, 29.5, 14, 52, 8], [47, 29, 15, 56, 2]], [M.war, M.hor, [46, 30, 13, 48, -6], [48, 29, 17, 60, 6]],
+    [M.hor, s(6), [52, 27.5, 9, 55, 0], [56.4, 26.35, 3.6, 62, -10]], [s(6), M.close, [56.4, 26.35, 3.6, 62, -10], [56.5, 26.3, 3.1, 58, -20]], [M.close, 99, [56.5, 26.3, 3.1, 58, -20], [56.45, 26.4, 2.7, 62, -26]]];
+  Object.assign(SC.city.A, { c0: s(2), blast: T('মুহূর্তের') + 0.1 }); BOOMS.add(+(SC.city.A.blast).toFixed(2));
+  Object.assign(SC.crowd.A, { c0: T('প্রাণ হারাতে') - 0.1, loss: T('প্রাণ হারাতে') + 0.3 });
+  Object.assign(SC.barrel.A, { c0: T('বিশ্বজুড়ে') - 0.1, up: T('আকাশ') });
+  Object.assign(SC.rad.A, { c0: s(7) });
+  Object.assign(SC.globe.A, { g1: T('সম্ভাব্য বৈশ্বিক') - 0.1, g2: s(8), only: T('শুধু ইরান'), notIran: T('ইরান নয়') + 0.35, face: 50.3 });
+  SC.map.MS.forEach(m => { const t0 = M.pal + 0.2 + m.i * 0.32; POPS.add(+t0.toFixed(2)); SHAKES.push([t0 + 1.5, 7, 5]); });
+  SHAKES.push([SC.city.A.blast, 30, 2.2], [0.85, 12, 7], [T('তা না') + 0.12, 18, 7], [T('বন্ধ হয়ে'), 12, 6], [T('অলরেডি'), 16, 7], [50.95, 10, 7], [0.0, 10, 8]);
+  SC.globe.view = [53.5, 30, 13.2, 2.4]; PAPERC = mk(440, 440); const pc = PAPERC.getContext('2d'); const tmp = mk(PW, PH), tg = tmp.getContext('2d'); globeBg(tg, 0); render3D(tg, 'globe', 47.5); pc.drawImage(tmp, 540 - 400, 960 - 400, 800, 800, 0, 0, 440, 440); SC.globe.view = null;
+}
+function drawBeat(g, bi, t) { const b = B[bi]; CUR_FROM = b.t0; g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.filter = 'none'; g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, PW, PH);
+  b.d(g, t, b); }
+const TRD = { zoom: 0.32, whip: 0.3, circle: 0.4, bars: 0.42, glitch: 0.22 };
+function render(i) {
+  const t = i / FPS; let bi = B.findIndex(b => t >= b.t0 && t < b.t1); if (bi < 0) bi = B.length - 1; const b = B[bi], d = t - b.t0;
+  drawBeat(OG, bi, t); let src = OUTP; const dur = TRD[b.tr] || 0;
+  if (bi > 0 && d < dur) {
+    drawBeat(PG, bi - 1, t); const p = d / dur, e = ease(p); TG.setTransform(1, 0, 0, 1, 0, 0); TG.globalAlpha = 1; TG.filter = 'none'; TG.globalCompositeOperation = 'source-over'; TG.clearRect(0, 0, PW, PH);
+    if (b.tr === 'zoom') { TG.save(); TG.translate(PW / 2, PH / 2); TG.scale(1 + e * 0.6, 1 + e * 0.6); TG.filter = `blur(${e * 16}px)`; TG.globalAlpha = 1 - e; TG.drawImage(PREVP, -PW / 2, -PH / 2); TG.restore(); TG.save(); TG.globalAlpha = e; TG.translate(PW / 2, PH / 2); TG.scale(0.85 + 0.15 * e, 0.85 + 0.15 * e); TG.filter = `blur(${(1 - e) * 12}px)`; TG.drawImage(OUTP, -PW / 2, -PH / 2); TG.restore(); }
+    else if (b.tr === 'whip') { const dir = bi % 2 ? 1 : -1; TG.save(); TG.filter = `blur(${Math.sin(p * Math.PI) * 26}px)`; TG.drawImage(PREVP, -dir * e * PW, 0); TG.drawImage(OUTP, dir * (1 - e) * PW, 0); TG.restore(); }
+    else if (b.tr === 'circle') { TG.drawImage(PREVP, 0, 0); const r = e * 1250; TG.save(); TG.beginPath(); TG.arc(PW / 2, PH * 0.45, r, 0, 7); TG.clip(); TG.drawImage(OUTP, 0, 0); TG.restore(); TG.strokeStyle = COL.yellow; TG.lineWidth = 26 * (1 - e); TG.beginPath(); TG.arc(PW / 2, PH * 0.45, r, 0, 7); TG.stroke(); }
+    else if (b.tr === 'bars') { TG.drawImage(PREVP, 0, 0); for (let k = 0; k < 6; k++) { const pk = ease(clamp(p * 1.7 - k * 0.12)); TG.save(); TG.translate(PW / 2, PH / 2); TG.rotate(-0.35); const bw = 460, x0 = -1400 + k * bw; TG.beginPath(); TG.rect(x0, -1400, bw + 2, 2800 * pk); TG.clip(); TG.rotate(0.35); TG.drawImage(OUTP, -PW / 2, -PH / 2); TG.restore(); TG.save(); TG.translate(PW / 2, PH / 2); TG.rotate(-0.35); TG.fillStyle = k % 2 ? COL.yellow : COL.red; if (pk > 0 && pk < 1) TG.fillRect(x0, -1400 + 2800 * pk - 18, bw + 2, 18); TG.restore(); } }
+    else if (b.tr === 'glitch') { TG.drawImage(p < 0.5 ? PREVP : OUTP, 0, 0); const src2 = p < 0.5 ? PREVP : OUTP; for (let s2 = 0; s2 < 16; s2++) { const y0 = hash(s2 + i * 3) * PH, h = 20 + hash(s2 + 2 + i) * 150, off = (hash(s2 + 5 + i * 7) - 0.5) * 220 * Math.sin(p * Math.PI); TG.drawImage(src2, 0, y0, PW, h, off, y0, PW, h); } TG.save(); TG.globalCompositeOperation = 'screen'; TG.globalAlpha = 0.5 * Math.sin(p * Math.PI); TG.drawImage(src2, 14, 0); TG.fillStyle = '#ff2a3a'; TG.fillRect(0, hash(i) * PH, PW, 8); TG.restore(); }
+    src = TMP;
+  }
+  const [sx, sy, sr] = shakeAt(t); if (Math.abs(sx) + Math.abs(sy) > 0.3) { SG.setTransform(1, 0, 0, 1, 0, 0); SG.clearRect(0, 0, PW, PH); SG.save(); SG.translate(PW / 2 + sx, PH / 2 + sy); SG.rotate(sr); SG.scale(1.04, 1.04); SG.drawImage(src, -PW / 2, -PH / 2); SG.restore(); src = SHK; }
+  finish(FG, src, b.look, t);
+  if (b.tr === 'flash' && d < 0.18) { FG.fillStyle = `rgba(255,248,235,${0.85 * (1 - d / 0.18)})`; FG.fillRect(0, 0, PW, PH); }
+  const fade = seg(t, DUR - 0.2, DUR); if (fade > 0) { FG.fillStyle = `rgba(0,0,0,${fade})`; FG.fillRect(0, 0, PW, PH); }
+  CUR_FROM = -1;
+}
+(async () => {
+  await new Promise(r => document.readyState === 'complete' ? r() : addEventListener('load', r));
+  const fs = '../node_modules/@fontsource-variable/anek-bangla/files/', hs = '../node_modules/@fontsource/hind-siliguri/files/';
+  const BNR = 'U+0951-0952,U+0964-0965,U+0980-09FE,U+1CD0,U+1CD2,U+1CD5-1CD6,U+1CD8,U+1CE1,U+1CEA,U+1CED,U+1CF2,U+1CF5-1CF7,U+200C-200D,U+20B9,U+25CC,U+A8F1', LTR = 'U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2190-2199,U+2212,U+2215,U+FEFF,U+FFFD';
+  const faces = [new FontFace('AnekV', `url(${fs}anek-bangla-bengali-wdth-normal.woff2)`, { weight: '100 800', stretch: '75% 125%', unicodeRange: BNR }), new FontFace('AnekV', `url(${fs}anek-bangla-latin-wdth-normal.woff2)`, { weight: '100 800', stretch: '75% 125%', unicodeRange: LTR })];
+  [500, 600, 700].forEach(w => { faces.push(new FontFace('Hind Siliguri', `url(${hs}hind-siliguri-bengali-${w}-normal.woff2)`, { weight: String(w), unicodeRange: BNR })); faces.push(new FontFace('Hind Siliguri', `url(${hs}hind-siliguri-latin-${w}-normal.woff2)`, { weight: String(w), unicodeRange: LTR })); });
+  await Promise.all(faces.map(f => f.load().then(ff => document.fonts.add(ff))));
+  const src = await (await fetch('../node_modules/three/build/three.module.js')).text(); window.THREE = await import(URL.createObjectURL(new Blob([src], { type: 'text/javascript' })));
+  TL = await (await fetch('../temp/timeline.json')).json(); DUR = TL.dur; NF = Math.round(DUR * FPS); TLS = TL.segs; SENT = TL.segs.map(s => ({ s: s.s, e: s.e, text: s.text }));
+  const ff = await (await fetch('../temp/face2/list.json')).json(); await Promise.all(ff.map(n => loadImg('../temp/face2/' + n).then(im => { FACE[+n.match(/\d+/)[0]] = im; })));
+  CHARLIST = new Set(await (await fetch('../temp/char/list.json')).json());
+  buildGrain(); buildCaps(); initGL(); await buildMap(); buildGlobe(); buildCity(); buildCrowd(); buildBarrel(); buildRad();
+  OUTP = mk(PW, PH); OG = OUTP.getContext('2d'); PREVP = mk(PW, PH); PG = PREVP.getContext('2d'); TMP = mk(PW, PH); TG = TMP.getContext('2d'); SHK = mk(PW, PH); SG = SHK.getContext('2d'); FINP = mk(PW, PH); FG = FINP.getContext('2d');
+  defineBeats(); prep();
+  window.frame = async i => { await ensureChar(i); render(i); return FINP.toDataURL('image/jpeg', 0.92); };
+  window.still = async arg => { const out = []; for (const tt of arg.split(',').map(Number)) { try { await ensureChar(Math.round(tt * FPS)); render(Math.round(tt * FPS)); } catch (e) { console.log('ERR at ' + tt + ': ' + e.message + ' | ' + (e.stack || '').split('\n')[1]); } out.push([`s_${tt}.jpg`, FINP.toDataURL('image/jpeg', 0.8)]); } return out; };
+  window.ready = true;
+})();
+</script></body></html>

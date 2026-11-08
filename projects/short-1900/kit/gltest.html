@@ -1,0 +1,18 @@
+<!doctype html><html><head><meta charset="utf-8"></head><body style="margin:0">
+<script>
+(async () => {
+  const src = await (await fetch('../node_modules/three/build/three.module.js')).text();
+  const THREE = await import(URL.createObjectURL(new Blob([src], { type: 'text/javascript' })));
+  const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+  r.setSize(1080, 1920); r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap;
+  document.body.appendChild(r.domElement);
+  const sc = new THREE.Scene(); sc.background = new THREE.Color('#dff1ee');
+  const cam = new THREE.PerspectiveCamera(35, 1080 / 1920, 0.1, 100); cam.position.set(0, 4, 9); cam.lookAt(0, 0, 0);
+  sc.add(new THREE.HemisphereLight('#ffffff', '#9fb', 1.2)); const d = new THREE.DirectionalLight('#fff', 2.5); d.position.set(3, 8, 4); d.castShadow = true; d.shadow.mapSize.set(2048, 2048); sc.add(d);
+  const m = new THREE.Mesh(new THREE.TorusKnotGeometry(1, 0.35, 200, 32), new THREE.MeshStandardMaterial({ color: '#e33', roughness: 0.4 })); m.castShadow = true; m.position.y = 1.5; sc.add(m);
+  const gnd = new THREE.Mesh(new THREE.PlaneGeometry(30, 30), new THREE.ShadowMaterial({ opacity: 0.25 })); gnd.rotation.x = -Math.PI / 2; gnd.receiveShadow = true; sc.add(gnd);
+  const info = r.getContext().getParameter(r.getContext().getExtension('WEBGL_debug_renderer_info').UNMASKED_RENDERER_WEBGL);
+  window.frame = i => { m.rotation.y = i * 0.05; r.render(sc, cam); return r.domElement.toDataURL('image/jpeg', 0.9); };
+  console.log('GPU: ' + info); window.ready = true;
+})();
+</script></body></html>

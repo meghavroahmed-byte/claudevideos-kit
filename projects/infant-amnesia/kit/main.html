@@ -1,0 +1,102 @@
+<!doctype html><html><head><meta charset="utf-8"></head><body style="margin:0;background:#000">
+<script src="../node_modules/topojson-client/dist/topojson-client.min.js"></script>
+<script src="common.js"></script><script src="rigcore.js"></script><script src="env.js"></script>
+<script src="eng.js"></script><script src="tpl1.js"></script><script src="tpl2.js"></script><script src="tpl3.js"></script>
+<script>
+let SENT = [], CUR_FROM = -1, DUR = 1462.26; const ANC = {};
+function T(str) {
+  const key = str + '|' + CUR_FROM.toFixed(1); if (ANC[key] != null) return ANC[key]; let first = null;
+  for (const s of SENT) { let k = -1; while ((k = s.text.indexOf(str, k + 1)) >= 0) { const tt = s.s + (s.e - s.s) * k / s.text.length; if (first == null) first = tt; if (tt >= CUR_FROM - 0.6) return ANC[key] = tt; } }
+  if (first == null) { console.log('MISSING ANCHOR: ' + str); window.MISSING = (window.MISSING || []).concat([str]); }
+  return ANC[key] = first || 0;
+}
+</script>
+<script src="beats.js"></script>
+<script>
+let FR, FG, STA, SGA, STB, SGB, BLC, BLG, GRAIN;
+const TR_CYCLE = ['pan', 'push', 'pan', 'crane', 'push', 'pan', 'push', 'panR'];
+function prep() {
+  let prev = 0;
+  B.forEach((b, i) => { b.o = b.o || {}; if (typeof b.at === 'number') b.t0 = b.at; else { CUR_FROM = prev; b.t0 = T(b.at) - 0.15; } prev = b.t0 + 0.15; });
+  B.forEach((b, i) => { CUR_FROM = b.t0; b.kt = (b.k || []).map(a => typeof a === 'number' ? b.t0 + a : T(a)); });
+  CUR_FROM = -1;
+  for (let i = 1; i < B.length; i++) if (B[i].t0 <= B[i - 1].t0 + 0.8) console.log('ORDER/SHORT: beat ' + i + ' "' + B[i].at + '" t0=' + B[i].t0.toFixed(2) + ' prev=' + B[i - 1].t0.toFixed(2));
+  B.sort((a, b) => a.t0 - b.t0); B[0].t0 = 0;
+  B.forEach((b, i) => b.t1 = i < B.length - 1 ? B[i + 1].t0 : DUR);
+  // stations on the endless floor
+  let u = 0, v = 0; B.forEach((b, i) => { if (i === 0) { b.tr = 'none'; b.su = 0; b.sv = 0; return; } if (!b.tr) b.tr = TR_CYCLE[i % TR_CYCLE.length];
+    const D = { pan: [900, -900], panR: [-900, 900], push: [-760, -760], crane: [700, 700] }[b.tr] || [900, -900]; u += D[0]; v += D[1]; b.su = u; b.sv = v; b.du = D[0]; b.dv = D[1]; });
+  // sections
+  SECS.forEach(s => { CUR_FROM = -1; s.t0 = typeof s.at === 'number' ? s.at : T(s.at) - 0.3; }); CUR_FROM = -1;
+  B.forEach(b => { const s = SECS.filter(x => b.t0 >= x.t0 - 0.01).pop() || SECS[0]; b.sec = s; });
+  window.CUTS = B.slice(1).map(b => +b.t0.toFixed(2)); window.BEATS = B.map(b => [+b.t0.toFixed(2), b.tpl, b.tr]);
+}
+const TRD = 0.9;
+function camAt(t, bi) {
+  const b = B[bi], d = t - b.t0, drift = { u: t * 16 + Math.sin(t * 0.13) * 90, v: Math.cos(t * 0.11) * 90 };
+  let u = b.su, v = b.sv, p = 1;
+  if (bi > 0 && d < TRD) { p = easeIO(d / TRD); u = lerp(B[bi - 1].su, b.su, p); v = lerp(B[bi - 1].sv, b.sv, p); }
+  return { u: u + drift.u, v: v + drift.v, z: 1 + 0.025 * Math.sin(t * 0.09), p };
+}
+function drawStage(ctx, bi, t) {
+  const b = B[bi]; ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.filter = 'none'; ctx.clearRect(0, 0, W, H);
+  const d = t - b.t0, len = Math.max(1, b.t1 - b.t0), z = 1 + 0.045 * easeOut(clamp(d / Math.min(len, 8)));
+  ctx.save(); ctx.translate(W / 2, H * 0.55); ctx.scale(z, z); ctx.translate(-W / 2, -H * 0.55);
+  try { (TPL[b.tpl] || TPL.typeSlam)(ctx, t, b, b.o); } catch (e) { console.log('ERR beat ' + bi + ' ' + b.tpl + ': ' + e.message + ' ' + (e.stack || '').split('\n')[1]); }
+  if (b.ch) { const c = b.ch; charIn(ctx, t, c.x || (c.side === 'R' ? W - 300 : 300), c.y || H * 0.97, c.s || 0.5, Object.assign({ rim: b.sec.col, up: (c.up || 0) * clamp((t - b.t0 - 0.3) * 2) }, c)); }
+  ctx.restore();
+}
+function render(i) {
+  const t = i / FPS; let bi = B.findIndex(b => t >= b.t0 && t < b.t1); if (bi < 0) bi = B.length - 1; const b = B[bi], d = t - b.t0;
+  const cam = camAt(t, bi), col = b.sec.col;
+  FG.setTransform(1, 0, 0, 1, 0, 0); FG.globalAlpha = 1; FG.globalCompositeOperation = 'source-over'; FG.filter = 'none';
+  drawFloor(FG, cam, t, col);
+  const inTr = bi > 0 && d < TRD;
+  drawStage(SGA, bi, t);
+  if (inTr) {
+    drawStage(SGB, bi - 1, t);
+    const p = cam.p, sp = Math.sin(clamp(d / TRD) * Math.PI), z = cam.z;
+    const sx = (b.du - b.dv) * C30 * z, sy = (b.du + b.dv) * S30 * z; // screen displacement between stations
+    const blur = Math.round(sp * 7);
+    if (b.tr === 'push') {
+      FG.save(); FG.globalAlpha = 1 - p; FG.translate(W / 2, H * 0.6); const so = 1 + p * 1.1; FG.scale(so, so); FG.translate(-W / 2, -H * 0.6 + p * 160); if (blur) FG.filter = `blur(${blur}px)`; FG.drawImage(STB, 0, 0); FG.restore();
+      FG.save(); FG.globalAlpha = clamp(p * 1.6); FG.translate(W / 2, H * 0.6); const sn = lerp(0.5, 1, p); FG.scale(sn, sn); FG.translate(-W / 2, -H * 0.6 - (1 - p) * 260); if (blur > 3) FG.filter = `blur(${Math.round(blur / 2)}px)`; FG.drawImage(STA, 0, 0); FG.restore();
+    } else {
+      FG.save(); FG.translate(-sx * p, -sy * p); if (blur) FG.filter = `blur(${blur}px)`; FG.drawImage(STB, 0, 0); FG.restore();
+      FG.save(); FG.translate(sx * (1 - p), sy * (1 - p)); if (blur) FG.filter = `blur(${blur}px)`; FG.drawImage(STA, 0, 0); FG.restore();
+    }
+    // speed streaks
+    FG.save(); FG.globalCompositeOperation = 'lighter'; FG.globalAlpha = sp * 0.5; for (let k = 0; k < 22; k++) { const y = hash(k + bi) * H, x = ((hash(k + 5) * W + d * 3000 * (b.tr === 'panR' ? -1 : 1)) % W + W) % W; FG.fillStyle = k % 2 ? col : '#ffffff'; FG.fillRect(x, y, 260 * sp, 2); } FG.restore();
+  } else FG.drawImage(STA, 0, 0);
+  // overlays fixed to the lens (do not travel)
+  if (b.term) termPill(FG, t, b.term[2] != null ? (typeof b.term[2] === 'number' ? b.t0 + b.term[2] : (CUR_FROM = b.t0, T(b.term[2]))) : b.t0 + 0.5, b.term[0], b.term[1], col);
+  CUR_FROM = -1;
+  hud(FG, t, b.sec.name, col);
+  post(FG, t);
+  const fin = 1 - seg(t, 0, 0.8); if (fin > 0) { FG.fillStyle = `rgba(0,0,0,${fin})`; FG.fillRect(0, 0, W, H); }
+  const fo = seg(t, DUR - 1.5, DUR); if (fo > 0) { FG.fillStyle = `rgba(0,0,0,${fo})`; FG.fillRect(0, 0, W, H); }
+}
+function post(g, t) {
+  BLG.setTransform(1, 0, 0, 1, 0, 0); BLG.clearRect(0, 0, 480, 270); BLG.filter = 'blur(6px) brightness(1.25)'; BLG.drawImage(FR, 0, 0, 480, 270); BLG.filter = 'none';
+  g.save(); g.globalCompositeOperation = 'screen'; g.globalAlpha = 0.28; g.drawImage(BLC, 0, 0, W, H); g.restore();
+  const v = g.createRadialGradient(W / 2, H / 2, H * 0.42, W / 2, H / 2, W * 0.64); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,0.6)'); g.fillStyle = v; g.fillRect(0, 0, W, H);
+  g.save(); g.globalCompositeOperation = 'overlay'; g.globalAlpha = 0.08; const ox = Math.floor(hash(Math.floor(t * 24)) * 256), oy = Math.floor(hash(Math.floor(t * 24) + 7) * 256); g.translate(-ox, -oy); g.fillStyle = g.createPattern(GRAIN, 'repeat'); g.fillRect(ox, oy, W, H); g.restore();
+}
+function makeGrain() { const c = mk(256, 256), g = c.getContext('2d'), id = g.createImageData(256, 256); for (let i = 0; i < id.data.length; i += 4) { const v = Math.random() * 255; id.data[i] = id.data[i + 1] = id.data[i + 2] = v; id.data[i + 3] = 255; } g.putImageData(id, 0, 0); return c; }
+(async () => {
+  await new Promise(r => document.readyState === 'complete' ? r() : addEventListener('load', r));
+  const NM = '../node_modules/';
+  const faces = [new FontFace('Anek Bangla', `url(${NM}@fontsource-variable/anek-bangla/files/anek-bangla-bengali-wght-normal.woff2)`, { weight: '100 800', unicodeRange: 'U+0951-0952,U+0964-0965,U+0980-09FE,U+1CD0-1CF9,U+200C-200D,U+20B9,U+25CC,U+A8F1' }),
+    new FontFace('Anek Bangla', `url(${NM}@fontsource-variable/anek-bangla/files/anek-bangla-latin-wght-normal.woff2)`, { weight: '100 800' })];
+  for (const w of [400, 600, 700]) faces.push(new FontFace('Hind Siliguri', `url(${NM}@fontsource/hind-siliguri/files/hind-siliguri-bengali-${w}-normal.woff2)`, { weight: String(w) }));
+  for (const f of faces) { try { document.fonts.add(await f.load()); } catch (e) { console.log('font fail', e.message); } }
+  try { window.WORLD = await (await fetch(NM + 'world-atlas/land-110m.json')).json(); } catch (e) { console.log('world fail ' + e.message); }
+  const TL = await (await fetch('../temp/timeline.json')).json(); DUR = TL.dur; SENT = TL.segs;
+  const S0 = await prepareSheet(); buildRig(S0); buildFloor(); buildMap();
+  FR = mk(W, H); FG = FR.getContext('2d'); STA = mk(W, H); SGA = STA.getContext('2d'); STB = mk(W, H); SGB = STB.getContext('2d'); BLC = mk(480, 270); BLG = BLC.getContext('2d'); GRAIN = makeGrain();
+  prep();
+  window.frame = i => { render(i); return FR.toDataURL('image/jpeg', 0.9); };
+  window.still = arg => { if (arg === 'beats') return [['beats.json', 'data:application/json;base64,' + btoa(unescape(encodeURIComponent(JSON.stringify(B.map(b => [String(b.at), +b.t0.toFixed(2), +b.t1.toFixed(2), b.tpl, b.tr]))))))]]; return arg.split(',').map(Number).map(t => { try { render(Math.round(t * FPS)); } catch (e) { console.log('ERR at ' + t + ': ' + e.message + ' | ' + (e.stack || '').split('\n')[1]); } return [`s_${t}.jpg`, FR.toDataURL('image/jpeg', 0.82)]; }); };
+  window.ready = true;
+})();
+</script></body></html>

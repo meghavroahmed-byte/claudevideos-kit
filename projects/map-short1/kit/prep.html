@@ -1,0 +1,57 @@
+<!doctype html><html><body><script>
+// Reproject NASA equirect tiles -> Web Mercator tiles + recolour flat navy ocean into bathymetry-style blues.
+const SRC = 'file:///D:/ClaudeVideos/cache/maps/tiles/';
+const load = u => new Promise((r, j) => { const i = new Image(); i.onload = () => r(i); i.onerror = j; i.src = u; });
+const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+const latOfY = (Y, S) => Math.atan(Math.sinh(Math.PI * (1 - 2 * Y / S))) * 180 / Math.PI;
+function recolor(c) {
+  const w = c.width, h = c.height, g = c.getContext('2d'), d = g.getImageData(0, 0, w, h), p = d.data;
+  // land mask -> blurred for shallow-water glow
+  const m = mk(w, h), mg = m.getContext('2d'), md = mg.createImageData(w, h);
+  const isOcean = i => { const r = p[i], gg = p[i + 1], b = p[i + 2]; return b > r + 25 && b > gg + 18 && r < 70 && gg < 80; };
+  for (let i = 0; i < p.length; i += 4) { const o = isOcean(i); md.data[i + 3] = o ? 0 : 255; }
+  mg.putImageData(md, 0, 0);
+  const bl = mk(w, h), bg = bl.getContext('2d'); const R = Math.max(8, w / 120); bg.filter = `blur(${R}px)`; bg.drawImage(m, 0, 0); bg.filter = `blur(${R * 4}px)`; bg.globalAlpha = 0.6; bg.drawImage(m, 0, 0);
+  const bd = bg.getImageData(0, 0, w, h).data;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { const i = (y * w + x) * 4; if (!isOcean(i)) continue;
+    const s = Math.min(1, bd[i + 3] / 255 * 1.6), n = (Math.sin(x * 0.0021 + y * 0.0013) + Math.sin(x * 0.0007 - y * 0.0017 + 2) * 1.2) * 2.2 + (Math.random() - 0.5) * 3;
+    const deep = [16, 52, 98], mid = [26, 86, 140], sh = [56, 150, 178];
+    const k1 = Math.min(1, s * 2), k2 = Math.max(0, s * 2 - 1); const r = deep[0] + (mid[0] - deep[0]) * k1 + (sh[0] - mid[0]) * k2, gg = deep[1] + (mid[1] - deep[1]) * k1 + (sh[1] - mid[1]) * k2, b = deep[2] + (mid[2] - deep[2]) * k1 + (sh[2] - mid[2]) * k2;
+    p[i] = r + n; p[i + 1] = gg + n; p[i + 2] = b + n; }
+  g.putImageData(d, 0, 0);
+}
+async function merc(srcCols, srcRows, tileW, srcW, srcH, getTile, S, ox, oy, OT) {
+  // output tile OT x OT at mercator global pixel (ox*OT, oy*OT) of world size S
+  const c = mk(OT, OT), g = c.getContext('2d'); g.imageSmoothingQuality = 'high';
+  const step = 4;
+  for (let y = 0; y < OT; y += step) {
+    const la0 = latOfY(oy * OT + y, S), la1 = latOfY(oy * OT + y + step, S);
+    const sy0 = (90 - la0) / 180 * srcH, sy1 = (90 - la1) / 180 * srcH;
+    const gx0 = ox * OT / S * srcW, gx1 = (ox + 1) * OT / S * srcW;
+    for (let ty = 0; ty < srcRows; ty++) for (let tx = 0; tx < srcCols; tx++) {
+      const tX0 = tx * tileW, tY0 = ty * tileW, tW = Math.min(tileW, srcW - tX0), tH = Math.min(tileW, srcH - tY0);
+      const ax = Math.max(gx0, tX0), bx = Math.min(gx1, tX0 + tW), ay = Math.max(sy0, tY0), by = Math.min(sy1, tY0 + tH);
+      if (bx <= ax || by <= ay) continue; const img = await getTile(tx, ty);
+      const dx0 = (ax - gx0) / (gx1 - gx0) * OT, dx1 = (bx - gx0) / (gx1 - gx0) * OT, dy0 = y + (ay - sy0) / (sy1 - sy0) * step, dy1 = y + (by - sy0) / (sy1 - sy0) * step;
+      g.drawImage(img, ax - tX0, ay - tY0, bx - ax, by - ay, dx0, dy0, dx1 - dx0, dy1 - dy0 + 0.6);
+    }
+  }
+  recolor(c); return c;
+}
+const cache = {};
+window.still = async arg => {
+  const out = [];
+  if (arg === 'L0') {
+    const ov = await load(SRC + 'bm_overview_6000.jpg');
+    const c = await merc(1, 1, 6000, 6000, 3000, async () => ov, 4096, 0, 0, 4096);
+    out.push(['L0.jpg', c.toDataURL('image/jpeg', 0.9)]);
+  } else {
+    const [ox, oy] = arg.split('_').map(Number);
+    const get = async (tx, ty) => cache[tx + '_' + ty] || (cache[tx + '_' + ty] = await load(SRC + `bm_${tx}_${ty}.jpg`));
+    const c = await merc(6, 3, 4000, 24000, 12000, get, 24000, ox, oy, 4000);
+    out.push([`L1_${ox}_${oy}.jpg`, c.toDataURL('image/jpeg', 0.88)]);
+  }
+  return out;
+};
+window.ready = true;
+</script></body></html>

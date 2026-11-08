@@ -1,0 +1,22 @@
+<!doctype html><html><body style="margin:0;background:#000">
+<script>window.VW = 1920; window.VH = 1080;</script>
+<script src="common.js"></script><script src="rigcore.js"></script><script src="world.js"></script><script src="kit16.js"></script><script src="wkit.js"></script><script src="wpro.js"></script>
+<script>
+const SC = {
+  poses: (g, t) => { tundra(g, { t, time: 'golden', pan: 300 }); const acts = ['stand', 'walk', 'carry', 'sit', 'warm', 'sew', 'scrape', 'knap', 'dig', 'lift', 'spear', 'point', 'talk', 'shiver', 'eat', 'sleep']; acts.forEach((a, i) => { const x = 140 + (i % 8) * 235, y = i < 8 ? 520 : 1040; person(g, x, y, 0.95, t, { act: a, light: 'golden', lx: 1500, female: i % 5 === 2, elder: i === 12, kid: i === 3, item: i === 9 ? 'tusk' : undefined }); btext(g, a, x, y + 26, 26, '#fff'); }); },
+  hut: (g, t) => { hutInside(g, t, { fx: 960 }); person(g, 600, 1010, 1.25, t, { act: 'sew', light: 'fire', lx: 960, female: true }); person(g, 1330, 1010, 1.25, t, { act: 'talk', seated: true, light: 'fire', lx: 960, elder: true, flip: true }); person(g, 1600, 1040, 0.9, t, { act: 'warm', light: 'fire', lx: 960, kid: true, flip: true }); tag(g, 'বয়স্কদের জ্ঞান', 960, 140, 1, '#ffcf5a', 56); },
+  cave: (g, t) => { caveInside(g, t, {}); person(g, 760 - 220, 1020, 1.2, t, { act: 'warm', light: 'fire', lx: 760 }); person(g, 1000, 1020, 1.2, t, { act: 'shiver', light: 'fire', lx: 760, flip: true }); title(g, 'গুহা', 960, 200, 1, 150, '#ffcf5a'); },
+  bench: (g, t) => { bench(g, t, { surface: 'hide' }); needle(g, 960, 760, 1.6, 2, t); bigNum(g, '৪০,০০০+ বছর', 960, 300, 110, '#ffcf5a', 1); },
+  city: (g, t) => { cityWinter(g, t, { pan: 200 }); },
+  cityT: (g, t) => { thermalEnv(g, c => cityWinter(c, t, { pan: 200, snow: false })); thermalHot(g, c => person(c, 960, 1000, 1.4, t, { act: 'stand', light: 'day' })); },
+  text: (g, t) => { tundra(g, { t, time: 'day', pan: 900 }); fgFrame(g, t, 'branch', 1); fgFrame(g, t, 'rocks', -1); lensSnow(g, t); person(g, 760, 1000, 1.4, t, { act: 'dig', light: 'day' }); person(g, 1200, 1000, 1.4, t, { act: 'scrape', light: 'day', flip: true }); stamp2(g, 'হাইপোথার্মিয়া', 1300, 260, 1); tag(g, 'চিরহিমায়িত মাটি = ফ্রিজার', 600, 140, 1, '#9fe8ff'); },
+};
+let OUT, OG;
+(async () => {
+  await new Promise(r => document.readyState === 'complete' ? r() : addEventListener('load', r));
+  await document.fonts.load('bold 40px "Nirmala UI"');
+  OUT = mk(W, H); OG = OUT.getContext('2d');
+  window.still = arg => arg.split(',').map(n => { OG.setTransform(1, 0, 0, 1, 0, 0); OG.clearRect(0, 0, W, H); NOW = 7.3; try { SC[n](OG, 7.3); } catch (e) { console.log('ERR ' + n + ' ' + e.message + ' ' + e.stack.split('\n')[1]); } return ['p_' + n + '.jpg', OUT.toDataURL('image/jpeg', 0.85)]; });
+  window.ready = true;
+})();
+</script></body></html>

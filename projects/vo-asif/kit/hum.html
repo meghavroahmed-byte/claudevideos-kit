@@ -1,0 +1,86 @@
+<!doctype html><html><head><meta charset="utf-8"></head><body style="margin:0;background:#000">
+<script>window.VW = 1920; window.VH = 1080; window.OW = 1920; window.OH = 1080;</script>
+<script src="common.js"></script><script src="rigcore.js"></script><script src="world.js"></script><script src="kit16.js"></script><script src="wkit.js"></script><script src="wpro.js"></script>
+<script src="env_v.js"></script><script src="mg.js"></script>
+<script>
+const FPS = 30;
+let TL = null, DUR = 1140.96, NF = 34229;
+let SENT = []; let CUR_FROM = -1; const ANC = {};
+function T(str) { const key = str + '|' + CUR_FROM.toFixed(1); if (ANC[key] != null) return ANC[key]; let first = null; for (const s of SENT) { let k = -1; while ((k = s.text.indexOf(str, k + 1)) >= 0) { const tt = s.ct ? s.ct[k] : s.s + (s.e - s.s) * k / s.text.length; if (first == null) first = tt; if (tt >= CUR_FROM - 0.6) return ANC[key] = tt; } } if (first == null) console.log('MISSING ANCHOR: ' + str); return ANC[key] = first || 0; }
+window.POPS = new Set();
+const P = (t, str, d = 0.35, off = 0) => { const a = T(str) + off; POPS.add(+a.toFixed(2)); return easeOutBack(seg(t, a, a + d)); };
+const S = (t, str, d = 0.6, off = 0) => ease(seg(t, T(str) + off, T(str) + off + d));
+function mouthAt(t) { const i = Math.round(t * FPS); if (i < 0 || i >= ENV.length) return 0; const v = j => ENV[Math.max(0, Math.min(ENV.length - 1, j))]; const db = (v(i - 1) + 2 * v(i) + v(i + 1)) / 4; return clamp((db + 44) / 22) * (0.7 + 0.3 * Math.abs(Math.sin(t * 17))); }
+let CL, CG, WC, WG;
+function lit(g, tint, fn) { CG.setTransform(1, 0, 0, 1, 0, 0); CG.clearRect(0, 0, W, H); fn(CG); if (tint) { CG.globalCompositeOperation = 'source-atop'; CG.fillStyle = tint; CG.fillRect(0, 0, W, H); CG.globalCompositeOperation = 'source-over'; } g.drawImage(CL, 0, 0); }
+function hero(g, t, x, o = {}) { const m = mouthAt(t); lit(g, o.tint, c => { shadow(c, x, o.gy || 1000, 105, 0.3); drawFront(c, x, o.gy || 1000, o.s || 0.82, Object.assign({ t, mouth: m }, o)); }); }
+function worldIn(g, fn, cam, clip, t) {
+  if ((clip.r != null && clip.r <= 1) || (clip.w != null && clip.w <= 1)) return;
+  WG.setTransform(1, 0, 0, 1, 0, 0); WG.globalAlpha = 1; WG.globalCompositeOperation = 'source-over'; WG.filter = 'none'; WG.clearRect(0, 0, W, H); fn(WG);
+  g.save(); g.beginPath(); if (clip.r) g.arc(clip.x, clip.y, clip.r, 0, 7); else g.roundRect(clip.x, clip.y, clip.w, clip.h, clip.rad || 30); g.clip();
+  const cw = clip.r ? clip.r * 2 : clip.w, ch = clip.r ? clip.r * 2 : clip.h, ccx = clip.r ? clip.x : clip.x + clip.w / 2, ccy = clip.r ? clip.y : clip.y + clip.h / 2;
+  const Z = Math.max(cw / 1920, ch / 1080) * (cam.z || 1); g.translate(ccx, ccy); g.scale(Z, Z); g.translate(-cam.fx, -cam.fy); g.drawImage(WC, 0, 0); g.restore();
+  if (clip.col && clip.col !== 'rgba(0,0,0,0)') { g.save(); g.strokeStyle = clip.col; g.lineWidth = 4; g.shadowColor = clip.col; g.shadowBlur = 20; g.beginPath(); if (clip.r) g.arc(clip.x, clip.y, clip.r, 0, 7); else g.roundRect(clip.x, clip.y, clip.w, clip.h, clip.rad || 30); g.stroke(); g.restore(); }
+}
+</script>
+<script src="hum.js"></script>
+<script src="beats.js"></script>
+<script src="w2d.js"></script>
+<script>
+let OUTP, OG, PREVP, PG2, FINP, FG, BLC, BLG;
+const TRS = ['circle', 'zoom', 'whip', 'bars', 'dissolve', 'zoom', 'whip', 'circle', 'glitch', 'bars'];
+function prep() {
+  let prevT = 0; B.forEach(b => { if (typeof b.from === 'number') b.t0 = b.from; else { CUR_FROM = prevT; b.t0 = T(b.from) - 0.12; } prevT = b.t0 + 0.12; }); CUR_FROM = -1;
+  B.forEach((b, i) => { if (b.tr == null) b.tr = i === 0 ? 'none' : TRS[i % TRS.length]; });
+  for (let i = 1; i < B.length; i++) if (B[i].t0 <= B[i - 1].t0 + 0.6) console.log('ORDER/SHORT: beat ' + i + ' "' + B[i].from + '" t0=' + B[i].t0.toFixed(2) + ' prev=' + B[i - 1].t0.toFixed(2));
+  B.sort((a, b) => a.t0 - b.t0);
+  B.forEach((b, i) => b.t1 = i < B.length - 1 ? B[i + 1].t0 : DUR); window.CUTS = B.slice(1).map(b => +b.t0.toFixed(2));
+  window.BEATS = B.map(b => [+b.t0.toFixed(2), b.tpl, b.tr, b.o.mode]);
+  assign2D();
+}
+function finish(dst, src, b, t) {
+  dst.setTransform(1, 0, 0, 1, 0, 0); dst.globalAlpha = 1; dst.globalCompositeOperation = 'source-over'; dst.filter = 'contrast(1.06) saturate(1.1)'; dst.drawImage(src, 0, 0); dst.filter = 'none';
+  BLG.setTransform(1, 0, 0, 1, 0, 0); BLG.clearRect(0, 0, 480, 270); BLG.filter = 'blur(5px) brightness(1.3)'; BLG.drawImage(src, 0, 0, 480, 270); BLG.filter = 'none'; dst.globalCompositeOperation = 'screen'; dst.globalAlpha = 0.2; dst.drawImage(BLC, 0, 0, PW, PH); dst.globalCompositeOperation = 'source-over'; dst.globalAlpha = 1;
+  const v = dst.createRadialGradient(PW / 2, PH / 2, PH * 0.45, PW / 2, PH / 2, PW * 0.62); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,0.55)'); dst.fillStyle = v; dst.fillRect(0, 0, PW, PH);
+  dst.globalCompositeOperation = 'overlay'; dst.globalAlpha = 0.07; const ox = Math.floor(hash(Math.floor(t * 24)) * 512), oy = Math.floor(hash(Math.floor(t * 24) + 7) * 512); dst.save(); dst.translate(-ox, -oy); dst.fillStyle = dst.createPattern(GRAIN, 'repeat'); dst.fillRect(ox, oy, PW, PH); dst.restore(); dst.globalCompositeOperation = 'source-over'; dst.globalAlpha = 1;
+}
+function drawBeat(g, bi, t) {
+  const b = B[bi], d = t - b.t0, len = Math.max(0.5, b.t1 - b.t0); g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.filter = 'none'; g.clearRect(0, 0, PW, PH);
+  CURB = bi; HUDON = false; CUR_FROM = b.t0; NOW = t; SECNOW = { mode: b.o.mode };
+  const u = 1 - Math.pow(1 - clamp(d / Math.min(len, 6)), 2), z = 1.0 + 0.035 * u;
+  g.save(); g.translate(PW / 2, PH / 2); g.scale(z, z); g.translate(-PW / 2, -PH / 2);
+  if (b.w2 && (SIDE2D.has(b.tpl) || b.w2.forceSide)) drawSide2D(g, t, b); else TPL[b.tpl](g, t, b, b.o); g.restore(); CUR_FROM = -1;
+}
+function render(i) {
+  const t = i / FPS; NOW = t; let bi = B.findIndex(b => t >= b.t0 && t < b.t1); if (bi < 0) bi = B.length - 1; const b = B[bi], d = t - b.t0;
+  drawBeat(OG, bi, t);
+  const TRD = { dissolve: 0.4, zoom: 0.35, circle: 0.45, bars: 0.42 }[b.tr] || 0;
+  if (bi > 0 && d < TRD) {
+    drawBeat(PG2, bi - 1, t); CURB = bi; NOW = t; const p = ease(d / TRD);
+    const [c, x] = tmpC('NEWP'); x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, PW, PH); x.drawImage(OUTP, 0, 0);
+    OG.save(); OG.setTransform(1, 0, 0, 1, 0, 0); OG.clearRect(0, 0, PW, PH);
+    if (b.tr === 'dissolve') { OG.drawImage(PREVP, 0, 0); OG.globalAlpha = p; OG.drawImage(c, 0, 0); }
+    else if (b.tr === 'zoom') { OG.drawImage(c, 0, 0); OG.globalAlpha = 1 - p; const s = 1 + p * 0.4; OG.translate(PW / 2, PH / 2); OG.scale(s, s); OG.translate(-PW / 2, -PH / 2); OG.filter = `blur(${p * 10}px)`; OG.drawImage(PREVP, 0, 0); }
+    else if (b.tr === 'circle') { OG.drawImage(PREVP, 0, 0); const r = p * 1150; OG.save(); OG.beginPath(); OG.arc(PW / 2, PH / 2, r, 0, 7); OG.clip(); OG.drawImage(c, 0, 0); OG.restore(); OG.strokeStyle = 'rgba(255,255,255,0.9)'; OG.lineWidth = 10 * (1 - p); OG.shadowColor = colOf(b.o); OG.shadowBlur = 30; OG.beginPath(); OG.arc(PW / 2, PH / 2, r, 0, 7); OG.stroke(); }
+    else if (b.tr === 'bars') { OG.drawImage(PREVP, 0, 0); for (let k = 0; k < 9; k++) { const pk = ease(clamp((d / TRD) * 1.6 - k * 0.07)); OG.save(); OG.beginPath(); const bw = PW / 9 + 4, x0 = k * PW / 9; OG.rect(x0, PH - pk * PH, bw, pk * PH); OG.clip(); OG.drawImage(c, 0, 0); OG.restore(); OG.fillStyle = colOf(b.o); OG.fillRect(x0, PH - pk * PH - 8, bw, pk > 0 && pk < 1 ? 8 : 0); } }
+    OG.restore();
+  }
+  if (bi > 0 && b.tr === 'whip' && d < 0.26) { const w = 1 - easeOut(d / 0.26), dir = bi % 2 ? 1 : -1; const [c, x] = tmpC('WHP'); x.drawImage(OUTP, 0, 0); OG.save(); OG.setTransform(1, 0, 0, 1, 0, 0); OG.clearRect(0, 0, PW, PH); OG.filter = `blur(${w * 22}px)`; OG.translate(PW / 2 + dir * w * 200, PH / 2); OG.scale(1 + w * 0.12, 1 + w * 0.12); OG.drawImage(c, -PW / 2, -PH / 2); OG.restore(); }
+  if (bi > 0 && b.tr === 'glitch' && d < 0.2) { const [c, x] = tmpC('GLP'); x.drawImage(OUTP, 0, 0); OG.save(); OG.setTransform(1, 0, 0, 1, 0, 0); for (let s = 0; s < 14; s++) { const y0 = hash(s + Math.floor(t * 60)) * PH, h = 20 + hash(s + 2) * 100, off = (hash(s + 5 + Math.floor(t * 60)) - 0.5) * 220 * (1 - d / 0.2); OG.drawImage(c, 0, y0, PW, h, off, y0, PW, h); } OG.globalCompositeOperation = 'screen'; OG.globalAlpha = 0.5 * (1 - d / 0.2); OG.fillStyle = '#ff2a6a'; OG.fillRect(0, hash(Math.floor(t * 60)) * PH, PW, 6); OG.restore(); }
+  finish(FG, OUTP, b, t);
+  if (bi > 0 && b.tr === 'flash' && d < 0.2) { FG.fillStyle = `rgba(255,248,235,${0.85 * (1 - d / 0.2)})`; FG.fillRect(0, 0, PW, PH); }
+  const fin = 1 - seg(t, 0, 0.6); if (fin > 0) { FG.fillStyle = `rgba(0,0,0,${fin})`; FG.fillRect(0, 0, PW, PH); }
+  const fade = seg(t, DUR - 1.2, DUR); if (fade > 0) { FG.fillStyle = `rgba(0,0,0,${fade})`; FG.fillRect(0, 0, PW, PH); }
+}
+(async () => {
+  await new Promise(r => document.readyState === 'complete' ? r() : addEventListener('load', r));
+  TL = await (await fetch('../temp/timeline.json')).json(); DUR = TL.dur; NF = Math.round(DUR * FPS); SENT = TL.segs.map(s => ({ s: s.s, e: s.e, text: s.text, ct: s.ct }));
+  const S0 = await prepareSheet(); buildRig(S0); buildMap3D(); buildPost();
+  CL = mk(W, H); CG = CL.getContext('2d'); WC = mk(W, H); WG = WC.getContext('2d');
+  OUTP = mk(PW, PH); OG = OUTP.getContext('2d'); PREVP = mk(PW, PH); PG2 = PREVP.getContext('2d'); FINP = mk(PW, PH); FG = FINP.getContext('2d'); BLC = mk(480, 270); BLG = BLC.getContext('2d');
+  prep(); await document.fonts.load('bold 40px "Nirmala UI"');
+  window.frame = i => { render(i); return FINP.toDataURL('image/jpeg', 0.9); };
+  window.still = arg => { if (arg === 'beats') return [['beats.json', 'data:application/json;base64,' + btoa(unescape(encodeURIComponent(JSON.stringify(B.map(b => [String(b.from), +b.t0.toFixed(2), +b.t1.toFixed(2), b.tpl])))))]]; return arg.split(',').map(Number).map(t => { try { render(Math.round(t * FPS)); } catch (e) { console.log('ERR at ' + t + ': ' + e.message + ' | ' + (e.stack || '').split('\n')[1]); } return [`s_${t}.jpg`, FINP.toDataURL('image/jpeg', 0.8)]; }); };
+  window.ready = true;
+})();
+</script></body></html>

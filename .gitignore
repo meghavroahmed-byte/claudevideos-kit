@@ -1,0 +1,8 @@
+node_modules/
+out/
+renders/
+temp/
+*.mp4
+*.wav
+*.mov
+*.aac

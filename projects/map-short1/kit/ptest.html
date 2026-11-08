@@ -1,0 +1,10 @@
+﻿<!doctype html><body><script>window.VW=1080;window.VH=1920;window.OW=1080;window.OH=1920;</script>
+<script src="common.js"></script><script src="rigcore.js"></script><script src="world.js"></script><script src="kit16.js"></script><script src="wkit.js"></script><script src="wpro.js"></script><script src="mg.js"></script>
+<script>
+window.still = () => { const c = mk(1080, 1920), g = c.getContext('2d'); g.fillStyle = '#8ac'; g.fillRect(0, 0, 1080, 1920);
+ const acts = ['stand', 'walk', 'spear', 'point', 'talk', 'throw', 'carry'];
+ acts.forEach((a, i) => { const x = 120 + i * 140, y = 600; person(g, x, y, 1.0, 1.2, { act: a, seed: i }); g.fillStyle = 'red'; for (let yy = 0; yy <= 400; yy += 50) g.fillRect(x + 50, y - yy, 12, 2); g.fillStyle = '#000'; g.font = '20px sans-serif'; g.fillText(a, x - 30, y + 30); });
+ person(g, 300, 1400, 2.0, 1.2, { act: 'stand' }); g.fillStyle = 'red'; for (let yy = 0; yy <= 800; yy += 50) { g.fillRect(400, 1400 - yy, 14, 2); g.fillText(String(yy), 420, 1405 - yy); }
+ return [['person.jpg', c.toDataURL('image/jpeg', 0.85)]]; };
+window.ready = true;
+</script></body>

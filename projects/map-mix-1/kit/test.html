@@ -1,0 +1,40 @@
+﻿<!doctype html><html><head><meta charset="utf-8">
+<style>
+@font-face { font-family: "Anek Bangla"; src: url(../node_modules/@fontsource-variable/anek-bangla/files/anek-bangla-bengali-wght-normal.woff2) format("woff2"); font-weight: 100 800; }
+@font-face { font-family: "Hind Siliguri"; src: url(../node_modules/@fontsource/hind-siliguri/files/hind-siliguri-bengali-600-normal.woff2) format("woff2"); font-weight: 600; }
+</style></head><body style="margin:0;background:#000">
+<script>window.VW = 1920; window.VH = 1080;</script>
+<script src="../node_modules/topojson-client/dist/topojson-client.min.js"></script>
+<script src="common.js"></script><script src="rigcore.js"></script><script src="world.js"></script><script src="kit16.js"></script><script src="wkit.js"></script><script src="wpro.js"></script><script src="mg16.js"></script>
+<script src="vmap.js"></script><script src="toys.js"></script><script src="scenes.js"></script>
+<script>
+(async () => {
+  await buildVMap(); buildPost();
+  await document.fonts.load('800 40px "Anek Bangla"');
+  const C = mk(W, H), g = C.getContext('2d');
+  window.still = arg => {
+    const t = +arg || 3; NOW = t; CURB = 0;
+    if (+arg === 7) { park(g, t); toy(g, 700, 860, 0.8, t, { type: 'man', act: 'idle', mood: 'neutral', look: 1 }); toy(g, 1290, 870, 0.8, t, { type: 'girl', act: 'talk', talk: 0.5, mood: 'happy', look: -1 }); tiltShift(g, 0.32, 0.86, 8); grade(C, PG, 'golden', t); return POST.toDataURL('image/jpeg', 0.88); }
+    if (+arg === 5) { const P = vmap(g, { lon: 60, lat: 25, z: 9 }, t, { fills: { 'Bangladesh': ['#2e9e5b', 1] } }); const [bx, by] = P(centroid('Bangladesh')); vring(g, bx, by, 60, 1);
+      ['man', 'man2', 'girl', 'hijabi', 'kid', 'oldman', 'ancestor', 'doctor', 'woman'].forEach((ty, i) => toy(g, 150 + i * 200, 900 - (i % 2) * 40, ty === 'kid' ? 0.5 : 0.65, t, { type: ty, act: ['talk', 'wave', 'idle', 'talk', 'cheer', 'idle', 'point', 'talk', 'shrug'][i], talk: i % 2 ? 0 : 0.5, mood: ['happy', 'neutral', 'shock', 'happy', 'happy', 'worried', 'angry', 'neutral', 'happy'][i] }));
+      grade(C, PG, 'map', t); return POST.toDataURL('image/jpeg', 0.88); }
+    const cam = { lon: 48, lat: 30, z: 38 };
+    const P = vmap(g, cam, t, { fills: { 'Iran': ['#3a6fd8', 1], 'Saudi Arabia': ['#d8732a', 0.7, [45, 24]], 'Israel': ['#d83a3a', 1] }, dim: 0.5 });
+    const [ix, iy] = P(centroid('Iran')); vlabel(g, 'à¦‡à¦°à¦¾à¦¨', ix, iy + 90, 54, 1); vring(g, ix, iy, 220, 1);
+    const [sx, sy] = P(centroid('Saudi Arabia')); vlabel(g, 'à¦¸à§Œà¦¦à¦¿ à¦†à¦°à¦¬', sx, sy + 70, 44, 1);
+    vroute(g, P, [[35, 31.5], [44, 33], [51.4, 35.7]], 0.8, '#c0261c', 7, { glow: true });
+    frameCard(g, ix - 120, iy - 190, 260, 170, 1, (c, w, h) => { const P2 = vmap(c, { lon: 51.4, lat: 35.7, z: 160 }, t, {}); });
+    toy(g, ix + 40, iy + 20, 0.6, t, { type: 'mullah', mood: 'angry', act: 'talk', talk: 0.6 });
+    toy(g, sx - 60, sy + 20, 0.55, t, { type: 'sheikh', mood: 'happy', act: 'wave', prop: 'oil' });
+    toy(g, 330, 760, 0.85, t, { type: 'leader', mood: 'shock', act: 'point', emote: '!' });
+    toy(g, 560, 780, 0.7, t, { type: 'diplomat', act: 'talk', talk: 0.3, prop: 'paper' });
+    toy(g, 760, 790, 0.65, t, { type: 'soldier', act: 'idle', mood: 'worried' });
+    ship(g, 1250, 860, 0.8, t); moneyStack(g, 1550, 900, 1.2, 7); coin(g, 1700, 840, 30, t);
+    glass(g, 1400, 120, 440, 250, 0.6); bigNum(g, 'à§¨à§¦%', 1620, 220, 110, CC.ember2, 1); subLine(g, 'à¦¬à¦¿à¦¶à§à¦¬à§‡à¦° à¦¤à§‡à¦²', 1620, 320, 40, 1);
+    toy(g, 1080, 820, 0.6, t, { type: 'worker', act: 'cheer', mood: 'happy' }); toy(g, 1180, 1000, 0.5, t, { type: 'king' });
+    grade(C, PG, 'map', t); return POST.toDataURL('image/jpeg', 0.88);
+  };
+  window.ready = true;
+})();
+</script></body></html>
+

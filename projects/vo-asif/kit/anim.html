@@ -1,0 +1,385 @@
+<!doctype html><html><body style="margin:0;background:#000"><script src="common.js"></script><script>
+const W = 1920, H = 1080, FPS = 30, DUR = 12, NF = DUR * FPS;
+const D2R = Math.PI / 180;
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const ease = t => { t = clamp(t); return t * t * (3 - 2 * t); };
+const easeOutBack = t => { t = clamp(t); const c = 1.9; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+// deterministic noise
+const hash = n => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+const noise = t => { const i = Math.floor(t), f = t - i, u = f * f * (3 - 2 * f); return lerp(hash(i), hash(i + 1), u) * 2 - 1; };
+
+// ---------- pieces ----------
+function piece(src, poly, pivot) {
+  const p = cutPoly(src, poly);
+  return { c: p.c, ox: p.ox, oy: p.oy, px: pivot ? pivot[0] : 0, py: pivot ? pivot[1] : 0, poly };
+}
+function rectPoly(x0, y0, x1, y1) { return [[x0, y0], [x1, y0], [x1, y1], [x0, y1]]; }
+function polyPath(g, poly, ox = 0, oy = 0) { g.beginPath(); poly.forEach(([x, y], k) => k ? g.lineTo(x - ox, y - oy) : g.moveTo(x - ox, y - oy)); g.closePath(); }
+function fillAtop(pc, poly, color) { const g = pc.c.getContext('2d'); g.save(); g.globalCompositeOperation = 'source-atop'; g.fillStyle = color; polyPath(g, poly, pc.ox, pc.oy); g.fill(); g.restore(); }
+function erase(pc, poly) { const g = pc.c.getContext('2d'); g.save(); g.globalCompositeOperation = 'destination-out'; polyPath(g, poly, pc.ox, pc.oy); g.fill(); g.restore(); }
+function shadeCopy(pc, color) {
+  const c = mk(pc.c.width, pc.c.height), g = c.getContext('2d'); g.drawImage(pc.c, 0, 0);
+  g.globalCompositeOperation = 'source-atop'; g.fillStyle = color; g.fillRect(0, 0, c.width, c.height);
+  return Object.assign({}, pc, { c });
+}
+// draw piece rotated about its pivot (all in sheet coords of current transform)
+function drawP(g, pc, ang = 0, fn) {
+  g.save();
+  if (ang) { g.translate(pc.px, pc.py); g.rotate(ang * D2R); g.translate(-pc.px, -pc.py); }
+  g.drawImage(pc.c, pc.ox, pc.oy);
+  if (fn) fn();
+  g.restore();
+}
+function rotPt([x, y], [cx, cy], a) { a *= D2R; const dx = x - cx, dy = y - cy; return [cx + dx * Math.cos(a) - dy * Math.sin(a), cy + dx * Math.sin(a) + dy * Math.cos(a)]; }
+function sampleColor(src, pts) {
+  const g = src.getContext('2d'); let r = 0, gg = 0, b = 0;
+  for (const [x, y] of pts) { const d = g.getImageData(x, y, 1, 1).data; r += d[0]; gg += d[1]; b += d[2]; }
+  return `rgb(${r / pts.length | 0},${gg / pts.length | 0},${b / pts.length | 0})`;
+}
+
+let R = {}; // rig pieces
+const HOODIE = '#c3c8d2', HOODIE_DK = '#a4abb8', JEANS = '#272b39', LINE = '#16161c';
+
+function buildRig(S) {
+  // ---------- SIDE (faces left) ----------
+  const sideArm = [[640, 418], [650, 470], [652, 525], [658, 560], [632, 615], [628, 650], [628, 672], [616, 690], [610, 730], [618, 756], [640, 760], [656, 752], [666, 730], [664, 700], [674, 684], [680, 640], [684, 580], [688, 500], [690, 445], [686, 418], [666, 408]];
+  R.sArm = piece(S, sideArm, [664, 440]);
+  R.sArmB = shadeCopy(R.sArm, 'rgba(15,20,45,0.38)');
+  R.sUpper = piece(S, [[560, 195], [760, 195], [760, 676], [560, 676]], [660, 660]);
+  fillAtop(R.sUpper, sideArm, HOODIE);
+  // redraw sleeve-less torso: keep outline of torso front pocket etc. (as is)
+  R.sThigh = piece(S, rectPoly(560, 668, 760, 888), [661, 700]);
+  fillAtop(R.sThigh, sideArm, JEANS);
+  R.sShin = piece(S, rectPoly(560, 862, 760, 1092), [661, 876]);
+  R.sThighB = shadeCopy(R.sThigh, 'rgba(10,12,30,0.45)');
+  R.sShinB = shadeCopy(R.sShin, 'rgba(10,12,30,0.45)');
+
+  // ---------- FRONT ----------
+  const fHead = [[213, 250], [238, 206], [300, 196], [342, 222], [352, 300], [347, 360], [330, 386], [300, 397], [270, 400], [240, 392], [220, 372], [209, 320]];
+  const arc = (cx, cy, r, a0, a1, n = 10) => Array.from({ length: n + 1 }, (_, k) => { const a = lerp(a0, a1, k / n); return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; });
+  // whole original arm (erased from body); sleeve is redrawn as one continuous stroke
+  const fArmUp = [[182, 370], [150, 393], [131, 440], [123, 520], [119, 578], [197, 578], [196, 520], [197, 450], [202, 408]];
+  const fArmLo = [[117, 548], [197, 548], [196, 600], [194, 665], [186, 690], [174, 708], [178, 745], [162, 762], [138, 757], [124, 737], [121, 700], [117, 676]];
+  const fHand = [[119, 674], [184, 674], [182, 690], [174, 708], [178, 745], [162, 763], [138, 758], [124, 738], [121, 700]];
+  R.fBody = piece(S, [[100, 195], [362, 195], [362, 335], [462, 335], [462, 1092], [100, 1092]], [280, 1078]);
+  erase(R.fBody, fHead); erase(R.fBody, fArmUp); erase(R.fBody, fArmLo);
+  {
+    const g = R.fBody.c.getContext('2d'), o = [R.fBody.ox, R.fBody.oy];
+    g.save(); g.translate(-o[0], -o[1]);
+    // hood interior behind head
+    g.fillStyle = '#7d8492'; polyPath(g, fHead.map(([x, y]) => [lerp(x, 278, 0.08), lerp(y, 300, 0.08)])); g.fill();
+    // torso side where arm was + shoulder joint
+    g.globalCompositeOperation = 'destination-over';
+    g.fillStyle = HOODIE; g.beginPath(); g.moveTo(205, 405); g.lineTo(178, 420); g.lineTo(186, 470); g.lineTo(192, 668); g.lineTo(205, 668); g.closePath(); g.fill();
+    g.globalCompositeOperation = 'source-over';
+    g.strokeStyle = LINE; g.lineWidth = 3; g.beginPath(); g.moveTo(186, 470); g.lineTo(192, 668); g.stroke();
+    g.restore();
+  }
+  R.fHead = piece(S, fHead, [278, 392]);
+  R.fHand = piece(S, fHand, [151, 680]);
+  R.fSleeve = sampleColor(S, [[150, 470], [155, 520], [150, 610]]);
+  R.fSkin = sampleColor(S, [[262, 322], [300, 324], [258, 330]]);
+
+  // ---------- CHINTA bust ----------
+  R.cBust = piece(S, [[1285, 195], [1522, 195], [1522, 330], [1585, 330], [1585, 562], [1285, 562]], [1430, 560]);
+  R.cSkin = sampleColor(S, [[1388, 318], [1428, 318]]);
+
+  // ---------- PHONE full body ----------
+  const pHead = [[1718, 260], [1740, 210], [1785, 198], [1830, 210], [1852, 260], [1852, 340], [1838, 380], [1810, 398], [1780, 402], [1750, 396], [1728, 378], [1716, 330]];
+  R.pBody = piece(S, [[1700, 195], [1962, 195], [1962, 1092], [1615, 1092], [1615, 752], [1686, 744], [1686, 572], [1615, 566], [1615, 372], [1700, 368]], [1785, 1078]);
+  erase(R.pBody, pHead);
+  { const g = R.pBody.c.getContext('2d'); g.save(); g.translate(-R.pBody.ox, -R.pBody.oy); g.globalCompositeOperation = 'destination-over'; g.fillStyle = '#7d8492'; polyPath(g, pHead.map(([x, y]) => [lerp(x, 1785, 0.08), lerp(y, 300, 0.08)])); g.fill(); g.restore(); }
+  R.pHead = piece(S, pHead, [1785, 395]);
+
+  // ---------- ANGRY bust ----------
+  const aHand = [[1390, 850], [1440, 845], [1480, 878], [1484, 936], [1456, 958], [1398, 948], [1386, 900]];
+  R.aBust = piece(S, [[1343, 596], [1497, 596], [1497, 790], [1645, 802], [1645, 1092], [1272, 1092], [1272, 790], [1343, 784]], [1430, 1080]);
+  fillAtop(R.aBust, aHand, HOODIE);
+  R.aHand = piece(S, aHand, [1480, 930]);
+}
+
+// ---------- background ----------
+let BG_CITY;
+function buildCity() {
+  const c = mk(W, H), g = c.getContext('2d');
+  const sky = g.createLinearGradient(0, 0, 0, 980);
+  sky.addColorStop(0, '#0f1630'); sky.addColorStop(0.65, '#27365f'); sky.addColorStop(1, '#4a4f78');
+  g.fillStyle = sky; g.fillRect(0, 0, W, H);
+  // moon
+  const mg = g.createRadialGradient(1550, 190, 10, 1550, 190, 160);
+  mg.addColorStop(0, 'rgba(255,240,200,0.9)'); mg.addColorStop(0.35, 'rgba(255,240,200,0.25)'); mg.addColorStop(1, 'rgba(255,240,200,0)');
+  g.fillStyle = mg; g.fillRect(1350, 0, 400, 400);
+  g.fillStyle = '#fff3d6'; g.beginPath(); g.arc(1550, 190, 48, 0, 7); g.fill();
+  // buildings, two layers
+  for (const [layer, base, col, win] of [[0, 760, '#1c2546', 0.25], [1, 900, '#141a33', 0.55]]) {
+    let x = -20, k = layer * 100;
+    while (x < W) {
+      const bw = 90 + hash(k++) * 140, bh = (layer ? 260 : 380) + hash(k++) * (layer ? 260 : 300);
+      g.fillStyle = col; g.fillRect(x, base - bh + (layer ? 80 : 0), bw, bh + 200);
+      for (let wy = base - bh + (layer ? 100 : 20); wy < base + 40; wy += 34)
+        for (let wx = x + 12; wx < x + bw - 18; wx += 26)
+          if (hash(wx * 7 + wy) > 0.55) { g.fillStyle = `rgba(255,205,120,${win * (0.4 + hash(wx + wy * 3) * 0.6)})`; g.fillRect(wx, wy, 12, 16); }
+      x += bw + 6;
+    }
+  }
+  // street
+  g.fillStyle = '#262c40'; g.fillRect(0, 935, W, 145);
+  g.fillStyle = '#3a4361'; g.fillRect(0, 935, W, 8);
+  g.fillStyle = '#1e2334'; g.fillRect(0, 1040, W, 40);
+  g.fillStyle = 'rgba(255,255,255,0.08)'; for (let x = 0; x < W; x += 160) g.fillRect(x, 985, 3, 50);
+  return c;
+}
+function bokehBG(g, t, c1, c2, seed) {
+  const gr = g.createRadialGradient(W / 2, H * 0.45, 50, W / 2, H / 2, 1200);
+  gr.addColorStop(0, c1); gr.addColorStop(1, c2); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  for (let i = 0; i < 26; i++) {
+    const x = hash(seed + i) * W + Math.sin(t * 0.6 + i) * 20, y = hash(seed + i + 50) * H + Math.cos(t * 0.5 + i) * 15, r = 20 + hash(seed + i + 90) * 70;
+    g.fillStyle = `rgba(255,255,255,${0.03 + hash(seed + i + 7) * 0.05})`; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill();
+  }
+}
+
+// ---------- walk precompute ----------
+const WALK_END = 3.1, STEP_T = 1.0;
+const env = t => 1 - ease(seg(t, 2.55, WALK_END));
+let WALK_X = [], WALK_P = [];
+function precompute() {
+  let tot = 0; const dt = 1 / FPS;
+  for (let i = 0; i < NF; i++) tot += env(i * dt) * dt;
+  const v = (2300 - 960) / tot; let x = 2300, p = 0;
+  for (let i = 0; i < NF; i++) { WALK_X[i] = x; WALK_P[i] = p; const e = env(i * dt); x -= v * e * dt; p += e * dt / STEP_T; }
+}
+
+// ---------- draw helpers ----------
+function shadow(g, x, y, w, a = 0.35) { g.save(); g.fillStyle = `rgba(0,0,0,${a})`; g.beginPath(); g.ellipse(x, y, w, w * 0.14, 0, 0, 7); g.fill(); g.restore(); }
+function blinkEyes(g, eyes, amt, skin) {
+  if (amt <= 0) return;
+  for (const [x, y, w, h] of eyes) {
+    g.save(); g.fillStyle = skin;
+    g.beginPath(); g.ellipse(x, y - h * (1 - amt), w, h * amt + 1, 0, 0, 7); g.fill();
+    if (amt > 0.6) { g.strokeStyle = LINE; g.lineWidth = 2; g.beginPath(); g.moveTo(x - w, y + 1); g.quadraticCurveTo(x, y + h * 0.7, x + w, y + 1); g.stroke(); }
+    g.restore();
+  }
+}
+function blinkAt(t, times) { let a = 0; for (const b of times) { const d = Math.abs(t - b); if (d < 0.09) a = Math.max(a, 1 - d / 0.09); } return a; }
+function text(g, s, x, y, size, fill, rot = 0, sc = 1, alpha = 1) {
+  g.save(); g.globalAlpha = alpha; g.translate(x, y); g.rotate(rot); g.scale(sc, sc);
+  g.font = `900 ${size}px "Arial Black", Impact, sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.lineJoin = 'round'; g.lineWidth = size * 0.16; g.strokeStyle = '#111'; g.strokeText(s, 0, 0);
+  g.fillStyle = fill; g.fillText(s, 0, 0); g.restore();
+}
+function angerMark(g, x, y, s, a) {
+  g.save(); g.translate(x, y); g.scale(s, s); g.globalAlpha = a; g.strokeStyle = '#ff2d2d'; g.lineWidth = 9; g.lineCap = 'round';
+  for (let k = 0; k < 4; k++) { g.save(); g.rotate(k * Math.PI / 2); g.beginPath(); g.moveTo(10, -26); g.quadraticCurveTo(12, -12, 26, -10); g.stroke(); g.restore(); }
+  g.restore();
+}
+
+// ---------- SHOTS ----------
+function shotWalk(g, t, i) {
+  g.drawImage(BG_CITY, 0, 0);
+  const turnS = 3.1, turnM = 3.25, turnE = 3.45;
+  const X = WALK_X[Math.min(i, NF - 1)], p = WALK_P[Math.min(i, NF - 1)];
+  const GROUND = 1010, s = 0.95;
+  if (t < turnM) {
+    const e = env(t);
+    const A = 18 * e, K = 40 * e, AR = 22 * e;
+    const legs = ph => { const th = A * Math.sin(2 * Math.PI * ph); const kn = -K * Math.pow(Math.max(0, Math.cos(2 * Math.PI * ph)), 1.3); return [th, kn]; };
+    const [t1, k1] = legs(p), [t2, k2] = legs(p + 0.5);
+    const foot = (th, kn) => rotPt(rotPt([640, 1076], [661, 876], kn), [661, 700], th)[1];
+    const drop = 1076 - Math.max(foot(t1, k1), foot(t2, k2));
+    const sqx = 1 - ease(seg(t, turnS, turnM));
+    shadow(g, X, GROUND, 120 * s);
+    g.save(); g.translate(X, GROUND + drop * s); g.scale(s * Math.max(0.02, sqx), s); g.translate(-661, -1076);
+    const arm = AR * Math.sin(2 * Math.PI * p);
+    drawP(g, R.sArmB, arm);
+    drawP(g, R.sThighB, t2, () => drawP(g, R.sShinB, k2));
+    drawP(g, R.sThigh, t1, () => drawP(g, R.sShin, k1));
+    // upper body bob + slight lean forward
+    g.save(); g.translate(661, 700); g.rotate(-2.5 * e * D2R); g.translate(-661, -700);
+    drawP(g, R.sUpper, 0);
+    drawP(g, R.sArm, -arm);
+    g.restore();
+    g.restore();
+  } else {
+    shotFront(g, t, turnM, turnE);
+  }
+  // whoosh lines during turn
+  const w = seg(t, turnS, turnE);
+  if (w > 0 && w < 1) {
+    g.save(); g.strokeStyle = `rgba(255,255,255,${0.7 * Math.sin(w * Math.PI)})`; g.lineWidth = 5; g.lineCap = 'round';
+    for (let k = 0; k < 5; k++) { const yy = 420 + k * 90, len = 120 + k * 15; g.beginPath(); g.arc(960, yy, 190 + k * 8, Math.PI * (0.9 - w * 0.5), Math.PI * (0.9 - w * 0.5) + len / 200); g.stroke(); }
+    g.restore();
+  }
+}
+
+// continuous sleeve (shoulder -> elbow -> wrist) + hand from the sheet
+function frontArm(g, a1, a2, pass) {
+  const dir = a => [-Math.sin(a * D2R), Math.cos(a * D2R)];
+  const S0 = [168, 422], L1 = 141.4, L2 = 117.2, Wd = 68;
+  const d1 = dir(a1), d2 = dir(a1 + a2);
+  const E = [S0[0] + L1 * d1[0], S0[1] + L1 * d1[1]], Wr = [E[0] + L2 * d2[0], E[1] + L2 * d2[1]];
+  const path = () => { g.beginPath(); g.moveTo(S0[0], S0[1]); g.lineTo(E[0], E[1]); g.lineTo(Wr[0], Wr[1]); };
+  g.save(); g.lineJoin = 'round'; g.lineCap = 'butt';
+  if (pass === 'outline') {
+    g.strokeStyle = LINE; g.lineWidth = Wd + 7; path(); g.stroke();
+    g.fillStyle = LINE; g.beginPath(); g.arc(S0[0], S0[1], (Wd + 7) / 2, 0, 7); g.fill();
+  } else {
+    g.strokeStyle = R.fSleeve; g.lineWidth = Wd; path(); g.stroke();
+    g.fillStyle = R.fSleeve; g.beginPath(); g.arc(S0[0], S0[1], Wd / 2, 0, 7); g.fill();
+    // soft fold shading on the inner side of the sleeve
+    const n = d => [d[1], -d[0]];
+    g.strokeStyle = 'rgba(120,128,145,0.45)'; g.lineWidth = 7; g.lineCap = 'round';
+    const n1 = n(d1), n2 = n(d2);
+    g.beginPath(); g.moveTo(S0[0] - n1[0] * 22 + d1[0] * 40, S0[1] - n1[1] * 22 + d1[1] * 40); g.lineTo(E[0] - n1[0] * 22 - d1[0] * 12, E[1] - n1[1] * 22 - d1[1] * 12); g.stroke();
+    g.beginPath(); g.moveTo(E[0] - n2[0] * 22 + d2[0] * 14, E[1] - n2[1] * 22 + d2[1] * 14); g.lineTo(Wr[0] - n2[0] * 22 - d2[0] * 26, Wr[1] - n2[1] * 22 - d2[1] * 26); g.stroke();
+    // cuff seam
+    g.strokeStyle = LINE; g.lineWidth = 3;
+    const c = [Wr[0] - d2[0] * 16, Wr[1] - d2[1] * 16];
+    g.beginPath(); g.moveTo(c[0] - n2[0] * (Wd / 2 - 1), c[1] - n2[1] * (Wd / 2 - 1)); g.lineTo(c[0] + n2[0] * (Wd / 2 - 1), c[1] + n2[1] * (Wd / 2 - 1)); g.stroke();
+    // hand
+    g.translate(Wr[0], Wr[1]); g.rotate((a1 + a2 - 2.94) * D2R);
+    g.drawImage(R.fHand.c, R.fHand.ox - R.fHand.px, R.fHand.oy - R.fHand.py);
+  }
+  g.restore();
+}
+
+function shotFront(g, t, t0, tIn) {
+  if (!tIn) g.drawImage(BG_CITY, 0, 0);
+  const GROUND = 1010, s = 0.95, X = 960;
+  const grow = tIn ? easeOutBack(seg(t, t0, tIn)) : 1;
+  const breath = Math.sin(t * 2.6) * 0.008;
+  // wave: raise 3.7-4.05, wave 4.05-4.95, lower 4.95-5.35
+  const up = ease(seg(t, 3.7, 4.05)) * (1 - ease(seg(t, 4.95, 5.35)));
+  const waveOsc = Math.sin((t - 4.05) * 11) * 16 * clamp(seg(t, 4.0, 4.15)) * (1 - seg(t, 4.85, 4.95));
+  const aUp = lerp(3 * Math.sin(t * 2.6), 64, up);
+  const aLo = lerp(0, 92, up) + waveOsc;
+  const headRot = Math.sin(t * 1.7) * 1.5 + up * -2.5 + ease(seg(t, 5.1, 5.5)) * 3;
+  shadow(g, X, GROUND, 120 * s);
+  g.save(); g.translate(X, GROUND); g.scale(s * Math.max(0.02, grow), s * (1 + breath)); g.translate(-280, -1078);
+  const a1 = 4.46 + aUp, a2 = -1.5 + aLo;
+  frontArm(g, a1, a2, 'outline');
+  drawP(g, R.fBody);
+  frontArm(g, a1, a2, 'fill');
+  drawP(g, R.fHead, headRot, () => blinkEyes(g, [[262, 311, 10, 6], [299, 313, 10, 6]], blinkAt(t, [3.95, 5.25]), R.fSkin));
+  g.restore();
+}
+
+function shotChinta(g, t) {
+  const t0 = 5.6, lt = t - t0;
+  bokehBG(g, t, '#3d5a8f', '#0d1630', 11);
+  const z = 2.55 + lt * 0.06;
+  g.save(); g.translate(W / 2, 1180); g.scale(z, z * (1 + Math.sin(t * 2.4) * 0.006)); g.rotate((Math.sin(t * 1.3) * 1.2 - 1.5) * D2R); g.translate(-1430, -560);
+  drawP(g, R.cBust, 0, () => blinkEyes(g, [[1388, 306, 10, 6], [1428, 306, 10, 6]], blinkAt(t, [6.85]), R.cSkin));
+  g.restore();
+  // question marks
+  [[6.0, 1250, 230, -0.25, 150], [6.3, 1420, 160, 0.15, 190], [6.6, 1560, 290, 0.3, 120]].forEach(([at, x, y, r, sz]) => {
+    const k = easeOutBack(seg(t, at, at + 0.3));
+    if (k > 0) text(g, '?', x, y + Math.sin(t * 3 + x) * 8, sz, '#ffd23f', r + Math.sin(t * 2 + x) * 0.08, k);
+  });
+  // sweat drop
+  const sd = seg(t, 6.2, 7.6);
+  if (sd > 0) {
+    g.save(); g.globalAlpha = Math.min(1, sd * 4) * (1 - seg(t, 7.3, 7.6)); g.translate(700, 330 + ease(sd) * 120); g.fillStyle = '#7fd3ff'; g.strokeStyle = '#123'; g.lineWidth = 4;
+    g.beginPath(); g.moveTo(0, -40); g.quadraticCurveTo(26, 0, 0, 18); g.quadraticCurveTo(-26, 0, 0, -40); g.fill(); g.stroke(); g.restore();
+  }
+}
+
+function shotPhone(g, t) {
+  g.drawImage(BG_CITY, 0, 0);
+  const GROUND = 1010, s = 0.95, X = 960;
+  const shock = ease(seg(t, 8.85, 9.0)) * (1 - ease(seg(t, 9.0, 9.3)));
+  shadow(g, X, GROUND, 130 * s);
+  g.save(); g.translate(X, GROUND); g.scale(s * (1 + shock * 0.04), s * (1 + Math.sin(t * 2.6) * 0.007 - shock * 0.05)); g.translate(-1785, -1078);
+  drawP(g, R.pBody);
+  drawP(g, R.pHead, Math.sin(t * 1.5) * 1.5 + ease(seg(t, 8.0, 8.4)) * 3 - shock * 6);
+  // phone glow + vibration
+  const buzz = seg(t, 7.9, 8.7) > 0 && seg(t, 7.9, 8.7) < 1;
+  const px = 1785, py = 500;
+  g.save(); g.globalCompositeOperation = 'lighter';
+  const gl = g.createRadialGradient(px, py, 5, px, py, 90); gl.addColorStop(0, 'rgba(120,200,255,0.5)'); gl.addColorStop(1, 'rgba(120,200,255,0)');
+  g.fillStyle = gl; g.fillRect(px - 100, py - 100, 200, 200); g.restore();
+  if (buzz) {
+    g.save(); g.strokeStyle = '#fff'; g.lineWidth = 4; g.lineCap = 'round';
+    const j = Math.sin(t * 90) > 0 ? 1 : -1;
+    for (const sd of [-1, 1]) for (let k = 0; k < 2; k++) { g.beginPath(); g.arc(px + j, py, 45 + k * 16, sd < 0 ? Math.PI * 0.8 : -Math.PI * 0.2, sd < 0 ? Math.PI * 1.2 : Math.PI * 0.2); g.stroke(); }
+    g.restore();
+  }
+  g.restore();
+  // notification bubble
+  const nb = easeOutBack(seg(t, 8.0, 8.3));
+  if (nb > 0) {
+    g.save(); g.translate(1150, 380); g.scale(nb, nb);
+    g.fillStyle = '#ff3b4a'; g.strokeStyle = '#111'; g.lineWidth = 6;
+    g.beginPath(); g.roundRect(-110, -50, 220, 100, 26); g.fill(); g.stroke();
+    g.beginPath(); g.moveTo(-60, 46); g.lineTo(-95, 95); g.lineTo(-20, 48); g.fill();
+    text(g, '! ! !', 0, 0, 56, '#fff');
+    g.restore();
+  }
+}
+
+function shotAngry(g, t) {
+  const t0 = 9.3, lt = t - t0;
+  bokehBG(g, t, '#8a2a1e', '#1e0606', 33);
+  // red pulse
+  const pulse = 0.5 + 0.5 * Math.sin(lt * 9);
+  const impact = 1 - ease(seg(t, t0, t0 + 0.25));
+  const shakeAmp = 14 * impact + 5 + 4 * pulse;
+  const sx = noise(t * 18) * shakeAmp, sy = noise(t * 18 + 40) * shakeAmp;
+  const z = 2.35 + impact * 0.5;
+  g.save(); g.translate(W / 2 + sx, 1150 + sy); g.scale(z, z); g.rotate(noise(t * 14 + 9) * 2.2 * D2R); g.translate(-1430, -1080);
+  drawP(g, R.aBust);
+  g.save(); g.translate(noise(t * 40) * 2.5, noise(t * 40 + 5) * 2.5); drawP(g, R.aHand, noise(t * 30 + 3) * 4); g.restore();
+  g.restore();
+  // steam puffs from both sides of the head
+  for (let k = 0; k < 10; k++) {
+    const life = ((lt * 1.4 + k * 0.1) % 1), side = k % 2 ? 1 : -1;
+    if (lt < 0.25) continue;
+    const x = W / 2 + side * (330 + life * 160) + sx, y = 330 - life * 260 + sy, r = 30 + life * 70;
+    g.fillStyle = `rgba(255,255,255,${0.55 * (1 - life)})`; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill();
+  }
+  angerMark(g, W / 2 + 360 + sx, 180 + sy, 1.6 + pulse * 0.4, ease(seg(t, t0 + 0.2, t0 + 0.4)));
+  angerMark(g, W / 2 - 400 + sx, 260 + sy, 1.1 + (1 - pulse) * 0.3, ease(seg(t, t0 + 0.5, t0 + 0.7)));
+  const ex = easeOutBack(seg(t, t0 + 0.35, t0 + 0.6));
+  if (ex > 0) text(g, '!!', W / 2 + 560 + sx, 520 + sy, 200, '#ff3b30', 0.18, ex);
+  // vignette
+  const vg = g.createRadialGradient(W / 2, H / 2, 300, W / 2, H / 2, 1100);
+  vg.addColorStop(0, 'rgba(255,0,0,0)'); vg.addColorStop(1, `rgba(170,0,0,${0.35 + 0.25 * pulse})`);
+  g.fillStyle = vg; g.fillRect(0, 0, W, H);
+}
+
+// ---------- main ----------
+let OUT, OG;
+function render(i) {
+  const t = i / FPS, g = OG;
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.clearRect(0, 0, W, H);
+  if (t < 3.45) shotWalk(g, t, i);
+  else if (t < 5.6) shotFront(g, t);
+  else if (t < 7.6) shotChinta(g, t);
+  else if (t < 9.3) shotPhone(g, t);
+  else shotAngry(g, t);
+  // cut flashes
+  for (const c of [5.6, 7.6, 9.3]) { const d = t - c; if (d >= 0 && d < 0.12) { g.fillStyle = `rgba(255,255,255,${0.55 * (1 - d / 0.12)})`; g.fillRect(0, 0, W, H); } }
+  // fades
+  const fade = Math.max(1 - seg(t, 0, 0.3), seg(t, DUR - 0.4, DUR));
+  if (fade > 0) { g.fillStyle = `rgba(0,0,0,${fade})`; g.fillRect(0, 0, W, H); }
+}
+
+(async () => {
+  const S = await prepareSheet();
+  buildRig(S); BG_CITY = buildCity(); precompute();
+  OUT = mk(W, H); OG = OUT.getContext('2d');
+  window.frame = i => { render(i); return OUT.toDataURL('image/jpeg', 0.93); };
+  window.still = arg => {
+    if (arg === 'debug') {
+      const c = mk(S.width, S.height), g = c.getContext('2d'); g.fillStyle = '#e040e0'; g.fillRect(0, 0, c.width, c.height); g.drawImage(S, 0, 0);
+      g.lineWidth = 2;
+      for (const [k, p] of Object.entries(R)) if (p && p.poly) { g.strokeStyle = '#0f0'; polyPath(g, p.poly); g.stroke(); g.fillStyle = '#ff0'; g.fillRect(p.px - 4, p.py - 4, 8, 8); }
+      return c.toDataURL('image/png');
+    }
+    const ts = arg.split(',').map(Number);
+    return ts.map(t => [`f_${t}.jpg`, (render(Math.round(t * FPS)), OUT.toDataURL('image/jpeg', 0.85))]);
+  };
+  window.ready = true;
+})();
+</script></body></html>

@@ -1,0 +1,21 @@
+- [v2 MG style wins](feedback-v2-mg-style-wins.md) — Zack-D cartoon remake rejected; IMG_1899 v2 "Ice & Ember" motion-graphics look is the house style
+- [Unique SFX per video](feedback-unique-sfx.md) — never reuse the same whoosh/pop/boom; design a fresh topic-themed palette every video
+- [megh-video skill](megh-video-skill.md) — the user's house-style skill file; use for every video, update with new feedback
+- [PC video toolchain](pc-video-toolchain.md) — portable Node 22/FFmpeg (no admin), HyperFrames, whisper.cpp needs VC++ runtime
+- [Iran Cable Explainer](iran-cable-explainer.md) — approved FINAL v3 in D:\seedance 2.5\, contents, unverified facts
+- [TOP 5 video edits](top5-video-edits.md) — 3 edit versions in D:\WHat a wild\Ntok USA\Output\New folder\
+- [Prachin Jug videos](prachin-jug-videos.md) — shorts done; long 16:9 voice covers only first half of script (up to Kalahari)
+- [Sheetkal winter video](sheetkal-winter-video.md) — v1 rejected; pro v2 APPROVED 2026-11-07
+- [Pro visual bar](feedback-pro-visual-bar.md) — winter v1 rejected as "normal": no black BGs, people must act out lines, kinetic text
+- [Raw footage edit style](raw-footage-edit-style.md) — user's raw talking footage: face rarely (~10-15%), mostly top-level explainer graphics/maps/2D
+- [Motion graphics, not cartoon](feedback-motion-graphics-not-cartoon.md) — short rejected as generic 2D; want MG-heavy unique design, 2D only light
+- [Iran nuke short (IMG_1900)](iran-nuke-short-1900.md) — 3-style combo Short with three.js, project D:\ClaudeVideos\projects\short-1900, PS encoding gotcha
+- [No captions](feedback-no-captions.md) — no subtitle pills in shorts; use extra motion graphics instead
+- [Reference visual style](reference-visual-style.md) — 3 ref shorts: 3D objects on soft BG, illustrated scenes, highlighted captions
+- [Zack D style reference](zackd-style-reference.md) — 3D explainer shorts style the user wants; Seedance for humans, we do FX/objects/edit
+- [Blender human pipeline](blender-human-pipeline.md) — portable Blender+MPFB on D:, ~57 s/frame at 720p, heatmap shader, gotchas
+- [Lost humans long video](lost-humans-long-video.md) — 19-min 16:9 MG video from Cartesia VO; reusable 16:9 template kit in vo-asif/kit
+- [MG + 2D every beat](feedback-mg-plus-2d-every-beat.md) — every MG beat must also have a framed acting 2D animation; user's character shown often (every 3-5 beats)
+- [Map short style](map-short-style.md) — GeoGlobeTales-like 9:16 map short wanted; NASA satellite tiles ready in D:\ClaudeVideos\cache\maps
+- [Raw voice + 3D maps](feedback-raw-voice-3d-maps.md) — never process user's voice; map shorts need 3D terrain feel, characters & busy shots (Chile v1 rejected as flat)
+- [Video style preferences](video-style-preferences.md) — original voice, minimal text, user's own character sheet, pro motion graphics

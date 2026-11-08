@@ -1,0 +1,177 @@
+<!doctype html><html><head><meta charset="utf-8"></head><body style="margin:0;background:#000">
+<script>window.VW = 1920; window.VH = 1080;</script>
+<script src="common.js"></script><script src="rigcore.js"></script><script src="world.js"></script><script src="kit16.js"></script><script src="wkit.js"></script><script src="wpro.js"></script>
+<script src="env_s.js"></script><script src="mg.js"></script>
+<script>
+const FPS = 30;
+let TL = null, DUR = 50.75, NF = 1523;
+const FACE = {}; let SENT = []; let CUR_FROM = -1; const ANC = {}; let SCN = {};
+function T(str) { const key = str + '|' + CUR_FROM.toFixed(1); if (ANC[key] != null) return ANC[key]; let first = null; for (const s of SENT) { let k = -1; while ((k = s.text.indexOf(str, k + 1)) >= 0) { const tt = s.s + (s.e - s.s) * k / s.text.length; if (first == null) first = tt; if (tt >= CUR_FROM - 0.6) return ANC[key] = tt; } } if (first == null) console.log('MISSING ANCHOR: ' + str); return ANC[key] = first || 0; }
+window.POPS = new Set();
+const P = (t, str, d = 0.35, off = 0) => { const a = T(str) + off; POPS.add(+a.toFixed(2)); return easeOutBack(seg(t, a, a + d)); };
+const S = (t, str, d = 0.6, off = 0) => ease(seg(t, T(str) + off, T(str) + off + d));
+function mouthAt(t) { const i = Math.round(t * FPS); if (i < 0 || i >= ENV.length) return 0; const v = j => ENV[Math.max(0, Math.min(ENV.length - 1, j))]; const db = (v(i - 1) + 2 * v(i) + v(i + 1)) / 4; return clamp((db + 44) / 22) * (0.7 + 0.3 * Math.abs(Math.sin(t * 17))); }
+let CL, CG, WC, WG;
+function lit(g, tint, fn) { CG.setTransform(1, 0, 0, 1, 0, 0); CG.clearRect(0, 0, W, H); fn(CG); if (tint) { CG.globalCompositeOperation = 'source-atop'; CG.fillStyle = tint; CG.fillRect(0, 0, W, H); CG.globalCompositeOperation = 'source-over'; } g.drawImage(CL, 0, 0); }
+function hero(g, t, x, o = {}) { const m = mouthAt(t); lit(g, o.tint, c => { shadow(c, x, o.gy || 1000, 105, 0.3); drawFront(c, x, o.gy || 1000, o.s || 0.82, Object.assign({ t, mouth: m }, o)); }); }
+// draw a world-space (1920x1080) scene into the portrait frame, clipped to a shape
+function worldIn(g, fn, cam, clip, t) {
+  WG.setTransform(1, 0, 0, 1, 0, 0); WG.globalAlpha = 1; WG.globalCompositeOperation = 'source-over'; WG.filter = 'none'; WG.clearRect(0, 0, W, H); fn(WG);
+  g.save(); g.beginPath(); if (clip.r) g.arc(clip.x, clip.y, clip.r, 0, 7); else g.roundRect(clip.x, clip.y, clip.w, clip.h, clip.rad || 30); g.clip();
+  const cw = clip.r ? clip.r * 2 : clip.w, ch = clip.r ? clip.r * 2 : clip.h, ccx = clip.r ? clip.x : clip.x + clip.w / 2, ccy = clip.r ? clip.y : clip.y + clip.h / 2;
+  const Z = Math.max(cw / 1920, ch / 1080) * (cam.z || 1); g.translate(ccx, ccy); g.scale(Z, Z); g.translate(-cam.fx, -cam.fy); g.drawImage(WC, 0, 0); g.restore();
+  g.save(); g.strokeStyle = clip.col || 'rgba(143,227,255,0.7)'; g.lineWidth = 4; g.shadowColor = clip.col || CC.ice; g.shadowBlur = 20; g.beginPath(); if (clip.r) g.arc(clip.x, clip.y, clip.r, 0, 7); else g.roundRect(clip.x, clip.y, clip.w, clip.h, clip.rad || 30); g.stroke(); g.restore();
+}
+function commentBox(g, x, y, w, k, t) {
+  if (k <= 0) return; const lt = tAge('CB', k), e = easeOutBack(clamp(lt / 0.5)); g.save(); g.translate(x, y + (1 - e) * 220); g.globalAlpha = clamp(lt * 3);
+  g.shadowColor = 'rgba(0,0,0,0.5)'; g.shadowBlur = 40; g.fillStyle = 'rgba(250,250,252,0.97)'; rr(g, -w / 2, -110, w, 220, 40); g.fill(); g.shadowColor = 'transparent';
+  g.fillStyle = CC.ember2; g.beginPath(); g.arc(-w / 2 + 90, -10, 48, 0, 7); g.fill(); g.fillStyle = '#3a2410'; g.font = 'bold 50px "Nirmala UI"'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('আ', -w / 2 + 90, -6);
+  const msg = 'আমি হলে আগুন জ্বালাতাম…'; const n = Math.floor(clamp((lt - 0.3) / 1.0) * msg.length); g.textAlign = 'left'; g.fillStyle = '#222'; g.font = 'bold 44px "Nirmala UI"'; g.fillText(msg.slice(0, n) + ((Math.floor(t * 3) % 2 && n < msg.length) ? '|' : ''), -w / 2 + 165, -30);
+  g.fillStyle = '#8a8a90'; g.font = '32px "Nirmala UI"'; g.fillText('কমেন্ট করুন', -w / 2 + 165, 40);
+  g.fillStyle = '#e8262c'; rr(g, w / 2 - 150, -40, 110, 80, 40); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.moveTo(w / 2 - 110, -20); g.lineTo(w / 2 - 66, 0); g.lineTo(w / 2 - 110, 20); g.closePath(); g.fill();
+  g.restore();
+}
+function ecg(g, t, y, col, a = 1) { g.save(); g.globalAlpha = a; g.strokeStyle = col; g.lineWidth = 5; g.shadowColor = col; g.shadowBlur = 20; g.beginPath(); for (let x = 0; x <= PW; x += 6) { const ph = ((x / PW) * 2 - t * 0.9) % 1, u = (ph + 1) % 1; const yy = u > 0.45 && u < 0.55 ? Math.sin((u - 0.45) / 0.1 * Math.PI * 2) * -120 * Math.exp(-((u - 0.5) ** 2) * 400) : 0; x ? g.lineTo(x, y + yy) : g.moveTo(x, y + yy); } g.stroke(); g.restore(); }
+// ---------- beats ----------
+const B = []; const beat = (from, mode, o) => B.push(Object.assign({ from, mode }, o));
+// 1 face hook
+beat(0, 'face', { tr: 'none', face: true, d: (g, t) => { corners(g, 40, 120, PW - 80, PH - 380, CC.ice, 0.7, 70, 4); chip(g, 'প্রাচীন যুগ · শীত', PW / 2, 200, CC.ice, 34, 1); hlText(g, 'প্রাচীন যুগে', 540, 1330, 92, P(t, 'প্রাচীন যুগে'), CC.ink, CC.ice); } });
+// 2 how did they survive winter
+beat('কীভাবে শীতকালে', 'ice', { tr: 'circle', d: (g, t, b) => { const lt = t - b.t0; bgMG(g, t, 'ice'); snowStorm(g, t, 60, 0.6, 0.35); drawIcon(g, 'snow', PW / 2, 700, 2.4, clamp(lt / 0.9), CC.ice, 8, { rot: t * 0.25 }); ringGauge(g, PW / 2, 700, 300, clamp(lt / 1.5), CC.ice, 1, 6); glitchText(g, 'শীতকালে', 540, 1140, 170, P(t, 'শীতকালে'), CC.ice); hlText(g, 'কীভাবে বাঁচতো?', 540, 1350, 84, P(t, 'বাঁচিয়ে'), CC.ink, CC.ice); } });
+// 3 imagine
+beat('জাস্ট কল্পনা', 'dark', { tr: 'zoom', d: (g, t) => { bgMG(g, t, 'dark', { floor: false }); tunnel(g, t, PW / 2, PH * 0.45, '143,227,255', 1.6); glitchText(g, 'কল্পনা করুন', 540, 880, 140, P(t, 'কল্পনা করুন'), CC.ice); subLine(g, 'আজ যদি…', 540, 1060, 60, S(t, 'আজকে যদি', 0.4)); } });
+// 4 rewind to stone age
+beat('আজকে যদি পাথর', 'ice', { tr: 'bars', d: (g, t, b) => { const lt = t - b.t0, kp = S(t, 'পাথর যুগে', 0.3); bgMG(g, t, 'ice'); const cx = PW / 2, cy = 760;
+  glass(g, cx - 300, cy - 300, 600, 600, 0.35, 'rgba(143,227,255,0.35)', 300); drawIcon(g, 'clock', cx, cy, 2.6, clamp(lt / 0.5), CC.ice, 7); const sp = -lt * 14 * (1 - kp * 0.9); g.save(); g.translate(cx, cy); g.strokeStyle = CC.ember2; g.lineWidth = 10; g.lineCap = 'round'; g.shadowColor = CC.ember2; g.shadowBlur = 20; g.beginPath(); g.moveTo(0, 0); g.lineTo(Math.sin(sp) * 180, -Math.cos(sp) * 180); g.moveTo(0, 0); g.lineTo(Math.sin(sp / 12) * 120, -Math.cos(sp / 12) * 120); g.stroke(); g.restore();
+  for (let i = 0; i < 3; i++) { g.save(); g.globalAlpha = 0.3 - i * 0.08; g.strokeStyle = CC.ice; g.lineWidth = 3; g.beginPath(); g.arc(cx, cy, 330 + i * 40, -lt * (2 + i), -lt * (2 + i) + 2.4); g.stroke(); g.restore(); }
+  const yr = Math.round(lerp(2026, 0, clamp(lt / 1.2))); if (kp < 0.5) { g.save(); g.font = 'bold 120px Consolas, monospace'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = '#fff'; g.shadowColor = CC.ice; g.shadowBlur = 30; g.globalAlpha = 1 - kp * 2; g.fillText(BN(String(yr)), cx, 1260); g.restore(); }
+  slam(g, 'পাথর যুগ', cx, 1260, 150, kp, CC.ember2); chip(g, '⟲ সময় পিছিয়ে', cx, 300, CC.ember2, 34, clamp(lt * 3)); } });
+// 5 sudden extreme cold (map)
+beat('হঠাৎ প্রচণ্ড', 'map', { tr: 'zoom', d: (g, t, b) => { const k = ease(seg(t, b.t0, b.t1 + 0.5)), kf = S(t, 'প্রচণ্ড শীত', 0.9);
+  worldIn(g, c => { mapPro(c, { lon: lerp(30, 20, k), lat: lerp(40, 54, k), zoom: lerp(0.8, 1.4, k), tilt: lerp(0.6, 0.95, k), rot: lerp(0.04, -0.04, k) }, t, (mg, SP) => { const [x, y] = SP([20, 62]); mg.save(); mg.globalCompositeOperation = 'screen'; glow(mg, x, y, 300 + 500 * kf, 'rgba(170,230,255,A)', 0.7 * kf); mg.restore(); }, { through: 1 - seg(t, b.t0, b.t0 + 1) }); }, { fx: 960, fy: 540, z: 1 }, { x: 0, y: 0, w: PW, h: PH, rad: 0, col: 'rgba(0,0,0,0)' }, t);
+  g.save(); g.globalAlpha = kf * 0.3; g.fillStyle = '#cfefff'; g.fillRect(0, 0, PW, PH); g.restore(); snowStorm(g, t, Math.round(150 * kf), 1.2, 0.7); corners(g, 60, 240, PW - 120, PH - 640, CC.ice, 0.6);
+  thermoGauge(g, 900, 1420, 560, lerp(0.75, 0.08, kf), mixC(CC.ember, CC.ice, kf), 1); bigNum(g, '−৪০°', 420, 1180, 210, CC.ice, P(t, 'প্রচণ্ড শীত')); hlText(g, 'হঠাৎ প্রচণ্ড শীত', 420, 1400, 66, P(t, 'প্রচণ্ড শীত', 0.35, 0.3), CC.ink, CC.ice); chip(g, 'বরফ যুগের ইউরোপ', 540, 300, CC.ice, 34, S(t, 'হঠাৎ', 0.4)); } });
+// 6 how would they survive (small 2D in spotlight)
+beat('তাহলে মানুষ কীভাবে', 'dark', { tr: 'circle', d: (g, t, b) => { const lt = t - b.t0; bgMG(g, t, 'ice'); worldIn(g, c => { tundra(c, { t, time: 'night', pan: 900, aurora: false, storm: 0.6 }); snowfall(c, t, { blizzard: true, wind: 1.4, n: 200 }); person(c, 960, 1000, 1.5, t, { act: 'shiver', light: 'night', mood: 'cold' }); }, { fx: 960, fy: 690, z: 1.25 }, { x: 540, y: 760, r: 330 }, t); drawIcon(g, 'q', 880, 470, 1.8, clamp((lt - 0.2) / 0.6), CC.ember2, 9); ringGauge(g, 540, 760, 360, clamp(lt / 1.3), CC.ice, 1, 5); hlText(g, 'কীভাবে বেঁচে থাকতো?', 540, 1300, 76, P(t, 'বেঁচে থাকতো'), CC.ink, CC.ember2); } });
+// 7 none of the modern things
+beat('তখন ছিল না', 'red', { tr: 'glitch', d: (g, t) => { bgMG(g, t, 'red', { floor: false }); glitchText(g, 'তখন ছিল না…', 540, 330, 104, 1, CC.red); drawIcon(g, 'hourglass', 540, 1500, 1.1, clamp((t - T('তখন ছিল না')) / 0.6), CC.red, 6, { rot: Math.sin(t * 2) * 0.2 });
+  [['blanket', 'কম্বল', 'কম্বল'], ['heater', 'হিটার', 'হিটার'], ['shop', 'গরম কাপড়ের দোকান', 'কাপড়ের দোকান']].forEach(([ic, lb, a], i) => { const y = 640 + i * 300, k = P(t, a), ks = S(t, a, 0.35, 0.45); if (k <= 0) return; g.save(); g.globalAlpha = clamp(k); glass(g, 70, y - 120, PW - 140, 240, 0.5, 'rgba(255,77,90,0.4)'); g.restore(); iconBadge(g, ic, 200, y, 95, k, ks > 0 ? '#ff8a8a' : CC.white); g.save(); g.font = fontPx(i === 2 ? 52 : 70); g.fillStyle = '#fff'; g.textAlign = 'left'; g.textBaseline = 'middle'; g.globalAlpha = clamp(k) * (1 - ks * 0.45); g.fillText(lb, 330, y + 4); const w = g.measureText(lb).width; g.restore(); strike(g, 330 + w / 2, y, w + 40, ks); xMarkMG(g, PW - 150, y, 40, ks); }); } });
+// 8 animal hide
+beat('তখনকার সময়ে শীত', 'ember', { tr: 'bars', d: (g, t, b) => { const lt = t - b.t0, kp = clamp(lt / 1.6); bgMG(g, t, 'ember'); chip(g, 'অস্ত্র ১ · পোশাক', 540, 300, CC.ember2, 34, clamp(lt * 3));
+  glass(g, 140, 470, 800, 640, 0.35, 'rgba(255,207,90,0.35)'); drawIcon(g, 'pelt', 540, 790, 2.4, kp, CC.ember2, 7, { fill: 0.12 }); for (let i = 0; i < 3; i++) { const yy = 620 + i * 140, kk = clamp(kp * 3 - i); drawLine(g, 160 + 30 * i, yy, 300, yy, kk, 'rgba(255,207,90,0.6)', 2, [8, 8]); }
+  drawLine(g, 700, 700, 900, 560, S(t, 'পশুর চামড়া', 0.5, 0.6), CC.ember2, 3); chip(g, 'পশমি চামড়া', 860, 520, CC.ember2, 34, S(t, 'পশুর চামড়া', 0.4, 0.9));
+  slam(g, 'পশুর চামড়া', 540, 1300, 130, P(t, 'পশুর চামড়া'), CC.ember2); } });
+// 9 cover body -> heat kept
+beat('নিজেদের শরীর ঢেকে', 'ember', { tr: 'whip', d: (g, t, b) => { const lt = t - b.t0, kh = clamp(lt / 1.4); bgMG(g, t, 'ember'); const cx = 540, cy = 760;
+  ringGauge(g, cx, cy, 300, kh, mixC(CC.ice, CC.ember, kh), 1, 22); drawIcon(g, 'body', cx, cy, 2.3, clamp(lt / 0.5), mixC(CC.ice, CC.ember2, kh), 8); g.save(); g.globalCompositeOperation = 'screen'; glow(g, cx, cy, 300, 'rgba(255,140,60,A)', 0.4 * kh); g.restore();
+  for (let i = 0; i < 10; i++) { const a = i / 10 * PI2 + t, r = lerp(520, 330, kh); g.save(); g.globalAlpha = (1 - kh) * 0.8; g.translate(cx + Math.cos(a) * r, cy + Math.sin(a) * r); g.rotate(a + Math.PI); g.fillStyle = CC.ice; g.beginPath(); g.moveTo(30, 0); g.lineTo(0, -10); g.lineTo(0, 10); g.fill(); g.restore(); }
+  worldIn(g, c => { tundra(c, { t, time: 'golden', pan: 700 }); person(c, 960, 1000, 1.6, t, { act: 'stand', drape: true, coat: '#a0703a', hood: true, mood: 'happy', light: 'golden', lx: 1500 }); }, { fx: 960, fy: 720, z: 1.2 }, { x: 760, y: 990, w: 260, h: 340, rad: 24, col: 'rgba(255,207,90,0.8)' }, t);
+  hlText(g, 'শরীর ঢেকে রাখতো', 460, 1420, 74, P(t, 'শরীর ঢেকে'), CC.ink, CC.ember2); bigNum(g, '+উষ্ণতা', 300, 1180, 70, CC.ember2, S(t, 'শরীর ঢেকে', 0.3, 0.4)); } });
+// 10 cave shelter
+beat('এমনকি গুহার', 'ember', { tr: 'circle', d: (g, t, b) => { const lt = t - b.t0; bgMG(g, t, 'ember'); worldIn(g, c => { caveInside(c, t, { fx: 960 }); [[860, 'sit', 1.2, { light: 'fire', female: true }], [1080, 'warm', 1.2, { light: 'fire', flip: true }]].forEach(([x, a, s, o]) => person(c, x, 1000, s, t, Object.assign({ act: a, lx: 960 }, o))); }, { fx: 960, fy: 740, z: 1.15 }, { x: 540, y: 900, r: 250, col: 'rgba(255,207,90,0.8)' }, t);
+  drawIcon(g, 'cave', 540, 870, 3.6, clamp(lt / 0.8), CC.ember2, 8); chip(g, 'অস্ত্র ২ · আশ্রয়', 540, 300, CC.ember2, 34, clamp(lt * 3)); slam(g, 'গুহায় আশ্রয়', 540, 1330, 120, P(t, 'গুহার ভিতরে'), CC.ember2); } });
+// 11 wind blocked
+beat('ঠান্ডা বাতাস থেকে', 'ice', { tr: 'whip', d: (g, t, b) => { const lt = t - b.t0, ks = clamp(lt / 0.7); bgMG(g, t, 'ice'); const cx = 600, cy = 860;
+  for (let i = 0; i < 14; i++) { const yy = 560 + i * 44, p = (t * 0.9 + hash(i)) % 1; g.save(); g.strokeStyle = `rgba(143,227,255,${0.25 + 0.4 * hash(i + 2)})`; g.lineWidth = 3; g.beginPath(); for (let x = -40; x <= PW; x += 20) { const dx = x - cx, dy = yy - cy, d = Math.hypot(dx, dy); const push = ks * Math.max(0, 260 - Math.abs(dx)) / 260 * (dy >= 0 ? 1 : -1) * Math.max(0, 300 - Math.abs(dy)) * 0.9; const y2 = yy + (x > cx - 260 ? push * (x < cx + 200 ? 1 : 1) : 0) * 0.6; x === -40 ? g.moveTo(x, y2) : g.lineTo(x, y2); } g.stroke(); const hx = ((p * (PW + 200)) - 100); g.fillStyle = CC.ice2; g.beginPath(); g.arc(hx, yy, 4, 0, 7); g.fill(); g.restore(); }
+  g.save(); g.globalCompositeOperation = 'screen'; glow(g, cx, cy, 300, 'rgba(60,227,154,A)', 0.25 * ks); g.restore(); drawIcon(g, 'shield', cx, cy, 2.1, ks, CC.green, 9, { fill: 0.15 });
+  glitchText(g, 'ঠান্ডা বাতাস', 540, 340, 120, P(t, 'ঠান্ডা বাতাস'), CC.ice); hlText(g, 'থেকে সুরক্ষা', 540, 1360, 80, P(t, 'রক্ষা করতো'), CC.ink, CC.green); } });
+// 12 suspense — biggest hope
+beat('কিন্তু তাদের সবচেয়ে', 'dark', { tr: 'dissolve', d: (g, t, b) => { const lt = t - b.t0; bgMG(g, t, 'dark', { floor: false, np: 12 }); ecg(g, t, 1020, 'rgba(255,138,42,0.9)', 0.6); const ey = 900 - ((lt * 60) % 300); g.save(); g.globalCompositeOperation = 'screen'; glow(g, 540, ey, 60, 'rgba(255,160,60,A)', 0.9); glow(g, 540, ey, 200, 'rgba(255,120,40,A)', 0.3); g.restore();
+  const ls = lerp(30, 4, easeOut(clamp(lt / 1.6))); g.save(); g.font = fontPx(96); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = '#fff'; g.globalAlpha = S(t, 'সবচেয়ে বড়', 0.6); g.letterSpacing = ls + 'px'; g.shadowColor = CC.ember; g.shadowBlur = 30; g.fillText('সবচেয়ে বড় ভরসা', 540, 700); g.restore(); subLine(g, '…', 540, 820, 90, S(t, 'বিষয় ছিল', 0.4), CC.ember2); } });
+// 13 FIRE
+beat('আগুন।', 'ember', { tr: 'flash', d: (g, t, b) => { const lt = t - b.t0; bgMG(g, t, 'ember', { np: 80 }); g.save(); g.globalCompositeOperation = 'screen'; glow(g, 540, 760, 700, 'rgba(255,120,40,A)', 0.6); g.restore(); const sh = lt < 0.3 ? (1 - lt / 0.3) * 14 : 0; g.save(); g.translate(Math.sin(lt * 80) * sh, Math.cos(lt * 60) * sh); drawIcon(g, 'flame', 540, 760, 3.2 + Math.sin(t * 9) * 0.05, clamp(lt / 0.25), CC.ember2, 10, { fill: 0.35 }); slam(g, 'আগুন', 540, 1280, 250, P(t, 'আগুন।', 0.2), '#ffb04a'); g.restore(); lightStreak(g, clamp(lt / 0.5), 900); } });
+// 14 three uses — radial diagram
+beat('আগুন জ্বালিয়ে তারা', 'ember', { tr: 'zoom', d: (g, t, b) => { const lt = t - b.t0; bgMG(g, t, 'ember'); const cx = 540, cy = 900;
+  g.save(); g.strokeStyle = 'rgba(255,207,90,0.35)'; g.lineWidth = 3; g.setLineDash([6, 14]); g.lineDashOffset = -t * 40; g.beginPath(); g.arc(cx, cy, 380, 0, 7); g.stroke(); g.restore();
+  worldIn(g, c => { c.fillStyle = '#0a0503'; c.fillRect(0, 0, W, H); firePit(c, 960, 640, 1.1, t); fireLight(c, 960, 560, 600, t, 1); }, { fx: 960, fy: 520, z: 1 }, { x: cx, y: cy, r: 150, col: 'rgba(255,207,90,0.9)' }, t);
+  const nodes = [['body', 'শরীর গরম', 'শরীর গরম', 230, 560, CC.ember2], ['meat', 'খাবার রান্না', 'খাবার রান্না', 850, 560, CC.ember2], ['wolf', 'হিংস্র প্রাণী দূরে', 'হিংস্র প্রাণী', 540, 1350, CC.red]];
+  nodes.forEach(([ic, lb, a, x, y, col], i) => { const k = P(t, a), kl = S(t, a, 0.4); drawLine(g, cx, cy, x, y, kl, col, 4); let xx = x, yy = y; if (ic === 'wolf') { const kr = S(t, 'দূরে সরিয়ে', 0.8); yy += kr * 60; } iconBadge(g, ic, xx, yy, 100, k, col); if (k > 0) { g.save(); g.globalAlpha = clamp(k); g.font = fontPx(46); g.textAlign = 'center'; g.fillStyle = '#fff'; g.shadowColor = '#000'; g.shadowBlur = 12; g.fillText(lb, xx, yy + 160); g.restore(); } });
+  chip(g, 'আগুনের ৩ কাজ', 540, 300, CC.ember2, 36, clamp(lt * 3)); } });
+// 15 food shortage
+beat('কিন্তু খাবারের অভাব', 'red', { tr: 'glitch', d: (g, t, b) => { const lt = t - b.t0, kd = clamp(lt / 1.4); bgMG(g, t, 'red'); drawIcon(g, 'plate', 540, 760, 2.3, clamp(lt / 0.6), '#ffd0d0', 7);
+  glass(g, 160, 1080, 760, 90, 0.5, 'rgba(255,77,90,0.5)', 45); g.fillStyle = mixC(CC.green, CC.red, kd); g.shadowColor = g.fillStyle; g.save(); g.shadowBlur = 20; rr(g, 175, 1095, Math.max(10, 730 * (1 - kd)), 60, 30); g.fill(); g.restore(); subLine(g, 'খাবারের মজুদ', 540, 1050, 40, 1, '#ffd0d0');
+  glitchText(g, 'খাবার শেষ?', 540, 1330, 140, P(t, 'খাবারের অভাব'), CC.red); } });
+// 16 hunting ahead
+beat('তারা আগে থেকে', 'ember', { tr: 'bars', d: (g, t, b) => { const lt = t - b.t0; bgMG(g, t, 'ember'); worldIn(g, c => { tundra(c, { t, time: 'golden', pan: 400 + lt * 40 }); mammoth(c, 1250 - lt * 25, 1000, 0.95, t * 0.6, '#5a3a24', 0.6); person(c, 820, 1000, 1.4, t, { act: 'spear', light: 'golden', lx: 1500, mood: 'focus' }); }, { fx: 1020, fy: 700, z: 1.0 }, { x: 70, y: 430, w: PW - 140, h: 640, rad: 34, col: 'rgba(255,207,90,0.8)' }, t);
+  const ks = S(t, 'শিকার করা', 0.5); drawIcon(g, 'spear', lerp(160, 860, ks), lerp(1300, 1170, ks), 0.9, 1, CC.ember2, 7); chip(g, 'অস্ত্র ৩ · খাবার', 540, 300, CC.ember2, 34, clamp(lt * 3)); hlText(g, 'আগে থেকে শিকার', 540, 1330, 84, P(t, 'শিকার করা'), CC.ink, CC.ember2); } });
+// 17 stored food grid
+beat('সংগ্রহ করা খাবারের', 'ice', { tr: 'circle', d: (g, t, b) => { const lt = t - b.t0; bgMG(g, t, 'ice'); const ics = ['meat', 'berry', 'meat', 'berry', 'meat', 'meat', 'berry', 'meat', 'berry'];
+  for (let i = 0; i < 9; i++) { const cx = 270 + (i % 3) * 270, cy = 560 + Math.floor(i / 3) * 270, k = clamp((lt - 0.1 - i * 0.14) / 0.3); glass(g, cx - 115, cy - 115, 230, 230, 0.45, k > 0 ? 'rgba(255,207,90,0.6)' : 'rgba(143,227,255,0.25)', 26); if (k > 0) { g.save(); g.translate(cx, cy); const e = easeOutBack(k); g.scale(e, e); drawIcon(g, ics[i], 0, 0, 0.8, 1, i % 2 ? '#ff7a9a' : CC.ember2, 7, { fill: 0.3 }); g.restore(); } }
+  ringGauge(g, 540, 1390, 70, clamp((lt - 0.2) / 1.6), CC.green, 1, 12); hlText(g, 'জমানো খাবার', 540, 1260, 80, P(t, 'সংগ্রহ করা'), CC.ink, CC.ember2); subLine(g, 'শীতজুড়ে ভরসা', 540, 1500, 46, S(t, 'নির্ভর করতো', 0.4), CC.ice2); } });
+// 18 thousands of years (map + marchers)
+beat('তবে সবচেয়ে অবাক', 'map', { tr: 'flash', d: (g, t, b) => { const k = ease(seg(t, b.t0, b.t1)), kr = clamp((t - b.t0 - 0.3) / 3.6); const routes = [[[36, 2], [36, 18], [35, 31], [30, 40], [20, 46], [8, 48]], [[35, 31], [45, 40], [60, 48], [80, 55], [100, 60], [120, 62]]];
+  let Sx; worldIn(g, c => { Sx = mapPro(c, { lon: lerp(45, 58, k), lat: lerp(32, 42, k), zoom: lerp(0.62, 0.8, k), tilt: 0.9, rot: -0.03 }, t, (mg, SP) => { glowRoute(mg, SP, routes[0], kr, CC.ember2, 9); glowRoute(mg, SP, routes[1], kr, CC.ember2, 9); }, { through: 1 - seg(t, b.t0, b.t0 + 1) }); marchers(c, Sx, routes[0], kr, t); marchers(c, Sx, routes[1], kr, t); }, { fx: 960, fy: 540, z: 1 }, { x: 0, y: 0, w: PW, h: PH, rad: 0, col: 'rgba(0,0,0,0)' }, t);
+  const vg = g.createLinearGradient(0, 0, 0, PH); vg.addColorStop(0, 'rgba(2,6,12,0.75)'); vg.addColorStop(0.3, 'rgba(2,6,12,0)'); vg.addColorStop(0.65, 'rgba(2,6,12,0)'); vg.addColorStop(1, 'rgba(2,6,12,0.85)'); g.fillStyle = vg; g.fillRect(0, 0, PW, PH);
+  glitchText(g, 'সবচেয়ে অবাক করা', 540, 300, 90, P(t, 'সবচেয়ে অবাক'), '#ffffff'); bigNum(g, 'হাজার হাজার', 540, 1230, 140, CC.ember2, P(t, 'হাজার হাজার'), 'বছর ধরে টিকে ছিল');
+  const kt = clamp((t - b.t0 - 0.3) / 4); g.save(); g.strokeStyle = 'rgba(255,207,90,0.6)'; g.lineWidth = 4; g.beginPath(); g.moveTo(120, 1500); g.lineTo(120 + 840 * kt, 1500); g.stroke(); for (let i = 0; i <= 12; i++) { const x = 120 + i * 70; if (x > 120 + 840 * kt) break; g.fillStyle = CC.ember2; g.beginPath(); g.arc(x, 1500, i % 4 ? 5 : 10, 0, 7); g.fill(); } g.restore(); } });
+// 19 in this cold
+beat('এই ঠান্ডার ভিতরেই', 'ice', { tr: 'dissolve', d: (g, t, b) => { const lt = t - b.t0; bgMG(g, t, 'ice'); snowStorm(g, t, 220, 1.4, 0.8); iconBadge(g, 'flame', 540, 900, 130, 1, CC.ember2); g.save(); g.globalCompositeOperation = 'screen'; glow(g, 540, 900, 260, 'rgba(255,140,50,A)', 0.5 + 0.1 * Math.sin(t * 8)); g.restore(); glitchText(g, 'এই ঠান্ডার ভিতরেই', 540, 1250, 96, P(t, 'এই ঠান্ডার'), CC.ice); } });
+// 20 what about you — recap (user's 2D character small)
+beat('আচ্ছা, আপনি', 'ember', { tr: 'zoom', d: (g, t, b) => { const lt = t - b.t0; bgMG(g, t, 'ember');
+  worldIn(g, c => { tundra(c, { t, time: 'golden', pan: 1400 }); snowfall(c, t, { n: 60 }); hero(c, t, 960, { up: 0.6, upAng: 50, loAng: 100 }); }, { fx: 960, fy: 600, z: 1.7 }, { x: 240, y: 420, w: 600, h: 640, rad: 34, col: 'rgba(255,207,90,0.85)' }, t);
+  slam(g, 'আপনি হলে?', 540, 300, 120, P(t, 'আপনি যদি'), CC.ember2); const ics = [['flame', 'আগুন'], ['pelt', 'চামড়া'], ['cave', 'গুহা'], ['meat', 'মজুদ']];
+  ics.forEach(([ic, lb], i) => { const x = 150 + i * 260, y = 1260, k = clamp((lt - 0.6 - i * 0.25) / 0.4); iconBadge(g, ic, x, y, 95, k, CC.ember2); if (k > 0) { g.save(); g.globalAlpha = k; g.font = fontPx(40); g.fillStyle = '#fff'; g.textAlign = 'center'; g.fillText(lb, x, y + 150); g.restore(); } }); } });
+// 21 face — straight look (47.7-48.85)
+beat(47.7, 'face', { tr: 'whip', face: true, d: (g, t) => { corners(g, 40, 120, PW - 80, PH - 380, CC.ember2, 0.7, 70, 4); hlText(g, 'আপনি কী করতেন?', 540, 1330, 84, seg(t, 47.75, 48.1), CC.ink, CC.ember2); } });
+// 22 comment CTA motion graphic
+beat(48.85, 'ice', { tr: 'circle', d: (g, t, b) => { const lt = t - b.t0; bgMG(g, t, 'ice'); drawIcon(g, 'bubble', 540, 640, 2.3, clamp(lt / 0.5), CC.ice, 8); commentBox(g, 540, 1050, 960, seg(t, b.t0 + 0.2, b.t0 + 0.5), t); slam(g, 'কমেন্টে জানান', 540, 1360, 110, seg(t, b.t0 + 0.1, b.t0 + 0.35), CC.ember2); } });
+// 23 face smile end (50.05-)
+beat(50.05, 'face', { tr: 'whip', face: true, d: (g, t) => { corners(g, 40, 120, PW - 80, PH - 380, CC.ice, 0.7, 70, 4); chip(g, 'কমেন্ট করুন', 540, 1330, CC.ember2, 46, 1); } });
+function xMarkMG(g, x, y, r, k) { if (k <= 0) return; g.save(); g.strokeStyle = CC.red; g.lineWidth = 12; g.lineCap = 'round'; g.shadowColor = CC.red; g.shadowBlur = 20; const a = clamp(k * 2), c = clamp(k * 2 - 1); g.beginPath(); g.moveTo(x - r, y - r); g.lineTo(x - r + 2 * r * a, y - r + 2 * r * a); if (c > 0) { g.moveTo(x + r, y - r); g.lineTo(x + r - 2 * r * c, y - r + 2 * r * c); } g.stroke(); g.restore(); }
+</script>
+<script>
+let OUTP, OG, PREVP, PG2, FINP, FG;
+function prep() {
+  let prevT = 0; B.forEach(b => { if (typeof b.from === 'number') b.t0 = b.from; else { CUR_FROM = prevT; b.t0 = T(b.from) - 0.12; } prevT = b.t0 + 0.12; }); CUR_FROM = -1; B.sort((a, b) => a.t0 - b.t0);
+  B.forEach((b, i) => b.t1 = i < B.length - 1 ? B[i + 1].t0 : DUR); window.CUTS = B.slice(1).map(b => +b.t0.toFixed(2));
+}
+function faceImg(t) { let i = Math.round(t * FPS); for (let d = 0; d < 40; d++) { if (FACE[i - d]) return FACE[i - d]; if (FACE[i + d]) return FACE[i + d]; } return null; }
+function finish(dst, src, b, t) {
+  dst.setTransform(1, 0, 0, 1, 0, 0); dst.globalAlpha = 1; dst.globalCompositeOperation = 'source-over'; dst.filter = b.face ? 'none' : 'contrast(1.06) saturate(1.1)'; dst.drawImage(src, 0, 0); dst.filter = 'none';
+  // bloom
+  if (!b.face) { dst.globalCompositeOperation = 'screen'; dst.globalAlpha = 0.18; dst.filter = 'blur(22px) brightness(1.3)'; dst.drawImage(src, 0, 0); dst.filter = 'none'; dst.globalCompositeOperation = 'source-over'; dst.globalAlpha = 1; }
+  const v = dst.createRadialGradient(PW / 2, PH / 2, PW * 0.42, PW / 2, PH / 2, PH * 0.66); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,0.55)'); dst.fillStyle = v; dst.fillRect(0, 0, PW, PH);
+  dst.globalCompositeOperation = 'overlay'; dst.globalAlpha = 0.07; const ox = Math.floor(hash(Math.floor(t * 24)) * 512), oy = Math.floor(hash(Math.floor(t * 24) + 7) * 512); dst.save(); dst.translate(-ox, -oy); dst.fillStyle = dst.createPattern(GRAIN, 'repeat'); dst.fillRect(ox, oy, PW, PH); dst.restore(); dst.globalCompositeOperation = 'source-over'; dst.globalAlpha = 1;
+}
+function drawBeat(g, bi, t) {
+  const b = B[bi], d = t - b.t0, len = Math.max(0.5, b.t1 - b.t0); g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.filter = 'none'; g.clearRect(0, 0, PW, PH);
+  CURB = bi; HUDON = false; CUR_FROM = b.t0; NOW = t;
+  const u = 1 - Math.pow(1 - clamp(d / Math.min(len, 5)), 2), z = b.face ? 1.0 + 0.05 * u : 1.0 + 0.035 * u;
+  g.save(); g.translate(PW / 2, PH * 0.45); g.scale(z, z); g.translate(-PW / 2, -PH * 0.45);
+  if (b.face) { const img = faceImg(t); if (img) g.drawImage(img, 0, 0, PW, PH); const tg = g.createLinearGradient(0, PH - 760, 0, PH); tg.addColorStop(0, 'rgba(0,0,0,0)'); tg.addColorStop(1, 'rgba(0,0,0,0.55)'); g.fillStyle = tg; g.fillRect(0, PH - 760, PW, 760); }
+  b.d(g, t, b); g.restore(); CUR_FROM = -1;
+}
+function render(i) {
+  const t = i / FPS; NOW = t; let bi = B.findIndex(b => t >= b.t0 && t < b.t1); if (bi < 0) bi = B.length - 1; const b = B[bi], d = t - b.t0;
+  drawBeat(OG, bi, t);
+  const TRD = { dissolve: 0.35, zoom: 0.35, circle: 0.42, bars: 0.4 }[b.tr] || 0;
+  if (bi > 0 && d < TRD) {
+    drawBeat(PG2, bi - 1, t); CURB = bi; NOW = t; const p = ease(d / TRD);
+    const [c, x] = tmpC('NEWP'); if (c.width !== PW) { c.width = PW; c.height = PH; } x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, PW, PH); x.drawImage(OUTP, 0, 0);
+    OG.save(); OG.setTransform(1, 0, 0, 1, 0, 0); OG.clearRect(0, 0, PW, PH);
+    if (b.tr === 'dissolve') { OG.drawImage(PREVP, 0, 0); OG.globalAlpha = p; OG.drawImage(c, 0, 0); }
+    else if (b.tr === 'zoom') { OG.drawImage(c, 0, 0); OG.globalAlpha = 1 - p; const s = 1 + p * 0.4; OG.translate(PW / 2, PH / 2); OG.scale(s, s); OG.translate(-PW / 2, -PH / 2); OG.filter = `blur(${p * 10}px)`; OG.drawImage(PREVP, 0, 0); }
+    else if (b.tr === 'circle') { OG.drawImage(PREVP, 0, 0); const r = p * 1150; OG.save(); OG.beginPath(); OG.arc(PW / 2, PH * 0.45, r, 0, 7); OG.clip(); OG.drawImage(c, 0, 0); OG.restore(); OG.strokeStyle = 'rgba(255,255,255,0.9)'; OG.lineWidth = 10 * (1 - p); OG.shadowColor = CC.ice; OG.shadowBlur = 30; OG.beginPath(); OG.arc(PW / 2, PH * 0.45, r, 0, 7); OG.stroke(); }
+    else if (b.tr === 'bars') { OG.drawImage(PREVP, 0, 0); for (let k = 0; k < 7; k++) { const pk = ease(clamp((d / TRD) * 1.6 - k * 0.09)); OG.save(); OG.beginPath(); const bw = PW / 7 + 4, x0 = k * PW / 7; OG.rect(x0, PH - pk * PH, bw, pk * PH); OG.clip(); OG.drawImage(c, 0, 0); OG.restore(); OG.fillStyle = CC.ember2; OG.fillRect(x0, PH - pk * PH - 8, bw, pk > 0 && pk < 1 ? 8 : 0); } }
+    OG.restore();
+  }
+  if (bi > 0 && b.tr === 'whip' && d < 0.26) { const w = 1 - easeOut(d / 0.26), dir = bi % 2 ? 1 : -1; const [c, x] = tmpC('WHP'); if (c.width !== PW) { c.width = PW; c.height = PH; } x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, PW, PH); x.drawImage(OUTP, 0, 0); OG.save(); OG.setTransform(1, 0, 0, 1, 0, 0); OG.clearRect(0, 0, PW, PH); OG.filter = `blur(${w * 22}px)`; OG.translate(PW / 2 + dir * w * 140, PH / 2); OG.scale(1 + w * 0.12, 1 + w * 0.12); OG.drawImage(c, -PW / 2, -PH / 2); OG.restore(); }
+  if (bi > 0 && b.tr === 'glitch' && d < 0.2) { const [c, x] = tmpC('GLP'); if (c.width !== PW) { c.width = PW; c.height = PH; } x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, PW, PH); x.drawImage(OUTP, 0, 0); OG.save(); OG.setTransform(1, 0, 0, 1, 0, 0); for (let s = 0; s < 14; s++) { const y0 = hash(s + Math.floor(t * 60)) * PH, h = 30 + hash(s + 2) * 160, off = (hash(s + 5 + Math.floor(t * 60)) - 0.5) * 160 * (1 - d / 0.2); OG.drawImage(c, 0, y0, PW, h, off, y0, PW, h); } OG.globalCompositeOperation = 'screen'; OG.globalAlpha = 0.5 * (1 - d / 0.2); OG.fillStyle = '#ff2a6a'; OG.fillRect(0, hash(Math.floor(t * 60)) * PH, PW, 6); OG.restore(); }
+  finish(FG, OUTP, b, t);
+  if (bi > 0 && b.tr === 'flash' && d < 0.18) { FG.fillStyle = `rgba(255,248,235,${0.8 * (1 - d / 0.18)})`; FG.fillRect(0, 0, PW, PH); }
+  FG.fillStyle = 'rgba(255,255,255,0.15)'; FG.fillRect(0, 0, PW, 8); const pg = FG.createLinearGradient(0, 0, PW, 0); pg.addColorStop(0, CC.ice); pg.addColorStop(1, CC.ember2); FG.fillStyle = pg; FG.fillRect(0, 0, PW * clamp(t / DUR), 8);
+  const fade = seg(t, DUR - 0.3, DUR); if (fade > 0) { FG.fillStyle = `rgba(0,0,0,${fade})`; FG.fillRect(0, 0, PW, PH); }
+}
+(async () => {
+  await new Promise(r => document.readyState === 'complete' ? r() : addEventListener('load', r));
+  TL = await (await fetch('../temp/timeline.json')).json(); DUR = TL.dur; NF = Math.round(DUR * FPS); SENT = TL.segs.map(s => ({ s: s.s, e: s.e, text: s.text }));
+  const ff = await (await fetch('../temp/face/list.json')).json(); await Promise.all(ff.map(n => loadImg('../temp/face/' + n).then(im => { FACE[+n.match(/\d+/)[0]] = im; })));
+  const S0 = await prepareSheet(); buildRig(S0); buildMap3D(); buildPost();
+  CL = mk(W, H); CG = CL.getContext('2d'); WC = mk(W, H); WG = WC.getContext('2d');
+  OUTP = mk(PW, PH); OG = OUTP.getContext('2d'); PREVP = mk(PW, PH); PG2 = PREVP.getContext('2d'); FINP = mk(PW, PH); FG = FINP.getContext('2d');
+  prep(); await document.fonts.load('bold 40px "Nirmala UI"');
+  window.frame = i => { render(i); return FINP.toDataURL('image/jpeg', 0.92); };
+  window.still = arg => { if (arg === 'beats') return [['beats_s2.json', 'data:application/json;base64,' + btoa(unescape(encodeURIComponent(JSON.stringify(B.map(b => [String(b.from), +b.t0.toFixed(2), +b.t1.toFixed(2)])))))]]; return arg.split(',').map(Number).map(t => { try { render(Math.round(t * FPS)); } catch (e) { console.log('ERR at ' + t + ': ' + e.message + ' | ' + (e.stack || '').split('\n')[1]); } return [`s_${t}.jpg`, FINP.toDataURL('image/jpeg', 0.8)]; }); };
+  window.ready = true;
+})();
+</script></body></html>

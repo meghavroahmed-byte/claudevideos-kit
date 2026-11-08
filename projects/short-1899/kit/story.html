@@ -1,0 +1,356 @@
+<!doctype html><html><body style="margin:0;background:#000">
+<script src="common.js"></script><script src="rigcore.js"></script><script src="world.js"></script><script src="env.js"></script>
+<script>
+const FPS = 30, DUR = 65, NF = DUR * FPS;
+
+// ---------- lip sync ----------
+function mouthAt(t) {
+  const i = Math.round(t * FPS); if (i < 0 || i >= ENV.length) return 0;
+  const v = j => ENV[Math.max(0, Math.min(ENV.length - 1, j))];
+  const db = (v(i - 1) + 2 * v(i) + v(i + 1)) / 4;
+  let o = clamp((db + 44) / 22);
+  return o * (0.7 + 0.3 * Math.abs(Math.sin(t * 17)));
+}
+// character layer with lighting tint
+let CL, CG;
+function lit(g, tint, fn) {
+  CG.setTransform(1, 0, 0, 1, 0, 0); CG.clearRect(0, 0, W, H); CG.globalCompositeOperation = 'source-over';
+  fn(CG);
+  if (tint) { CG.setTransform(1, 0, 0, 1, 0, 0); CG.globalCompositeOperation = 'source-atop'; CG.fillStyle = tint; CG.fillRect(0, 0, W, H); CG.globalCompositeOperation = 'source-over'; }
+  g.drawImage(CL, 0, 0);
+}
+const pop = (t, a, d = 0.35) => easeOutBack(seg(t, a, a + d));
+const sparkle = (g, x, y, s, t, a = 1) => { g.save(); g.translate(x, y); g.rotate(t * 2); g.scale(s, s); g.globalAlpha = a; g.fillStyle = '#fff6c2'; g.beginPath(); for (let k = 0; k < 8; k++) { const r = k % 2 ? 8 : 26, an = k * Math.PI / 4; g.lineTo(Math.cos(an) * r, Math.sin(an) * r); } g.fill(); g.restore(); };
+
+// camera helper: slow push-in on whole frame
+function cam(g, k, cx = W / 2, cy = H / 2) { g.translate(cx, cy); g.scale(k, k); g.translate(-cx, -cy); }
+
+// ================= SCENES =================
+// 1. Hook — character already in the ancient world, talking
+function sc1(g, t) {
+  const o = { t, pan: t * 6 };
+  g.save(); cam(g, 1 + t * 0.012, W / 2, 1300);
+  land(g, o);
+  // cave on the left
+  g.fillStyle = '#7b6f62'; g.beginPath(); g.moveTo(-40, 1560); g.quadraticCurveTo(40, 1120, 330, 1180); g.quadraticCurveTo(430, 1300, 420, 1560); g.closePath(); g.fill();
+  g.fillStyle = '#1d1712'; g.beginPath(); g.ellipse(190, 1520, 95, 150, 0, Math.PI, 0); g.fill();
+  fire(g, 190, 1535, 0.35, t);
+  caveman(g, 300, 1540, 0.75, { t, pose: 'spear', col: '#2e211a', cloth: '#6b4a2e', skin: '#8a5a3a', beard: true });
+  caveman(g, 90, 1545, 0.6, { t, pose: 'sit', col: '#2e211a', cloth: '#7a5534', skin: '#8a5a3a' });
+  g.restore();
+  const m = mouthAt(t);
+  const up = ease(seg(t, 0.4, 0.8)) * (1 - ease(seg(t, 1.9, 2.3))), up2 = ease(seg(t, 3.2, 3.5));
+  lit(g, null, c => { shadow(c, 700, 1790, 120); drawFront(c, 700, 1790, 0.98, { t, mouth: m, up: Math.max(up, up2), upAng: up2 > up ? 40 : 64, loAng: up2 > up ? 120 : 92, wave: up > 0.5 ? Math.sin(t * 9) * 10 : 0 }); });
+  foregroundGrass(g, t, o, t * 6);
+  // job icon crossed
+  iconTile(g, 300, 470, 130, pop(t, 1.8), ICON.briefcase, seg(t, 2.4, 3.0));
+  btext(g, 'চাকরি?', 300, 660, 78, '#fff', pop(t, 2.0));
+  symbolText(g, '?', 760, 420, 230, '#ffd23f', pop(t, 3.3), Math.sin(t * 3) * 0.1);
+  vignette(g, 0.35);
+}
+// 2. "ধরুন..." time warp
+function sc2(g, t) {
+  const lt = t - 4.25;
+  g.fillStyle = '#0b0820'; g.fillRect(0, 0, W, H);
+  const sp = ease(seg(t, 4.8, 6.2));
+  for (let i = 0; i < 26; i++) {
+    const r = ((i * 70 + lt * 900 * (0.3 + sp)) % 1900);
+    g.strokeStyle = `hsla(${(i * 25 + lt * 120) % 360},90%,62%,${0.15 + 0.5 * (r / 1900)})`; g.lineWidth = 6 + r / 60;
+    g.beginPath(); g.ellipse(W / 2, H / 2, r * 0.6, r, lt * (0.5 + sp * 3) + i * 0.3, 0, Math.PI * 1.6); g.stroke();
+  }
+  for (let i = 0; i < 80; i++) { const a = hash(i) * Math.PI * 2, d = ((hash(i + 3) * 1000 + lt * 1400 * (0.2 + sp)) % 1100); g.strokeStyle = `rgba(255,255,255,${d / 1100})`; g.lineWidth = 3; g.beginPath(); g.moveTo(W / 2 + Math.cos(a) * d, H / 2 + Math.sin(a) * d); g.lineTo(W / 2 + Math.cos(a) * (d + 30 + sp * 120), H / 2 + Math.sin(a) * (d + 30 + sp * 120)); g.stroke(); }
+  // clock spinning backwards
+  const ck = pop(t, 4.3, 0.4);
+  g.save(); g.translate(W / 2, 820); g.scale(ck, ck); g.rotate(Math.sin(lt * 8) * 0.04 * sp);
+  g.fillStyle = '#fff8ea'; g.strokeStyle = '#1b1b1b'; g.lineWidth = 14; g.beginPath(); g.arc(0, 0, 230, 0, 7); g.fill(); g.stroke();
+  for (let k = 0; k < 12; k++) { g.save(); g.rotate(k * Math.PI / 6); g.fillStyle = '#1b1b1b'; g.fillRect(-5, -205, 10, 30); g.restore(); }
+  const back = -(lt * 0.6 + sp * sp * 60);
+  g.lineCap = 'round'; g.strokeStyle = '#1b1b1b'; g.lineWidth = 14; g.save(); g.rotate(back / 12); g.beginPath(); g.moveTo(0, 0); g.lineTo(0, -120); g.stroke(); g.restore();
+  g.strokeStyle = '#e8262c'; g.lineWidth = 9; g.save(); g.rotate(back); g.beginPath(); g.moveTo(0, 30); g.lineTo(0, -180); g.stroke(); g.restore();
+  g.fillStyle = '#1b1b1b'; g.beginPath(); g.arc(0, 0, 16, 0, 7); g.fill();
+  g.restore();
+  // counter
+  const yrs = Math.round(Math.pow(sp, 2.2) * 50000 / 100) * 100;
+  btext(g, BN(yrs.toLocaleString('en-US')) + ' বছর আগে', W / 2, 1230, 92, '#ffd23f', pop(t, 5.0));
+  btext(g, 'ধরুন...', W / 2, 360, 96, '#fff', pop(t, 4.3) * (1 - seg(t, 5.0, 5.3)));
+  // white-out into map
+  const wo = seg(t, 6.7, 7.0); if (wo > 0) { g.fillStyle = `rgba(255,248,230,${wo})`; g.fillRect(0, 0, W, H); }
+}
+// 3. Map — Out of Africa, 50,000 years ago
+const ROUTES = [
+  [[36, 2], [42, 11], [48, 18], [56, 24], [66, 25], [77, 20], [88, 23], [98, 18], [104, 5], [112, -4], [124, -9], [133, -20], [142, -27]],
+  [[36, 2], [36, 18], [35, 30], [32, 38], [24, 43], [14, 47], [4, 48]],
+  [[56, 24], [62, 35], [72, 42], [90, 42], [104, 38], [116, 36]],
+];
+function sc3(g, t) {
+  const k = ease(seg(t, 7.0, 8.0));
+  const S = drawMap(g, { lon: lerp(70, 62, k), lat: lerp(15, 18, k), zoom: lerp(0.32, 0.72, k) }, t);
+  // early humans region glow
+  const [ax, ay] = S([33, 2]);
+  const gl = g.createRadialGradient(ax, ay, 5, ax, ay, 170); gl.addColorStop(0, 'rgba(210,60,30,0.55)'); gl.addColorStop(1, 'rgba(210,60,30,0)'); g.fillStyle = gl; g.fillRect(ax - 200, ay - 200, 400, 400);
+  ROUTES.forEach((r, i) => route(g, S, r, ease(seg(t, 7.3 + i * 0.25, 9.0 + i * 0.1)), '#a3201a', 8));
+  pinDot(g, ax, ay, 16, t);
+  // walking footprints along main route
+  btext(g, 'আফ্রিকা', ax - 30, ay + 70, 52, '#5a3a1a', pop(t, 7.4), { stroke: '#f3e2bd' });
+  compass(g, 900, 1620, 80, t * 0.3);
+  btext(g, '৫০,০০০ বছর আগের পৃথিবী', W / 2, 300, 76, '#fff8ea', pop(t, 7.2), { pill: '#7a2a14', stroke: '#3a1408' });
+  // tiny people icons
+  const [px, py] = S([77, 20]); if (t > 8.2) caveman(g, px, py, 0.22, { t, walk: true, col: '#5a3a1a', cloth: '#5a3a1a' });
+}
+// 4. No mobile / electricity / water
+function sc4(g, t) {
+  const o = { t, pan: 200 + t * 4 };
+  land(g, o);
+  const m = mouthAt(t);
+  lit(g, null, c => { shadow(c, 540, 1790, 130); drawPhone(c, 540, 1790, 0.98, { t, mouth: m, headRot: Math.sin(t * 1.5) * 1.5 + Math.sin(t * 7) * (t > 9.6 && t < 10.4 ? 2 : 0) }); });
+  // phone in hand: no signal
+  const ph = [540, 1790 - (1078 - 500) * 0.98];
+  if (t > 9.6) { g.save(); g.globalAlpha = 0.5 + 0.5 * Math.sin(t * 12); symbolText(g, '✕', ph[0] + 70, ph[1] - 60, 60, '#ff3b30'); g.restore(); }
+  foregroundGrass(g, t, o, o.pan);
+  const icons = [[ICON.phone, 9.55, 'মোবাইল'], [ICON.bulb, 10.95, 'বিদ্যুৎ'], [ICON.glass, 12.05, 'পানি']];
+  icons.forEach(([ic, at, lb], i) => {
+    const x = 200 + i * 340, y = 470 + (i === 1 ? -40 : 0);
+    iconTile(g, x, y, 120, pop(t, at), ic, seg(t, at + 0.35, at + 0.8));
+    btext(g, lb, x, y + 175, 56, '#fff', pop(t, at + 0.15));
+  });
+  vignette(g, 0.3);
+}
+// 5. Danger — survive today
+function sc5(g, t) {
+  const lt = t - 14.6, pulse = 0.5 + 0.5 * Math.sin(lt * 5);
+  const gr = g.createRadialGradient(W / 2, H * 0.55, 100, W / 2, H / 2, 1300);
+  gr.addColorStop(0, mixC('#5a1e1e', '#7a1c1c', pulse)); gr.addColorStop(1, '#120404'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  // sun racing to set behind silhouettes
+  const sy = lerp(700, 1500, ease(seg(t, 15, 21)));
+  g.fillStyle = 'rgba(255,120,60,0.5)'; g.beginPath(); g.arc(W / 2, sy, 260, 0, 7); g.fill();
+  ridge(g, 1500, 200, 0.004, 5, lt * 10, '#2a0c0c');
+  const shake = (t > 14.7 && t < 15.1) ? 12 : 2;
+  const m = mouthAt(t);
+  lit(g, 'rgba(255,60,40,0.12)', c => drawChinta(c, W / 2 + noise(t * 20) * shake, 1990 + noise(t * 20 + 9) * shake, 2.95, { t, mouth: m }));
+  iconTile(g, 840, 380, 115, pop(t, 16.9), (gg, r) => ICON.hourglass(gg, r, t));
+  symbolText(g, '⚠', 230, 370, 190, '#ffd23f', pop(t, 14.75) * (0.92 + 0.08 * pulse));
+  btext(g, 'আগামীকাল?', W / 2, 640, 104, '#fff', pop(t, 19.3), { pill: '#c0261c' });
+  vignette(g, 0.6, '40,0,0');
+}
+// 6. Morning — walk to find food
+function sc6(g, t) {
+  const lt = t - 21.0, pan = lt * 380;
+  const o = { t, dawn: 1 - ease(seg(t, 21, 24.3)) * 0.4, pan, sunY: 1150 - lt * 60, sunX: 300 };
+  land(g, o);
+  const m = mouthAt(t);
+  lit(g, 'rgba(255,150,80,0.10)', c => { shadow(c, 620, 1790, 115); drawSide(c, 620, 1790, 0.98, { p: lt / 0.95, e: 1, mouth: m }); });
+  foregroundGrass(g, t, o, pan);
+  btext(g, 'খাবারের খোঁজে', W / 2, 400, 96, '#fff', pop(t, 21.4), { pill: '#e0862a' });
+  // hunger rumble lines
+  if (lt > 1.2) { g.save(); g.strokeStyle = 'rgba(255,255,255,0.85)'; g.lineWidth = 6; for (let k = 0; k < 3; k++) { g.beginPath(); g.arc(560, 1420, 40 + k * 22 + Math.sin(t * 20) * 3, Math.PI * 0.7, Math.PI * 1.3); g.stroke(); } g.restore(); }
+  dust(g, t, 30);
+}
+// 7. No supershop / restaurant / fridge
+function sc7(g, t) {
+  const o = { t, pan: 900 + t * 5 };
+  land(g, o);
+  const m = mouthAt(t);
+  const up = ease(seg(t, 24.6, 25.0)) * (1 - ease(seg(t, 27.4, 27.9)));
+  lit(g, null, c => { shadow(c, 540, 1790, 120); drawFront(c, 540, 1790, 0.98, { t, mouth: m, up, upAng: 35, loAng: 95, wave: Math.sin(t * 4) * 6 * up }); });
+  foregroundGrass(g, t, o, o.pan);
+  [[ICON.shop, 24.85, 'সুপারশপ'], [ICON.food, 25.85, 'রেস্টুরেন্ট'], [ICON.fridge, 26.75, 'ফ্রিজ']].forEach(([ic, at, lb], i) => {
+    const x = 200 + i * 340, y = 440 + (i === 1 ? 60 : 0);
+    iconTile(g, x, y, 120, pop(t, at), ic, seg(t, at + 0.3, at + 0.75));
+    btext(g, lb, x, y + 175, 52, '#fff', pop(t, at + 0.15));
+  });
+  vignette(g, 0.3);
+}
+// 8. Fruit / fish / hunt cards
+function miniFruit(g, w, h, t) {
+  const sk = g.createLinearGradient(0, 0, 0, h); sk.addColorStop(0, '#8fd0f2'); sk.addColorStop(1, '#d9f2c4'); g.fillStyle = sk; g.fillRect(0, 0, w, h);
+  g.fillStyle = '#6aa84f'; g.fillRect(0, h * 0.78, w, h);
+  g.fillStyle = '#6b4a2a'; g.fillRect(w * 0.3, h * 0.35, 40, h * 0.45);
+  g.fillStyle = '#3f8a3a'; for (const [dx, dy, r] of [[0, 0, 150], [-110, 40, 110], [110, 40, 110], [0, -80, 110]]) { g.beginPath(); g.arc(w * 0.3 + 20 + dx, h * 0.3 + dy, r, 0, 7); g.fill(); }
+  for (let i = 0; i < 9; i++) { g.fillStyle = '#e8402c'; g.beginPath(); g.arc(w * 0.3 + 20 + (hash(i) - 0.5) * 300, h * 0.3 + (hash(i + 4) - 0.4) * 180, 18, 0, 7); g.fill(); }
+  const f = (t % 1.4) / 1.4; g.fillStyle = '#e8402c'; g.beginPath(); g.arc(w * 0.45, lerp(h * 0.42, h * 0.8, f * f), 20, 0, 7); g.fill();
+  caveman(g, w * 0.72, h * 0.86, 0.85, { t, pose: 'stand', col: '#2e211a', cloth: '#7a5534', skin: '#8a5a3a', flip: true });
+  g.fillStyle = '#9a6a3a'; g.beginPath(); g.moveTo(w * 0.5, h * 0.8); g.lineTo(w * 0.62, h * 0.8); g.lineTo(w * 0.6, h * 0.88); g.lineTo(w * 0.52, h * 0.88); g.fill();
+}
+function miniFish(g, w, h, t) {
+  g.fillStyle = '#8fd0f2'; g.fillRect(0, 0, w, h); g.fillStyle = '#7fb35a'; g.fillRect(0, h * 0.42, w, 40);
+  const wg = g.createLinearGradient(0, h * 0.5, 0, h); wg.addColorStop(0, '#2f8fd0'); wg.addColorStop(1, '#14507d'); g.fillStyle = wg; g.fillRect(0, h * 0.5, w, h);
+  g.strokeStyle = 'rgba(255,255,255,0.5)'; g.lineWidth = 4; for (let y = h * 0.56; y < h; y += 46) { g.beginPath(); for (let x = 0; x <= w; x += 20) g.lineTo(x, y + Math.sin(x * 0.04 + t * 3 + y) * 6); g.stroke(); }
+  for (let i = 0; i < 3; i++) { const p = ((t * 0.7 + i / 3) % 1), x = w * (0.2 + i * 0.3), y = h * 0.55 - Math.sin(p * Math.PI) * h * 0.25; if (p < 0.9) fish(g, x + p * 80, y, 1.1, -Math.cos(p * Math.PI) * 0.9, '#f2a23a'); }
+  caveman(g, w * 0.2, h * 0.5, 0.75, { t, pose: 'spear', col: '#2e211a', cloth: '#6b4a2e', skin: '#8a5a3a' });
+}
+function miniHunt(g, w, h, t) {
+  const sk = g.createLinearGradient(0, 0, 0, h); sk.addColorStop(0, '#f2b066'); sk.addColorStop(1, '#f7dfa0'); g.fillStyle = sk; g.fillRect(0, 0, w, h);
+  g.fillStyle = '#b08a4a'; g.fillRect(0, h * 0.72, w, h);
+  const dx = ((t * 260) % (w + 400)) - 200;
+  deer(g, w - dx, h * 0.8, 1.0, t, '#4a2e1a');
+  caveman(g, w * 0.15, h * 0.86, 0.75, { t, pose: 'throw', k: (t * 0.8) % 1, col: '#2e211a', cloth: '#6b4a2e', skin: '#8a5a3a' });
+  const sp = (t * 0.8) % 1; g.save(); g.translate(lerp(w * 0.22, w * 0.8, sp), h * 0.55 - Math.sin(sp * Math.PI) * 140); g.rotate(-0.4 + sp * 0.8); g.strokeStyle = '#6b4a2a'; g.lineWidth = 7; g.beginPath(); g.moveTo(-70, 0); g.lineTo(70, 0); g.stroke(); g.fillStyle = '#999'; g.beginPath(); g.moveTo(70, -8); g.lineTo(95, 0); g.lineTo(70, 8); g.fill(); g.restore();
+}
+function sc8(g, t) {
+  const lt = t - 28.1;
+  const bg = g.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, '#2b4a3a'); bg.addColorStop(1, '#13231b'); g.fillStyle = bg; g.fillRect(0, 0, W, H);
+  dust(g, t, 40, '200,255,200', 0.35);
+  card(g, W / 2, 380, 960, 520, pop(t, 28.25), 'ফল সংগ্রহ', (c, w, h) => miniFruit(c, w, h, t), -0.15);
+  card(g, W / 2, 960, 960, 520, pop(t, 30.75), 'মাছ ধরা', (c, w, h) => miniFish(c, w, h, t), 0.15);
+  card(g, W / 2, 1540, 960, 520, pop(t, 33.1), 'শিকার', (c, w, h) => miniHunt(c, w, h, t), -0.15);
+}
+// 9. Surprise — not only food
+function sc9(g, t) {
+  const o = { t, pan: 1500 + t * 4 };
+  g.save(); cam(g, 1.0, W / 2, 900); land(g, o); g.restore();
+  g.fillStyle = 'rgba(20,10,40,0.25)'; g.fillRect(0, 0, W, H);
+  const m = mouthAt(t), pk = pop(t, 35.55, 0.3);
+  const up = ease(seg(t, 38.5, 38.9)) * (1 - ease(seg(t, 41.0, 41.4)));
+  lit(g, null, c => drawFront(c, 540, 1080, 1.85, { t, mouth: m, up, upAng: 30, loAng: 110, wave: Math.sin(t * 6) * 8 * up, sy: 1 + (1 - pk) * 0.05 }, [280, 520]));
+  for (let i = 0; i < 6; i++) sparkle(g, 540 + Math.cos(i + t) * 420, 420 + Math.sin(i * 2 + t) * 160, 1.3, t + i, pk * (0.5 + 0.5 * Math.sin(t * 4 + i)));
+  symbolText(g, '!', 880, 330, 260, '#ffd23f', pk, 0.15);
+  btext(g, 'শুধু খাবার নয়!', W / 2, 1640, 100, '#fff', pop(t, 38.7), { pill: '#2a7fd0' });
+  iconTile(g, 190, 360, 105, pop(t, 39.0), ICON.food, seg(t, 39.4, 39.9));
+}
+// 10. Activities: story / tools / painting / family
+function miniStory(g, w, h, t) {
+  g.fillStyle = '#1a1430'; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 30; i++) { g.fillStyle = `rgba(255,255,255,${0.5 * hash(i)})`; g.fillRect(hash(i + 1) * w, hash(i + 2) * h * 0.5, 3, 3); }
+  g.fillStyle = '#2a1e18'; g.fillRect(0, h * 0.75, w, h);
+  fire(g, w / 2, h * 0.78, 0.45, t);
+  caveman(g, w * 0.2, h * 0.82, 0.7, { t, pose: 'sit', col: '#1a120d', cloth: '#5a3a24', skin: '#6a4430' });
+  caveman(g, w * 0.82, h * 0.82, 0.7, { t: t + 1, pose: 'sit', col: '#1a120d', cloth: '#5a3a24', skin: '#6a4430', flip: true });
+  const b = 0.5 + 0.5 * Math.sin(t * 3); g.fillStyle = '#fff'; g.beginPath(); g.ellipse(w * 0.32, h * 0.25, 110, 70, 0, 0, 7); g.fill(); g.beginPath(); g.moveTo(w * 0.24, h * 0.33); g.lineTo(w * 0.2, h * 0.45); g.lineTo(w * 0.3, h * 0.34); g.fill();
+  deer(g, w * 0.3, h * 0.31, 0.32, t, '#5a3a1a', b);
+}
+function miniTool(g, w, h, t) {
+  g.fillStyle = '#c9a77a'; g.fillRect(0, 0, w, h); g.fillStyle = '#9a7a52'; g.fillRect(0, h * 0.7, w, h);
+  rock(g, w * 0.55, h * 0.8, 1.1, '#7d7a72', '#a8a59c');
+  caveman(g, w * 0.32, h * 0.88, 0.9, { t, pose: 'hammer', col: '#2e211a', cloth: '#6b4a2e', skin: '#8a5a3a' });
+  const hk = Math.abs(Math.sin(t * 6)); if (hk < 0.25) for (let i = 0; i < 8; i++) { const a = -Math.PI / 2 + (i - 3.5) * 0.35; g.strokeStyle = '#ffd23f'; g.lineWidth = 5; g.beginPath(); g.moveTo(w * 0.55 + Math.cos(a) * 20, h * 0.72 + Math.sin(a) * 20); g.lineTo(w * 0.55 + Math.cos(a) * 70, h * 0.72 + Math.sin(a) * 70); g.stroke(); }
+  g.fillStyle = '#6d6a62'; g.beginPath(); g.moveTo(w * 0.8, h * 0.25); g.lineTo(w * 0.9, h * 0.35); g.lineTo(w * 0.8, h * 0.5); g.lineTo(w * 0.72, h * 0.37); g.closePath(); g.fill();
+}
+function miniPaint(g, w, h, t, t0) {
+  const bg = g.createRadialGradient(w / 2, h / 2, 50, w / 2, h / 2, w); bg.addColorStop(0, '#b0784a'); bg.addColorStop(1, '#4a2a16'); g.fillStyle = bg; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 40; i++) { g.fillStyle = `rgba(60,30,10,${hash(i) * 0.2})`; g.beginPath(); g.arc(hash(i + 1) * w, hash(i + 2) * h, 10 + hash(i + 3) * 40, 0, 7); g.fill(); }
+  const k = clamp((t - t0) / 1.8);
+  g.save(); g.globalAlpha = 0.9;
+  for (let i = 0; i < 3; i++) if (k > i * 0.25) { g.fillStyle = '#7a1a10'; g.save(); g.translate(w * (0.15 + i * 0.12), h * (0.25 + (i % 2) * 0.12)); g.rotate(-0.3 + i * 0.2); g.beginPath(); g.ellipse(0, 0, 26, 32, 0, 0, 7); g.fill(); for (let f = 0; f < 5; f++) { g.beginPath(); g.ellipse(-24 + f * 12, -40 - (f === 2 ? 8 : 0), 6, 20, 0, 0, 7); g.fill(); } g.restore(); }
+  g.beginPath(); g.rect(0, 0, w * (0.35 + k * 0.65), h); g.clip();
+  deer(g, w * 0.6, h * 0.75, 1.0, 0, 'rgba(40,15,5,0.9)', 0);
+  g.restore();
+}
+function miniFamily(g, w, h, t) {
+  const sk = g.createLinearGradient(0, 0, 0, h); sk.addColorStop(0, '#ff9a5a'); sk.addColorStop(1, '#ffd88a'); g.fillStyle = sk; g.fillRect(0, 0, w, h);
+  g.fillStyle = '#ffe9a0'; g.beginPath(); g.arc(w * 0.5, h * 0.62, 110, 0, 7); g.fill();
+  g.fillStyle = '#5a3a2a'; g.fillRect(0, h * 0.78, w, h);
+  caveman(g, w * 0.32, h * 0.86, 0.85, { t, col: '#3a2418', cloth: '#3a2418', skin: '#3a2418', beard: true });
+  caveman(g, w * 0.64, h * 0.86, 0.78, { t: t + 1, col: '#3a2418', cloth: '#3a2418', skin: '#3a2418' });
+  caveman(g, w * 0.48, h * 0.86, 0.45, { t: t + 2, col: '#3a2418', cloth: '#3a2418', skin: '#3a2418' });
+  const hp = 1 + 0.15 * Math.sin(t * 6); g.save(); g.translate(w * 0.48, h * 0.35); g.scale(hp, hp); g.fillStyle = '#e8262c'; g.beginPath(); g.moveTo(0, 30); g.bezierCurveTo(-60, -10, -30, -60, 0, -25); g.bezierCurveTo(30, -60, 60, -10, 0, 30); g.fill(); g.restore();
+}
+function sc10(g, t) {
+  const bg = g.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, '#3a2414'); bg.addColorStop(1, '#1a0f08'); g.fillStyle = bg; g.fillRect(0, 0, W, H);
+  dust(g, t, 40, '255,200,140', 0.35);
+  const cw = 500, ch = 820;
+  card(g, 285, 520, cw, ch, pop(t, 41.7), 'গল্প', (c, w, h) => miniStory(c, w, h, t), -0.2);
+  card(g, 795, 520, cw, ch, pop(t, 42.9), 'হাতিয়ার', (c, w, h) => miniTool(c, w, h, t), 0.2);
+  card(g, 285, 1400, cw, ch, pop(t, 44.55), 'ছবি আঁকা', (c, w, h) => miniPaint(c, w, h, t, 44.6), 0.2);
+  card(g, 795, 1400, cw, ch, pop(t, 45.5), 'পরিবার', (c, w, h) => miniFamily(c, w, h, t), -0.2);
+}
+// 11. Night danger
+function sc11(g, t) {
+  const n = ease(seg(t, 46.7, 48.3));
+  const o = { t, night: 0.35 + n * 0.65, dawn: (1 - n) * 0.8, sunY: lerp(1200, 330, n), sunX: lerp(300, 820, n), pan: 2400 };
+  land(g, o);
+  // eyes in the bushes
+  [[160, 1440, 49.6], [420, 1500, 49.9], [900, 1450, 50.2], [700, 1520, 50.5], [300, 1600, 50.8]].forEach(([x, y, at], i) => glowingEyes(g, x, y, 1.2, seg(t, at, at + 0.3), t, i));
+  // wolf on rock against moon
+  const wk = seg(t, 48.3, 48.7);
+  if (wk > 0) { rock(g, 830, 640, 1.4, '#05070c', '#05070c'); wolf(g, 830, 585, 1.1 * wk, '#05070c', clamp(Math.sin((t - 48.5) * 2) * 0.5 + 0.5)); }
+  lit(g, 'rgba(10,20,70,0.5)', c => { shadow(c, 540, 1800, 120, 0.5); drawBack(c, 540, 1800, 0.98, { t }); });
+  foregroundGrass(g, t, o);
+  btext(g, 'রাত = বিপদ', W / 2, 330, 98, '#ffd23f', pop(t, 48.4), { pill: '#1a1a3a' });
+  vignette(g, 0.7, '0,0,20');
+}
+// 12. Fire + group
+function sc12(g, t) {
+  const o = { t, night: 1, pan: 2600 };
+  land(g, o);
+  g.fillStyle = 'rgba(0,0,10,0.35)'; g.fillRect(0, 0, W, H);
+  fire(g, 360, 1660, 1.0, t);
+  caveman(g, 130, 1720, 0.95, { t, pose: 'sit', col: '#1a0f0a', cloth: '#5a3220', skin: '#5a3a28' });
+  caveman(g, 590, 1740, 0.95, { t: t + 2, pose: 'sit', col: '#1a0f0a', cloth: '#5a3220', skin: '#5a3a28', flip: true });
+  caveman(g, 360, 1840, 0.8, { t: t + 1, pose: 'sit', col: '#1a0f0a', cloth: '#4a2a18', skin: '#4a2e20' });
+  const m = mouthAt(t);
+  lit(g, `rgba(255,120,40,${0.2 + 0.05 * Math.sin(t * 13)})`, c => { shadow(c, 830, 1800, 110, 0.5); drawFront(c, 830, 1800, 0.9, { t, mouth: m, up: ease(seg(t, 52.2, 52.6)) * (1 - ease(seg(t, 54.0, 54.4))), upAng: 30, loAng: 100 }); });
+  btext(g, 'আগুন', 260, 420, 100, '#ffb02a', pop(t, 53.85));
+  btext(g, '+', W / 2, 420, 110, '#fff', pop(t, 54.0));
+  btext(g, 'দল', 820, 420, 100, '#ffb02a', pop(t, 54.15));
+  vignette(g, 0.65, '20,5,0');
+}
+// 13. "Did you know?" timeline
+function sc13(g, t) {
+  const bg = g.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, '#2b1d3f'); bg.addColorStop(1, '#0e0a1a'); g.fillStyle = bg; g.fillRect(0, 0, W, H);
+  dust(g, t, 60, '220,200,255', 0.4);
+  const m = mouthAt(t);
+  lit(g, null, c => drawFront(c, 540, 1180, 1.75, { t, mouth: m, up: ease(seg(t, 55.0, 55.4)) * (1 - ease(seg(t, 56.8, 57.2))), upAng: 60, loAng: 100, wave: Math.sin(t * 5) * 6 }, [280, 520]));
+  symbolText(g, '?', 860, 330, 250, '#ffd23f', pop(t, 55.1), Math.sin(t * 2) * 0.1);
+  // timeline
+  const k = ease(seg(t, 56.3, 59.5)), y = 1660;
+  g.strokeStyle = '#fff8ea'; g.lineWidth = 10; g.lineCap = 'round'; g.beginPath(); g.moveTo(110, y); g.lineTo(lerp(110, 970, k), y); g.stroke();
+  for (let i = 0; i <= 5; i++) { const x = 110 + i * 172; if (x <= lerp(110, 970, k)) { g.fillStyle = '#ffd23f'; g.beginPath(); g.arc(x, y, 14, 0, 7); g.fill(); } }
+  btext(g, '৫০,০০০ বছর আগে', 230, y + 90, 46, '#ffd23f', pop(t, 56.4));
+  btext(g, 'আজ', 950, y + 90, 50, '#fff', pop(t, 59.3));
+  if (k > 0) caveman(g, lerp(110, 970, k), y - 12, 0.4, { t, walk: true, col: '#fff8ea', cloth: '#fff8ea', skin: '#fff8ea' });
+  btext(g, 'অনেক আলাদা!', W / 2, 1420, 92, '#fff', pop(t, 58.6), { pill: '#8a3fd0' });
+}
+// 14. Agriculture: map -> fields
+function sc14(g, t) {
+  if (t < 62.2) {
+    const k = ease(seg(t, 60.45, 61.6));
+    const S = drawMap(g, { lon: lerp(30, 42, k), lat: lerp(20, 33, k), zoom: lerp(0.6, 2.4, k) }, t);
+    const FC = [[35, 31], [36, 34], [38, 36.5], [42, 37.5], [45, 36], [48, 33], [48, 30], [46, 31], [44, 33], [41, 35], [38, 34], [36, 31.5]];
+    const a = seg(t, 61.0, 61.6);
+    g.save(); g.globalAlpha = a * (0.6 + 0.3 * Math.sin(t * 6)); g.fillStyle = '#3f9a3a'; g.beginPath(); FC.forEach((p, i) => { const [x, y] = S(p); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.closePath(); g.fill(); g.restore();
+    g.save(); g.globalAlpha = a; g.strokeStyle = '#1f5a1a'; g.lineWidth = 6; g.beginPath(); FC.forEach((p, i) => { const [x, y] = S(p); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.closePath(); g.stroke(); g.restore();
+    const [fx, fy] = S([42, 35]); if (a > 0) { for (let i = 0; i < 5; i++) wheat(g, fx - 80 + i * 40, fy + 40, 120 * a, t, '#e2b23a', i); }
+    btext(g, 'কৃষিকাজ', W / 2, 330, 110, '#fff8ea', pop(t, 61.0), { pill: '#2f7a2a', stroke: '#123' });
+    compass(g, 900, 1640, 80, t * 0.3);
+  } else {
+    const lt = t - 62.2;
+    const o = { t, pan: 3200 + lt * 20, sunY: lerp(1000, 420, ease(lt / 2.5)), dawn: 0.5 - lt * 0.15, noVolcano: true };
+    land(g, o);
+    // ploughed rows + wheat growing
+    g.fillStyle = '#8a6a3a'; g.fillRect(0, 1500, W, 420);
+    for (let r = 0; r < 7; r++) { const y = 1530 + r * 58; g.fillStyle = r % 2 ? '#7a5a30' : '#9a7a44'; g.fillRect(0, y, W, 30); for (let i = 0; i < 14; i++) wheat(g, 30 + i * 78 + (r % 2) * 38, y + 26, clamp(lt * 1.2 - r * 0.12 - i * 0.02) * (110 + r * 14), t, '#e2b23a', r * 20 + i); }
+    caveman(g, 830, 1580, 0.95, { t, pose: 'stand', col: '#2e211a', cloth: '#7a5534', skin: '#8a5a3a', walk: true });
+    btext(g, 'কৃষিকাজ', W / 2, 330, 120, '#fff', pop(t, 62.25), { pill: '#2f7a2a' });
+    btext(g, 'সব বদলে দিল!', W / 2, 520, 80, '#ffd23f', pop(t, 63.0));
+    vignette(g, 0.3);
+  }
+}
+
+const SCENES = [[0, 4.25, sc1], [4.25, 7.0, sc2], [7.0, 9.3, sc3], [9.3, 14.6, sc4], [14.6, 21.0, sc5], [21.0, 24.3, sc6], [24.3, 28.1, sc7], [28.1, 35.4, sc8], [35.4, 41.6, sc9], [41.6, 46.7, sc10], [46.7, 51.7, sc11], [51.7, 54.75, sc12], [54.75, 60.43, sc13], [60.43, 99, sc14]];
+window.CUTS = SCENES.slice(1).map(s => s[0]);
+let OUT, OG;
+function render(i) {
+  const t = i / FPS, g = OG;
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.clearRect(0, 0, W, H);
+  const sc = SCENES.find(s => t >= s[0] && t < s[1]);
+  // whip-in on each cut
+  const d = t - sc[0], whip = sc[0] > 0 ? 1 - easeOut(seg(d, 0, 0.3)) : 0;
+  g.save();
+  if (whip > 0) { g.translate(W / 2, H / 2); g.scale(1 + whip * 0.15, 1 + whip * 0.15); g.rotate(whip * 0.03); g.translate(-W / 2, -H / 2); }
+  sc[2](g, t);
+  g.restore();
+  if (sc[0] > 0 && d < 0.14) { g.fillStyle = `rgba(255,255,255,${0.5 * (1 - d / 0.14)})`; g.fillRect(0, 0, W, H); }
+  const fade = Math.max(1 - seg(t, 0, 0.25), seg(t, DUR - 0.6, DUR));
+  if (fade > 0) { g.fillStyle = `rgba(0,0,0,${fade})`; g.fillRect(0, 0, W, H); }
+}
+(async () => {
+  const S = await prepareSheet();
+  buildRig(S); PARCH = buildParchment();
+  CL = mk(W, H); CG = CL.getContext('2d');
+  OUT = mk(W, H); OG = OUT.getContext('2d');
+  await document.fonts.load('bold 40px "Nirmala UI"');
+  window.frame = i => { render(i); return OUT.toDataURL('image/jpeg', 0.9); };
+  window.still = arg => arg.split(',').map(Number).map(t => [`s_${t}.jpg`, (render(Math.round(t * FPS)), OUT.toDataURL('image/jpeg', 0.8))]);
+  window.ready = true;
+})();
+</script></body></html>
