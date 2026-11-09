@@ -377,11 +377,12 @@ window.still = arg => {
   return ts.map(s => ['still_' + String(s).replace('.', '_') + '.png', render(Math.round(s * FPS)).toDataURL('image/png')]);
 };
 async function boot() {
+  const FB = window.FONT_BASE || 'fonts/';
   await Promise.all([
-    new FontFace('PJS', 'url(fonts/plus-jakarta-sans-latin-800-normal.woff2)', { weight: '800' }).load(),
-    new FontFace('PJS', 'url(fonts/plus-jakarta-sans-latin-700-normal.woff2)', { weight: '600 700' }).load(),
-    new FontFace('PJS', 'url(fonts/plus-jakarta-sans-latin-500-normal.woff2)', { weight: '500' }).load(),
-    new FontFace('Anek', 'url(fonts/anek.woff2)', { weight: '100 800' }).load(),
+    new FontFace('PJS', 'url(' + FB + 'plus-jakarta-sans-latin-800-normal.woff2)', { weight: '800' }).load(),
+    new FontFace('PJS', 'url(' + FB + 'plus-jakarta-sans-latin-700-normal.woff2)', { weight: '600 700' }).load(),
+    new FontFace('PJS', 'url(' + FB + 'plus-jakarta-sans-latin-500-normal.woff2)', { weight: '500' }).load(),
+    new FontFace('Anek', 'url(' + FB + 'anek.woff2)', { weight: '100 800' }).load(),
   ].map(p => p.then(f => document.fonts.add(f))));
   makeGrain();
   window.ready = true;
