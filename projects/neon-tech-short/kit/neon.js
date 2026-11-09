@@ -145,16 +145,20 @@ function worldDot(g, x, z, col, r = 14) {
 }
 
 // ---------- HUD ----------
-const CFG = { ep: 'EP 01 · TECH', handle: 'your_handle', duration: 20, captions: false }; // user: no subtitles
+const CFG = { ep: 'EP 01 · TECH', handle: 'your_handle', duration: 20, captions: false, tag: false, handle_chip: false, cta: false }; // user: no subtitles, no EP tag, no handle chip, no follow card
 function drawHUD(g, t) {
   // top progress bar
   g.fillStyle = 'rgba(255,255,255,0.07)'; g.fillRect(0, 0, W, 8);
   const pw = W * clamp(t / CFG.duration), pg = g.createLinearGradient(0, 0, W, 0);
   pg.addColorStop(0, C.orange); pg.addColorStop(1, C.yellow);
   g.save(); g.shadowColor = C.orange; g.shadowBlur = 16; g.fillStyle = pg; g.fillRect(0, 0, pw, 8); g.restore();
-  // episode tag
+  // episode tag + handle chip: OFF by default (user said no)
+  if (!CFG.tag && !CFG.handle_chip) return;
+  if (CFG.tag) {
   g.font = `600 26px ${FONT}`; g.fillStyle = C.dim; g.textBaseline = 'middle'; g.textAlign = 'left';
   g.letterSpacing = '5px'; g.fillText(CFG.ep, 64, 140); g.letterSpacing = '0px';
+  }
+  if (!CFG.handle_chip) return;
   // handle chip
   g.font = `600 28px ${FONT}`;
   const tw = g.measureText(CFG.handle).width, cw = tw + 94, cx = W - 56 - cw, cy = 116;

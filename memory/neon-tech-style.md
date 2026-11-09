@@ -16,3 +16,6 @@ What the reference does (studied from contact sheets):
 - Dark scrim behind the captions, vignette, slight grain.
 
 **How to apply:** start from projects/neon-tech-short/kit (neon.js engine, story.js per video). Use the user's own handle, never the reference creator's handle, logo or exact scenes. Captions follow the user's language (Banglish/Bangla; Anek Bangla font is the fallback).
+
+**Also NO branding UI.** On 2026-11-09 the user said not to add the Instagram follow card or the top tags. Keep these off: the EP tag, the handle chip and the FOLLOW/profile CTA (`CFG.tag`, `CFG.handle_chip`, `CFG.cta` are all false). The thin progress bar stays.
+The user wants videos made from their own voiceover plus script, "exactly" like the 2 reference reels (train/rail one and food-delivery city one).

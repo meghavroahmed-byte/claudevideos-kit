@@ -106,7 +106,9 @@ SCENE.ui = (g, t) => {
     g.fillStyle = C.yellow; g.fillText(ty.slice(base.length), 140 + bw, 790);
     if (Math.floor(t * 3) % 2 === 0) { g.fillStyle = C.white; g.fillRect(140 + g.measureText(ty).width + 6, 765, 4, 50); }
   });
-  // beat 8: FOLLOW CTA + profile card + cursor click
+  // beat 8: FOLLOW CTA (only if CFG.cta)
+  // + profile card + cursor click
+  if (!CFG.cta) return;
   if (t > 21.2) {
     const k = clamp((t - 21.2) / 0.35);
     g.save(); g.globalAlpha = k; g.font = `800 ${lerp(150, 120, eOut(k))}px ${FONT}`; g.textAlign = 'center'; g.textBaseline = 'middle';

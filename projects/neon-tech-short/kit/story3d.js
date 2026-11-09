@@ -107,7 +107,8 @@ SCENE.ui = (g, t) => {
     g.fillStyle = C.white; const b = ty.slice(0, base.length); g.fillText(b, 140, 1480);
     g.fillStyle = C.yellow; g.fillText(ty.slice(base.length), 140 + g.measureText(b).width, 1480);
   });
-  // 8: FOLLOW CTA
+  // 8: FOLLOW CTA (only if CFG.cta)
+  if (!CFG.cta) return;
   if (t > 23.0) {
     const k = clamp((t - 23.0) / 0.35);
     g.save(); g.globalAlpha = k; g.font = `800 ${lerp(150, 120, eOut(k))}px ${FONT}`; g.textAlign = 'center'; g.textBaseline = 'middle';
