@@ -1,0 +1,16 @@
+<!doctype html><html><body style="margin:0">
+<script src="common.js"></script><script src="rigcore.js"></script><script src="rig2.js"></script>
+<script>
+(async () => {
+  const S = await prepareSheet(); buildRig2(S);
+  window.still = () => { const c = mk(2400, 1500), g = c.getContext('2d'); g.fillStyle = '#f3e6d6'; g.fillRect(0, 0, 2400, 1500);
+    const base = { t: 0.3, blink: 0, armL: { a: 5, e: -2 }, armR: { a: 5, e: -2 }, legL: { a: 9 }, legR: { a: 9 } };
+    ['normal', 'angry', 'confused', 'sad', 'happy', 'surprised'].forEach((f, i) => { g.save(); g.beginPath(); g.rect(i * 400, 0, 400, 520); g.clip(); drawCharF(g, 200 + i * 400, 1450, 1.55, Object.assign({}, base, { face: f, mouth: 0 })); g.restore(); g.fillStyle = '#333'; g.font = '30px sans-serif'; g.fillText(f, 140 + i * 400, 560); });
+    const hp = ['open', 'relax', 'fist', 'point', 'peace', 'thumb', 'grip', 'three'];
+    hp.forEach((h, i) => { g.save(); g.translate(80 + i * 150, 900); g.scale(1.4, 1.4); handV(g, [0, 0], 180, false, h, R.fSkin); g.restore(); g.fillStyle = '#333'; g.font = '24px sans-serif'; g.fillText(h, 50 + i * 150, 1080); });
+    drawCharF(g, 1500, 1480, 0.55, Object.assign({}, base, { armR: { a: 95, e: 0 }, handR: 'point', armL: { a: 150, e: 20 }, handL: 'peace', face: 'happy' }));
+    drawCharB(g, 1850, 1480, 0.55, { t: 0.3 }); drawCharB(g, 2150, 1480, 0.5, { t: 0.3, legL: { a: 9, lift: 0.6 }, legR: { a: 9 }, armL: { a: 12 }, armR: { a: -2 } });
+    return [['test2.jpg', c.toDataURL('image/jpeg', 0.85)]]; };
+  window.ready = true;
+})();
+</script></body></html>

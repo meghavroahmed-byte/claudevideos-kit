@@ -10,6 +10,8 @@ This holds the code, templates and data from Megh's video workflow (Bangla YouTu
 | `skills/megh-video/SKILL.md` | House-style rules and workflow. **Read first.** |
 | `memory/*.md` | Saved feedback and project notes. Start with `MEMORY.md`. |
 | `projects/short-1899/kit` | Approved v2 "Ice & Ember" motion-graphics Short kit: `short2.html`, `mg.js`, `wpro.js`, `wkit.js`, plus the user's character rig (`rigcore.js`, `common.js`, `sheet.jpg`). |
+| `projects/char-rig/kit` | **The user's character, FULL BODY. Use in every video.** `rig2.js` (front/side/back, finger hands, faces) + `anim2.js` (walk, run, sit, eat, emotions...). Guide: its `README.md`; example: `demo.html`. |
+| `GLOBAL_CLAUDE.md` | Copy of the user's global rules (D: drive, Banglish, always use the full-body character). |
 | `projects/vo-asif/kit` | 16:9 long-video MG template kit: `hum.html`, `hum.js`, `beats.js`, plus `w2d.js` (a 2D window in every beat). |
 | `projects/map-short1/kit` | 9:16 map-short engines. `map3d.html` is the 3D terrain/globe engine (three.js), built from `engine3d.js`, `tk2d.js`, `scenes.js` (chibi characters and story cards) and `beats3d.js`. `map.html` is the older flat 2D version. |
 | `projects/short-1900`, `map-mix-1`, `infant-amnesia` | Other earlier project kits. |

@@ -18,4 +18,7 @@
 - [MG + 2D every beat](feedback-mg-plus-2d-every-beat.md) — every MG beat must also have a framed acting 2D animation; user's character shown often (every 3-5 beats)
 - [Map short style](map-short-style.md) — GeoGlobeTales-like 9:16 map short wanted; NASA satellite tiles ready in D:\ClaudeVideos\cache\maps
 - [Raw voice + 3D maps](feedback-raw-voice-3d-maps.md) — never process user's voice; map shorts need 3D terrain feel, characters & busy shots (Chile v1 rejected as flat)
+- [Cloud kit repo](cloud-kit-repo.md) — private GitHub meghavroahmed-byte/claudevideos-kit = all kits/skill/memory/map assets for cloud sessions; portable git/gh on D:
+- [Continuous explainer style](continuous-explainer-style.md) — user wants healthbyvipul-like "one continuous" soft flat-vector reels (organ mascots, zoom-through, no cuts)
+- [Full-body character](feedback-full-body-character.md) — use user's character full body with walk/run/eat etc. (char-rig/kit rig2.js + anim2.js), never half-body bust
 - [Video style preferences](video-style-preferences.md) — original voice, minimal text, user's own character sheet, pro motion graphics

@@ -1,0 +1,18 @@
+<!doctype html><html><body style="margin:0">
+<script src="common.js"></script><script src="rigcore.js"></script><script src="rig2.js"></script>
+<script>
+(async () => {
+  const S = await prepareSheet(); buildRig2(S);
+  window.still = () => { const c = mk(2400, 1200), g = c.getContext('2d'); g.fillStyle = '#f3e6d6'; g.fillRect(0, 0, 2400, 1200); g.fillStyle = '#d9c3a8'; g.fillRect(0, 1100, 2400, 100);
+    const F = { armL: { a: 5, e: -2 }, armR: { a: 5, e: -2 }, legL: { a: 9 }, legR: { a: 9 } };
+    drawCharF(g, 200, 1100, 1, Object.assign({ t: 0.5 }, F));
+    drawCharF(g, 560, 1100, 1, { t: 0.5, armL: { a: 5, e: -2 }, armR: { a: 150, e: 30 }, legL: { a: 9 }, legR: { a: 9 }, mouth: 0.6 });
+    drawCharF(g, 920, 1100, 1, { t: 0.5, armL: { a: 5, e: -2 }, armR: { to: [300, 360] }, legL: { a: 9 }, legR: { a: 9 }, item: { type: 'apple', hand: 'R', bite: 1 }, mouth: 0.4 });
+    drawCharF(g, 1280, 1100, 1, { t: 0.5, armL: { a: 70, e: 60 }, armR: { a: 70, e: 60 }, legL: { a: 9, lift: 0.6 }, legR: { a: 9 } });
+    drawCharS(g, 1650, 1100, 1, { t: 0.5 });
+    drawCharS(g, 1950, 1100, 1, { t: 0.5, near: { a: 30, e: 20 }, far: { a: -25, e: 15 }, nearLeg: { a: 25, k: 5 }, farLeg: { a: -20, k: 10 } });
+    drawCharS(g, 2250, 1100, 1, { t: 0.5, near: { to: [595, 330] }, far: { a: 5 }, item: { type: 'glass', rot: -20 } });
+    return [['rigtest.jpg', c.toDataURL('image/jpeg', 0.85)]]; };
+  window.ready = true;
+})();
+</script></body></html>

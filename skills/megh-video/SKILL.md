@@ -46,14 +46,17 @@ What v2 looks like:
   - Never fill the whole screen with a cartoon scene. Full-screen cartoon looks "generic/unprofessional" to this user (rejected twice).
 - **Pro map:** a full-frame `mapPro` fly-through with glowing routes and marchers is allowed.
 - **Transitions:** circle, zoom, whip, bars, glitch, flash, dissolve. Change something every 1–3 s.
-- **The user's character:** a cut-out rig from their own sheet (`rigcore.js`, `common.js`, `sheet.jpg` in `D:\ClaudeVideos\projects\short-1899\kit`).
-  - Use it lightly, and only inside framed windows.
+- **The user's character:** ALWAYS the **full-body rig** in `D:\ClaudeVideos\projects\char-rig\kit` (`rig2.js` + `anim2.js`, guide in its `README.md`, example `demo.html`). Never the old half-body bust from short-1899 (user said 2026-11-09: no half body, use full body with hands and legs; use it in every new session's video).
+  - Walk, run, sit, eat, drink, gesture with fingers, show faces (angry/sad/happy/surprised/confused), walk away from behind.
+  - Place it inside framed windows / scenes of the MG layout.
   - Show it OFTEN: about every 3–5 beats across the whole video (pointing, reacting, explaining), not just in the intro. The user complained it was barely shown.
   - Never use vector characters Claude drew.
 - **Science or body topics:** clear diagrams and step-by-step animation, inside the MG layout.
 - **Backgrounds:** no flat black, no plain navy studio, no room or house backgrounds.
 - **Grade:** bloom, vignette, grain.
 - **Element mix:** if the user gives one by percentage, follow it.
+
+**Second approved style (2026-11-09): "2D that looks 3D, one continuous shot".** When the user asks for the fewshot.studio-style look, a full-screen world is allowed: an endless iso circuit/neuron floor, a camera that travels between scenes with no hard cuts, iso boxes with 3–4 tone shading, "একে বলে" term pills, and every named type from the ultra.skills "30 animations" list. Kit: `D:\ClaudeVideos\projects\infant-amnesia\kit` (see `render.ps1`, `align3.js`, `sfx.ps1`, `sfxmix.js`). The user's character still appears every few beats. After v1 feedback: keep the background calm (soft section-coloured sky, plain glossy floor, a few bokeh orbs; never busy circuit boards), and act the story out with cartoon humans from `kit\humans.js` (babies, mothers, scientists, kids), not only icons or neon outlines.
 
 The Zack D Films channel was a reference the user once asked for. Its grammar (hook in the first second, x-ray/heatmap reveals, slow-mo) may only be used as small ideas INSIDE the v2 MG layout, never as full-screen cartoon shots.
 
@@ -82,7 +85,7 @@ The Zack D Films channel was a reference the user once asked for. Its grammar (h
   - A 0.8 s line ("যেটা অলরেডি হয়েই গেছে") was once lost this way.
 - Face grade: hqdn3d denoise, eq, colorbalance or skin tone, curves, unsharp, vignette, stabilize. It must never look raw.
 - Audio: highpass, afftdn, compressor, EQ.
-- Use their character **lightly** (pointing at a map, worried bust, on the phone for the CTA).
+- Use their character **lightly** (full-body rig2: pointing at a map, worried face, on the phone for the CTA).
 - Keep the edit list in `edl.json`, and run a build script that writes `cut.mov` and `timeline.json`.
 
 ## 5. Audio mix
