@@ -324,6 +324,24 @@ function cursorHand(g, x, y, press) {
   g.fill(); g.stroke(); g.restore();
 }
 
+// ---------- big stamped word (any language), popping chip ----------
+function stamp(g, t, t0, t1, txt, y, size, c1, c2, rot = -0.05, italic = true) {
+  if (t < t0 || t > t1) return;
+  const k = (t - t0) / 0.3, sc = k < 1 ? lerp(2.4, 1, eOut(k)) : 1 + 0.025 * Math.sin((t - t0) * 6);
+  const a = clamp(k * 2) * clamp((t1 - t) / 0.25);
+  g.save(); g.globalAlpha = a; g.translate(W / 2, y); g.rotate(rot); g.scale(sc, sc);
+  g.font = `${italic ? 'italic ' : ''}800 ${size}px ${FONT}`; g.textAlign = 'center'; g.textBaseline = 'middle';
+  for (let d = 14; d > 0; d -= 2) { g.fillStyle = mix(c2, '#000000', 0.55 - d / 50); g.fillText(txt, d * 0.6, d); }
+  const gr = g.createLinearGradient(0, -size / 2, 0, size / 2); gr.addColorStop(0, mix(c1, '#ffffff', 0.45)); gr.addColorStop(1, c1);
+  g.shadowColor = c1; g.shadowBlur = 45; g.fillStyle = gr; g.fillText(txt, 0, 0);
+  g.restore();
+}
+function chip(g, t, t0, t1, txt, x, y, col, size = 34) { // popping pill
+  if (t < t0 || t > t1) return;
+  const p = popIn(t, t0, t1); g.save(); g.globalAlpha = p.a; g.translate(x, y); g.scale(p.s, p.s);
+  pill(g, txt, 0, 0, col, { center: true, icon: true, size }); g.restore();
+}
+
 // ---------- finishing: vignette, caption scrim, grain ----------
 let GRAIN = [];
 function makeGrain() {

@@ -8,6 +8,7 @@ This holds the code, templates and data from Megh's video workflow (Bangla YouTu
 | Path | What |
 |---|---|
 | `skills/megh-video/SKILL.md` | House-style rules and workflow. **Read first.** |
+| `skills/neon-3d-short/SKILL.md` | The "Neon 3D" reference-style 3D short workflow (voice + script → video). Kit in `projects/neon-tech-short/kit`, example `projects/anaros-dudh`. Also linked at `.claude/skills/` so cloud sessions load it. |
 | `memory/*.md` | Saved feedback and project notes. Start with `MEMORY.md`. |
 | `projects/short-1899/kit` | Approved v2 "Ice & Ember" motion-graphics Short kit: `short2.html`, `mg.js`, `wpro.js`, `wkit.js`, plus the user's character rig (`rigcore.js`, `common.js`, `sheet.jpg`). |
 | `projects/vo-asif/kit` | 16:9 long-video MG template kit: `hum.html`, `hum.js`, `beats.js`, plus `w2d.js` (a 2D window in every beat). |

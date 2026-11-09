@@ -1,11 +1,14 @@
-# sfx.py: fresh synthesized SFX palette for "anaros-dudh" (kitchen/body theme: liquid plops,
+# sfx.py: synthesized SFX palette (no stock sounds). Usage: python3 sfx.py <story.js> <out.wav> <duration_s> [seed]
+# Kinds: whoosh pop tick slam hiss type bad good fizz rise snip plop curdle pour drop gurgle.
+# Per video: pass a NEW seed and tweak the generator params/theme so no two videos sound the same.
+# First palette (anaros-dudh): kitchen/body theme: liquid plops,
 # fizz, gurgles, soft glassy pops, enzyme snips). Reads cue list from anaros.js and writes sfx_anaros.wav.
 import re, sys, wave
 import numpy as np
 
 SR = 44100
-DUR = 86.0
-rng = np.random.default_rng(1109)
+DUR = float(sys.argv[3]) if len(sys.argv) > 3 else 86.0
+rng = np.random.default_rng(int(sys.argv[4]) if len(sys.argv) > 4 else 1109)
 
 
 def t_(d): return np.arange(int(d * SR)) / SR
