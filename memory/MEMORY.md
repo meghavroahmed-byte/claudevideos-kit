@@ -19,4 +19,4 @@
 - [Map short style](map-short-style.md) — GeoGlobeTales-like 9:16 map short wanted; NASA satellite tiles ready in D:\ClaudeVideos\cache\maps
 - [Raw voice + 3D maps](feedback-raw-voice-3d-maps.md) — never process user's voice; map shorts need 3D terrain feel, characters & busy shots (Chile v1 rejected as flat)
 - [Video style preferences](video-style-preferences.md) — original voice, minimal text, user's own character sheet, pro motion graphics
-- [Neon Tech style](neon-tech-style.md) — captioned dark 3D-grid tech shorts copied from a reference creator (2026-11-09); kit projects/neon-tech-short/kit; captions allowed ONLY in this style
+- [Neon Tech style](neon-tech-style.md) — dark 3D-grid tech shorts copied from a reference creator (2026-11-09); kit projects/neon-tech-short/kit; subtitles OFF (user said no)

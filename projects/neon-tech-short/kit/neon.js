@@ -145,7 +145,7 @@ function worldDot(g, x, z, col, r = 14) {
 }
 
 // ---------- HUD ----------
-const CFG = { ep: 'EP 01 · TECH', handle: 'your_handle', duration: 20 };
+const CFG = { ep: 'EP 01 · TECH', handle: 'your_handle', duration: 20, captions: false }; // user: no subtitles
 function drawHUD(g, t) {
   // top progress bar
   g.fillStyle = 'rgba(255,255,255,0.07)'; g.fillRect(0, 0, W, 8);
@@ -358,9 +358,9 @@ function render(i) {
   g.save(); g.clearRect(0, 0, W, H);
   drawWorld(g, t);
   SCENE.world && SCENE.world(g, t);
-  drawScrim(g);
+  if (CFG.captions) drawScrim(g);
   SCENE.ui && SCENE.ui(g, t);
-  drawCaption(g, t);
+  if (CFG.captions) drawCaption(g, t);
   drawHUD(g, t);
   drawFinish(g, i);
   g.restore();

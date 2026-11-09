@@ -5,7 +5,7 @@ type: project
 ---
 The user sent 3 reference reels (2 from a Hinglish tech-explainer creator, 1 pastel 2D body-science cartoon by someone else) and asked for "hubhu" the same style, captions included.
 
-**This style ALLOWS captions.** The "no captions" rule still holds for the v2 MG style. Use captions only when the user asks for this Neon Tech style.
+**NO subtitles here either.** On 2026-11-09 the user saw the captioned demo and said "subtitle hbe na". The caption engine is kept but off (`CFG.captions = false`). Keep everything else from the reference look. Short labels inside cards and the FOLLOW/TWIST stamps are OK.
 
 What the reference does (studied from contact sheets):
 - 9:16, 30 fps, ~100-150 s. **One continuous camera move** through a dark 3D world (night rail line, neon city, blue perspective grid map). Almost no hard cuts (scene-cut detector found 0-6 per video). Beats change by popping UI on/off over the same moving world.

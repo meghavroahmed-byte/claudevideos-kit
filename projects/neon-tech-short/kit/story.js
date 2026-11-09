@@ -97,7 +97,7 @@ SCENE.ui = (g, t) => {
   withPop(g, t, 18.1, 20.6, W / 2, 760, () => {
     glassCard(g, 90, 640, 900, 230);
     g.fillStyle = C.yellow; g.beginPath(); g.arc(140, 694, 16, 0, 7); g.fill();
-    label(g, 'Comment', 172, 694);
+    label(g, 'Comment koro', 172, 694, C.yellow);
     const base = 'Amar daily station: ', ans = 'Esplanade!';
     const ty = typeText(t, 18.6, base + ans, 18);
     g.font = `700 46px ${FONT}`; g.textAlign = 'left'; g.textBaseline = 'middle';

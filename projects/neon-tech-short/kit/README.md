@@ -1,6 +1,6 @@
 # Neon Tech short kit (9:16)
 
-A dark 3D-grid world with one continuous camera move, word-by-word kinetic captions, glass UI cards, a "TWIST!" slam, a comment card and a follow CTA. See `memory/neon-tech-style.md` for the style notes.
+A dark 3D-grid world with one continuous camera move, word-by-word kinetic captions (off by default), glass UI cards, a "TWIST!" slam, a comment card and a follow CTA. See `memory/neon-tech-style.md` for the style notes.
 
 ## Files
 - `neon.js`: the engine. Camera keys, grid world, world objects (`worldPath`, `worldRing`, `worldTower`, `worldDot`), HUD, captions, UI pieces (`glassCard`, `pill`, `label`, `bigNumber`, `slam3D`, `ringGauge`, `typeText`, `cursorHand`), grade.
@@ -8,7 +8,9 @@ A dark 3D-grid world with one continuous camera move, word-by-word kinetic capti
 - `neon.html`: loads both files.
 - `fonts/`: Plus Jakarta Sans (500/700/800) and Anek Bangla.
 
-## Captions
+## Captions (OFF by default)
+The user does not want subtitles, so `CFG.captions = false`. Turn it on only if they ask.
+
 `{ t0, t1, text }`. In `text`:
 - `*word*` or `*two words*` turns yellow.
 - `!word!` turns pink/red.
