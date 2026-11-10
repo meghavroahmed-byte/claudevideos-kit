@@ -259,7 +259,7 @@ footer{position:relative;z-index:2;padding:20px clamp(16px,4vw,56px) 40px;color:
 <section class="ch" id="pages" data-ch="2">
   <div class="panel">
     <div class="eyebrow" data-i18n="pages.eyebrow">Facebook pages · in stock now</div>
-    <h2 data-i18n="pages.title">Five pages, ready to transfer today.</h2>
+    <h2 data-i18n="pages.title">Six pages, monetisation-eligible, ready today.</h2>
     <p class="lead" data-i18n="pages.lead">Each one is live on Facebook right now. Open it, check it yourself, then message me for the price and a live walkthrough.</p>
     <div class="hint"><span class="k">⇆</span><span data-i18n="pages.hint">Drag to spin the ring. Click a card for details.</span></div>
     <div class="mini" id="pageList"></div>
@@ -366,19 +366,21 @@ const CONFIG = {
   ],
 
   stats: [
-    { v:"1.98M", en:"YouTube subscribers", bn:"ইউটিউব সাবস্ক্রাইবার" },
-    { v:"1.5M",  en:"TikTok followers",    bn:"টিকটক ফলোয়ার" },
-    { v:"265K",  en:"Facebook followers",  bn:"ফেসবুক ফলোয়ার" },
-    { v:"5",     en:"Pages in stock",      bn:"পেজ স্টকে" }
+    { v:"120+", en:"Facebook pages sold",     bn:"ফেসবুক পেজ বিক্রি" },
+    { v:"60+",  en:"YouTube channels sold",   bn:"ইউটিউব চ্যানেল বিক্রি" },
+    { v:"50+",  en:"TikTok & Instagram sold", bn:"টিকটক ও ইনস্টাগ্রাম বিক্রি" },
+    { v:"2 yrs", bn_v:"২ বছর", en:"In business, 3.7M own followers", bn:"ব্যবসায়, নিজের ৩৭ লাখ ফলোয়ার" }
   ],
 
   // Facebook pages for sale. price "" shows "Ask for price". status: available | reserved | sold
+  // video: screen-recorded walkthrough of the page (followers, reels, monetisation eligibility). topReel: best reel view count seen in it.
   pages: [
-    { name:"Emilia Belmonr",   img:"assets/p3.jpg", category:{en:"Personal blog",bn:"পার্সোনাল ব্লগ"},   followers:"24,582", talking:"", url:"https://www.facebook.com/p/Emilia-Belmonr-61590759412647/", price:"", status:"available" },
-    { name:"Kieran Sinclair",  img:"assets/p2.jpg", category:{en:"Product / service",bn:"প্রোডাক্ট / সার্ভিস"}, followers:"20,750", talking:"", url:"https://www.facebook.com/people/Kieran-Sinclair/61590585480592/", price:"", status:"available" },
-    { name:"Gregorian Graham", img:"assets/p1.jpg", category:{en:"Product / service",bn:"প্রোডাক্ট / সার্ভিস"}, followers:"20,530", talking:"", url:"https://www.facebook.com/p/Gregorian-Graham-61590797361266/", price:"", status:"available" },
-    { name:"Ubir blogs",       img:"assets/p5.jpg", category:{en:"Digital creator",bn:"ডিজিটাল ক্রিয়েটর"}, followers:"20,492", talking:"938", url:"https://www.facebook.com/p/Ubir-blogs-61594139177314/", price:"", status:"available" },
-    { name:"Nad 1",            img:"assets/p4.jpg", category:{en:"Personal blog",bn:"পার্সোনাল ব্লগ"},   followers:"20,237", talking:"1,931", url:"https://www.facebook.com/p/Nad-1-61593802150639/", price:"", status:"available" }
+    { name:"Emilia Belmonr",   img:"assets/p3.jpg", video:"assets/v3.mp4", poster:"assets/v3.jpg", category:{en:"Personal blog",bn:"পার্সোনাল ব্লগ"},   followers:"24,582", talking:"", topReel:"829K", monet:true, url:"https://www.facebook.com/p/Emilia-Belmonr-61590759412647/", price:"", status:"available" },
+    { name:"Gregorian Graham", img:"assets/p1.jpg", video:"assets/v6.mp4", poster:"assets/v6.jpg", category:{en:"Product / service",bn:"প্রোডাক্ট / সার্ভিস"}, followers:"20,530", talking:"", topReel:"849K", monet:true, url:"https://www.facebook.com/p/Gregorian-Graham-61590797361266/", price:"", status:"available" },
+    { name:"Kieran Sinclair",  img:"assets/p2.jpg", video:"assets/v1.mp4", poster:"assets/v1.jpg", category:{en:"Product / service",bn:"প্রোডাক্ট / সার্ভিস"}, followers:"20,750", talking:"", topReel:"261K", monet:true, url:"https://www.facebook.com/people/Kieran-Sinclair/61590585480592/", price:"", status:"available" },
+    { name:"Ubir blogs",       img:"assets/p5.jpg", video:"assets/v2.mp4", poster:"assets/v2.jpg", category:{en:"Digital creator",bn:"ডিজিটাল ক্রিয়েটর"}, followers:"20,492", talking:"938", topReel:"212K", monet:true, url:"https://www.facebook.com/p/Ubir-blogs-61594139177314/", price:"", status:"available" },
+    { name:"Nad 1",            img:"assets/p4.jpg", video:"assets/v5.mp4", poster:"assets/v5.jpg", category:{en:"Personal blog",bn:"পার্সোনাল ব্লগ"},   followers:"20,237", talking:"1,931", topReel:"44.4K", monet:true, url:"https://www.facebook.com/p/Nad-1-61593802150639/", price:"", status:"available" },
+    { name:"Hylane4",          img:"assets/p6.jpg", video:"assets/v4.mp4", poster:"assets/v4.jpg", category:{en:"Personal blog",bn:"পার্সোনাল ব্লগ"},   followers:"10K", talking:"", topReel:"", monet:true, url:"", price:"", status:"available" }
   ],
 
   // Client review videos. video: a file published with this page (e.g. "assets/review1.mp4"); leave [] to link to the Facebook videos tab.
@@ -416,17 +418,17 @@ const T = {
     "home.title":"Buy a <span class=\"fb\">Facebook page</span> from someone with 3.7 million followers of his own.",
     "home.lead":"Pages in stock today, YouTube channels on order, and an ads agency to make them earn. Everything verified live on a call before you pay a single taka.",
     "home.cta1":"Message MEGH on WhatsApp","home.cta2":"See pages in stock","home.hint":"Scroll to fly through the vault. Hover and click anything that glows.",
-    "megh.eyebrow":"Who you are dealing with","megh.sub":"Content creator, Jhenaidah. Founder of Fidah Digital Agency.","megh.title":"Not an anonymous seller. A public face with 3.7M+ followers.","megh.lead":"I grow my own audiences on YouTube, TikTok and Facebook every day. Buying from me means buying from someone whose name and face are on the line.","megh.hint":"Tap a tile in 3D or a chip above to open that profile.",
-    "pages.eyebrow":"Facebook pages · in stock now","pages.title":"Five pages, ready to transfer today.","pages.lead":"Each one is live on Facebook right now. Open it, check it yourself, then message me for the price and a live walkthrough.","pages.hint":"Drag to spin the ring. Click a card for details.","pages.note":"Need a different niche or size? I source pages to order in two to seven days.",
-    "yt.eyebrow":"YouTube channels · on order","yt.title":"No channel in stock today. Order one built to your spec.","yt.lead":"I run a 1.98M-subscriber channel myself. Tell me the niche, subscriber range, monetization need and budget, and I source or build it and hand it over as primary owner.","yt.l1":"Monetized or near-monetized, AdSense clean","yt.l2":"No copyright strikes, full analytics shown before payment","yt.l3":"Primary owner and recovery email transferred on the call","yt.cta":"Order a YouTube channel",
+    "megh.eyebrow":"Who you are dealing with","megh.sub":"Content creator, Jhenaidah. Founder of Fidah Digital Agency. 2 years, 230+ accounts sold.","megh.title":"Not an anonymous seller. A public face with 3.7M+ followers.","megh.lead":"I grow my own audiences on YouTube, TikTok and Facebook every day. Buying from me means buying from someone whose name and face are on the line.","megh.hint":"Tap a tile in 3D or a chip above to open that profile.",
+    "pages.eyebrow":"Facebook pages · in stock now","pages.title":"Six pages, monetisation-eligible, ready today.","pages.lead":"Every page is live on Facebook and already eligible for content monetisation. Watch the screen recording, open the page yourself, then message me for the price.","pages.hint":"Drag to spin the ring. Click a card for details.","pages.note":"Need a different niche or size? I source pages to order in two to seven days.",
+    "yt.eyebrow":"YouTube channels · on order","yt.title":"No channel in stock today. Order one built to your spec.","yt.lead":"I run a 1.98M-subscriber channel myself and have sold 60+ channels in two years. Tell me the niche, subscriber range, monetization need and budget, and I source or build it and hand it over as primary owner. TikTok and Instagram accounts on order too: 30+ and 20+ sold.","yt.l1":"Monetized or near-monetized, AdSense clean","yt.l2":"No copyright strikes, full analytics shown before payment","yt.l3":"Primary owner and recovery email transferred on the call","yt.cta":"Order a YouTube channel",
     "ag.eyebrow":"Fidah ads agency","ag.title":"Bought a page? Now make it earn.","ag.lead":"Meta and YouTube ad campaigns for the asset you just bought, or for your own product. Pixel setup, targeting, creatives and a weekly report you can read in two minutes.","ag.l1":"Meta Ads, boosting, pixel and catalog setup","ag.l2":"YouTube and Google Ads","ag.l3":"Page growth plan with a content calendar","ag.hint":"The bars grow as you scroll. Hover one to see the service.",
-    "tr.eyebrow":"Security · what you get from me","tr.title":"You never pay for something you have not seen with your own eyes.","tr.bad":"RANDOM SELLER","tr.b1":"Fake name, no face","tr.b2":"Screenshots only","tr.b3":"Disappears after payment","tr.good":"FIDAH · MEGH","tr.g1":"Public creator, 3.7M+ followers","tr.g2":"Live screen-share before payment","tr.g3":"7 days of support after transfer",
+    "tr.eyebrow":"Security · what you get from me","tr.title":"You never pay for something you have not seen with your own eyes.","tr.bad":"RANDOM SELLER","tr.b1":"Fake name, no face","tr.b2":"Screenshots only","tr.b3":"Disappears after payment","tr.good":"FIDAH · MEGH","tr.g1":"Public creator, 3.7M+ followers, 230+ deals done","tr.g2":"Live screen-share before payment","tr.g3":"7 days of support after transfer",
     "rv.eyebrow":"Client reviews","rv.title":"Real buyers, on video, on my agency page.","rv.lead":"Clients record a short review after their transfer and I post it on the Fidah Digital Product page, 11.6K followers strong. Watch them there, then message me.","rv.watch":"Watch client review videos","rv.watch.s":"On the Fidah Digital Product page","rv.page":"Fidah Digital Product","rv.page.s":"11.6K followers · agency page on Facebook","rv.frame":"Client review",
     "pr.eyebrow":"How a deal works","pr.title":"Five gates. You pass each one yourself.",
     "ct.eyebrow":"Contact · Jhenaidah, Bangladesh","ct.title":"One tap. Straight into my WhatsApp.","ct.lead":"Say which page you want, or your niche, size and budget. I reply with the price, screenshots and a time for the live walkthrough.","ct.hours":"Usually online 10:00 to 23:00, Bangladesh time",
     "ct.wa":"WhatsApp","ct.wa.s":"Opens my business chat directly","ct.fb":"Fidah Digital Product","ct.fb.s":"Agency page on Facebook","ct.yt":"Voice Of Megh on YouTube","ct.yt.s":"1.98M subscribers","ct.em":"Email","ct.em.s":"Agency and sponsorship proposals",
     "foot.tag":"Facebook pages, YouTube channels, ads.","foot.note":"Not affiliated with Meta, Google, TikTok or ByteDance.",
-    "d.followers":"Followers","d.talking":"Talking about this","d.category":"Category","d.status":"Status","d.price":"Price","d.askprice":"Ask for price","d.ask":"Ask MEGH about this page","d.open":"Open on Facebook","d.openp":"Open profile","d.sold":"Sold","d.available":"In stock","d.reserved":"Reserved",
+    "d.followers":"Followers","d.talking":"Talking about this","d.video":"Video","d.videonote":"Screen recording of the real page: followers, reels, monetisation eligibility.","d.topreel":"Top reel views","d.monet":"Monetisation","d.monet.yes":"Eligible ✓","d.category":"Category","d.status":"Status","d.price":"Price","d.askprice":"Ask for price","d.ask":"Ask MEGH about this page","d.open":"Open on Facebook","d.openp":"Open profile","d.sold":"Sold","d.available":"In stock","d.reserved":"Reserved",
     "ch.0":"Home","ch.1":"MEGH","ch.2":"Pages","ch.3":"YouTube","ch.4":"Agency","ch.5":"Security","ch.6":"Reviews","ch.7":"Process","ch.8":"Contact"
   },
   bn:{
@@ -435,17 +437,17 @@ const T = {
     "home.title":"এমন একজনের কাছ থেকে <span class=\"fb\">ফেসবুক পেজ</span> কিনুন, যার নিজেরই ৩৭ লাখ ফলোয়ার।",
     "home.lead":"আজই স্টকে পেজ আছে, ইউটিউব চ্যানেল অর্ডারে, আর সেটা দিয়ে আয় করানোর জন্য অ্যাডস এজেন্সি। এক টাকা দেওয়ার আগে সব কিছু লাইভ কলে ভেরিফাই।",
     "home.cta1":"MEGH-কে হোয়াটসঅ্যাপে মেসেজ দিন","home.cta2":"স্টকের পেজ দেখুন","home.hint":"স্ক্রল করে ভল্টের ভেতর দিয়ে উড়ে যান। যা জ্বলছে তাতে হোভার আর ক্লিক করুন।",
-    "megh.eyebrow":"আপনি কার সাথে ডিল করছেন","megh.sub":"কনটেন্ট ক্রিয়েটর, ঝিনাইদহ। ফিদাহ ডিজিটাল এজেন্সির ফাউন্ডার।","megh.title":"অচেনা কোনো সেলার না। ৩৭ লাখ+ ফলোয়ারের একটা পরিচিত মুখ।","megh.lead":"ইউটিউব, টিকটক আর ফেসবুকে প্রতিদিন নিজের অডিয়েন্স বড় করি। আমার কাছ থেকে কেনা মানে এমন কারো কাছ থেকে কেনা যার নাম আর মুখ দুটোই বাজিতে আছে।","megh.hint":"3D-তে একটা টাইল বা উপরের চিপে ট্যাপ করলে প্রোফাইল খুলবে।",
-    "pages.eyebrow":"ফেসবুক পেজ · এখন স্টকে","pages.title":"পাঁচটা পেজ, আজই ট্রান্সফারের জন্য রেডি।","pages.lead":"প্রতিটা এই মুহূর্তে ফেসবুকে লাইভ। নিজে খুলে চেক করুন, তারপর দাম আর লাইভ ওয়াকথ্রুর জন্য মেসেজ দিন।","pages.hint":"ড্র্যাগ করে রিং ঘোরান। কার্ডে ক্লিক করলে ডিটেইলস।","pages.note":"অন্য নিশ বা সাইজ লাগবে? দুই থেকে সাত দিনে অর্ডারে পেজ জোগাড় করে দিই।",
-    "yt.eyebrow":"ইউটিউব চ্যানেল · অর্ডারে","yt.title":"আজ স্টকে চ্যানেল নেই। আপনার স্পেসিফিকেশনে একটা অর্ডার করুন।","yt.lead":"আমি নিজেই ১.৯৮M সাবস্ক্রাইবারের চ্যানেল চালাই। নিশ, সাবস্ক্রাইবার রেঞ্জ, মনিটাইজেশন আর বাজেট বলুন, আমি জোগাড় বা তৈরি করে প্রাইমারি ওনার হিসেবে হ্যান্ডওভার করি।","yt.l1":"মনিটাইজড বা প্রায়-মনিটাইজড, অ্যাডসেন্স ক্লিন","yt.l2":"কপিরাইট স্ট্রাইক নেই, পেমেন্টের আগে ফুল অ্যানালিটিক্স","yt.l3":"কলেই প্রাইমারি ওনার আর রিকভারি ইমেইল ট্রান্সফার","yt.cta":"ইউটিউব চ্যানেল অর্ডার করুন",
+    "megh.eyebrow":"আপনি কার সাথে ডিল করছেন","megh.sub":"কনটেন্ট ক্রিয়েটর, ঝিনাইদহ। ফিদাহ ডিজিটাল এজেন্সির ফাউন্ডার। ২ বছরে ২৩০+ অ্যাকাউন্ট বিক্রি।","megh.title":"অচেনা কোনো সেলার না। ৩৭ লাখ+ ফলোয়ারের একটা পরিচিত মুখ।","megh.lead":"ইউটিউব, টিকটক আর ফেসবুকে প্রতিদিন নিজের অডিয়েন্স বড় করি। আমার কাছ থেকে কেনা মানে এমন কারো কাছ থেকে কেনা যার নাম আর মুখ দুটোই বাজিতে আছে।","megh.hint":"3D-তে একটা টাইল বা উপরের চিপে ট্যাপ করলে প্রোফাইল খুলবে।",
+    "pages.eyebrow":"ফেসবুক পেজ · এখন স্টকে","pages.title":"ছয়টা পেজ, মনিটাইজেশন-এলিজিবল, আজই রেডি।","pages.lead":"প্রতিটা পেজ ফেসবুকে লাইভ আর কনটেন্ট মনিটাইজেশনের জন্য এলিজিবল। স্ক্রিন রেকর্ডিং দেখুন, নিজে পেজটা খুলুন, তারপর দামের জন্য মেসেজ দিন।","pages.hint":"ড্র্যাগ করে রিং ঘোরান। কার্ডে ক্লিক করলে ডিটেইলস।","pages.note":"অন্য নিশ বা সাইজ লাগবে? দুই থেকে সাত দিনে অর্ডারে পেজ জোগাড় করে দিই।",
+    "yt.eyebrow":"ইউটিউব চ্যানেল · অর্ডারে","yt.title":"আজ স্টকে চ্যানেল নেই। আপনার স্পেসিফিকেশনে একটা অর্ডার করুন।","yt.lead":"আমি নিজেই ১.৯৮M সাবস্ক্রাইবারের চ্যানেল চালাই, আর দুই বছরে ৬০+ চ্যানেল বিক্রি করেছি। নিশ, সাবস্ক্রাইবার রেঞ্জ, মনিটাইজেশন আর বাজেট বলুন, আমি জোগাড় বা তৈরি করে প্রাইমারি ওনার হিসেবে হ্যান্ডওভার করি। টিকটক আর ইনস্টাগ্রাম অ্যাকাউন্টও অর্ডারে: ৩০+ আর ২০+ বিক্রি।","yt.l1":"মনিটাইজড বা প্রায়-মনিটাইজড, অ্যাডসেন্স ক্লিন","yt.l2":"কপিরাইট স্ট্রাইক নেই, পেমেন্টের আগে ফুল অ্যানালিটিক্স","yt.l3":"কলেই প্রাইমারি ওনার আর রিকভারি ইমেইল ট্রান্সফার","yt.cta":"ইউটিউব চ্যানেল অর্ডার করুন",
     "ag.eyebrow":"ফিদাহ অ্যাডস এজেন্সি","ag.title":"পেজ কিনলেন? এবার আয় করান।","ag.lead":"যে অ্যাসেট কিনলেন বা নিজের প্রোডাক্টের জন্য Meta আর ইউটিউব অ্যাড ক্যাম্পেইন। পিক্সেল সেটআপ, টার্গেটিং, ক্রিয়েটিভ আর দুই মিনিটে পড়া যায় এমন সাপ্তাহিক রিপোর্ট।","ag.l1":"Meta Ads, বুস্টিং, পিক্সেল আর ক্যাটালগ সেটআপ","ag.l2":"ইউটিউব আর গুগল অ্যাডস","ag.l3":"কনটেন্ট ক্যালেন্ডারসহ পেজ গ্রোথ প্ল্যান","ag.hint":"স্ক্রল করলে বারগুলো বাড়ে। হোভার করলে সার্ভিস দেখাবে।",
-    "tr.eyebrow":"সিকিউরিটি · আমার কাছ থেকে যা পাবেন","tr.title":"নিজের চোখে না দেখে আপনাকে কখনো টাকা দিতে হবে না।","tr.bad":"যেকোনো সেলার","tr.b1":"ভুয়া নাম, মুখ নেই","tr.b2":"শুধু স্ক্রিনশট","tr.b3":"পেমেন্টের পর গায়েব","tr.good":"ফিদাহ · MEGH","tr.g1":"পরিচিত ক্রিয়েটর, ৩৭ লাখ+ ফলোয়ার","tr.g2":"পেমেন্টের আগে লাইভ স্ক্রিন-শেয়ার","tr.g3":"ট্রান্সফারের পর ৭ দিন সাপোর্ট",
+    "tr.eyebrow":"সিকিউরিটি · আমার কাছ থেকে যা পাবেন","tr.title":"নিজের চোখে না দেখে আপনাকে কখনো টাকা দিতে হবে না।","tr.bad":"যেকোনো সেলার","tr.b1":"ভুয়া নাম, মুখ নেই","tr.b2":"শুধু স্ক্রিনশট","tr.b3":"পেমেন্টের পর গায়েব","tr.good":"ফিদাহ · MEGH","tr.g1":"পরিচিত ক্রিয়েটর, ৩৭ লাখ+ ফলোয়ার, ২৩০+ ডিল","tr.g2":"পেমেন্টের আগে লাইভ স্ক্রিন-শেয়ার","tr.g3":"ট্রান্সফারের পর ৭ দিন সাপোর্ট",
     "rv.eyebrow":"ক্লায়েন্ট রিভিউ","rv.title":"আসল ক্রেতা, ভিডিওতে, আমার এজেন্সি পেজে।","rv.lead":"ট্রান্সফারের পর ক্লায়েন্টরা ছোট একটা রিভিউ রেকর্ড করেন, আমি সেটা ১১.৬K ফলোয়ারের Fidah Digital Product পেজে পোস্ট করি। ওখানে দেখুন, তারপর মেসেজ দিন।","rv.watch":"ক্লায়েন্ট রিভিউ ভিডিও দেখুন","rv.watch.s":"Fidah Digital Product পেজে","rv.page":"Fidah Digital Product","rv.page.s":"১১.৬K ফলোয়ার · ফেসবুকে এজেন্সি পেজ","rv.frame":"ক্লায়েন্ট রিভিউ",
     "pr.eyebrow":"ডিল কীভাবে হয়","pr.title":"পাঁচটা গেট। প্রতিটা নিজে পার হন।",
     "ct.eyebrow":"যোগাযোগ · ঝিনাইদহ, বাংলাদেশ","ct.title":"এক ট্যাপ। সোজা আমার হোয়াটসঅ্যাপে।","ct.lead":"কোন পেজটা চান বলুন, বা নিশ, সাইজ আর বাজেট। আমি দাম, স্ক্রিনশট আর লাইভ ওয়াকথ্রুর সময় জানিয়ে রিপ্লাই দিই।","ct.hours":"সাধারণত অনলাইন সকাল ১০টা থেকে রাত ১১টা",
     "ct.wa":"হোয়াটসঅ্যাপ","ct.wa.s":"সরাসরি আমার বিজনেস চ্যাট খোলে","ct.fb":"Fidah Digital Product","ct.fb.s":"ফেসবুকে এজেন্সি পেজ","ct.yt":"ইউটিউবে Voice Of Megh","ct.yt.s":"১.৯৮M সাবস্ক্রাইবার","ct.em":"ইমেইল","ct.em.s":"এজেন্সি আর স্পন্সরশিপ প্রপোজাল",
     "foot.tag":"ফেসবুক পেজ, ইউটিউব চ্যানেল, অ্যাডস।","foot.note":"Meta, Google, TikTok বা ByteDance-এর সাথে সম্পর্কিত নয়।",
-    "d.followers":"ফলোয়ার","d.talking":"টকিং অ্যাবাউট","d.category":"ক্যাটাগরি","d.status":"স্ট্যাটাস","d.price":"দাম","d.askprice":"দাম জানতে মেসেজ দিন","d.ask":"এই পেজ নিয়ে MEGH-কে জিজ্ঞেস করুন","d.open":"ফেসবুকে খুলুন","d.openp":"প্রোফাইল খুলুন","d.sold":"বিক্রি হয়েছে","d.available":"স্টকে আছে","d.reserved":"রিজার্ভড",
+    "d.followers":"ফলোয়ার","d.talking":"টকিং অ্যাবাউট","d.video":"ভিডিও","d.videonote":"আসল পেজের স্ক্রিন রেকর্ডিং: ফলোয়ার, রিলস, মনিটাইজেশন এলিজিবিলিটি।","d.topreel":"সেরা রিলের ভিউ","d.monet":"মনিটাইজেশন","d.monet.yes":"এলিজিবল ✓","d.category":"ক্যাটাগরি","d.status":"স্ট্যাটাস","d.price":"দাম","d.askprice":"দাম জানতে মেসেজ দিন","d.ask":"এই পেজ নিয়ে MEGH-কে জিজ্ঞেস করুন","d.open":"ফেসবুকে খুলুন","d.openp":"প্রোফাইল খুলুন","d.sold":"বিক্রি হয়েছে","d.available":"স্টকে আছে","d.reserved":"রিজার্ভড",
     "ch.0":"হোম","ch.1":"MEGH","ch.2":"পেজ","ch.3":"ইউটিউব","ch.4":"এজেন্সি","ch.5":"সিকিউরিটি","ch.6":"রিভিউ","ch.7":"প্রসেস","ch.8":"যোগাযোগ"
   }
 };
@@ -490,7 +492,7 @@ document.querySelectorAll(".walink").forEach(a => a.href = CONFIG.whatsappUrl);
 let statsDone = false;
 function renderStats(){
   const box = document.getElementById("stats");
-  box.innerHTML = CONFIG.stats.map(s => `<div class="stat"><b class="num" data-v="${esc(s.v)}">${esc(s.v)}</b><span>${esc(lang==="bn"?s.bn:s.en)}</span></div>`).join("");
+  box.innerHTML = CONFIG.stats.map(s => `<div class="stat"><b class="num" data-v="${esc(lang==="bn"&&s.bn_v?s.bn_v:s.v)}">${esc(lang==="bn"&&s.bn_v?s.bn_v:s.v)}</b><span>${esc(lang==="bn"?s.bn:s.en)}</span></div>`).join("");
   if (!statsDone && !reduce){ statsDone = true; box.querySelectorAll("b").forEach(el => { const m = el.dataset.v.match(/^([\d.]+)(.*)$/); if (!m) return; const n = parseFloat(m[1]), suf = m[2], dec = (m[1].split(".")[1]||"").length, t0 = performance.now();
     (function f(now){ const p=Math.min(1,(now-t0)/1400), e=1-Math.pow(1-p,3); el.textContent=(n*e).toFixed(dec)+suf; if(p<1) requestAnimationFrame(f); })(t0); }); }
 }
@@ -499,7 +501,7 @@ function renderSocials(){
   document.getElementById("socials").innerHTML = CONFIG.socials.map(s => `<a class="chip" href="${esc(s.url)}"><span class="pf ${s.key}">${socialIcon(s.key)}</span><div><b>${esc(s.label)} ${s.followers?"· "+esc(s.followers):""}</b><small>${esc(s.handle)} · ${esc(pick(s.sub))}</small></div></a>`).join("");
 }
 function renderPages(){
-  document.getElementById("pageList").innerHTML = CONFIG.pages.map((p,i) => `<button type="button" class="card" data-page="${i}"><img src="${esc(p.img)}" alt=""><div style="flex:1;min-width:0"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>${esc(p.name)}</b><span class="status ${p.status}">${t("d."+p.status)}</span></div><span>${esc(pick(p.category))} · ${esc(p.followers)} ${t("d.followers").toLowerCase()}</span><span class="pr">${p.price?esc(p.price):t("d.askprice")}</span></div></button>`).join("");
+  document.getElementById("pageList").innerHTML = CONFIG.pages.map((p,i) => `<button type="button" class="card" data-page="${i}"><img src="${esc(p.img)}" alt=""><div style="flex:1;min-width:0"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>${esc(p.name)}</b><span class="status ${p.status}">${t("d."+p.status)}</span></div><span>${esc(pick(p.category))} · ${esc(p.followers)} ${t("d.followers").toLowerCase()}</span><span class="pr">${p.video?"▶ "+t("d.video")+" · ":""}${p.price?esc(p.price):t("d.askprice")}</span></div></button>`).join("");
   document.querySelectorAll("[data-page]").forEach(b => b.onclick = () => openPage(+b.dataset.page));
 }
 function renderGuar(){
@@ -548,8 +550,10 @@ addEventListener("keydown", e => { if (e.key === "Escape") closeDetail(); });
 function openPage(i){
   const p = CONFIG.pages[i];
   openDetail(`<div class="pf" id="dPf"><img src="${esc(p.img)}" alt=""></div>`, p.name, pick(p.category) + " · " + t("d."+p.status),
-    `<div class="kv"><div><span>${t("d.followers")}</span><b class="num">${esc(p.followers)}</b></div><div><span>${t("d.category")}</span><b>${esc(pick(p.category))}</b></div>${p.talking?`<div><span>${t("d.talking")}</span><b class="num">${esc(p.talking)}</b></div>`:""}<div><span>${t("d.status")}</span><b>${t("d."+p.status)}</b></div></div>`,
-    `<div class="price"><small>${t("d.price")}</small>${p.price?esc(p.price):t("d.askprice")}</div><a class="btn ghost" href="${esc(p.url)}">${t("d.open")}</a>${p.status==="sold"?"":`<a class="btn wa" style="margin-left:0" href="${esc(CONFIG.whatsappUrl)}">${WA_SVG}${t("d.ask")}</a>`}`);
+    `${p.video?`<video controls playsinline muted preload="metadata" poster="${esc(p.poster||"")}" src="${esc(p.video)}" style="max-height:52vh;aspect-ratio:9/19.5;margin:0 auto;display:block"></video><p style="font-size:12px;color:var(--muted);text-align:center;margin-top:6px">${t("d.videonote")}</p>`:""}
+     <div class="kv" style="margin-top:12px"><div><span>${t("d.followers")}</span><b class="num">${esc(p.followers)}</b></div><div><span>${t("d.category")}</span><b>${esc(pick(p.category))}</b></div>${p.topReel?`<div><span>${t("d.topreel")}</span><b class="num">${esc(p.topReel)}</b></div>`:""}${p.talking?`<div><span>${t("d.talking")}</span><b class="num">${esc(p.talking)}</b></div>`:""}<div><span>${t("d.monet")}</span><b style="color:var(--ok)">${p.monet?t("d.monet.yes"):"—"}</b></div><div><span>${t("d.status")}</span><b>${t("d."+p.status)}</b></div></div>`,
+    `<div class="price"><small>${t("d.price")}</small>${p.price?esc(p.price):t("d.askprice")}</div>${p.url?`<a class="btn ghost" href="${esc(p.url)}">${t("d.open")}</a>`:""}${p.status==="sold"?"":`<a class="btn wa" style="margin-left:0" href="${esc(CONFIG.whatsappUrl)}">${WA_SVG}${t("d.ask")}</a>`}`);
+  const pv = detail.querySelector("video"); if (pv) pv.play().catch(()=>{});
 }
 function openReview(i){
   const r = CONFIG.reviews[i];
@@ -634,7 +638,7 @@ applyLang();
       g.fillStyle="#97a3c2"; g.font="18px sans-serif"; g.fillText("followers",252,204);
       g.fillStyle=p.status==="sold"?"#ffc857":p.status==="reserved"?"#97a3c2":"#3ddc97"; g.font="bold 18px sans-serif"; g.fillText(p.status==="available"?"IN STOCK":p.status.toUpperCase(),252,240);
       g.fillStyle="#ffc857"; g.font="bold 20px sans-serif"; g.textAlign="right"; g.fillText(p.price||"ASK PRICE",484,290);
-      g.fillStyle="#97a3c2"; g.font="16px sans-serif"; g.textAlign="left"; g.fillText("fidah · verified live",28,290);
+      g.fillStyle=p.monet?"#3ddc97":"#97a3c2"; g.font="bold 16px sans-serif"; g.textAlign="left"; g.fillText(p.monet?"MONETISATION ELIGIBLE ✓":"fidah · verified live",28,290);
       tx.needsUpdate=true;
     }
     draw(null); withImage(p.img, draw); return tx;
@@ -776,7 +780,7 @@ applyLang();
   function layout(){
     wide = innerWidth > 820;
     groups.forEach((g,i) => { g.position.x = sides[i]*sideX(); g.position.y = sideY(); });
-    g0.position.x = wide ? 3.8 : 0; g0.position.y = wide ? 0 : 4.3;
+    g0.position.x = wide ? 3.8 : 0; g0.position.y = wide ? 0 : 3.5;
     const w = innerWidth, h = innerHeight;
     renderer.setSize(w,h,false); camera.aspect = w/h; camera.fov = wide ? 52 : 64; camera.updateProjectionMatrix();
   }
