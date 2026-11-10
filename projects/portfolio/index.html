@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Megh Digital Assets</title>
+<meta name="description" content="Verified Facebook pages and YouTube channels for sale, plus a performance ads agency. Safe transfer, live verification, after-sale support.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Instrument+Sans:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Plan: a dark neon showroom. The hero is a three.js "vault" of floating page/channel cards; everything below is a quiet 1120px column of glass cards. One bold place (the 3D hero), everything else restrained. */
+:root{
+  --ink:#070a12;
+  --ink-2:#0d1220;
+  --ink-3:#131a2c;
+  --line:rgba(140,170,255,.14);
+  --text:#e9edf8;
+  --muted:#93a0bf;
+  --fb:#2f7bff;
+  --yt:#ff3d57;
+  --gold:#ffc857;
+  --ok:#3ddc97;
+  --display:'Unbounded',system-ui,sans-serif;
+  --body:'Instrument Sans','Segoe UI',system-ui,sans-serif;
+  --bn:'Hind Siliguri','Noto Sans Bengali',system-ui,sans-serif;
+  --r:18px;
+  --col:1120px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{
+  background:var(--ink);color:var(--text);font-family:var(--body);
+  font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+html[lang="bn"] body{font-family:var(--bn)}
+html[lang="bn"] h1,html[lang="bn"] h2,html[lang="bn"] h3,html[lang="bn"] .display{font-family:var(--bn);font-weight:700;letter-spacing:0}
+a{color:inherit}
+img{max-width:100%}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:6px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.1}
+h2{font-size:clamp(26px,4vw,40px);font-weight:800;letter-spacing:-.01em}
+h3{font-size:18px;font-weight:600}
+p{margin:0}
+.wrap{width:min(var(--col),100% - 32px);margin-inline:auto}
+.muted{color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+.only-bn{display:none}
+html[lang="bn"] .only-bn{display:inline}
+html[lang="bn"] .only-en{display:none}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:20;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);background:rgba(7,10,18,.65);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:18px;height:66px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:var(--display);font-weight:800;font-size:15px;letter-spacing:.04em}
+.logo .mark{width:32px;height:32px;border-radius:9px;background:conic-gradient(from 210deg,var(--fb),var(--yt),var(--gold),var(--fb));display:grid;place-items:center;box-shadow:0 0 24px rgba(47,123,255,.45)}
+.logo .mark i{width:14px;height:14px;border-radius:4px;background:var(--ink);display:block}
+.links{display:flex;gap:22px;margin-left:auto;font-size:14px;font-weight:500}
+.links a{text-decoration:none;color:var(--muted)}
+.links a:hover{color:var(--text)}
+.lang{display:flex;border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px;margin-left:auto}
+.links + .lang{margin-left:0}
+.lang button{border:0;background:transparent;border-radius:999px;padding:4px 10px;font-size:13px;font-weight:600;color:var(--muted)}
+.lang button[aria-pressed="true"]{background:var(--ink-3);color:var(--text)}
+.btn{display:inline-flex;align-items:center;gap:9px;border-radius:999px;padding:11px 18px;font-weight:600;font-size:14px;text-decoration:none;border:1px solid var(--line);background:var(--ink-3);transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn.wa{background:#1fbf62;border-color:transparent;color:#04130a;box-shadow:0 8px 28px rgba(31,191,98,.3)}
+.btn.ghost{background:transparent}
+.btn svg{width:17px;height:17px}
+.nav .btn{padding:9px 15px}
+
+/* hero */
+.hero{position:relative;min-height:640px;overflow:hidden;isolation:isolate}
+#hero3d{position:absolute;inset:0;width:100%;height:100%;z-index:-1;display:block}
+.hero::after{content:"";position:absolute;inset:auto 0 0 0;height:160px;background:linear-gradient(transparent,var(--ink));z-index:-1;pointer-events:none}
+.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(7,10,18,.92) 0%,rgba(7,10,18,.7) 38%,rgba(7,10,18,.15) 62%,transparent 100%);z-index:-1;pointer-events:none}
+@media (max-width:760px){.hero::before{background:linear-gradient(180deg,rgba(7,10,18,.55),rgba(7,10,18,.75))}}
+.hero .wrap{padding:86px 0 56px;display:grid;gap:26px;max-width:760px;margin-left:max(16px,(100% - var(--col))/2)}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--gold)}
+.eyebrow::before{content:"";width:28px;height:2px;background:var(--gold);box-shadow:0 0 12px var(--gold)}
+html[lang="bn"] .eyebrow{letter-spacing:0;font-size:14px;text-transform:none}
+.hero h1{font-size:clamp(34px,6.2vw,66px);font-weight:800;letter-spacing:-.02em;text-shadow:0 10px 50px rgba(0,0,0,.6)}
+.hero h1 .fb{color:var(--fb);text-shadow:0 0 30px rgba(47,123,255,.55)}
+.hero h1 .yt{color:var(--yt);text-shadow:0 0 30px rgba(255,61,87,.5)}
+.hero .lead{font-size:clamp(16px,2vw,19px);color:var(--muted);max-width:56ch}
+.cta{display:flex;flex-wrap:wrap;gap:12px}
+.stats{display:grid;grid-template-columns:repeat(4,auto);gap:10px 34px;margin-top:10px;width:max-content;max-width:100%}
+.stat b{display:block;font-family:var(--display);font-size:clamp(22px,3vw,32px);font-weight:800;letter-spacing:-.02em}
+.stat span{font-size:13px;color:var(--muted)}
+.scroll-hint{position:absolute;right:28px;bottom:28px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);writing-mode:vertical-rl;opacity:.8}
+
+/* sections */
+section{padding:84px 0}
+.sec-head{display:grid;gap:12px;max-width:640px;margin-bottom:38px}
+.sec-head .eyebrow{color:var(--fb)}
+.sec-head .eyebrow::before{background:var(--fb);box-shadow:0 0 12px var(--fb)}
+.sec-head p{color:var(--muted);font-size:17px}
+
+/* services */
+.services{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.015));border:1px solid var(--line);border-radius:var(--r);padding:26px;position:relative;overflow:hidden;transform-style:preserve-3d;transition:transform .2s ease,border-color .2s}
+.card::before{content:"";position:absolute;inset:0;background:radial-gradient(420px 220px at var(--mx,50%) var(--my,0%),var(--glow,rgba(47,123,255,.22)),transparent 60%);opacity:0;transition:opacity .3s;pointer-events:none}
+.card:hover::before{opacity:1}
+.card:hover{border-color:rgba(140,170,255,.32)}
+.tilt{will-change:transform}
+.svc .ic{width:50px;height:50px;border-radius:14px;display:grid;place-items:center;margin-bottom:20px;background:var(--ink-3);border:1px solid var(--line)}
+.svc .ic svg{width:24px;height:24px}
+.svc h3{margin-bottom:10px;font-size:20px}
+.svc p{color:var(--muted);font-size:15px}
+.svc ul{margin:16px 0 0;padding:0;list-style:none;display:grid;gap:8px;font-size:14px}
+.svc li{display:flex;gap:9px;align-items:flex-start}
+.svc li::before{content:"";flex:0 0 6px;width:6px;height:6px;border-radius:50%;background:var(--gold);margin-top:8px}
+.svc.main{--glow:rgba(47,123,255,.22)}
+.svc.yt{--glow:rgba(255,61,87,.2)}
+.svc.ads{--glow:rgba(255,200,87,.18)}
+.tag{display:inline-block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;padding:4px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted);margin-bottom:14px}
+html[lang="bn"] .tag{letter-spacing:0;font-size:12px;text-transform:none}
+.tag.hot{color:var(--gold);border-color:rgba(255,200,87,.4)}
+
+/* inventory */
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+.filters button{border:1px solid var(--line);background:transparent;border-radius:999px;padding:8px 16px;font-size:14px;font-weight:600;color:var(--muted)}
+.filters button[aria-pressed="true"]{background:var(--text);color:var(--ink);border-color:var(--text)}
+.listings{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.listing{padding:0;display:grid;grid-template-rows:auto 1fr auto}
+.listing .top{padding:18px 20px 14px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line)}
+.listing .pf{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:0 0 auto;font-family:var(--display);font-weight:800;font-size:16px}
+.listing[data-platform="facebook"] .pf{background:rgba(47,123,255,.18);color:var(--fb);border:1px solid rgba(47,123,255,.4)}
+.listing[data-platform="youtube"] .pf{background:rgba(255,61,87,.16);color:var(--yt);border:1px solid rgba(255,61,87,.4)}
+.listing[data-platform="facebook"]{--glow:rgba(47,123,255,.22)}
+.listing[data-platform="youtube"]{--glow:rgba(255,61,87,.2)}
+.listing .name{font-weight:700;font-size:16px;line-height:1.2}
+.listing .niche{font-size:13px;color:var(--muted)}
+.listing .status{margin-left:auto;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border-radius:999px;white-space:nowrap}
+html[lang="bn"] .listing .status{letter-spacing:0;font-size:12px;text-transform:none}
+.status.available{background:rgba(61,220,151,.14);color:var(--ok);border:1px solid rgba(61,220,151,.35)}
+.status.sold{background:rgba(255,200,87,.12);color:var(--gold);border:1px solid rgba(255,200,87,.35)}
+.status.reserved{background:rgba(147,160,191,.14);color:var(--muted);border:1px solid var(--line)}
+.listing .mid{padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:12px 16px}
+.kv span{display:block;font-size:12px;color:var(--muted)}
+.kv b{font-size:16px;font-weight:700}
+.listing .bot{padding:14px 20px 18px;border-top:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.price{font-family:var(--display);font-weight:800;font-size:18px}
+.price small{font-family:var(--body);font-weight:500;color:var(--muted);font-size:12px;display:block}
+.listing .bot a{margin-left:auto;font-size:13px;font-weight:700;text-decoration:none;padding:8px 14px;border-radius:999px;background:var(--ink-3);border:1px solid var(--line)}
+.listing .bot a:hover{border-color:var(--text)}
+.demo{position:absolute;top:10px;right:10px;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(147,160,191,.55);border:1px dashed rgba(147,160,191,.35);padding:2px 6px;border-radius:6px}
+.inv-note{margin-top:22px;color:var(--muted);font-size:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+/* process */
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;counter-reset:s}
+.step{padding:22px 20px;border-radius:var(--r);background:var(--ink-2);border:1px solid var(--line);position:relative}
+.step::before{counter-increment:s;content:"0" counter(s);font-family:var(--display);font-weight:800;font-size:13px;color:var(--gold);display:block;margin-bottom:14px;letter-spacing:.1em}
+.step h3{font-size:16px;margin-bottom:8px}
+.step p{font-size:14px;color:var(--muted)}
+.safe{margin-top:22px;padding:18px 22px;border-radius:var(--r);border:1px solid rgba(61,220,151,.3);background:rgba(61,220,151,.06);display:flex;gap:14px;align-items:flex-start;font-size:15px}
+.safe svg{width:22px;height:22px;flex:0 0 auto;color:var(--ok);margin-top:2px}
+
+/* proof */
+.proof{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;align-items:start}
+.quotes{display:grid;gap:14px}
+.quote{padding:22px;border-radius:var(--r);background:var(--ink-2);border:1px solid var(--line)}
+.quote p{font-size:15px}
+.quote .who{display:flex;align-items:center;gap:12px;margin-top:14px;font-size:13px;color:var(--muted)}
+.quote .av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;color:var(--ink);background:linear-gradient(135deg,var(--gold),#ff9a3d)}
+.quote .who b{color:var(--text);display:block}
+.stars{color:var(--gold);letter-spacing:2px;font-size:13px;margin-bottom:8px}
+.shots{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.shot{aspect-ratio:4/5;border-radius:14px;border:1px solid var(--line);background:var(--ink-2);display:grid;place-items:center;overflow:hidden;position:relative}
+.shot img{width:100%;height:100%;object-fit:cover}
+.shot .ph{display:grid;gap:8px;place-items:center;text-align:center;padding:16px;color:var(--muted);font-size:13px}
+.shot .ph svg{width:28px;height:28px;opacity:.7}
+.shot .lab{position:absolute;left:10px;bottom:10px;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:rgba(7,10,18,.8);border:1px solid var(--line)}
+
+/* faq */
+.faq{display:grid;gap:10px;max-width:800px}
+details{border:1px solid var(--line);border-radius:14px;background:var(--ink-2);padding:0 20px}
+summary{cursor:pointer;list-style:none;padding:18px 0;font-weight:600;display:flex;justify-content:space-between;gap:16px;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-family:var(--display);color:var(--gold);font-size:18px;flex:0 0 auto}
+details[open] summary::after{content:"–"}
+details p{padding:0 0 18px;color:var(--muted);font-size:15px;max-width:65ch}
+
+/* contact */
+.contact{border-radius:28px;border:1px solid var(--line);background:radial-gradient(800px 400px at 15% 0%,rgba(47,123,255,.22),transparent 60%),radial-gradient(600px 400px at 90% 100%,rgba(255,61,87,.18),transparent 60%),var(--ink-2);padding:clamp(28px,5vw,56px);display:grid;grid-template-columns:1.1fr .9fr;gap:36px;align-items:center}
+.contact h2{font-size:clamp(28px,4.4vw,44px)}
+.contact .lead{color:var(--muted);margin-top:12px;font-size:17px;max-width:48ch}
+.channels{display:grid;gap:10px}
+.ch{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:14px;background:rgba(7,10,18,.6);border:1px solid var(--line);text-decoration:none;transition:border-color .15s,transform .15s}
+.ch:hover{border-color:rgba(140,170,255,.4);transform:translateX(3px)}
+.ch .ci{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;flex:0 0 auto}
+.ch .ci svg{width:20px;height:20px}
+.ch b{display:block;font-size:15px}
+.ch span{font-size:13px;color:var(--muted)}
+.ch .go{margin-left:auto;color:var(--muted)}
+.hours{margin-top:16px;font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}
+
+footer{padding:34px 0 50px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:center}
+
+/* reveal */
+.rv{opacity:1;transform:none}
+@media (prefers-reduced-motion:no-preference){
+  .rv.in{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes rise{from{opacity:.001;transform:translateY(18px)}to{opacity:1;transform:none}}
+}
+
+@media (max-width:980px){
+  .services,.listings{grid-template-columns:1fr 1fr}
+  .steps{grid-template-columns:1fr 1fr 1fr}
+  .proof,.contact{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  .links{display:none}
+  .nav .btn span{display:none}
+  .hero .wrap{padding:64px 0 48px}
+  .stats{grid-template-columns:1fr 1fr;width:100%}
+  .scroll-hint{display:none}
+  section{padding:64px 0}
+}
+@media (max-width:600px){
+  .services,.listings,.shots{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr 1fr}
+}
+@media (max-width:420px){.steps{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="#top"><span class="mark"><i></i></span><span id="brandName">MEGH</span></a>
+    <nav class="links" aria-label="Sections">
+      <a href="#services" data-i18n="nav.services">Services</a>
+      <a href="#inventory" data-i18n="nav.inventory">Available now</a>
+      <a href="#process" data-i18n="nav.process">How it works</a>
+      <a href="#proof" data-i18n="nav.proof">Proof</a>
+      <a href="#faq" data-i18n="nav.faq">FAQ</a>
+    </nav>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" id="langEn" aria-pressed="true">EN</button>
+      <button type="button" id="langBn" aria-pressed="false">বাং</button>
+    </div>
+    <a class="btn wa" id="navWa" href="#contact">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.1.7a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.2c0-.1-.2-.2-.5-.3z"/></svg>
+      <span data-i18n="nav.chat">WhatsApp</span>
+    </a>
+  </div>
+</header>
+
+<main id="top">
+<section class="hero">
+  <canvas id="hero3d" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div class="eyebrow" data-i18n="hero.eyebrow">Digital asset broker · Bangladesh</div>
+    <h1 data-i18n-html="hero.title">I sell <span class="fb">Facebook pages</span> and <span class="yt">YouTube channels</span>. Verified, aged, delivered safely.</h1>
+    <p class="lead" data-i18n="hero.lead">Real audiences, clean history, full ownership transfer on a live call. Plus a small ads agency that grows what you buy.</p>
+    <div class="cta">
+      <a class="btn wa" id="heroWa" href="#contact">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.1.7a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.2c0-.1-.2-.2-.5-.3z"/></svg>
+        <span data-i18n="hero.cta1">Message on WhatsApp</span>
+      </a>
+      <a class="btn ghost" href="#inventory" data-i18n="hero.cta2">See what's available</a>
+    </div>
+    <div class="stats" id="stats"></div>
+  </div>
+  <div class="scroll-hint" data-i18n="hero.scroll">scroll</div>
+</section>
+
+<section id="services">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="eyebrow" data-i18n="svc.eyebrow">What I do</div>
+      <h2 data-i18n="svc.title">Three things, done properly.</h2>
+      <p data-i18n="svc.lead">Pages and channels are the main business. The ads agency exists so your new asset actually grows after the deal.</p>
+    </div>
+    <div class="services">
+      <article class="card tilt svc main rv">
+        <span class="tag hot" data-i18n="svc.a.tag">Main service</span>
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--fb)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></div>
+        <h3 data-i18n="svc.a.title">Facebook page selling</h3>
+        <p data-i18n="svc.a.text">Aged pages with real, active followers in clean niches. Monetization-ready pages, reels bonus pages, and brand-safe community pages.</p>
+        <ul>
+          <li data-i18n="svc.a.l1">Real followers, no bot inflation</li>
+          <li data-i18n="svc.a.l2">Admin transfer on a live screen-share</li>
+          <li data-i18n="svc.a.l3">Insights and history shown before payment</li>
+        </ul>
+      </article>
+      <article class="card tilt svc yt rv">
+        <span class="tag hot" data-i18n="svc.b.tag">Main service</span>
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--yt)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22.5 6.4a2.8 2.8 0 0 0-2-2C18.8 4 12 4 12 4s-6.8 0-8.5.4a2.8 2.8 0 0 0-2 2A29 29 0 0 0 1 12a29 29 0 0 0 .5 5.6 2.8 2.8 0 0 0 2 2C5.2 20 12 20 12 20s6.8 0 8.5-.4a2.8 2.8 0 0 0 2-2A29 29 0 0 0 23 12a29 29 0 0 0-.5-5.6z"/><path d="M10 15.5l5.5-3.5L10 8.5z" fill="var(--yt)" stroke="none"/></svg></div>
+        <h3 data-i18n="svc.b.title">YouTube channel selling</h3>
+        <p data-i18n="svc.b.text">Monetized and near-monetized channels with watch-time history, no copyright strikes, and AdSense clean. Niche channels for faceless creators.</p>
+        <ul>
+          <li data-i18n="svc.b.l1">Monetization status verified live</li>
+          <li data-i18n="svc.b.l2">Primary owner + recovery email handed over</li>
+          <li data-i18n="svc.b.l3">Analytics access before you pay</li>
+        </ul>
+      </article>
+      <article class="card tilt svc ads rv">
+        <span class="tag" data-i18n="svc.c.tag">Side service</span>
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></div>
+        <h3 data-i18n="svc.c.title">Ads agency</h3>
+        <p data-i18n="svc.c.text">Meta and YouTube ad campaigns for the page or channel you just bought, or for your own product. Setup, targeting, creatives, weekly reporting.</p>
+        <ul>
+          <li data-i18n="svc.c.l1">Meta Ads, boosting, pixel setup</li>
+          <li data-i18n="svc.c.l2">YouTube and Google Ads</li>
+          <li data-i18n="svc.c.l3">Page growth and content plan</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="inventory">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="eyebrow" data-i18n="inv.eyebrow">Live inventory</div>
+      <h2 data-i18n="inv.title">Available right now.</h2>
+      <p data-i18n="inv.lead">Every listing is checked by me personally. Ask for the full insights screenshot or a live walkthrough before you decide.</p>
+    </div>
+    <div class="filters" role="group" aria-label="Filter listings">
+      <button type="button" data-f="all" aria-pressed="true" data-i18n="inv.f.all">All</button>
+      <button type="button" data-f="facebook" aria-pressed="false" data-i18n="inv.f.fb">Facebook pages</button>
+      <button type="button" data-f="youtube" aria-pressed="false" data-i18n="inv.f.yt">YouTube channels</button>
+      <button type="button" data-f="sold" aria-pressed="false" data-i18n="inv.f.sold">Recently sold</button>
+    </div>
+    <div class="listings" id="listings"></div>
+    <p class="inv-note"><span class="dot"></span><span data-i18n="inv.note">Looking for a specific niche, size or budget? Tell me on WhatsApp and I will source it, usually within a few days.</span></p>
+  </div>
+</section>
+
+<section id="process">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="eyebrow" data-i18n="pro.eyebrow">How a deal works</div>
+      <h2 data-i18n="pro.title">Five steps. No surprises.</h2>
+      <p data-i18n="pro.lead">The whole process is designed so you never pay for something you have not seen with your own eyes.</p>
+    </div>
+    <div class="steps">
+      <div class="step rv"><h3 data-i18n="pro.s1.t">Pick an asset</h3><p data-i18n="pro.s1.p">Choose from the list above or tell me your niche, size and budget.</p></div>
+      <div class="step rv"><h3 data-i18n="pro.s2.t">Verify live</h3><p data-i18n="pro.s2.p">Screen-share call: insights, audience countries, monetization, strikes, history.</p></div>
+      <div class="step rv"><h3 data-i18n="pro.s3.t">Agree and secure</h3><p data-i18n="pro.s3.p">Price is fixed in writing. Partial payment or a trusted middleman if you prefer.</p></div>
+      <div class="step rv"><h3 data-i18n="pro.s4.t">Transfer ownership</h3><p data-i18n="pro.s4.p">You become primary owner or admin on the call. My access is removed in front of you.</p></div>
+      <div class="step rv"><h3 data-i18n="pro.s5.t">After-sale support</h3><p data-i18n="pro.s5.p">Seven days of help with security settings, recovery email and first posts.</p></div>
+    </div>
+    <div class="safe rv">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+      <span data-i18n="pro.safe">Middleman deals welcome. If you have a trusted escrow or group admin, we can run the payment through them at no extra cost from my side.</span>
+    </div>
+  </div>
+</section>
+
+<section id="proof">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="eyebrow" data-i18n="prf.eyebrow">Proof</div>
+      <h2 data-i18n="prf.title">What buyers say.</h2>
+      <p data-i18n="prf.lead">Deal screenshots and client feedback. More available on request, including references you can message directly.</p>
+    </div>
+    <div class="proof">
+      <div class="quotes" id="quotes"></div>
+      <div class="shots" id="shots"></div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="eyebrow" data-i18n="faq.eyebrow">FAQ</div>
+      <h2 data-i18n="faq.title">Questions buyers ask first.</h2>
+    </div>
+    <div class="faq" id="faqList"></div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap">
+    <div class="contact rv">
+      <div>
+        <div class="eyebrow" data-i18n="ct.eyebrow">Contact</div>
+        <h2 data-i18n="ct.title">Send a message. Get a reply today.</h2>
+        <p class="lead" data-i18n="ct.lead">Tell me what you are looking for: platform, niche, size, budget. I reply with options, screenshots and a price.</p>
+        <div class="hours"><span class="dot"></span><span data-i18n="ct.hours">Usually online 10:00 to 23:00 (Dhaka time)</span></div>
+      </div>
+      <div class="channels" id="channels"></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div><span id="footBrand">MEGH</span> · <span data-i18n="foot.tag">Facebook pages, YouTube channels, ads.</span></div>
+    <div class="muted" data-i18n="foot.note">Not affiliated with Meta or Google. Assets are transferred with full disclosure of history.</div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ============================================================
+   EDIT HERE. Everything the client sees comes from this block.
+   ============================================================ */
+const CONFIG = {
+  brand: "MEGH",
+  // Contact. Keep the number in international format without "+" for the WhatsApp link.
+  whatsappNumber: "8801XXXXXXXXX",          // example: 8801712345678
+  whatsappDisplay: "+880 1XXX-XXXXXX",
+  telegramUser: "yourusername",             // without @
+  messengerUrl: "https://m.me/yourpage",    // your Facebook page's m.me link
+  email: "you@example.com",
+  showDemoBadge: true,                       // set false once the listings below are your real ones
+
+  stats: [
+    { n: 150, suffix: "+", en: "Pages sold", bn: "পেজ বিক্রি" },
+    { n: 60,  suffix: "+", en: "Channels sold", bn: "চ্যানেল বিক্রি" },
+    { n: 200, suffix: "+", en: "Happy clients", bn: "সন্তুষ্ট ক্লায়েন্ট" },
+    { n: 4,   suffix: " yrs", bn_suffix: " বছর", en: "In business", bn: "অভিজ্ঞতা" }
+  ],
+
+  // platform: "facebook" | "youtube"; status: "available" | "reserved" | "sold"
+  listings: [
+    { platform:"facebook", name:"Daily Tech Bangla", niche:{en:"Tech news", bn:"টেক নিউজ"}, size:"248K", sizeLabel:{en:"Followers",bn:"ফলোয়ার"}, age:"2019", extra:{en:"Reels bonus on",bn:"রিলস বোনাস চালু"}, reach:"1.2M / 28d", price:"৳ 85,000", status:"available" },
+    { platform:"youtube",  name:"Facts Unfold", niche:{en:"Facts / explainer", bn:"ফ্যাক্টস / এক্সপ্লেইনার"}, size:"112K", sizeLabel:{en:"Subscribers",bn:"সাবস্ক্রাইবার"}, age:"2021", extra:{en:"Monetized, no strikes",bn:"মনিটাইজড, স্ট্রাইক নেই"}, reach:"4.1M views / 28d", price:"$ 1,900", status:"available" },
+    { platform:"facebook", name:"Foodie Dhaka", niche:{en:"Food & lifestyle", bn:"ফুড ও লাইফস্টাইল"}, size:"96K", sizeLabel:{en:"Followers",bn:"ফলোয়ার"}, age:"2020", extra:{en:"BD audience 92%",bn:"বাংলাদেশি অডিয়েন্স ৯২%"}, reach:"620K / 28d", price:"৳ 38,000", status:"reserved" },
+    { platform:"youtube",  name:"Islamic Reminder HD", niche:{en:"Religion", bn:"ইসলামিক"}, size:"310K", sizeLabel:{en:"Subscribers",bn:"সাবস্ক্রাইবার"}, age:"2018", extra:{en:"Monetized, 4 yrs history",bn:"মনিটাইজড, ৪ বছরের হিস্ট্রি"}, reach:"9M views / 28d", price:"$ 4,200", status:"available" },
+    { platform:"facebook", name:"Cricket Buzz 24", niche:{en:"Sports", bn:"স্পোর্টস"}, size:"540K", sizeLabel:{en:"Followers",bn:"ফলোয়ার"}, age:"2017", extra:{en:"In-stream ads eligible",bn:"ইন-স্ট্রিম অ্যাড এলিজিবল"}, reach:"3.8M / 28d", price:"৳ 1,60,000", status:"sold" },
+    { platform:"youtube",  name:"Motivation Tube BD", niche:{en:"Motivation", bn:"মোটিভেশন"}, size:"74K", sizeLabel:{en:"Subscribers",bn:"সাবস্ক্রাইবার"}, age:"2022", extra:{en:"Monetized",bn:"মনিটাইজড"}, reach:"1.3M views / 28d", price:"$ 1,100", status:"sold" }
+  ],
+
+  testimonials: [
+    { en:"Showed me everything on a video call before I paid a single taka. Page transferred in 20 minutes, still growing.", bn:"এক টাকা দেওয়ার আগেই ভিডিও কলে সব দেখিয়েছে। ২০ মিনিটে পেজ ট্রান্সফার, এখনো গ্রো করছে।", name:"Rafiul H.", role:{en:"Bought a 240K tech page",bn:"২৪০K টেক পেজ কিনেছেন"} },
+    { en:"Second channel I have bought from him. AdSense clean, analytics matched exactly what he claimed.", bn:"ওর কাছ থেকে আমার দ্বিতীয় চ্যানেল। অ্যাডসেন্স ক্লিন, অ্যানালিটিক্স একদম যা বলেছিল তাই।", name:"Sadia K.", role:{en:"YouTube creator",bn:"ইউটিউব ক্রিয়েটর"} },
+    { en:"Also ran our boosting for two months. ROAS went from 1.4 to 3.1 with the same budget.", bn:"দুই মাস আমাদের বুস্টিংও চালিয়েছে। একই বাজেটে ROAS ১.৪ থেকে ৩.১।", name:"Nayeem Traders", role:{en:"Ads client",bn:"অ্যাডস ক্লায়েন্ট"} }
+  ],
+
+  // Deal screenshots. Put a base64 data URI in "img" (or leave empty to show the placeholder).
+  shots: [
+    { label:{en:"Page transfer",bn:"পেজ ট্রান্সফার"}, img:"" },
+    { label:{en:"Monetization proof",bn:"মনিটাইজেশন প্রুফ"}, img:"" },
+    { label:{en:"Client chat",bn:"ক্লায়েন্ট চ্যাট"}, img:"" },
+    { label:{en:"Ads result",bn:"অ্যাডস রেজাল্ট"}, img:"" }
+  ],
+
+  faq: [
+    { q:{en:"Is buying a page or channel safe?",bn:"পেজ বা চ্যানেল কেনা কি নিরাপদ?"}, a:{en:"Yes, when the history is clean and the transfer is done properly. I show the full history, audience and any policy issues before payment, and you watch the transfer happen live.",bn:"হ্যাঁ, যদি হিস্ট্রি ক্লিন থাকে আর ট্রান্সফারটা ঠিকভাবে হয়। পেমেন্টের আগে পুরো হিস্ট্রি, অডিয়েন্স আর পলিসি ইস্যু দেখাই, আর ট্রান্সফারটা আপনি লাইভ দেখেন।"} },
+    { q:{en:"How do you price an asset?",bn:"দাম কীভাবে ঠিক হয়?"}, a:{en:"Audience size, country mix, age, engagement, monetization status and niche demand. I share the reasoning, not just a number.",bn:"অডিয়েন্স সাইজ, কোন দেশের অডিয়েন্স, বয়স, এনগেজমেন্ট, মনিটাইজেশন স্ট্যাটাস আর নিশের ডিমান্ড দেখে। শুধু একটা নাম্বার না, কারণটাও বলি।"} },
+    { q:{en:"Do you accept middleman or escrow?",bn:"মিডলম্যান বা এসক্রো নেন?"}, a:{en:"Yes. Trusted group admins or an escrow you choose. Partial advance is also fine for larger deals.",bn:"হ্যাঁ। বিশ্বস্ত গ্রুপ অ্যাডমিন বা আপনার পছন্দের এসক্রো। বড় ডিলে পার্শিয়াল অ্যাডভান্সও চলে।"} },
+    { q:{en:"What payment methods work?",bn:"কী কী পেমেন্ট মেথড চলে?"}, a:{en:"bKash, Nagad, bank transfer inside Bangladesh. Binance USDT, Payoneer or Wise for international buyers.",bn:"দেশে বিকাশ, নগদ, ব্যাংক ট্রান্সফার। ইন্টারন্যাশনাল হলে Binance USDT, Payoneer বা Wise।"} },
+    { q:{en:"What if the page gets restricted after transfer?",bn:"ট্রান্সফারের পর পেজ রেস্ট্রিক্টেড হলে?"}, a:{en:"I guide you through secure handover steps to avoid that, and support you for seven days after the deal. Issues caused by undisclosed history are on me.",bn:"এটা এড়াতে সিকিউর হ্যান্ডওভার স্টেপ ধরে ধরে দেখাই, আর ডিলের পর সাত দিন সাপোর্ট দিই। না জানানো হিস্ট্রির কারণে সমস্যা হলে সেটার দায় আমার।"} },
+    { q:{en:"Can you find a specific kind of page for me?",bn:"নির্দিষ্ট ধরনের পেজ খুঁজে দিতে পারবেন?"}, a:{en:"Yes. Tell me niche, size and budget. Sourcing usually takes two to seven days.",bn:"পারব। নিশ, সাইজ আর বাজেট বলুন। সাধারণত দুই থেকে সাত দিনে পেয়ে যাই।"} }
+  ]
+};
+
+/* ---------------- translations ---------------- */
+const T = {
+  en: {
+    "nav.services":"Services","nav.inventory":"Available now","nav.process":"How it works","nav.proof":"Proof","nav.faq":"FAQ","nav.chat":"WhatsApp",
+    "hero.eyebrow":"Digital asset broker · Bangladesh",
+    "hero.title":"I sell <span class=\"fb\">Facebook pages</span> and <span class=\"yt\">YouTube channels</span>. Verified, aged, delivered safely.",
+    "hero.lead":"Real audiences, clean history, full ownership transfer on a live call. Plus a small ads agency that grows what you buy.",
+    "hero.cta1":"Message on WhatsApp","hero.cta2":"See what's available","hero.scroll":"scroll",
+    "svc.eyebrow":"What I do","svc.title":"Three things, done properly.","svc.lead":"Pages and channels are the main business. The ads agency exists so your new asset actually grows after the deal.",
+    "svc.a.tag":"Main service","svc.a.title":"Facebook page selling","svc.a.text":"Aged pages with real, active followers in clean niches. Monetization-ready pages, reels bonus pages, and brand-safe community pages.","svc.a.l1":"Real followers, no bot inflation","svc.a.l2":"Admin transfer on a live screen-share","svc.a.l3":"Insights and history shown before payment",
+    "svc.b.tag":"Main service","svc.b.title":"YouTube channel selling","svc.b.text":"Monetized and near-monetized channels with watch-time history, no copyright strikes, and AdSense clean. Niche channels for faceless creators.","svc.b.l1":"Monetization status verified live","svc.b.l2":"Primary owner + recovery email handed over","svc.b.l3":"Analytics access before you pay",
+    "svc.c.tag":"Side service","svc.c.title":"Ads agency","svc.c.text":"Meta and YouTube ad campaigns for the page or channel you just bought, or for your own product. Setup, targeting, creatives, weekly reporting.","svc.c.l1":"Meta Ads, boosting, pixel setup","svc.c.l2":"YouTube and Google Ads","svc.c.l3":"Page growth and content plan",
+    "inv.eyebrow":"Live inventory","inv.title":"Available right now.","inv.lead":"Every listing is checked by me personally. Ask for the full insights screenshot or a live walkthrough before you decide.",
+    "inv.f.all":"All","inv.f.fb":"Facebook pages","inv.f.yt":"YouTube channels","inv.f.sold":"Recently sold",
+    "inv.note":"Looking for a specific niche, size or budget? Tell me on WhatsApp and I will source it, usually within a few days.",
+    "inv.age":"Since","inv.reach":"Reach (28 days)","inv.ask":"Ask about this","inv.sold":"Sold","inv.available":"Available","inv.reserved":"Reserved","inv.price.sold":"Sold at","inv.price.ask":"Price",
+    "pro.eyebrow":"How a deal works","pro.title":"Five steps. No surprises.","pro.lead":"The whole process is designed so you never pay for something you have not seen with your own eyes.",
+    "pro.s1.t":"Pick an asset","pro.s1.p":"Choose from the list above or tell me your niche, size and budget.",
+    "pro.s2.t":"Verify live","pro.s2.p":"Screen-share call: insights, audience countries, monetization, strikes, history.",
+    "pro.s3.t":"Agree and secure","pro.s3.p":"Price is fixed in writing. Partial payment or a trusted middleman if you prefer.",
+    "pro.s4.t":"Transfer ownership","pro.s4.p":"You become primary owner or admin on the call. My access is removed in front of you.",
+    "pro.s5.t":"After-sale support","pro.s5.p":"Seven days of help with security settings, recovery email and first posts.",
+    "pro.safe":"Middleman deals welcome. If you have a trusted escrow or group admin, we can run the payment through them at no extra cost from my side.",
+    "prf.eyebrow":"Proof","prf.title":"What buyers say.","prf.lead":"Deal screenshots and client feedback. More available on request, including references you can message directly.",
+    "prf.add":"Screenshot goes here",
+    "faq.eyebrow":"FAQ","faq.title":"Questions buyers ask first.",
+    "ct.eyebrow":"Contact","ct.title":"Send a message. Get a reply today.","ct.lead":"Tell me what you are looking for: platform, niche, size, budget. I reply with options, screenshots and a price.","ct.hours":"Usually online 10:00 to 23:00 (Dhaka time)",
+    "ct.wa":"WhatsApp","ct.wa.s":"Fastest reply","ct.tg":"Telegram","ct.tg.s":"For international buyers","ct.ms":"Messenger","ct.ms.s":"Message my Facebook page","ct.em":"Email","ct.em.s":"For agency proposals",
+    "foot.tag":"Facebook pages, YouTube channels, ads.","foot.note":"Not affiliated with Meta or Google. Assets are transferred with full disclosure of history."
+  },
+  bn: {
+    "nav.services":"সার্ভিস","nav.inventory":"এখন অ্যাভেইলেবল","nav.process":"কীভাবে কাজ হয়","nav.proof":"প্রুফ","nav.faq":"প্রশ্নোত্তর","nav.chat":"হোয়াটসঅ্যাপ",
+    "hero.eyebrow":"ডিজিটাল অ্যাসেট ব্রোকার · বাংলাদেশ",
+    "hero.title":"আমি <span class=\"fb\">ফেসবুক পেজ</span> আর <span class=\"yt\">ইউটিউব চ্যানেল</span> বিক্রি করি। ভেরিফায়েড, পুরোনো, নিরাপদে হ্যান্ডওভার।",
+    "hero.lead":"আসল অডিয়েন্স, ক্লিন হিস্ট্রি, লাইভ কলে পুরো ওনারশিপ ট্রান্সফার। সাথে একটা ছোট অ্যাডস এজেন্সি, যাতে যা কিনলেন সেটা গ্রো করে।",
+    "hero.cta1":"হোয়াটসঅ্যাপে মেসেজ দিন","hero.cta2":"কী কী আছে দেখুন","hero.scroll":"নিচে দেখুন",
+    "svc.eyebrow":"আমি যা করি","svc.title":"তিনটা কাজ, ঠিকভাবে।","svc.lead":"পেজ আর চ্যানেলই মূল ব্যবসা। অ্যাডস এজেন্সিটা আছে যাতে ডিলের পর আপনার নতুন অ্যাসেটটা সত্যিই গ্রো করে।",
+    "svc.a.tag":"মেইন সার্ভিস","svc.a.title":"ফেসবুক পেজ বিক্রি","svc.a.text":"ক্লিন নিশে আসল, অ্যাক্টিভ ফলোয়ারসহ পুরোনো পেজ। মনিটাইজেশন-রেডি পেজ, রিলস বোনাস পেজ, ব্র্যান্ড-সেফ কমিউনিটি পেজ।","svc.a.l1":"আসল ফলোয়ার, বট দিয়ে ফোলানো না","svc.a.l2":"লাইভ স্ক্রিন-শেয়ারে অ্যাডমিন ট্রান্সফার","svc.a.l3":"পেমেন্টের আগে ইনসাইটস আর হিস্ট্রি দেখানো হয়",
+    "svc.b.tag":"মেইন সার্ভিস","svc.b.title":"ইউটিউব চ্যানেল বিক্রি","svc.b.text":"ওয়াচ-টাইম হিস্ট্রিসহ মনিটাইজড আর প্রায়-মনিটাইজড চ্যানেল, কপিরাইট স্ট্রাইক নেই, অ্যাডসেন্স ক্লিন। ফেসলেস ক্রিয়েটরদের জন্য নিশ চ্যানেল।","svc.b.l1":"মনিটাইজেশন স্ট্যাটাস লাইভ ভেরিফাই","svc.b.l2":"প্রাইমারি ওনার + রিকভারি ইমেইল হ্যান্ডওভার","svc.b.l3":"পেমেন্টের আগে অ্যানালিটিক্স অ্যাক্সেস",
+    "svc.c.tag":"সাইড সার্ভিস","svc.c.title":"অ্যাডস এজেন্সি","svc.c.text":"যে পেজ বা চ্যানেল কিনলেন তার জন্য, বা আপনার নিজের প্রোডাক্টের জন্য Meta আর ইউটিউব অ্যাড ক্যাম্পেইন। সেটআপ, টার্গেটিং, ক্রিয়েটিভ, সাপ্তাহিক রিপোর্ট।","svc.c.l1":"Meta Ads, বুস্টিং, পিক্সেল সেটআপ","svc.c.l2":"ইউটিউব আর গুগল অ্যাডস","svc.c.l3":"পেজ গ্রোথ আর কনটেন্ট প্ল্যান",
+    "inv.eyebrow":"লাইভ ইনভেন্টরি","inv.title":"এই মুহূর্তে যা আছে।","inv.lead":"প্রতিটা লিস্টিং আমি নিজে চেক করি। সিদ্ধান্ত নেওয়ার আগে ফুল ইনসাইটস স্ক্রিনশট বা লাইভ ওয়াকথ্রু চেয়ে নিন।",
+    "inv.f.all":"সব","inv.f.fb":"ফেসবুক পেজ","inv.f.yt":"ইউটিউব চ্যানেল","inv.f.sold":"সম্প্রতি বিক্রি",
+    "inv.note":"নির্দিষ্ট নিশ, সাইজ বা বাজেট খুঁজছেন? হোয়াটসঅ্যাপে বলুন, সাধারণত কয়েক দিনের মধ্যে জোগাড় করে দিই।",
+    "inv.age":"শুরু","inv.reach":"রিচ (২৮ দিন)","inv.ask":"এটা নিয়ে জানতে চাই","inv.sold":"বিক্রি হয়েছে","inv.available":"অ্যাভেইলেবল","inv.reserved":"রিজার্ভড","inv.price.sold":"বিক্রি হয়েছে","inv.price.ask":"দাম",
+    "pro.eyebrow":"ডিল কীভাবে হয়","pro.title":"পাঁচটা ধাপ। কোনো সারপ্রাইজ নেই।","pro.lead":"পুরো প্রসেসটা এমনভাবে সাজানো যাতে নিজের চোখে না দেখে আপনাকে কখনো টাকা দিতে না হয়।",
+    "pro.s1.t":"অ্যাসেট বাছুন","pro.s1.p":"উপরের লিস্ট থেকে বাছুন, বা নিশ, সাইজ আর বাজেট বলুন।",
+    "pro.s2.t":"লাইভ ভেরিফাই","pro.s2.p":"স্ক্রিন-শেয়ার কল: ইনসাইটস, অডিয়েন্স কোন দেশের, মনিটাইজেশন, স্ট্রাইক, হিস্ট্রি।",
+    "pro.s3.t":"দাম ফাইনাল","pro.s3.p":"দাম লিখিতভাবে ফিক্সড। চাইলে পার্শিয়াল পেমেন্ট বা বিশ্বস্ত মিডলম্যান।",
+    "pro.s4.t":"ওনারশিপ ট্রান্সফার","pro.s4.p":"কলেই আপনি প্রাইমারি ওনার বা অ্যাডমিন হন। আপনার সামনেই আমার অ্যাক্সেস রিমুভ।",
+    "pro.s5.t":"আফটার-সেল সাপোর্ট","pro.s5.p":"সিকিউরিটি সেটিংস, রিকভারি ইমেইল আর প্রথম পোস্টে সাত দিনের সাহায্য।",
+    "pro.safe":"মিডলম্যান ডিল ওয়েলকাম। আপনার বিশ্বস্ত এসক্রো বা গ্রুপ অ্যাডমিন থাকলে তার মাধ্যমে পেমেন্ট করা যাবে, আমার দিক থেকে কোনো বাড়তি খরচ নেই।",
+    "prf.eyebrow":"প্রুফ","prf.title":"ক্রেতারা যা বলেন।","prf.lead":"ডিলের স্ক্রিনশট আর ক্লায়েন্ট ফিডব্যাক। চাইলে আরও দেখাব, রেফারেন্সসহ যাদের আপনি সরাসরি মেসেজ করতে পারবেন।",
+    "prf.add":"এখানে স্ক্রিনশট বসবে",
+    "faq.eyebrow":"প্রশ্নোত্তর","faq.title":"ক্রেতারা প্রথমে যা জিজ্ঞেস করেন।",
+    "ct.eyebrow":"যোগাযোগ","ct.title":"মেসেজ দিন। আজই রিপ্লাই পাবেন।","ct.lead":"কী খুঁজছেন বলুন: প্ল্যাটফর্ম, নিশ, সাইজ, বাজেট। আমি অপশন, স্ক্রিনশট আর দাম সহ রিপ্লাই দিই।","ct.hours":"সাধারণত অনলাইন সকাল ১০টা থেকে রাত ১১টা",
+    "ct.wa":"হোয়াটসঅ্যাপ","ct.wa.s":"সবচেয়ে দ্রুত রিপ্লাই","ct.tg":"টেলিগ্রাম","ct.tg.s":"ইন্টারন্যাশনাল ক্রেতাদের জন্য","ct.ms":"মেসেঞ্জার","ct.ms.s":"আমার ফেসবুক পেজে মেসেজ","ct.em":"ইমেইল","ct.em.s":"এজেন্সি প্রপোজালের জন্য",
+    "foot.tag":"ফেসবুক পেজ, ইউটিউব চ্যানেল, অ্যাডস।","foot.note":"Meta বা Google-এর সাথে সম্পর্কিত নয়। প্রতিটা অ্যাসেট পুরো হিস্ট্রি জানিয়ে হ্যান্ডওভার করা হয়।"
+  }
+};
+
+let lang = "en";
+try { const s = localStorage.getItem("mg-lang"); if (s === "bn" || s === "en") lang = s; } catch (e) {}
+const t = k => (T[lang] && T[lang][k]) || T.en[k] || k;
+const pick = o => (o && typeof o === "object") ? (o[lang] || o.en) : o;
+const waLink = txt => "https://wa.me/" + CONFIG.whatsappNumber + (txt ? "?text=" + encodeURIComponent(txt) : "");
+
+function applyLang(){
+  document.documentElement.lang = lang;
+  document.getElementById("langEn").setAttribute("aria-pressed", lang === "en");
+  document.getElementById("langBn").setAttribute("aria-pressed", lang === "bn");
+  document.querySelectorAll("[data-i18n]").forEach(el => el.textContent = t(el.dataset.i18n));
+  document.querySelectorAll("[data-i18n-html]").forEach(el => el.innerHTML = t(el.dataset.i18nHtml));
+  renderStats(); renderListings(); renderQuotes(); renderShots(); renderFaq(); renderChannels();
+}
+document.getElementById("langEn").onclick = () => { lang = "en"; try{localStorage.setItem("mg-lang",lang)}catch(e){}; applyLang(); };
+document.getElementById("langBn").onclick = () => { lang = "bn"; try{localStorage.setItem("mg-lang",lang)}catch(e){}; applyLang(); };
+
+document.getElementById("brandName").textContent = CONFIG.brand;
+document.getElementById("footBrand").textContent = CONFIG.brand;
+document.getElementById("navWa").href = waLink("Hi, I saw your portfolio and I am interested.");
+document.getElementById("heroWa").href = waLink("Hi, I saw your portfolio and I am interested.");
+
+/* stats */
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let statsAnimated = false;
+function renderStats(){
+  const box = document.getElementById("stats");
+  box.innerHTML = CONFIG.stats.map((s,i) => {
+    const suf = (lang === "bn" && s.bn_suffix) ? s.bn_suffix : s.suffix;
+    return `<div class="stat"><b class="num" data-n="${s.n}" data-suf="${suf}">${s.n}${suf}</b><span>${lang==="bn"?s.bn:s.en}</span></div>`;
+  }).join("");
+  if (!statsAnimated && !reduce) { statsAnimated = true; box.querySelectorAll("b").forEach(countUp); }
+}
+function countUp(el){
+  const n = +el.dataset.n, suf = el.dataset.suf, t0 = performance.now(), d = 1400;
+  (function f(now){ const p = Math.min(1,(now-t0)/d), e = 1-Math.pow(1-p,3); el.textContent = Math.round(n*e)+suf; if (p<1) requestAnimationFrame(f); })(t0);
+}
+
+/* listings */
+let filter = "all";
+function renderListings(){
+  const box = document.getElementById("listings");
+  const rows = CONFIG.listings.filter(l => filter==="all" ? l.status!=="sold" : filter==="sold" ? l.status==="sold" : (l.platform===filter && l.status!=="sold"));
+  box.innerHTML = rows.map(l => `
+    <article class="card tilt listing rv in" data-platform="${l.platform}">
+      ${CONFIG.showDemoBadge ? `<span class="demo">demo</span>` : ``}
+      <div class="top">
+        <div class="pf">${l.platform==="facebook"?"f":"▶"}</div>
+        <div><div class="name">${l.name}</div><div class="niche">${pick(l.niche)}</div></div>
+        <span class="status ${l.status}">${t("inv."+l.status)}</span>
+      </div>
+      <div class="mid">
+        <div class="kv"><span>${pick(l.sizeLabel)}</span><b class="num">${l.size}</b></div>
+        <div class="kv"><span>${t("inv.age")}</span><b class="num">${l.age}</b></div>
+        <div class="kv"><span>${t("inv.reach")}</span><b class="num">${l.reach}</b></div>
+        <div class="kv"><span>${l.platform==="facebook"?"Facebook":"YouTube"}</span><b>${pick(l.extra)}</b></div>
+      </div>
+      <div class="bot">
+        <div class="price num"><small>${l.status==="sold"?t("inv.price.sold"):t("inv.price.ask")}</small>${l.price}</div>
+        ${l.status==="sold" ? `` : `<a href="${waLink("Hi, I am interested in: "+l.name+" ("+l.size+")")}">${t("inv.ask")}</a>`}
+      </div>
+    </article>`).join("");
+  bindTilt(box);
+}
+document.querySelectorAll(".filters button").forEach(b => b.onclick = () => {
+  filter = b.dataset.f;
+  document.querySelectorAll(".filters button").forEach(x => x.setAttribute("aria-pressed", x===b));
+  renderListings();
+});
+
+/* quotes, shots, faq, channels */
+function renderQuotes(){
+  document.getElementById("quotes").innerHTML = CONFIG.testimonials.map(q => `
+    <div class="quote rv in"><div class="stars">★★★★★</div><p>“${lang==="bn"?q.bn:q.en}”</p>
+    <div class="who"><div class="av">${q.name.split(" ").map(w=>w[0]).join("").slice(0,2)}</div><div><b>${q.name}</b>${pick(q.role)}</div></div></div>`).join("");
+}
+function renderShots(){
+  document.getElementById("shots").innerHTML = CONFIG.shots.map(s => `
+    <div class="shot">${s.img ? `<img src="${s.img}" alt="${pick(s.label)}">` : `<div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>${t("prf.add")}</div>`}<span class="lab">${pick(s.label)}</span></div>`).join("");
+}
+function renderFaq(){
+  document.getElementById("faqList").innerHTML = CONFIG.faq.map((f,i) => `<details${i===0?" open":""}><summary>${pick(f.q)}</summary><p>${pick(f.a)}</p></details>`).join("");
+}
+function renderChannels(){
+  const wa = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.1.7a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.2c0-.1-.2-.2-.5-.3z"/></svg>`;
+  const tg = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.9 4.6L18.7 19.8c-.2 1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.4-5 9.1-8.2c.4-.4-.1-.5-.6-.2L6.2 13.5 1.4 12c-1-.3-1-1 .2-1.5L20.5 3.2c.9-.3 1.6.2 1.4 1.4z"/></svg>`;
+  const ms = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.1 2 11.3c0 2.9 1.4 5.5 3.7 7.2V22l3.4-1.9c.9.3 1.9.4 2.9.4 5.5 0 10-4.1 10-9.3S17.5 2 12 2zm1 12.5l-2.6-2.7-5 2.7 5.5-5.8 2.6 2.7 4.9-2.7-5.4 5.8z"/></svg>`;
+  const em = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>`;
+  const go = `<svg class="go" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`;
+  document.getElementById("channels").innerHTML = `
+    <a class="ch" href="${waLink("Hi, I saw your portfolio.")}"><span class="ci" style="background:rgba(31,191,98,.18);color:#3ddc97">${wa}</span><div><b>${t("ct.wa")} · ${CONFIG.whatsappDisplay}</b><span>${t("ct.wa.s")}</span></div>${go}</a>
+    <a class="ch" href="https://t.me/${CONFIG.telegramUser}"><span class="ci" style="background:rgba(47,123,255,.18);color:#5aa0ff">${tg}</span><div><b>${t("ct.tg")} · @${CONFIG.telegramUser}</b><span>${t("ct.tg.s")}</span></div>${go}</a>
+    <a class="ch" href="${CONFIG.messengerUrl}"><span class="ci" style="background:rgba(160,80,255,.18);color:#c08cff">${ms}</span><div><b>${t("ct.ms")}</b><span>${t("ct.ms.s")}</span></div>${go}</a>
+    <a class="ch" href="mailto:${CONFIG.email}"><span class="ci" style="background:rgba(255,200,87,.16);color:var(--gold)">${em}</span><div><b>${t("ct.em")} · ${CONFIG.email}</b><span>${t("ct.em.s")}</span></div>${go}</a>`;
+}
+
+/* tilt */
+function bindTilt(root){
+  if (reduce || !matchMedia("(hover:hover)").matches) return;
+  root.querySelectorAll(".tilt").forEach(c => {
+    if (c.dataset.tilt) return; c.dataset.tilt = "1";
+    c.addEventListener("mousemove", e => {
+      const r = c.getBoundingClientRect(), x = (e.clientX-r.left)/r.width, y = (e.clientY-r.top)/r.height;
+      c.style.transform = `perspective(900px) rotateX(${(0.5-y)*9}deg) rotateY(${(x-0.5)*11}deg) translateY(-3px)`;
+      c.style.setProperty("--mx", (x*100)+"%"); c.style.setProperty("--my", (y*100)+"%");
+    });
+    c.addEventListener("mouseleave", () => c.style.transform = "");
+  });
+}
+
+/* reveal */
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), {threshold:.12});
+
+applyLang();
+bindTilt(document);
+document.querySelectorAll(".rv:not(.in)").forEach(el => io.observe(el));
+
+/* ---------------- three.js hero ---------------- */
+(function(){
+  if (!window.THREE) return;
+  const canvas = document.getElementById("hero3d");
+  let renderer;
+  try { renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true}); } catch(e){ return; }
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x070a12, 0.055);
+  const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+  camera.position.set(0, 0.6, 9.5);
+
+  scene.add(new THREE.AmbientLight(0x8fa3ff, 0.55));
+  const lb = new THREE.PointLight(0x2f7bff, 2.2, 30); lb.position.set(-5, 3, 4); scene.add(lb);
+  const lr = new THREE.PointLight(0xff3d57, 1.8, 30); lr.position.set(5, 1, 3); scene.add(lr);
+  const lw = new THREE.PointLight(0xffffff, 0.8, 40); lw.position.set(0, 8, 2); scene.add(lw);
+
+  const grid = new THREE.GridHelper(80, 80, 0x2f7bff, 0x1a2a4d);
+  grid.material.transparent = true; grid.material.opacity = 0.28; grid.position.y = -2.6; scene.add(grid);
+
+  function cardTexture(kind, name, stat){
+    const c = document.createElement("canvas"); c.width = 512; c.height = 320; const g = c.getContext("2d");
+    const col = kind === "fb" ? "#2f7bff" : "#ff3d57";
+    const bg = g.createLinearGradient(0,0,512,320); bg.addColorStop(0,"#161e33"); bg.addColorStop(1,"#0b0f1c");
+    g.fillStyle = bg; g.fillRect(0,0,512,320);
+    g.fillStyle = col; g.fillRect(0,0,512,10);
+    g.beginPath(); g.arc(60,80,32,0,Math.PI*2); g.fillStyle = col; g.fill();
+    g.fillStyle = "#0b0f1c"; g.font = "bold 34px sans-serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(kind==="fb"?"f":"▶", 60, 82);
+    g.textAlign = "left"; g.fillStyle = "#e9edf8"; g.font = "bold 30px sans-serif"; g.fillText(name, 112, 70);
+    g.fillStyle = "#93a0bf"; g.font = "20px sans-serif"; g.fillText(kind==="fb"?"Facebook page":"YouTube channel", 112, 100);
+    g.fillStyle = "#e9edf8"; g.font = "bold 54px sans-serif"; g.fillText(stat, 40, 180);
+    g.fillStyle = "#93a0bf"; g.font = "18px sans-serif"; g.fillText(kind==="fb"?"followers":"subscribers", 40, 215);
+    for (let i=0;i<14;i++){ const h = 20+Math.random()*60; g.fillStyle = i>10?col:"rgba(147,160,191,.35)"; g.fillRect(40+i*32, 300-h, 20, h); }
+    g.fillStyle = "#3ddc97"; g.font = "bold 18px sans-serif"; g.textAlign = "right"; g.fillText("VERIFIED", 480, 180);
+    const tx = new THREE.CanvasTexture(c); tx.anisotropy = 4; return tx;
+  }
+  const seeds = [["fb","Daily Tech","248K"],["yt","Facts Unfold","112K"],["fb","Foodie Dhaka","96K"],["yt","Islamic HD","310K"],["fb","Cricket Buzz","540K"],["yt","Motivation","74K"],["fb","Travel BD","180K"],["yt","Gadget Lab","205K"],["fb","Meme Corner","1.1M"]];
+  const cards = [];
+  const geo = new THREE.BoxGeometry(2.1, 1.3, 0.07);
+  const glowGeo = new THREE.PlaneGeometry(2.4, 1.6);
+  seeds.forEach((s,i) => {
+    const tx = cardTexture(s[0], s[1], s[2]);
+    const mats = [];
+    const side = new THREE.MeshStandardMaterial({color:0x1b2440, metalness:.5, roughness:.4});
+    for (let k=0;k<6;k++) mats.push(k===4 ? new THREE.MeshStandardMaterial({map:tx, metalness:.25, roughness:.35, emissive:0x111a33, emissiveIntensity:.6}) : side);
+    const m = new THREE.Mesh(geo, mats);
+    const glow = new THREE.Mesh(glowGeo, new THREE.MeshBasicMaterial({color: s[0]==="fb"?0x2f7bff:0xff3d57, transparent:true, opacity:.14, blending:THREE.AdditiveBlending, depthWrite:false}));
+    glow.position.z = -0.08;
+    const g = new THREE.Group(); g.add(m); g.add(glow);
+    const a = (i/seeds.length)*Math.PI*2;
+    const R = 4.6 + (i%3)*0.9;
+    g.userData = {a, R, y: (Math.random()-0.5)*3.2, spd: 0.06 + Math.random()*0.05, ph: Math.random()*6};
+    scene.add(g); cards.push(g);
+  });
+
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(3.2, 0.025, 12, 160), new THREE.MeshBasicMaterial({color:0xffc857, transparent:true, opacity:.55}));
+  ring.rotation.x = Math.PI/2.4; scene.add(ring);
+  const ring2 = new THREE.Mesh(new THREE.TorusGeometry(2.1, 0.02, 12, 160), new THREE.MeshBasicMaterial({color:0x2f7bff, transparent:true, opacity:.5}));
+  ring2.rotation.x = Math.PI/1.7; ring2.rotation.y = .5; scene.add(ring2);
+  const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.75, 1), new THREE.MeshStandardMaterial({color:0x0d1220, metalness:.9, roughness:.2, emissive:0x2f7bff, emissiveIntensity:.35, wireframe:true}));
+  scene.add(core);
+
+  const pN = 700, pos = new Float32Array(pN*3);
+  for (let i=0;i<pN;i++){ pos[i*3]=(Math.random()-.5)*40; pos[i*3+1]=(Math.random()-.5)*16; pos[i*3+2]=(Math.random()-.5)*30-5; }
+  const pGeo = new THREE.BufferGeometry(); pGeo.setAttribute("position", new THREE.BufferAttribute(pos,3));
+  const pts = new THREE.Points(pGeo, new THREE.PointsMaterial({color:0x9fb6ff, size:.05, transparent:true, opacity:.7}));
+  scene.add(pts);
+
+  const hero = canvas.parentElement;
+  function resize(){
+    const w = hero.clientWidth, h = hero.clientHeight;
+    renderer.setSize(w, h, false); camera.aspect = w/h; camera.updateProjectionMatrix();
+    // keep the scene on the right of the headline on wide screens, further back on phones
+    camera.position.x = w < 760 ? 0 : -3.2;
+    camera.position.z = w < 760 ? 13 : 9.5;
+  }
+  resize(); addEventListener("resize", resize);
+
+  let mx = 0, my = 0, tx = 0, ty = 0;
+  addEventListener("pointermove", e => { tx = (e.clientX/innerWidth - .5); ty = (e.clientY/innerHeight - .5); }, {passive:true});
+
+  let running = true;
+  new IntersectionObserver(es => running = es[0].isIntersecting).observe(hero);
+  const clock = new THREE.Clock();
+  function frame(){
+    requestAnimationFrame(frame);
+    if (!running) return;
+    const time = clock.getElapsedTime(), dt = reduce ? 0 : 1;
+    mx += (tx-mx)*.04; my += (ty-my)*.04;
+    cards.forEach((g,i) => {
+      const u = g.userData, a = u.a + time*u.spd*dt;
+      g.position.set(Math.cos(a)*u.R, u.y + Math.sin(time*.8*dt + u.ph)*.25, Math.sin(a)*u.R*0.55 - 1);
+      g.rotation.y = -a + Math.PI/2 + Math.sin(time*.5+u.ph)*.15;
+      g.rotation.x = Math.sin(time*.4+u.ph)*.08;
+    });
+    ring.rotation.z = time*.12*dt; ring2.rotation.z = -time*.18*dt;
+    core.rotation.y = time*.35*dt; core.rotation.x = time*.2*dt;
+    pts.rotation.y = time*.02*dt;
+    grid.position.z = (time*0.6*dt) % 1;
+    camera.position.y = -0.2 - my*1.2; camera.rotation.y = -mx*.18; camera.rotation.x = -my*.06;
+    renderer.render(scene, camera);
+  }
+  frame();
+})();
+</script>
+</body>
+</html>
