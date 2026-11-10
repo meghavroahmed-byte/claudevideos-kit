@@ -156,11 +156,11 @@ details p{padding:0 0 12px;color:var(--muted);font-size:14px}
 .vs .good ul{color:var(--text)}
 .reviews-row{display:grid;gap:8px;grid-template-columns:1fr 1fr}
 @media (max-width:820px){.reviews-row{grid-template-columns:1fr}}
-.rev{display:flex;gap:12px;align-items:center;padding:11px 12px;border-radius:14px;background:rgba(20,27,48,.5);border:1px solid var(--line);text-decoration:none;transition:transform .15s,border-color .15s}
+.rev{display:flex;gap:12px;align-items:flex-start;padding:11px 12px;border-radius:14px;background:rgba(20,27,48,.5);border:1px solid var(--line);text-decoration:none;transition:transform .15s,border-color .15s}
 .rev:hover{transform:translateX(4px);border-color:rgba(255,255,255,.3)}
 .rev .av{width:40px;height:40px;border-radius:12px;flex:0 0 auto;display:grid;place-items:center;font-weight:800;color:#fff;background:var(--yt);font-size:14px}
 .rev b{display:block;font-size:14px}
-.rev span{font-size:12px;color:var(--muted)}
+.rev span{font-size:12px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .stars{color:var(--gold);letter-spacing:2px;font-size:12px}
 .channels{display:grid;gap:8px}
 .chn{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:rgba(20,27,48,.6);border:1px solid var(--line);text-decoration:none;transition:transform .15s,border-color .15s}
@@ -387,13 +387,13 @@ const CONFIG = {
 
   // Client review videos. video: a file published with this page (e.g. "assets/review1.mp4"); leave [] to link to the Facebook videos tab.
   reviews: [
-    { name:"Client review 1", role:{en:"Recorded after the deal",bn:"ডিলের পর রেকর্ড করা"}, video:"assets/r1.mp4", poster:"assets/r1.jpg", url:"https://www.facebook.com/share/r/1YoidYTLJq/" },
-    { name:"Client review 2", role:{en:"Best client review",bn:"সেরা ক্লায়েন্ট রিভিউ"}, video:"assets/r2.mp4", poster:"assets/r2.jpg", url:"https://www.facebook.com/share/r/1DbgWf8SNa/" },
-    { name:"Client review 3", role:{en:"Recorded after the deal",bn:"ডিলের পর রেকর্ড করা"}, video:"assets/r3.mp4", poster:"assets/r3.jpg", url:"https://www.facebook.com/share/r/1F5zkd4D9M/" },
-    { name:"Client review 4", role:{en:"Recorded after the deal",bn:"ডিলের পর রেকর্ড করা"}, video:"assets/r4.mp4", poster:"assets/r4.jpg", url:"https://www.facebook.com/share/r/1E1P7EGrBb/" },
-    { name:"Client review 5", role:{en:"Expat client (probashi)",bn:"প্রবাসী ভাইয়ের রিভিউ"}, video:"assets/r5.mp4", poster:"assets/r5.jpg", url:"https://www.facebook.com/share/r/1DcikAp5At/" },
-    { name:"Client review 6", role:{en:"From Malaysia, repeat client · YouTube monetization",bn:"মালয়েশিয়া থেকে, আবারও · ইউটিউব মনিটাইজেশন"}, video:"assets/r6.mp4", poster:"assets/r6.jpg", url:"https://www.facebook.com/share/r/19BgJnapA9/" },
-    { name:"Arsek Iqbal", role:{en:"Client from Malaysia",bn:"মালয়েশিয়ার ভাই"}, video:"assets/r7.mp4", poster:"assets/r7.jpg", url:"https://www.facebook.com/share/r/19vnx8bkeH/" }
+    { name:{en:"Client review 1",bn:"ক্লায়েন্ট রিভিউ ১"}, role:{en:"Recorded after the deal",bn:"ডিলের পর রেকর্ড করা"}, text:{bn:"ডিল শেষ করে ক্লায়েন্ট নিজেই ক্যামেরার সামনে বলছেন MEGH-এর সাথে কাজ করে কেমন লেগেছে। যা কথা ছিল, তাই পেয়েছেন।",en:"After the deal, the client says on camera how it felt to work with MEGH. What was promised is what he got."}, video:"assets/r1.mp4", poster:"assets/r1.jpg", url:"https://www.facebook.com/share/r/1YoidYTLJq/" },
+    { name:{en:"Client review 2",bn:"ক্লায়েন্ট রিভিউ ২"}, role:{en:"Best client review",bn:"সেরা ক্লায়েন্ট রিভিউ"}, text:{bn:"ফিদাহ পেজের সবচেয়ে আলোচিত রিভিউ। সোয়া এক মিনিটে ক্লায়েন্টের নিজের মুখে পুরো অভিজ্ঞতা, ভেরিফাই থেকে হ্যান্ডওভার পর্যন্ত।",en:"The most talked-about review on the Fidah page. A full minute of the client's own account, from verification to handover."}, video:"assets/r2.mp4", poster:"assets/r2.jpg", url:"https://www.facebook.com/share/r/1DbgWf8SNa/" },
+    { name:{en:"Client review 3",bn:"ক্লায়েন্ট রিভিউ ৩"}, role:{en:"Recorded after the deal",bn:"ডিলের পর রেকর্ড করা"}, text:{bn:"ছোট রিভিউ, পরিষ্কার কথা। MEGH-এর কাছ থেকে নিয়ে ঠকেননি, সেটা বলতেই ভিডিওটা করেছেন।",en:"A short review with a clear message: he was not cheated, and he recorded this to say so."}, video:"assets/r3.mp4", poster:"assets/r3.jpg", url:"https://www.facebook.com/share/r/1F5zkd4D9M/" },
+    { name:{en:"Client review 4",bn:"ক্লায়েন্ট রিভিউ ৪"}, role:{en:"Recorded after the deal",bn:"ডিলের পর রেকর্ড করা"}, text:{bn:"ট্রান্সফারের পরে রেকর্ড করা পুরো এক মিনিটের রিভিউ। কেউ জোর করে বলায়নি, ক্লায়েন্ট নিজে থেকে দিয়েছেন।",en:"A full one-minute review recorded after the transfer. Nobody asked for it; the client sent it himself."}, video:"assets/r4.mp4", poster:"assets/r4.jpg", url:"https://www.facebook.com/share/r/1E1P7EGrBb/" },
+    { name:{en:"Client review 5",bn:"ক্লায়েন্ট রিভিউ ৫"}, role:{en:"Expat client (probashi)",bn:"প্রবাসী ভাইয়ের রিভিউ"}, text:{bn:"দেশের বাইরে থেকে ডিল। হাজার মাইল দূরে থেকেও MEGH-কে বিশ্বাস করে কাজ করিয়েছেন, আর রিভিউটাও নিজে পাঠিয়েছেন।",en:"A deal done from abroad. Thousands of miles away, he trusted MEGH with the job and sent this review himself."}, video:"assets/r5.mp4", poster:"assets/r5.jpg", url:"https://www.facebook.com/share/r/1DcikAp5At/" },
+    { name:{en:"Client review 6",bn:"ক্লায়েন্ট রিভিউ ৬"}, role:{en:"From Malaysia, repeat client · YouTube monetization",bn:"মালয়েশিয়া থেকে, আবারও · ইউটিউব মনিটাইজেশন"}, text:{bn:"মালয়েশিয়া থেকে দ্বিতীয়বার কাজ করালেন, এবার ইউটিউব মনিটাইজেশনের কাজ। একবার যিনি নেন, তিনি ফিরে আসেন।",en:"Second job from Malaysia, this time YouTube monetization. Clients who buy once come back."}, video:"assets/r6.mp4", poster:"assets/r6.jpg", url:"https://www.facebook.com/share/r/19BgJnapA9/" },
+    { name:{en:"Arsek Iqbal",bn:"Arsek Iqbal"}, role:{en:"Client from Malaysia",bn:"মালয়েশিয়ার ভাই"}, text:{bn:"মালয়েশিয়ার Arsek Iqbal ভাই। ফিদাহ পেজের কথায়: ওনার কাজ করতে পেরে আমরা ধন্য। ১৭ সেকেন্ডের হাসিমুখের রিভিউ।",en:"Arsek Iqbal from Malaysia. In the Fidah page's words: honoured to have worked for him. Seventeen seconds, all smiles."}, video:"assets/r7.mp4", poster:"assets/r7.jpg", url:"https://www.facebook.com/share/r/19vnx8bkeH/" }
   ],
 
   services: ["Meta Ads", "Boosting", "Pixel setup", "YouTube Ads", "Page growth"],
@@ -521,7 +521,7 @@ function renderGuar(){
 function renderReviews(){
   const box = document.getElementById("revList");
   if (CONFIG.reviews.length){
-    box.innerHTML = CONFIG.reviews.map((r,i) => `<button type="button" class="rev" data-rev="${i}"><div class="av" style="background:#000 url('${esc(r.poster||"")}') center/cover;position:relative"><span style="position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.35);border-radius:12px">▶</span></div><div><div class="stars">★★★★★</div><b>${esc(r.name)}</b><span>${esc(pick(r.role))}</span></div></button>`).join("") + `<a class="rev" href="${esc(CONFIG.agency.videosUrl)}"><div class="av" style="background:#000;padding:0;overflow:hidden"><img src="assets/logo.jpg" alt="" style="width:100%;height:100%;object-fit:cover"></div><div><b>${t("rv.more")}</b><span>${t("rv.watch.s")}</span></div></a>`;
+    box.innerHTML = CONFIG.reviews.map((r,i) => `<button type="button" class="rev" data-rev="${i}"><div class="av" style="background:#000 url('${esc(r.poster||"")}') center/cover;position:relative"><span style="position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.35);border-radius:12px">▶</span></div><div><div class="stars">★★★★★</div><b>${esc(pick(r.name))} <span style="display:inline;color:var(--muted);font-weight:500">· ${esc(pick(r.role))}</span></b><span>${esc(pick(r.text))}</span></div></button>`).join("") + `<a class="rev" href="${esc(CONFIG.agency.videosUrl)}"><div class="av" style="background:#000;padding:0;overflow:hidden"><img src="assets/logo.jpg" alt="" style="width:100%;height:100%;object-fit:cover"></div><div><b>${t("rv.more")}</b><span>${t("rv.watch.s")}</span></div></a>`;
     box.querySelectorAll("[data-rev]").forEach(b => b.onclick = () => openReview(+b.dataset.rev));
   } else {
     box.innerHTML = `<a class="rev" href="${esc(CONFIG.agency.videosUrl)}"><div class="av">▶</div><div><div class="stars">★★★★★</div><b>${t("rv.watch")}</b><span>${t("rv.watch.s")}</span></div></a>
@@ -567,7 +567,7 @@ function openPage(i){
 }
 function openReview(i){
   const r = CONFIG.reviews[i];
-  openDetail(`<div class="pf" id="dPf" style="background:var(--yt);color:#fff">▶</div>`, r.name, pick(r.role),
+  openDetail(`<div class="pf" id="dPf" style="background:var(--yt);color:#fff">▶</div>`, pick(r.name), pick(r.role),
     `<video controls playsinline preload="metadata" poster="${esc(r.poster||"")}" src="${esc(r.video)}" style="max-height:60vh;aspect-ratio:9/16;margin:0 auto;display:block"></video><div class="stars" style="margin-top:10px;text-align:center">★★★★★</div>${r.text?`<p style="font-size:15px">“${esc(pick(r.text))}”</p>`:""}`, r.url?`<a class="btn ghost" href="${esc(r.url)}">${t("rv.onfb")}</a>`:``);
   const v = detail.querySelector("video"); if (v) v.play().catch(()=>{});
 }
