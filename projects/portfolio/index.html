@@ -4,23 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fidah Digital Agency</title>
-<meta name="description" content="Fidah Digital Agency by MEGH (Voice of MEGH). Verified Facebook pages for sale, YouTube channels on order, and a performance ads agency. Safe live transfer.">
+<meta name="description" content="Fidah Digital Agency by Voice of MEGH, Jhenaidah. Facebook pages in stock, YouTube channels on order, ads agency. Live verification, safe transfer.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800;900&family=Instrument+Sans:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* Plan: one continuous three.js tunnel. Scrolling flies the camera through eight chapters; every 3D object reacts to hover, click or drag. HTML panels float over the scene as glass cards. Dark navy world, blue + red for the two platforms, gold for the brand. */
+/* Plan: one continuous three.js tunnel, nine chapters, camera flies on scroll. Mobile first: panels are bottom sheets under the 3D, sticky WhatsApp bar. Dark navy, Facebook blue + YouTube red for the platforms, gold for the Fidah brand. */
 :root{
-  --ink:#06080f;
-  --ink-2:#0c1120;
-  --ink-3:#141b30;
-  --line:rgba(140,170,255,.16);
-  --text:#edf1fb;
-  --muted:#97a3c2;
-  --fb:#3b82ff;
-  --yt:#ff3d57;
-  --gold:#ffc857;
-  --ok:#3ddc97;
+  --ink:#06080f; --ink-2:#0c1120; --ink-3:#141b30;
+  --line:rgba(140,170,255,.16); --text:#edf1fb; --muted:#97a3c2;
+  --fb:#3b82ff; --yt:#ff3d57; --gold:#ffc857; --ok:#3ddc97; --wa:#25d366;
   --display:'Unbounded',system-ui,sans-serif;
   --body:'Instrument Sans','Segoe UI',system-ui,sans-serif;
   --bn:'Hind Siliguri','Noto Sans Bengali',system-ui,sans-serif;
@@ -34,16 +27,16 @@ html[lang="bn"] body{font-family:var(--bn)}
 html[lang="bn"] h1,html[lang="bn"] h2,html[lang="bn"] h3{font-family:var(--bn);font-weight:700;letter-spacing:0}
 a{color:inherit}
 button{font:inherit;color:inherit;cursor:pointer}
+img{max-width:100%}
 :focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:6px}
 h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.08}
 p{margin:0}
 .num{font-variant-numeric:tabular-nums}
-@media (hover:hover) and (pointer:fine){ body.cur-on, body.cur-on a, body.cur-on button{cursor:none} }
+@media (hover:hover) and (pointer:fine){ body.cur-on, body.cur-on a, body.cur-on button, body.cur-on summary{cursor:none} }
 
 #gl{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
 .vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(120% 90% at 50% 50%,transparent 55%,rgba(6,8,15,.85) 100%)}
 
-/* cursor */
 .cursor{position:fixed;left:0;top:0;z-index:50;pointer-events:none;display:none}
 @media (hover:hover) and (pointer:fine){.cursor{display:block}}
 .cursor .dot{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--gold);transform:translate(-50%,-50%);box-shadow:0 0 12px var(--gold)}
@@ -53,271 +46,298 @@ p{margin:0}
 .ripple{position:fixed;z-index:49;pointer-events:none;width:12px;height:12px;border-radius:50%;border:2px solid var(--gold);transform:translate(-50%,-50%);animation:rip .6s ease-out forwards}
 @keyframes rip{to{width:90px;height:90px;opacity:0}}
 
-/* intro */
-#intro{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:var(--ink);pointer-events:none;animation:introOut .5s ease 1.5s forwards}
-#intro .word{font-family:var(--display);font-weight:900;font-size:clamp(44px,11vw,120px);letter-spacing:.08em;display:flex}
-#intro .word span{opacity:0;transform:translateY(30px) rotateX(70deg);animation:letter .6s cubic-bezier(.2,.8,.2,1) forwards;background:linear-gradient(180deg,#fff,#9fb6ff);-webkit-background-clip:text;background-clip:text;color:transparent}
-#intro .sub{margin-top:10px;font-size:12px;letter-spacing:.4em;text-transform:uppercase;color:var(--gold);opacity:0;animation:fadeIn .5s .8s forwards}
+#intro{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:var(--ink);pointer-events:none;animation:introOut .5s ease 1.6s forwards}
+#intro img{width:96px;height:96px;border-radius:24px;opacity:0;animation:logoIn .7s cubic-bezier(.2,.8,.2,1) .05s forwards;box-shadow:0 0 60px rgba(255,200,87,.25)}
+#intro .word{font-family:var(--display);font-weight:900;font-size:clamp(34px,8vw,80px);letter-spacing:.1em;display:flex;justify-content:center;margin-top:18px}
+#intro .word span{opacity:0;transform:translateY(30px) rotateX(70deg);animation:letter .6s cubic-bezier(.2,.8,.2,1) forwards;background:linear-gradient(180deg,#fff,#ffd98a);-webkit-background-clip:text;background-clip:text;color:transparent}
+#intro .sub{margin-top:8px;text-align:center;font-size:11px;letter-spacing:.35em;text-transform:uppercase;color:var(--gold);opacity:0;animation:fadeIn .5s .9s forwards}
+@keyframes logoIn{from{opacity:0;transform:scale(.6) rotate(-20deg)}to{opacity:1;transform:none}}
 @keyframes letter{to{opacity:1;transform:none}}
 @keyframes fadeIn{to{opacity:1}}
 @keyframes introOut{to{opacity:0;visibility:hidden}}
 @media (prefers-reduced-motion:reduce){#intro{display:none}}
 
-/* nav */
-.nav{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;gap:14px;padding:14px clamp(16px,3vw,32px)}
-.brand{display:flex;align-items:center;gap:11px;text-decoration:none;font-family:var(--display);font-weight:800;font-size:14px;letter-spacing:.06em;pointer-events:auto}
-.brand .mark{width:34px;height:34px;border-radius:10px;background:conic-gradient(from 200deg,var(--fb),var(--yt),var(--gold),var(--fb));display:grid;place-items:center;box-shadow:0 0 26px rgba(59,130,255,.45)}
-.brand .mark i{width:14px;height:14px;border-radius:4px;background:var(--ink);display:block}
-.brand small{display:block;font-family:var(--body);font-weight:500;font-size:10px;letter-spacing:.25em;color:var(--muted)}
-.dots{margin-left:auto;display:flex;gap:6px;align-items:center}
-.dots a{width:26px;height:26px;display:grid;place-items:center;text-decoration:none;position:relative}
+.nav{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;gap:12px;padding:12px clamp(14px,3vw,32px)}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:var(--display);font-weight:800;font-size:13px;letter-spacing:.06em;pointer-events:auto}
+.brand img{width:38px;height:38px;border-radius:11px;box-shadow:0 0 22px rgba(255,200,87,.35);border:1px solid rgba(255,255,255,.12)}
+.brand small{display:block;font-family:var(--body);font-weight:500;font-size:10px;letter-spacing:.22em;color:var(--muted)}
+.dots{margin-left:auto;display:flex;gap:4px;align-items:center}
+.dots a{width:24px;height:24px;display:grid;place-items:center;text-decoration:none;position:relative}
 .dots a::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--muted);opacity:.5;transition:transform .2s,opacity .2s,background .2s}
 .dots a.on::before{background:var(--gold);opacity:1;transform:scale(1.8);box-shadow:0 0 10px var(--gold)}
-.dots a span{position:absolute;right:34px;top:50%;transform:translateY(-50%);font-size:11px;white-space:nowrap;color:var(--text);background:var(--ink-2);border:1px solid var(--line);padding:3px 8px;border-radius:6px;opacity:0;pointer-events:none;transition:opacity .15s}
+.dots a span{position:absolute;right:30px;top:50%;transform:translateY(-50%);font-size:11px;white-space:nowrap;color:var(--text);background:var(--ink-2);border:1px solid var(--line);padding:3px 8px;border-radius:6px;opacity:0;pointer-events:none;transition:opacity .15s}
 .dots a:hover span{opacity:1}
-.lang{display:flex;border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px;background:rgba(6,8,15,.6);backdrop-filter:blur(8px)}
+.lang{display:flex;border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px;background:rgba(6,8,15,.6);backdrop-filter:blur(8px);margin-left:auto}
+.dots + .lang{margin-left:0}
 .lang button{border:0;background:transparent;border-radius:999px;padding:4px 10px;font-size:13px;font-weight:600;color:var(--muted)}
 .lang button[aria-pressed="true"]{background:var(--ink-3);color:var(--text)}
-.snd{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(6,8,15,.6);display:grid;place-items:center;color:var(--muted)}
+.snd{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:rgba(6,8,15,.6);display:grid;place-items:center;color:var(--muted)}
 .snd[aria-pressed="true"]{color:var(--gold);border-color:rgba(255,200,87,.5)}
-.snd svg{width:17px;height:17px}
-.btn{display:inline-flex;align-items:center;gap:9px;border-radius:999px;padding:12px 20px;font-weight:600;font-size:14px;text-decoration:none;border:1px solid var(--line);background:rgba(20,27,48,.8);transition:transform .15s,box-shadow .15s,border-color .15s;will-change:transform}
+.snd svg{width:16px;height:16px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;border-radius:999px;padding:12px 20px;font-weight:700;font-size:14px;text-decoration:none;border:1px solid var(--line);background:rgba(20,27,48,.8);transition:transform .15s,box-shadow .15s,border-color .15s;will-change:transform}
 .btn:hover{border-color:rgba(255,255,255,.3)}
-.btn.wa{background:#1fbf62;border-color:transparent;color:#04130a;box-shadow:0 8px 28px rgba(31,191,98,.35)}
+.btn.wa{background:var(--wa);border-color:transparent;color:#04130a;box-shadow:0 8px 28px rgba(37,211,102,.35)}
 .btn.gold{background:var(--gold);border-color:transparent;color:#1a1200;box-shadow:0 8px 28px rgba(255,200,87,.3)}
 .btn.ghost{background:transparent}
-.btn svg{width:17px;height:17px}
-.nav .btn{padding:9px 15px}
+.btn svg{width:17px;height:17px;flex:0 0 auto}
+.nav .btn{padding:9px 14px}
 .progress{position:fixed;left:0;right:0;top:0;height:2px;z-index:41;background:rgba(255,255,255,.06)}
 .progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--fb),var(--gold),var(--yt));box-shadow:0 0 10px var(--gold)}
 
-/* chapters */
 main{position:relative;z-index:2}
 .ch{min-height:100vh;display:grid;align-items:center;padding:90px clamp(16px,4vw,56px) 60px;pointer-events:none}
 .ch.right{justify-items:end}
-.panel{pointer-events:auto;width:min(560px,100%);display:grid;gap:18px;padding:clamp(22px,3vw,34px);border-radius:24px;background:rgba(8,12,24,.62);border:1px solid var(--line);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 30px 80px rgba(0,0,0,.45);transition:opacity .25s,transform .25s}
+.panel{pointer-events:auto;width:min(560px,100%);display:grid;gap:16px;padding:clamp(20px,3vw,32px);border-radius:24px;background:rgba(8,12,24,.66);border:1px solid var(--line);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 30px 80px rgba(0,0,0,.45);transition:opacity .25s,transform .25s}
 .panel.hero{background:transparent;border:0;backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none;width:min(680px,100%);padding:0}
 .eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--gold)}
 .eyebrow::before{content:"";width:26px;height:2px;background:var(--gold);box-shadow:0 0 12px var(--gold)}
 html[lang="bn"] .eyebrow{letter-spacing:0;font-size:14px;text-transform:none}
-h1{font-size:clamp(30px,5vw,60px);font-weight:900;letter-spacing:-.02em}
+h1{font-size:clamp(30px,5vw,58px);font-weight:900;letter-spacing:-.02em}
 h1 .fb{color:var(--fb);text-shadow:0 0 34px rgba(59,130,255,.55)}
 h1 .yt{color:var(--yt);text-shadow:0 0 34px rgba(255,61,87,.5)}
-h1 .brandline{display:block;font-size:.3em;font-weight:600;letter-spacing:.2em;color:var(--muted);margin-bottom:.3em}
-h2{font-size:clamp(26px,3.6vw,40px);font-weight:800;letter-spacing:-.01em}
+h1 .brandline{display:block;font-size:.3em;font-weight:600;letter-spacing:.2em;color:var(--muted);margin-bottom:.4em}
+h2{font-size:clamp(24px,3.4vw,38px);font-weight:800;letter-spacing:-.01em}
 .lead{font-size:clamp(15px,1.6vw,18px);color:var(--muted);max-width:58ch}
-.cta{display:flex;flex-wrap:wrap;gap:12px}
-.stats{display:grid;grid-template-columns:repeat(4,auto);gap:10px 30px;width:max-content;max-width:100%}
+.cta{display:flex;flex-wrap:wrap;gap:10px}
+.stats{display:grid;grid-template-columns:repeat(4,auto);gap:10px 28px;width:max-content;max-width:100%}
 .stat b{display:block;font-family:var(--display);font-size:clamp(20px,2.6vw,30px);font-weight:800;letter-spacing:-.02em}
-.stat span{font-size:13px;color:var(--muted)}
+.stat span{font-size:12px;color:var(--muted)}
 .hint{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
 .hint .k{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 6px;border:1px solid var(--line);border-radius:6px;font-size:11px;font-family:var(--display);color:var(--text)}
 .list{display:grid;gap:8px;margin:0;padding:0;list-style:none;font-size:15px}
 .list li{display:flex;gap:10px;align-items:flex-start}
 .list li::before{content:"";flex:0 0 6px;width:6px;height:6px;border-radius:50%;background:var(--gold);margin-top:9px}
+.list.ok li::before{background:var(--ok);box-shadow:0 0 8px var(--ok)}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(20,27,48,.6);font-size:14px;text-decoration:none;transition:transform .15s,border-color .15s}
+.chip{display:inline-flex;align-items:center;gap:9px;padding:9px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(20,27,48,.6);font-size:14px;text-decoration:none;transition:transform .15s,border-color .15s}
 .chip:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.3)}
-.chip b{font-family:var(--display);font-size:12px}
-.chip .pf{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;font-size:11px;font-weight:800;color:#fff}
+.chip b{font-family:var(--display);font-size:12px;display:block}
+.chip .pf{width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font-size:11px;font-weight:800;color:#fff;flex:0 0 auto}
 .pf.facebook{background:#1877f2}.pf.tiktok{background:#111;border:1px solid #444}.pf.youtube{background:#ff0033}.pf.instagram{background:linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7)}
-.chip small{color:var(--muted)}
+.chip small{color:var(--muted);font-size:12px}
+.me{display:flex;gap:14px;align-items:center}
+.me img{width:72px;height:72px;border-radius:50%;border:2px solid var(--gold);box-shadow:0 0 30px rgba(255,200,87,.3);flex:0 0 auto;object-fit:cover}
+.me b{display:block;font-family:var(--display);font-size:15px}
+.me span{font-size:13px;color:var(--muted)}
 .mini{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.mini .card{padding:14px;border-radius:14px;background:rgba(20,27,48,.55);border:1px solid var(--line);cursor:pointer;transition:transform .15s,border-color .15s;text-align:left}
+.mini .card{padding:12px;border-radius:14px;background:rgba(20,27,48,.55);border:1px solid var(--line);cursor:pointer;transition:transform .15s,border-color .15s;text-align:left;display:flex;gap:10px;align-items:center}
 .mini .card:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.3)}
-.mini .card b{display:block;font-size:14px}
-.mini .card span{font-size:12px;color:var(--muted)}
-.mini .card .pr{font-family:var(--display);font-size:13px;color:var(--gold);margin-top:6px;display:block}
-.status{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:999px}
+.mini .card img{width:46px;height:46px;border-radius:12px;object-fit:cover;flex:0 0 auto;border:1px solid var(--line)}
+.mini .card b{display:block;font-size:14px;line-height:1.2}
+.mini .card span{font-size:12px;color:var(--muted);display:block}
+.mini .card .pr{font-family:var(--display);font-size:11px;color:var(--gold);margin-top:3px}
+.status{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:999px;white-space:nowrap}
 .status.available{background:rgba(61,220,151,.14);color:var(--ok)}
 .status.reserved{background:rgba(151,163,194,.14);color:var(--muted)}
 .status.sold{background:rgba(255,200,87,.14);color:var(--gold)}
-.steps{display:grid;gap:10px;counter-reset:s}
-.step{display:flex;gap:14px;padding:12px 14px;border-radius:14px;background:rgba(20,27,48,.5);border:1px solid var(--line);transition:transform .15s,border-color .15s}
+.steps{display:grid;gap:8px;counter-reset:s}
+.step{display:flex;gap:12px;padding:11px 13px;border-radius:14px;background:rgba(20,27,48,.5);border:1px solid var(--line);transition:transform .15s,border-color .15s}
 .step:hover{transform:translateX(4px);border-color:rgba(255,200,87,.45)}
-.step::before{counter-increment:s;content:"0" counter(s);font-family:var(--display);font-weight:800;font-size:12px;color:var(--gold);flex:0 0 28px;padding-top:3px}
-.step b{display:block;font-size:15px}
+.step::before{counter-increment:s;content:"0" counter(s);font-family:var(--display);font-weight:800;font-size:12px;color:var(--gold);flex:0 0 26px;padding-top:3px}
+.step b{display:block;font-size:14px}
 .step span{font-size:13px;color:var(--muted)}
 details{border:1px solid var(--line);border-radius:12px;background:rgba(20,27,48,.5);padding:0 14px}
-summary{cursor:pointer;list-style:none;padding:12px 0;font-weight:600;font-size:14px;display:flex;justify-content:space-between;gap:12px}
+summary{cursor:pointer;list-style:none;padding:11px 0;font-weight:600;font-size:14px;display:flex;justify-content:space-between;gap:12px}
 summary::-webkit-details-marker{display:none}
 summary::after{content:"+";color:var(--gold);font-family:var(--display)}
 details[open] summary::after{content:"–"}
 details p{padding:0 0 12px;color:var(--muted);font-size:14px}
-.reviews-row{display:grid;gap:10px}
-.rev{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:14px;background:rgba(20,27,48,.5);border:1px solid var(--line);cursor:pointer;text-align:left;transition:transform .15s,border-color .15s}
+.guar{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.g{padding:12px;border-radius:14px;background:rgba(20,27,48,.55);border:1px solid rgba(61,220,151,.25);display:grid;gap:4px;transition:transform .15s,border-color .15s}
+.g:hover{transform:translateY(-3px);border-color:var(--ok)}
+.g svg{width:20px;height:20px;color:var(--ok)}
+.g b{font-size:13px}
+.g span{font-size:12px;color:var(--muted)}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px}
+.vs div{padding:12px;border-radius:14px;border:1px solid var(--line);background:rgba(20,27,48,.5)}
+.vs div b{display:block;font-family:var(--display);font-size:11px;letter-spacing:.1em;margin-bottom:8px}
+.vs .bad b{color:var(--yt)}.vs .good{border-color:rgba(255,200,87,.45)}.vs .good b{color:var(--gold)}
+.vs ul{margin:0;padding:0;list-style:none;display:grid;gap:5px;color:var(--muted)}
+.vs .good ul{color:var(--text)}
+.reviews-row{display:grid;gap:8px}
+.rev{display:flex;gap:12px;align-items:center;padding:11px 12px;border-radius:14px;background:rgba(20,27,48,.5);border:1px solid var(--line);text-decoration:none;transition:transform .15s,border-color .15s}
 .rev:hover{transform:translateX(4px);border-color:rgba(255,255,255,.3)}
-.rev .av{width:38px;height:38px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;font-weight:700;font-size:13px;color:#1a1200;background:linear-gradient(135deg,var(--gold),#ff9a3d)}
-.rev .av.vid{background:var(--yt);color:#fff}
+.rev .av{width:40px;height:40px;border-radius:12px;flex:0 0 auto;display:grid;place-items:center;font-weight:800;color:#fff;background:var(--yt);font-size:14px}
 .rev b{display:block;font-size:14px}
-.rev span{font-size:13px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.rev span{font-size:12px;color:var(--muted)}
 .stars{color:var(--gold);letter-spacing:2px;font-size:12px}
 .channels{display:grid;gap:8px}
 .chn{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:rgba(20,27,48,.6);border:1px solid var(--line);text-decoration:none;transition:transform .15s,border-color .15s}
 .chn:hover{transform:translateX(4px);border-color:rgba(255,255,255,.3)}
-.chn .ci{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;flex:0 0 auto}
-.chn .ci svg{width:18px;height:18px}
+.chn .ci{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;flex:0 0 auto}
+.chn .ci svg{width:19px;height:19px}
+.chn .ci img{width:38px;height:38px;border-radius:11px;object-fit:cover}
 .chn b{display:block;font-size:14px}
 .chn span{font-size:12px;color:var(--muted)}
+.chn.wa{background:rgba(37,211,102,.14);border-color:rgba(37,211,102,.4)}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok);display:inline-block}
-.demo{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(151,163,194,.6);border:1px dashed rgba(151,163,194,.35);padding:2px 6px;border-radius:6px}
 
-/* detail modal */
-#detail{position:fixed;inset:0;z-index:45;display:none;place-items:center;padding:16px;background:rgba(6,8,15,.55);backdrop-filter:blur(6px)}
+#detail{position:fixed;inset:0;z-index:45;display:none;place-items:center;padding:14px;background:rgba(6,8,15,.6);backdrop-filter:blur(6px)}
 #detail.open{display:grid}
-#detail .box{width:min(640px,100%);max-height:90vh;overflow:auto;border-radius:24px;background:var(--ink-2);border:1px solid var(--line);padding:26px;display:grid;gap:16px;box-shadow:0 40px 100px rgba(0,0,0,.6);animation:pop .25s cubic-bezier(.2,.8,.2,1)}
+#detail .box{width:min(620px,100%);max-height:88vh;overflow:auto;border-radius:24px;background:var(--ink-2);border:1px solid var(--line);padding:22px;display:grid;gap:14px;box-shadow:0 40px 100px rgba(0,0,0,.6);animation:pop .25s cubic-bezier(.2,.8,.2,1)}
 @keyframes pop{from{transform:scale(.94);opacity:0}}
 #detail .head{display:flex;align-items:center;gap:12px}
-#detail .head .pf{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:16px}
-#detail h3{font-size:20px}
-#detail .x{margin-left:auto;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:transparent;display:grid;place-items:center}
+#detail .head .pf{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:16px;overflow:hidden;flex:0 0 auto}
+#detail .head .pf img{width:100%;height:100%;object-fit:cover}
+#detail h3{font-size:19px}
+#detail .x{margin-left:auto;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:transparent;display:grid;place-items:center;flex:0 0 auto}
 #detail .kv{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px}
 #detail .kv span{display:block;font-size:12px;color:var(--muted)}
 #detail .kv b{font-size:16px}
 #detail video{width:100%;border-radius:14px;background:#000;max-height:60vh}
 #detail .foot{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-#detail .price{font-family:var(--display);font-weight:800;font-size:20px}
+#detail .price{font-family:var(--display);font-weight:800;font-size:18px}
 #detail .price small{display:block;font-family:var(--body);font-size:12px;color:var(--muted);font-weight:500}
 #detail .foot .btn{margin-left:auto}
 
+.mbar{display:none}
 footer{position:relative;z-index:2;padding:20px clamp(16px,4vw,56px) 40px;color:var(--muted);font-size:13px;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
 
 @media (max-width:820px){
-  .ch{align-items:end;padding:80px 14px 28px}
+  .ch{align-items:end;padding:76px 12px 92px}
   .ch.right{justify-items:stretch}
-  .panel{width:100%;gap:14px}
-  .dots{display:none}
-  .nav .btn span{display:none}
+  .panel{width:100%;gap:12px;padding:18px;max-height:57vh;overflow:auto;border-radius:20px}
+  .panel.hero{max-height:none;overflow:visible;padding:18px 4px 0;background:linear-gradient(180deg,transparent,rgba(6,8,15,.88) 20%)}
+  .dots,.nav .btn{display:none}
   .stats{grid-template-columns:1fr 1fr;width:100%}
-  .mini{grid-template-columns:1fr 1fr}
-  h1{font-size:clamp(30px,8vw,44px)}
-  .mini,.reviews-row{grid-auto-flow:column;grid-auto-columns:74%;grid-template-columns:none;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:4px;-webkit-overflow-scrolling:touch}
-  .mini .card,.rev{scroll-snap-align:start}
-  .panel.hero{padding:18px 4px 0;background:linear-gradient(180deg,transparent,rgba(6,8,15,.85) 22%)}
+  .mini{grid-template-columns:1fr}
+  .guar,.vs{grid-template-columns:1fr 1fr}
+  h1{font-size:clamp(28px,7.6vw,42px)}
+  h2{font-size:clamp(22px,6vw,30px)}
+  .mbar{display:flex;position:fixed;left:10px;right:10px;bottom:10px;z-index:42;gap:8px;padding:8px;border-radius:999px;background:rgba(8,12,24,.85);border:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+  .mbar .btn{flex:1;padding:12px 10px;font-size:13px}
+  footer{padding-bottom:90px}
 }
-
-@media (prefers-reduced-motion:reduce){.panel,.btn,.chip,.step,.rev,.chn{transition:none}}
+@media (max-width:380px){.guar,.vs{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.panel,.btn,.chip,.step,.rev,.chn,.g{transition:none}}
 </style>
 </head>
 <body>
-<div id="intro" aria-hidden="true"><div><div class="word"><span style="animation-delay:.05s">F</span><span style="animation-delay:.12s">I</span><span style="animation-delay:.19s">D</span><span style="animation-delay:.26s">A</span><span style="animation-delay:.33s">H</span></div><div class="sub">Digital Agency · Voice of MEGH</div></div></div>
+<div id="intro" aria-hidden="true"><div><div style="display:grid;place-items:center"><img src="assets/logo.jpg" alt=""></div><div class="word"><span style="animation-delay:.25s">F</span><span style="animation-delay:.32s">I</span><span style="animation-delay:.39s">D</span><span style="animation-delay:.46s">A</span><span style="animation-delay:.53s">H</span></div><div class="sub">Digital Agency · Voice of MEGH</div></div></div>
 <canvas id="gl" aria-hidden="true"></canvas>
 <div class="vignette" aria-hidden="true"></div>
 <div class="cursor" id="cur" aria-hidden="true"><div class="dot"></div><div class="ring"></div></div>
 <div class="progress" aria-hidden="true"><i id="pbar"></i></div>
 
 <header class="nav">
-  <a class="brand" href="#home"><span class="mark"><i></i></span><span>FIDAH<small>DIGITAL AGENCY</small></span></a>
+  <a class="brand" href="#home"><img src="assets/logo.jpg" alt="Fidah logo"><span>FIDAH<small>DIGITAL AGENCY</small></span></a>
   <nav class="dots" id="dots" aria-label="Chapters"></nav>
   <div class="lang" role="group" aria-label="Language">
     <button type="button" id="langEn" aria-pressed="true">EN</button>
     <button type="button" id="langBn" aria-pressed="false">বাং</button>
   </div>
   <button type="button" class="snd" id="snd" aria-pressed="false" aria-label="Sound"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10v4h4l5 4V6l-5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg></button>
-  <a class="btn wa" id="navWa" href="#contact"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.1.7a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.2c0-.1-.2-.2-.5-.3z"/></svg><span data-i18n="nav.chat">WhatsApp</span></a>
+  <a class="btn wa walink" href="#contact"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.1.7a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.2c0-.1-.2-.2-.5-.3z"/></svg><span data-i18n="nav.chat">WhatsApp</span></a>
 </header>
 
 <main>
-<!-- 0 HOME -->
 <section class="ch" id="home" data-ch="0">
   <div class="panel hero">
-    <div class="eyebrow" data-i18n="home.eyebrow">Fidah Digital Agency · Dhaka</div>
-    <h1><span class="brandline" data-i18n="home.brandline">VOICE OF MEGH PRESENTS</span><span data-i18n-html="home.title">Buy a <span class="fb">Facebook page</span> that already has an audience. Order a <span class="yt">YouTube channel</span> built for you.</span></h1>
-    <p class="lead" data-i18n="home.lead">Real followers, clean history, ownership transferred on a live call. Run by MEGH, an influencer who grows pages for a living.</p>
+    <div class="eyebrow" data-i18n="home.eyebrow">Fidah Digital Agency · Jhenaidah, Bangladesh</div>
+    <h1><span class="brandline" data-i18n="home.brandline">VOICE OF MEGH PRESENTS</span><span data-i18n-html="home.title">Buy a <span class="fb">Facebook page</span> from someone with 3.7 million followers of his own.</span></h1>
+    <p class="lead" data-i18n="home.lead">Pages in stock today, YouTube channels on order, and an ads agency to make them earn. Everything verified live on a call before you pay a single taka.</p>
     <div class="cta">
-      <a class="btn wa mag" id="heroWa" href="#contact"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.1.7a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.2c0-.1-.2-.2-.5-.3z"/></svg><span data-i18n="home.cta1">Message on WhatsApp</span></a>
-      <a class="btn ghost mag" href="#pages" data-i18n="home.cta2">See the pages</a>
+      <a class="btn wa mag walink" href="#contact"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.1.7a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.2c0-.1-.2-.2-.5-.3z"/></svg><span data-i18n="home.cta1">Message MEGH on WhatsApp</span></a>
+      <a class="btn ghost mag" href="#pages" data-i18n="home.cta2">See pages in stock</a>
     </div>
     <div class="stats" id="stats"></div>
     <div class="hint"><span class="k">↓</span><span data-i18n="home.hint">Scroll to fly through the vault. Hover and click anything that glows.</span></div>
   </div>
 </section>
 
-<!-- 1 MEGH -->
 <section class="ch right" id="megh" data-ch="1">
   <div class="panel">
-    <div class="eyebrow" data-i18n="megh.eyebrow">Who is behind this</div>
-    <h2 data-i18n="megh.title">MEGH. The voice, the face, the seller.</h2>
-    <p class="lead" data-i18n="megh.lead">Content creator known as Voice of MEGH. I grow my own pages and channels first, so every asset I sell is one I know how to build. Hover the floating tiles to see each platform.</p>
+    <div class="eyebrow" data-i18n="megh.eyebrow">Who you are dealing with</div>
+    <div class="me"><img src="assets/megh.jpg" alt="MEGH"><div><b>MEGH · Voice of MEGH</b><span data-i18n="megh.sub">Content creator, Jhenaidah. Founder of Fidah Digital Agency.</span></div></div>
+    <h2 data-i18n="megh.title">Not an anonymous seller. A public face with 3.7M+ followers.</h2>
+    <p class="lead" data-i18n="megh.lead">I grow my own audiences on YouTube, TikTok and Facebook every day. Buying from me means buying from someone whose name and face are on the line.</p>
     <div class="chips" id="socials"></div>
-    <div class="hint"><span class="k">●</span><span data-i18n="megh.hint">Click a tile in 3D to open that profile.</span></div>
+    <div class="hint"><span class="k">●</span><span data-i18n="megh.hint">Tap a tile in 3D or a chip above to open that profile.</span></div>
   </div>
 </section>
 
-<!-- 2 PAGES -->
 <section class="ch" id="pages" data-ch="2">
   <div class="panel">
-    <div class="eyebrow" data-i18n="pages.eyebrow">Facebook pages · available now</div>
-    <h2 data-i18n="pages.title">Spin the ring. Pick a page.</h2>
-    <p class="lead" data-i18n="pages.lead">Every page is checked by me. Insights, audience country and monetization are shown live before you pay.</p>
-    <div class="hint"><span class="k">⇆</span><span data-i18n="pages.hint">Drag anywhere to rotate. Click a card for details.</span></div>
+    <div class="eyebrow" data-i18n="pages.eyebrow">Facebook pages · in stock now</div>
+    <h2 data-i18n="pages.title">Five pages, ready to transfer today.</h2>
+    <p class="lead" data-i18n="pages.lead">Each one is live on Facebook right now. Open it, check it yourself, then message me for the price and a live walkthrough.</p>
+    <div class="hint"><span class="k">⇆</span><span data-i18n="pages.hint">Drag to spin the ring. Click a card for details.</span></div>
     <div class="mini" id="pageList"></div>
-    <p class="hint" style="margin-top:4px"><span class="dot"></span><span data-i18n="pages.note">Need a niche or size you do not see? I source pages to order in two to seven days.</span></p>
+    <p class="hint"><span class="dot"></span><span data-i18n="pages.note">Need a different niche or size? I source pages to order in two to seven days.</span></p>
   </div>
 </section>
 
-<!-- 3 YOUTUBE -->
 <section class="ch right" id="youtube" data-ch="3">
   <div class="panel">
     <div class="eyebrow" data-i18n="yt.eyebrow">YouTube channels · on order</div>
-    <h2 data-i18n="yt.title">No channel in stock today. Order one, built to spec.</h2>
-    <p class="lead" data-i18n="yt.lead">Tell me the niche, subscriber range, monetization requirement and budget. I source or build the channel and hand it over as primary owner.</p>
+    <h2 data-i18n="yt.title">No channel in stock today. Order one built to your spec.</h2>
+    <p class="lead" data-i18n="yt.lead">I run a 1.98M-subscriber channel myself. Tell me the niche, subscriber range, monetization need and budget, and I source or build it and hand it over as primary owner.</p>
     <ul class="list">
       <li data-i18n="yt.l1">Monetized or near-monetized, AdSense clean</li>
       <li data-i18n="yt.l2">No copyright strikes, full analytics shown before payment</li>
       <li data-i18n="yt.l3">Primary owner and recovery email transferred on the call</li>
     </ul>
-    <div class="cta"><a class="btn gold mag" id="ytOrder" href="#contact" data-i18n="yt.cta">Order a YouTube channel</a></div>
+    <div class="cta"><a class="btn gold mag walink" href="#contact" data-i18n="yt.cta">Order a YouTube channel</a></div>
   </div>
 </section>
 
-<!-- 4 AGENCY -->
 <section class="ch" id="agency" data-ch="4">
   <div class="panel">
     <div class="eyebrow" data-i18n="ag.eyebrow">Fidah ads agency</div>
     <h2 data-i18n="ag.title">Bought a page? Now make it earn.</h2>
-    <p class="lead" data-i18n="ag.lead">Meta and YouTube ad campaigns for the asset you just bought or your own product. Pixel setup, targeting, creatives and a weekly report you can read in two minutes.</p>
+    <p class="lead" data-i18n="ag.lead">Meta and YouTube ad campaigns for the asset you just bought, or for your own product. Pixel setup, targeting, creatives and a weekly report you can read in two minutes.</p>
     <ul class="list">
       <li data-i18n="ag.l1">Meta Ads, boosting, pixel and catalog setup</li>
       <li data-i18n="ag.l2">YouTube and Google Ads</li>
-      <li data-i18n="ag.l3">Page growth plan with content calendar</li>
+      <li data-i18n="ag.l3">Page growth plan with a content calendar</li>
     </ul>
-    <div class="hint"><span class="k">▲</span><span data-i18n="ag.hint">The bars on the right grow as you scroll. Hover one to see the metric.</span></div>
+    <div class="hint"><span class="k">▲</span><span data-i18n="ag.hint">The bars grow as you scroll. Hover one to see the service.</span></div>
   </div>
 </section>
 
-<!-- 5 REVIEWS -->
-<section class="ch right" id="reviews" data-ch="5">
+<section class="ch right" id="trust" data-ch="5">
+  <div class="panel">
+    <div class="eyebrow" data-i18n="tr.eyebrow">Security · what you get from me</div>
+    <h2 data-i18n="tr.title">You never pay for something you have not seen with your own eyes.</h2>
+    <div class="guar" id="guar"></div>
+    <div class="vs">
+      <div class="bad"><b data-i18n="tr.bad">RANDOM SELLER</b><ul><li data-i18n="tr.b1">Fake name, no face</li><li data-i18n="tr.b2">Screenshots only</li><li data-i18n="tr.b3">Disappears after payment</li></ul></div>
+      <div class="good"><b data-i18n="tr.good">FIDAH · MEGH</b><ul><li data-i18n="tr.g1">Public creator, 3.7M+ followers</li><li data-i18n="tr.g2">Live screen-share before payment</li><li data-i18n="tr.g3">7 days of support after transfer</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="ch" id="reviews" data-ch="6">
   <div class="panel">
     <div class="eyebrow" data-i18n="rv.eyebrow">Client reviews</div>
-    <h2 data-i18n="rv.title">Real people. Real deals.</h2>
-    <p class="lead" data-i18n="rv.lead">Video reviews recorded by buyers after their transfer. Click a frame in 3D or a name below to watch.</p>
+    <h2 data-i18n="rv.title">Real buyers, on video, on my agency page.</h2>
+    <p class="lead" data-i18n="rv.lead">Clients record a short review after their transfer and I post it on the Fidah Digital Product page, 11.6K followers strong. Watch them there, then message me.</p>
     <div class="reviews-row" id="revList"></div>
   </div>
 </section>
 
-<!-- 6 PROCESS -->
-<section class="ch" id="process" data-ch="6">
+<section class="ch right" id="process" data-ch="7">
   <div class="panel">
     <div class="eyebrow" data-i18n="pr.eyebrow">How a deal works</div>
-    <h2 data-i18n="pr.title">Five gates. You pass each one with your own eyes.</h2>
+    <h2 data-i18n="pr.title">Five gates. You pass each one yourself.</h2>
     <div class="steps" id="steps"></div>
     <div id="faq" style="display:grid;gap:8px"></div>
   </div>
 </section>
 
-<!-- 7 CONTACT -->
-<section class="ch right" id="contact" data-ch="7">
+<section class="ch" id="contact" data-ch="8">
   <div class="panel">
-    <div class="eyebrow" data-i18n="ct.eyebrow">Contact</div>
-    <h2 data-i18n="ct.title">Send a message. Get a reply today.</h2>
-    <p class="lead" data-i18n="ct.lead">Platform, niche, size, budget. I reply with options, screenshots and a price.</p>
+    <div class="eyebrow" data-i18n="ct.eyebrow">Contact · Jhenaidah, Bangladesh</div>
+    <h2 data-i18n="ct.title">One tap. Straight into my WhatsApp.</h2>
+    <p class="lead" data-i18n="ct.lead">Say which page you want, or your niche, size and budget. I reply with the price, screenshots and a time for the live walkthrough.</p>
     <div class="channels" id="channels"></div>
-    <div class="hint"><span class="dot"></span><span data-i18n="ct.hours">Usually online 10:00 to 23:00, Dhaka time</span></div>
+    <div class="hint"><span class="dot"></span><span data-i18n="ct.hours">Usually online 10:00 to 23:00, Bangladesh time</span></div>
   </div>
 </section>
 </main>
-<footer><div>Fidah Digital Agency · <span data-i18n="foot.tag">Facebook pages, YouTube channels, ads.</span></div><div data-i18n="foot.note">Not affiliated with Meta, Google, TikTok or ByteDance.</div></footer>
+<footer><div>Fidah Digital Agency · Jhenaidah · <span data-i18n="foot.tag">Facebook pages, YouTube channels, ads.</span></div><div data-i18n="foot.note">Not affiliated with Meta, Google, TikTok or ByteDance.</div></footer>
+
+<div class="mbar"><a class="btn wa walink" href="#contact"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.1.7a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.2c0-.1-.2-.2-.5-.3z"/></svg><span data-i18n="nav.chat">WhatsApp</span></a><a class="btn ghost" href="#pages" data-i18n="m.pages">Pages in stock</a></div>
 
 <div id="detail" role="dialog" aria-modal="true" aria-labelledby="dTitle"><div class="box">
   <div class="head"><div class="pf" id="dPf"></div><div><h3 id="dTitle"></h3><div id="dSub" style="font-size:13px;color:var(--muted)"></div></div><button type="button" class="x" id="dClose" aria-label="Close">✕</button></div>
@@ -333,48 +353,46 @@ footer{position:relative;z-index:2;padding:20px clamp(16px,4vw,56px) 40px;color:
 const CONFIG = {
   brand: "Fidah Digital Agency",
   owner: "MEGH",
-  whatsappNumber: "8801XXXXXXXXX",          // international format, no "+"
-  whatsappDisplay: "+880 1XXX-XXXXXX",
-  telegramUser: "yourusername",
-  messengerUrl: "https://m.me/yourpage",
-  email: "you@example.com",
-  showDemoBadge: true,                       // set false once pages and reviews below are real
+  location: "Jhenaidah, Bangladesh",
+  whatsappUrl: "https://wa.me/message/LQYHIY5O5KYME1",
+  email: "iammegh143143@gmail.com",
+  agency: { name:"Fidah Digital Product", url:"https://www.facebook.com/Fidahdigitalproduct/", videosUrl:"https://www.facebook.com/Fidahdigitalproduct/videos", followers:"11.6K", tagline:"একটা বিশ্বাসযোগ্য Digital Product's Agency যা আপনি খুঁজছিলেন!" },
 
-  // Your own profiles. followers is free text. url empty = tile still shows, link hidden.
   socials: [
-    { key:"facebook",  label:"Facebook",  handle:"Voice of MEGH", followers:"—", url:"" },
-    { key:"tiktok",    label:"TikTok",    handle:"@voiceofmegh",  followers:"—", url:"" },
-    { key:"youtube",   label:"YouTube",   handle:"Voice of MEGH", followers:"—", url:"" },
-    { key:"instagram", label:"Instagram", handle:"@voiceofmegh",  followers:"—", url:"" }
+    { key:"youtube",   label:"YouTube",   handle:"@Voice_Of_Megh", followers:"1.98M", sub:{en:"subscribers · 1.9K videos",bn:"সাবস্ক্রাইবার · ১.৯K ভিডিও"}, url:"https://www.youtube.com/@Voice_Of_Megh" },
+    { key:"tiktok",    label:"TikTok",    handle:"@voiceofmegh",   followers:"1.5M",  sub:{en:"followers · 35.4M likes",bn:"ফলোয়ার · ৩৫.৪M লাইক"}, url:"https://www.tiktok.com/@voiceofmegh" },
+    { key:"facebook",  label:"Facebook",  handle:"Voice Of Megh",  followers:"265K",  sub:{en:"followers",bn:"ফলোয়ার"}, url:"https://www.facebook.com/VoiceOfMegh/" },
+    { key:"instagram", label:"Instagram", handle:"@voiceofmegh",   followers:"",      sub:{en:"profile",bn:"প্রোফাইল"}, url:"https://www.instagram.com/voiceofmegh/" }
   ],
 
   stats: [
-    { n:150, suffix:"+", en:"Pages sold",      bn:"পেজ বিক্রি" },
-    { n:200, suffix:"+", en:"Happy clients",   bn:"সন্তুষ্ট ক্লায়েন্ট" },
-    { n:4,   suffix:" yrs", bn_suffix:" বছর", en:"Selling pages", bn:"অভিজ্ঞতা" },
-    { n:24,  suffix:"h",  en:"Reply time, max", bn:"সর্বোচ্চ রিপ্লাই টাইম" }
+    { v:"1.98M", en:"YouTube subscribers", bn:"ইউটিউব সাবস্ক্রাইবার" },
+    { v:"1.5M",  en:"TikTok followers",    bn:"টিকটক ফলোয়ার" },
+    { v:"265K",  en:"Facebook followers",  bn:"ফেসবুক ফলোয়ার" },
+    { v:"5",     en:"Pages in stock",      bn:"পেজ স্টকে" }
   ],
 
-  // Facebook pages for sale. status: available | reserved | sold
+  // Facebook pages for sale. price "" shows "Ask for price". status: available | reserved | sold
   pages: [
-    { name:"Daily Tech Bangla", niche:{en:"Tech news",bn:"টেক নিউজ"}, followers:"248K", since:"2019", reach:"1.2M / 28d", extra:{en:"Reels bonus on",bn:"রিলস বোনাস চালু"}, price:"৳ 85,000", status:"available" },
-    { name:"Foodie Dhaka", niche:{en:"Food & lifestyle",bn:"ফুড ও লাইফস্টাইল"}, followers:"96K", since:"2020", reach:"620K / 28d", extra:{en:"BD audience 92%",bn:"বাংলাদেশি অডিয়েন্স ৯২%"}, price:"৳ 38,000", status:"available" },
-    { name:"Cricket Buzz 24", niche:{en:"Sports",bn:"স্পোর্টস"}, followers:"540K", since:"2017", reach:"3.8M / 28d", extra:{en:"In-stream ads eligible",bn:"ইন-স্ট্রিম অ্যাড এলিজিবল"}, price:"৳ 1,60,000", status:"reserved" },
-    { name:"Travel BD", niche:{en:"Travel",bn:"ট্রাভেল"}, followers:"180K", since:"2018", reach:"900K / 28d", extra:{en:"Monetization-ready",bn:"মনিটাইজেশন রেডি"}, price:"৳ 62,000", status:"available" },
-    { name:"Meme Corner", niche:{en:"Entertainment",bn:"এন্টারটেইনমেন্ট"}, followers:"1.1M", since:"2016", reach:"8M / 28d", extra:{en:"Viral reels page",bn:"ভাইরাল রিলস পেজ"}, price:"৳ 2,40,000", status:"available" },
-    { name:"Islamic Reminder", niche:{en:"Religion",bn:"ইসলামিক"}, followers:"310K", since:"2018", reach:"2.1M / 28d", extra:{en:"Clean history",bn:"ক্লিন হিস্ট্রি"}, price:"৳ 95,000", status:"sold" }
+    { name:"Emilia Belmonr",   img:"assets/p3.jpg", category:{en:"Personal blog",bn:"পার্সোনাল ব্লগ"},   followers:"24,582", talking:"", url:"https://www.facebook.com/p/Emilia-Belmonr-61590759412647/", price:"", status:"available" },
+    { name:"Kieran Sinclair",  img:"assets/p2.jpg", category:{en:"Product / service",bn:"প্রোডাক্ট / সার্ভিস"}, followers:"20,750", talking:"", url:"https://www.facebook.com/people/Kieran-Sinclair/61590585480592/", price:"", status:"available" },
+    { name:"Gregorian Graham", img:"assets/p1.jpg", category:{en:"Product / service",bn:"প্রোডাক্ট / সার্ভিস"}, followers:"20,530", talking:"", url:"https://www.facebook.com/p/Gregorian-Graham-61590797361266/", price:"", status:"available" },
+    { name:"Ubir blogs",       img:"assets/p5.jpg", category:{en:"Digital creator",bn:"ডিজিটাল ক্রিয়েটর"}, followers:"20,492", talking:"938", url:"https://www.facebook.com/p/Ubir-blogs-61594139177314/", price:"", status:"available" },
+    { name:"Nad 1",            img:"assets/p4.jpg", category:{en:"Personal blog",bn:"পার্সোনাল ব্লগ"},   followers:"20,237", talking:"1,931", url:"https://www.facebook.com/p/Nad-1-61593802150639/", price:"", status:"available" }
   ],
 
-  // Client reviews. video: relative file name published with this page (e.g. "reviews/rafi.mp4"), or "" for text only.
-  reviews: [
-    { name:"Rafiul H.", role:{en:"Bought a 240K tech page",bn:"২৪০K টেক পেজ কিনেছেন"}, text:{en:"Showed me everything on a video call before I paid a single taka. Page transferred in 20 minutes, still growing.",bn:"এক টাকা দেওয়ার আগেই ভিডিও কলে সব দেখিয়েছে। ২০ মিনিটে পেজ ট্রান্সফার, এখনো গ্রো করছে।"}, video:"" },
-    { name:"Sadia K.", role:{en:"Food page buyer",bn:"ফুড পেজ ক্রেতা"}, text:{en:"Second page from MEGH. Insights matched exactly what was promised.",bn:"MEGH-এর কাছ থেকে দ্বিতীয় পেজ। ইনসাইটস একদম যা বলা হয়েছিল তাই।"}, video:"" },
-    { name:"Nayeem Traders", role:{en:"Ads client",bn:"অ্যাডস ক্লায়েন্ট"}, text:{en:"Ran our boosting for two months. ROAS went from 1.4 to 3.1 on the same budget.",bn:"দুই মাস আমাদের বুস্টিং চালিয়েছে। একই বাজেটে ROAS ১.৪ থেকে ৩.১।"}, video:"" },
-    { name:"Tanvir A.", role:{en:"Sports page buyer",bn:"স্পোর্টস পেজ ক্রেতা"}, text:{en:"Middleman deal, smooth. Admin removed in front of me after transfer.",bn:"মিডলম্যান ডিল, স্মুথ। ট্রান্সফারের পর আমার সামনেই অ্যাডমিন রিমুভ।"}, video:"" }
-  ],
+  // Client review videos. video: a file published with this page (e.g. "assets/review1.mp4"); leave [] to link to the Facebook videos tab.
+  reviews: [],
 
-  agencyBars: [ // label + height 0..1, shown as 3D bars in the agency chapter
-    { label:"ROAS 1.4 → 3.1", h:.95 }, { label:"CPM −38%", h:.6 }, { label:"Reach +4.2x", h:.8 }, { label:"CTR 2.9%", h:.5 }, { label:"Leads +210%", h:.7 }
+  services: ["Meta Ads", "Boosting", "Pixel setup", "YouTube Ads", "Page growth"],
+
+  guarantees: [
+    { t:{en:"Live verification",bn:"লাইভ ভেরিফিকেশন"}, p:{en:"Screen-share of insights, audience and history before payment.",bn:"পেমেন্টের আগে ইনসাইটস, অডিয়েন্স আর হিস্ট্রি স্ক্রিন-শেয়ারে।"} },
+    { t:{en:"Middleman welcome",bn:"মিডলম্যান ওয়েলকাম"}, p:{en:"Any trusted group admin or escrow you choose, no extra cost from me.",bn:"আপনার বিশ্বস্ত অ্যাডমিন বা এসক্রো, আমার দিক থেকে বাড়তি খরচ নেই।"} },
+    { t:{en:"Price fixed in writing",bn:"দাম লিখিতভাবে ফিক্সড"}, p:{en:"No change after we agree. Partial advance on bigger deals.",bn:"একবার ঠিক হলে বদলায় না। বড় ডিলে পার্শিয়াল অ্যাডভান্স।"} },
+    { t:{en:"Transfer on the call",bn:"কলেই ট্রান্সফার"}, p:{en:"You become admin while we are on the call. My access removed in front of you.",bn:"কলেই আপনি অ্যাডমিন হন। আপনার সামনেই আমার অ্যাক্সেস রিমুভ।"} },
+    { t:{en:"Full history disclosed",bn:"পুরো হিস্ট্রি জানানো হয়"}, p:{en:"Restrictions, name changes, past niches. If I hid it, it is on me.",bn:"রেস্ট্রিকশন, নাম বদল, আগের নিশ। লুকালে দায় আমার।"} },
+    { t:{en:"7-day after-sale support",bn:"৭ দিনের আফটার-সেল সাপোর্ট"}, p:{en:"Security settings, recovery email, first posts, growth tips.",bn:"সিকিউরিটি সেটিংস, রিকভারি ইমেইল, প্রথম পোস্ট, গ্রোথ টিপস।"} }
   ],
 
   steps: [
@@ -386,62 +404,63 @@ const CONFIG = {
   ],
   faq: [
     { q:{en:"Payment methods?",bn:"পেমেন্ট মেথড?"}, a:{en:"bKash, Nagad, bank transfer in Bangladesh. Binance USDT, Payoneer or Wise internationally.",bn:"দেশে বিকাশ, নগদ, ব্যাংক। ইন্টারন্যাশনাল হলে Binance USDT, Payoneer বা Wise।"} },
-    { q:{en:"Middleman or escrow?",bn:"মিডলম্যান বা এসক্রো?"}, a:{en:"Yes, any trusted group admin or escrow you choose, no extra cost from my side.",bn:"হ্যাঁ, আপনার বিশ্বস্ত গ্রুপ অ্যাডমিন বা এসক্রো, আমার দিক থেকে বাড়তি খরচ নেই।"} },
+    { q:{en:"Why are prices not listed?",bn:"দাম লেখা নেই কেন?"}, a:{en:"Page prices move with reach and engagement that week. Message me and you get the current price with the reasoning, in writing.",bn:"ওই সপ্তাহের রিচ আর এনগেজমেন্ট অনুযায়ী দাম ওঠানামা করে। মেসেজ দিলে কারণসহ বর্তমান দাম লিখিতভাবে পাবেন।"} },
     { q:{en:"What if the page gets restricted later?",bn:"পরে পেজ রেস্ট্রিক্টেড হলে?"}, a:{en:"I walk you through a secure handover to avoid it. Problems from undisclosed history are on me.",bn:"এটা এড়াতে সিকিউর হ্যান্ডওভার দেখিয়ে দিই। না জানানো হিস্ট্রির সমস্যা হলে দায় আমার।"} }
   ]
 };
 
 const T = {
   en:{
-    "nav.chat":"WhatsApp",
-    "home.eyebrow":"Fidah Digital Agency · Dhaka","home.brandline":"VOICE OF MEGH PRESENTS",
-    "home.title":"Buy a <span class=\"fb\">Facebook page</span> that already has an audience. Order a <span class=\"yt\">YouTube channel</span> built for you.",
-    "home.lead":"Real followers, clean history, ownership transferred on a live call. Run by MEGH, an influencer who grows pages for a living.",
-    "home.cta1":"Message on WhatsApp","home.cta2":"See the pages","home.hint":"Scroll to fly through the vault. Hover and click anything that glows.",
-    "megh.eyebrow":"Who is behind this","megh.title":"MEGH. The voice, the face, the seller.","megh.lead":"Content creator known as Voice of MEGH. I grow my own pages and channels first, so every asset I sell is one I know how to build. Hover the floating tiles to see each platform.","megh.hint":"Click a tile in 3D to open that profile.",
-    "pages.eyebrow":"Facebook pages · available now","pages.title":"Spin the ring. Pick a page.","pages.lead":"Every page is checked by me. Insights, audience country and monetization are shown live before you pay.","pages.hint":"Drag anywhere to rotate. Click a card for details.","pages.note":"Need a niche or size you do not see? I source pages to order in two to seven days.",
-    "yt.eyebrow":"YouTube channels · on order","yt.title":"No channel in stock today. Order one, built to spec.","yt.lead":"Tell me the niche, subscriber range, monetization requirement and budget. I source or build the channel and hand it over as primary owner.","yt.l1":"Monetized or near-monetized, AdSense clean","yt.l2":"No copyright strikes, full analytics shown before payment","yt.l3":"Primary owner and recovery email transferred on the call","yt.cta":"Order a YouTube channel",
-    "ag.eyebrow":"Fidah ads agency","ag.title":"Bought a page? Now make it earn.","ag.lead":"Meta and YouTube ad campaigns for the asset you just bought or your own product. Pixel setup, targeting, creatives and a weekly report you can read in two minutes.","ag.l1":"Meta Ads, boosting, pixel and catalog setup","ag.l2":"YouTube and Google Ads","ag.l3":"Page growth plan with content calendar","ag.hint":"The bars on the right grow as you scroll. Hover one to see the metric.",
-    "rv.eyebrow":"Client reviews","rv.title":"Real people. Real deals.","rv.lead":"Video reviews recorded by buyers after their transfer. Click a frame in 3D or a name below to watch.",
-    "pr.eyebrow":"How a deal works","pr.title":"Five gates. You pass each one with your own eyes.",
-    "ct.eyebrow":"Contact","ct.title":"Send a message. Get a reply today.","ct.lead":"Platform, niche, size, budget. I reply with options, screenshots and a price.","ct.hours":"Usually online 10:00 to 23:00, Dhaka time",
-    "ct.wa":"WhatsApp","ct.wa.s":"Fastest reply","ct.tg":"Telegram","ct.tg.s":"International buyers","ct.ms":"Messenger","ct.ms.s":"Message my Facebook page","ct.em":"Email","ct.em.s":"Agency proposals",
+    "nav.chat":"WhatsApp","m.pages":"Pages in stock",
+    "home.eyebrow":"Fidah Digital Agency · Jhenaidah, Bangladesh","home.brandline":"VOICE OF MEGH PRESENTS",
+    "home.title":"Buy a <span class=\"fb\">Facebook page</span> from someone with 3.7 million followers of his own.",
+    "home.lead":"Pages in stock today, YouTube channels on order, and an ads agency to make them earn. Everything verified live on a call before you pay a single taka.",
+    "home.cta1":"Message MEGH on WhatsApp","home.cta2":"See pages in stock","home.hint":"Scroll to fly through the vault. Hover and click anything that glows.",
+    "megh.eyebrow":"Who you are dealing with","megh.sub":"Content creator, Jhenaidah. Founder of Fidah Digital Agency.","megh.title":"Not an anonymous seller. A public face with 3.7M+ followers.","megh.lead":"I grow my own audiences on YouTube, TikTok and Facebook every day. Buying from me means buying from someone whose name and face are on the line.","megh.hint":"Tap a tile in 3D or a chip above to open that profile.",
+    "pages.eyebrow":"Facebook pages · in stock now","pages.title":"Five pages, ready to transfer today.","pages.lead":"Each one is live on Facebook right now. Open it, check it yourself, then message me for the price and a live walkthrough.","pages.hint":"Drag to spin the ring. Click a card for details.","pages.note":"Need a different niche or size? I source pages to order in two to seven days.",
+    "yt.eyebrow":"YouTube channels · on order","yt.title":"No channel in stock today. Order one built to your spec.","yt.lead":"I run a 1.98M-subscriber channel myself. Tell me the niche, subscriber range, monetization need and budget, and I source or build it and hand it over as primary owner.","yt.l1":"Monetized or near-monetized, AdSense clean","yt.l2":"No copyright strikes, full analytics shown before payment","yt.l3":"Primary owner and recovery email transferred on the call","yt.cta":"Order a YouTube channel",
+    "ag.eyebrow":"Fidah ads agency","ag.title":"Bought a page? Now make it earn.","ag.lead":"Meta and YouTube ad campaigns for the asset you just bought, or for your own product. Pixel setup, targeting, creatives and a weekly report you can read in two minutes.","ag.l1":"Meta Ads, boosting, pixel and catalog setup","ag.l2":"YouTube and Google Ads","ag.l3":"Page growth plan with a content calendar","ag.hint":"The bars grow as you scroll. Hover one to see the service.",
+    "tr.eyebrow":"Security · what you get from me","tr.title":"You never pay for something you have not seen with your own eyes.","tr.bad":"RANDOM SELLER","tr.b1":"Fake name, no face","tr.b2":"Screenshots only","tr.b3":"Disappears after payment","tr.good":"FIDAH · MEGH","tr.g1":"Public creator, 3.7M+ followers","tr.g2":"Live screen-share before payment","tr.g3":"7 days of support after transfer",
+    "rv.eyebrow":"Client reviews","rv.title":"Real buyers, on video, on my agency page.","rv.lead":"Clients record a short review after their transfer and I post it on the Fidah Digital Product page, 11.6K followers strong. Watch them there, then message me.","rv.watch":"Watch client review videos","rv.watch.s":"On the Fidah Digital Product page","rv.page":"Fidah Digital Product","rv.page.s":"11.6K followers · agency page on Facebook","rv.frame":"Client review",
+    "pr.eyebrow":"How a deal works","pr.title":"Five gates. You pass each one yourself.",
+    "ct.eyebrow":"Contact · Jhenaidah, Bangladesh","ct.title":"One tap. Straight into my WhatsApp.","ct.lead":"Say which page you want, or your niche, size and budget. I reply with the price, screenshots and a time for the live walkthrough.","ct.hours":"Usually online 10:00 to 23:00, Bangladesh time",
+    "ct.wa":"WhatsApp","ct.wa.s":"Opens my business chat directly","ct.fb":"Fidah Digital Product","ct.fb.s":"Agency page on Facebook","ct.yt":"Voice Of Megh on YouTube","ct.yt.s":"1.98M subscribers","ct.em":"Email","ct.em.s":"Agency and sponsorship proposals",
     "foot.tag":"Facebook pages, YouTube channels, ads.","foot.note":"Not affiliated with Meta, Google, TikTok or ByteDance.",
-    "d.followers":"Followers","d.since":"Since","d.reach":"Reach (28 days)","d.extra":"Note","d.price":"Price","d.ask":"Ask about this page","d.open":"Open profile","d.sold":"Sold","d.available":"Available","d.reserved":"Reserved","d.review":"Review","d.novideo":"Video review coming soon. Text review below.","d.order":"Order a channel like this",
-    "ch.0":"Home","ch.1":"MEGH","ch.2":"Pages","ch.3":"YouTube","ch.4":"Agency","ch.5":"Reviews","ch.6":"Process","ch.7":"Contact"
+    "d.followers":"Followers","d.talking":"Talking about this","d.category":"Category","d.status":"Status","d.price":"Price","d.askprice":"Ask for price","d.ask":"Ask MEGH about this page","d.open":"Open on Facebook","d.openp":"Open profile","d.sold":"Sold","d.available":"In stock","d.reserved":"Reserved",
+    "ch.0":"Home","ch.1":"MEGH","ch.2":"Pages","ch.3":"YouTube","ch.4":"Agency","ch.5":"Security","ch.6":"Reviews","ch.7":"Process","ch.8":"Contact"
   },
   bn:{
-    "nav.chat":"হোয়াটসঅ্যাপ",
-    "home.eyebrow":"ফিদাহ ডিজিটাল এজেন্সি · ঢাকা","home.brandline":"ভয়েস অফ MEGH প্রেজেন্টস",
-    "home.title":"এমন <span class=\"fb\">ফেসবুক পেজ</span> কিনুন যার অডিয়েন্স আগে থেকেই আছে। আপনার জন্য বানানো <span class=\"yt\">ইউটিউব চ্যানেল</span> অর্ডার করুন।",
-    "home.lead":"আসল ফলোয়ার, ক্লিন হিস্ট্রি, লাইভ কলে ওনারশিপ ট্রান্সফার। চালাচ্ছেন MEGH, একজন ইনফ্লুয়েন্সার যিনি নিজেই পেজ গ্রো করেন।",
-    "home.cta1":"হোয়াটসঅ্যাপে মেসেজ দিন","home.cta2":"পেজগুলো দেখুন","home.hint":"স্ক্রল করে ভল্টের ভেতর দিয়ে উড়ে যান। যা জ্বলছে তাতে হোভার আর ক্লিক করুন।",
-    "megh.eyebrow":"এর পেছনে কে","megh.title":"MEGH। ভয়েস, মুখ, আর বিক্রেতা।","megh.lead":"ভয়েস অফ MEGH নামে পরিচিত কনটেন্ট ক্রিয়েটর। আগে নিজের পেজ আর চ্যানেল গ্রো করি, তাই যা বিক্রি করি সেটা কীভাবে বানাতে হয় জানি। ভাসমান টাইলগুলোতে হোভার করে প্ল্যাটফর্ম দেখুন।","megh.hint":"3D-তে একটা টাইলে ক্লিক করলে প্রোফাইল খুলবে।",
-    "pages.eyebrow":"ফেসবুক পেজ · এখন অ্যাভেইলেবল","pages.title":"রিংটা ঘোরান। পেজ বাছুন।","pages.lead":"প্রতিটা পেজ আমি নিজে চেক করি। পেমেন্টের আগে ইনসাইটস, অডিয়েন্স কোন দেশের আর মনিটাইজেশন লাইভ দেখানো হয়।","pages.hint":"যেকোনো জায়গায় ড্র্যাগ করে ঘোরান। কার্ডে ক্লিক করলে ডিটেইলস।","pages.note":"যে নিশ বা সাইজ দেখছেন না সেটা লাগবে? দুই থেকে সাত দিনে অর্ডারে পেজ জোগাড় করে দিই।",
-    "yt.eyebrow":"ইউটিউব চ্যানেল · অর্ডারে","yt.title":"আজ স্টকে চ্যানেল নেই। আপনার স্পেসিফিকেশনে একটা অর্ডার করুন।","yt.lead":"নিশ, সাবস্ক্রাইবার রেঞ্জ, মনিটাইজেশন দরকার কি না আর বাজেট বলুন। আমি চ্যানেল জোগাড় বা তৈরি করে প্রাইমারি ওনার হিসেবে হ্যান্ডওভার করি।","yt.l1":"মনিটাইজড বা প্রায়-মনিটাইজড, অ্যাডসেন্স ক্লিন","yt.l2":"কপিরাইট স্ট্রাইক নেই, পেমেন্টের আগে ফুল অ্যানালিটিক্স","yt.l3":"কলেই প্রাইমারি ওনার আর রিকভারি ইমেইল ট্রান্সফার","yt.cta":"ইউটিউব চ্যানেল অর্ডার করুন",
-    "ag.eyebrow":"ফিদাহ অ্যাডস এজেন্সি","ag.title":"পেজ কিনলেন? এবার আয় করান।","ag.lead":"যে অ্যাসেট কিনলেন বা আপনার নিজের প্রোডাক্টের জন্য Meta আর ইউটিউব অ্যাড ক্যাম্পেইন। পিক্সেল সেটআপ, টার্গেটিং, ক্রিয়েটিভ আর দুই মিনিটে পড়া যায় এমন সাপ্তাহিক রিপোর্ট।","ag.l1":"Meta Ads, বুস্টিং, পিক্সেল আর ক্যাটালগ সেটআপ","ag.l2":"ইউটিউব আর গুগল অ্যাডস","ag.l3":"কনটেন্ট ক্যালেন্ডারসহ পেজ গ্রোথ প্ল্যান","ag.hint":"ডানের বারগুলো স্ক্রল করলে বাড়ে। হোভার করলে মেট্রিক দেখাবে।",
-    "rv.eyebrow":"ক্লায়েন্ট রিভিউ","rv.title":"আসল মানুষ। আসল ডিল।","rv.lead":"ট্রান্সফারের পর ক্রেতাদের রেকর্ড করা ভিডিও রিভিউ। 3D-তে ফ্রেমে বা নিচে নামে ক্লিক করে দেখুন।",
-    "pr.eyebrow":"ডিল কীভাবে হয়","pr.title":"পাঁচটা গেট। প্রতিটা নিজের চোখে দেখে পার হন।",
-    "ct.eyebrow":"যোগাযোগ","ct.title":"মেসেজ দিন। আজই রিপ্লাই পাবেন।","ct.lead":"প্ল্যাটফর্ম, নিশ, সাইজ, বাজেট। অপশন, স্ক্রিনশট আর দাম সহ রিপ্লাই দিই।","ct.hours":"সাধারণত অনলাইন সকাল ১০টা থেকে রাত ১১টা",
-    "ct.wa":"হোয়াটসঅ্যাপ","ct.wa.s":"সবচেয়ে দ্রুত রিপ্লাই","ct.tg":"টেলিগ্রাম","ct.tg.s":"ইন্টারন্যাশনাল ক্রেতা","ct.ms":"মেসেঞ্জার","ct.ms.s":"আমার ফেসবুক পেজে মেসেজ","ct.em":"ইমেইল","ct.em.s":"এজেন্সি প্রপোজাল",
+    "nav.chat":"হোয়াটসঅ্যাপ","m.pages":"স্টকের পেজ",
+    "home.eyebrow":"ফিদাহ ডিজিটাল এজেন্সি · ঝিনাইদহ, বাংলাদেশ","home.brandline":"ভয়েস অফ MEGH প্রেজেন্টস",
+    "home.title":"এমন একজনের কাছ থেকে <span class=\"fb\">ফেসবুক পেজ</span> কিনুন, যার নিজেরই ৩৭ লাখ ফলোয়ার।",
+    "home.lead":"আজই স্টকে পেজ আছে, ইউটিউব চ্যানেল অর্ডারে, আর সেটা দিয়ে আয় করানোর জন্য অ্যাডস এজেন্সি। এক টাকা দেওয়ার আগে সব কিছু লাইভ কলে ভেরিফাই।",
+    "home.cta1":"MEGH-কে হোয়াটসঅ্যাপে মেসেজ দিন","home.cta2":"স্টকের পেজ দেখুন","home.hint":"স্ক্রল করে ভল্টের ভেতর দিয়ে উড়ে যান। যা জ্বলছে তাতে হোভার আর ক্লিক করুন।",
+    "megh.eyebrow":"আপনি কার সাথে ডিল করছেন","megh.sub":"কনটেন্ট ক্রিয়েটর, ঝিনাইদহ। ফিদাহ ডিজিটাল এজেন্সির ফাউন্ডার।","megh.title":"অচেনা কোনো সেলার না। ৩৭ লাখ+ ফলোয়ারের একটা পরিচিত মুখ।","megh.lead":"ইউটিউব, টিকটক আর ফেসবুকে প্রতিদিন নিজের অডিয়েন্স বড় করি। আমার কাছ থেকে কেনা মানে এমন কারো কাছ থেকে কেনা যার নাম আর মুখ দুটোই বাজিতে আছে।","megh.hint":"3D-তে একটা টাইল বা উপরের চিপে ট্যাপ করলে প্রোফাইল খুলবে।",
+    "pages.eyebrow":"ফেসবুক পেজ · এখন স্টকে","pages.title":"পাঁচটা পেজ, আজই ট্রান্সফারের জন্য রেডি।","pages.lead":"প্রতিটা এই মুহূর্তে ফেসবুকে লাইভ। নিজে খুলে চেক করুন, তারপর দাম আর লাইভ ওয়াকথ্রুর জন্য মেসেজ দিন।","pages.hint":"ড্র্যাগ করে রিং ঘোরান। কার্ডে ক্লিক করলে ডিটেইলস।","pages.note":"অন্য নিশ বা সাইজ লাগবে? দুই থেকে সাত দিনে অর্ডারে পেজ জোগাড় করে দিই।",
+    "yt.eyebrow":"ইউটিউব চ্যানেল · অর্ডারে","yt.title":"আজ স্টকে চ্যানেল নেই। আপনার স্পেসিফিকেশনে একটা অর্ডার করুন।","yt.lead":"আমি নিজেই ১.৯৮M সাবস্ক্রাইবারের চ্যানেল চালাই। নিশ, সাবস্ক্রাইবার রেঞ্জ, মনিটাইজেশন আর বাজেট বলুন, আমি জোগাড় বা তৈরি করে প্রাইমারি ওনার হিসেবে হ্যান্ডওভার করি।","yt.l1":"মনিটাইজড বা প্রায়-মনিটাইজড, অ্যাডসেন্স ক্লিন","yt.l2":"কপিরাইট স্ট্রাইক নেই, পেমেন্টের আগে ফুল অ্যানালিটিক্স","yt.l3":"কলেই প্রাইমারি ওনার আর রিকভারি ইমেইল ট্রান্সফার","yt.cta":"ইউটিউব চ্যানেল অর্ডার করুন",
+    "ag.eyebrow":"ফিদাহ অ্যাডস এজেন্সি","ag.title":"পেজ কিনলেন? এবার আয় করান।","ag.lead":"যে অ্যাসেট কিনলেন বা নিজের প্রোডাক্টের জন্য Meta আর ইউটিউব অ্যাড ক্যাম্পেইন। পিক্সেল সেটআপ, টার্গেটিং, ক্রিয়েটিভ আর দুই মিনিটে পড়া যায় এমন সাপ্তাহিক রিপোর্ট।","ag.l1":"Meta Ads, বুস্টিং, পিক্সেল আর ক্যাটালগ সেটআপ","ag.l2":"ইউটিউব আর গুগল অ্যাডস","ag.l3":"কনটেন্ট ক্যালেন্ডারসহ পেজ গ্রোথ প্ল্যান","ag.hint":"স্ক্রল করলে বারগুলো বাড়ে। হোভার করলে সার্ভিস দেখাবে।",
+    "tr.eyebrow":"সিকিউরিটি · আমার কাছ থেকে যা পাবেন","tr.title":"নিজের চোখে না দেখে আপনাকে কখনো টাকা দিতে হবে না।","tr.bad":"যেকোনো সেলার","tr.b1":"ভুয়া নাম, মুখ নেই","tr.b2":"শুধু স্ক্রিনশট","tr.b3":"পেমেন্টের পর গায়েব","tr.good":"ফিদাহ · MEGH","tr.g1":"পরিচিত ক্রিয়েটর, ৩৭ লাখ+ ফলোয়ার","tr.g2":"পেমেন্টের আগে লাইভ স্ক্রিন-শেয়ার","tr.g3":"ট্রান্সফারের পর ৭ দিন সাপোর্ট",
+    "rv.eyebrow":"ক্লায়েন্ট রিভিউ","rv.title":"আসল ক্রেতা, ভিডিওতে, আমার এজেন্সি পেজে।","rv.lead":"ট্রান্সফারের পর ক্লায়েন্টরা ছোট একটা রিভিউ রেকর্ড করেন, আমি সেটা ১১.৬K ফলোয়ারের Fidah Digital Product পেজে পোস্ট করি। ওখানে দেখুন, তারপর মেসেজ দিন।","rv.watch":"ক্লায়েন্ট রিভিউ ভিডিও দেখুন","rv.watch.s":"Fidah Digital Product পেজে","rv.page":"Fidah Digital Product","rv.page.s":"১১.৬K ফলোয়ার · ফেসবুকে এজেন্সি পেজ","rv.frame":"ক্লায়েন্ট রিভিউ",
+    "pr.eyebrow":"ডিল কীভাবে হয়","pr.title":"পাঁচটা গেট। প্রতিটা নিজে পার হন।",
+    "ct.eyebrow":"যোগাযোগ · ঝিনাইদহ, বাংলাদেশ","ct.title":"এক ট্যাপ। সোজা আমার হোয়াটসঅ্যাপে।","ct.lead":"কোন পেজটা চান বলুন, বা নিশ, সাইজ আর বাজেট। আমি দাম, স্ক্রিনশট আর লাইভ ওয়াকথ্রুর সময় জানিয়ে রিপ্লাই দিই।","ct.hours":"সাধারণত অনলাইন সকাল ১০টা থেকে রাত ১১টা",
+    "ct.wa":"হোয়াটসঅ্যাপ","ct.wa.s":"সরাসরি আমার বিজনেস চ্যাট খোলে","ct.fb":"Fidah Digital Product","ct.fb.s":"ফেসবুকে এজেন্সি পেজ","ct.yt":"ইউটিউবে Voice Of Megh","ct.yt.s":"১.৯৮M সাবস্ক্রাইবার","ct.em":"ইমেইল","ct.em.s":"এজেন্সি আর স্পন্সরশিপ প্রপোজাল",
     "foot.tag":"ফেসবুক পেজ, ইউটিউব চ্যানেল, অ্যাডস।","foot.note":"Meta, Google, TikTok বা ByteDance-এর সাথে সম্পর্কিত নয়।",
-    "d.followers":"ফলোয়ার","d.since":"শুরু","d.reach":"রিচ (২৮ দিন)","d.extra":"নোট","d.price":"দাম","d.ask":"এই পেজ নিয়ে জানতে চাই","d.open":"প্রোফাইল খুলুন","d.sold":"বিক্রি হয়েছে","d.available":"অ্যাভেইলেবল","d.reserved":"রিজার্ভড","d.review":"রিভিউ","d.novideo":"ভিডিও রিভিউ শিগগিরই আসছে। নিচে টেক্সট রিভিউ।","d.order":"এমন একটা চ্যানেল অর্ডার করুন",
-    "ch.0":"হোম","ch.1":"MEGH","ch.2":"পেজ","ch.3":"ইউটিউব","ch.4":"এজেন্সি","ch.5":"রিভিউ","ch.6":"প্রসেস","ch.7":"যোগাযোগ"
+    "d.followers":"ফলোয়ার","d.talking":"টকিং অ্যাবাউট","d.category":"ক্যাটাগরি","d.status":"স্ট্যাটাস","d.price":"দাম","d.askprice":"দাম জানতে মেসেজ দিন","d.ask":"এই পেজ নিয়ে MEGH-কে জিজ্ঞেস করুন","d.open":"ফেসবুকে খুলুন","d.openp":"প্রোফাইল খুলুন","d.sold":"বিক্রি হয়েছে","d.available":"স্টকে আছে","d.reserved":"রিজার্ভড",
+    "ch.0":"হোম","ch.1":"MEGH","ch.2":"পেজ","ch.3":"ইউটিউব","ch.4":"এজেন্সি","ch.5":"সিকিউরিটি","ch.6":"রিভিউ","ch.7":"প্রসেস","ch.8":"যোগাযোগ"
   }
 };
 
-/* ---------------- shared helpers ---------------- */
+/* ---------------- helpers ---------------- */
 let lang = "en";
 try { const s = localStorage.getItem("fidah-lang"); if (s === "bn" || s === "en") lang = s; } catch (e) {}
 const t = k => (T[lang] && T[lang][k]) || T.en[k] || k;
 const pick = o => (o && typeof o === "object") ? (o[lang] || o.en) : o;
-const waLink = txt => "https://wa.me/" + CONFIG.whatsappNumber + (txt ? "?text=" + encodeURIComponent(txt) : "");
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const fine = matchMedia("(hover:hover) and (pointer:fine)").matches;
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const CH = ["home","megh","pages","youtube","agency","reviews","process","contact"];
+const CH = ["home","megh","pages","youtube","agency","trust","reviews","process","contact"];
+const WA_SVG = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.1.7a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.2c0-.1-.2-.2-.5-.3z"/></svg>`;
 
-/* ---------------- sound (off until the user turns it on) ---------------- */
 let AC = null, soundOn = false;
 function beep(f = 880, d = .06, g = .05, type = "sine"){
   if (!soundOn || !AC) return;
@@ -455,62 +474,65 @@ document.getElementById("snd").onclick = function(){
   soundOn = !soundOn; this.setAttribute("aria-pressed", soundOn); if (soundOn) beep(660,.12,.06);
 };
 
-/* ---------------- render HTML from CONFIG ---------------- */
 function applyLang(){
   document.documentElement.lang = lang;
   document.getElementById("langEn").setAttribute("aria-pressed", lang === "en");
   document.getElementById("langBn").setAttribute("aria-pressed", lang === "bn");
   document.querySelectorAll("[data-i18n]").forEach(el => el.textContent = t(el.dataset.i18n));
   document.querySelectorAll("[data-i18n-html]").forEach(el => el.innerHTML = t(el.dataset.i18nHtml));
-  renderStats(); renderSocials(); renderPages(); renderReviews(); renderSteps(); renderChannels(); renderDots();
+  renderStats(); renderSocials(); renderPages(); renderGuar(); renderReviews(); renderSteps(); renderChannels(); renderDots();
   bindMagnet();
 }
 document.getElementById("langEn").onclick = () => { lang="en"; try{localStorage.setItem("fidah-lang",lang)}catch(e){}; applyLang(); };
 document.getElementById("langBn").onclick = () => { lang="bn"; try{localStorage.setItem("fidah-lang",lang)}catch(e){}; applyLang(); };
-document.getElementById("navWa").href = waLink("Hi MEGH, I saw the Fidah portfolio and I am interested.");
-document.getElementById("heroWa").href = waLink("Hi MEGH, I saw the Fidah portfolio and I am interested.");
-document.getElementById("ytOrder").href = waLink("Hi MEGH, I want to order a YouTube channel. Niche: ___ Subscribers: ___ Budget: ___");
+document.querySelectorAll(".walink").forEach(a => a.href = CONFIG.whatsappUrl);
 
 let statsDone = false;
 function renderStats(){
   const box = document.getElementById("stats");
-  box.innerHTML = CONFIG.stats.map(s => { const suf = (lang==="bn" && s.bn_suffix) ? s.bn_suffix : s.suffix;
-    return `<div class="stat"><b class="num" data-n="${s.n}" data-suf="${esc(suf)}">${s.n}${esc(suf)}</b><span>${esc(lang==="bn"?s.bn:s.en)}</span></div>`; }).join("");
-  if (!statsDone && !reduce){ statsDone = true; box.querySelectorAll("b").forEach(el => { const n=+el.dataset.n, suf=el.dataset.suf, t0=performance.now();
-    (function f(now){ const p=Math.min(1,(now-t0)/1400), e=1-Math.pow(1-p,3); el.textContent=Math.round(n*e)+suf; if(p<1) requestAnimationFrame(f); })(t0); }); }
+  box.innerHTML = CONFIG.stats.map(s => `<div class="stat"><b class="num" data-v="${esc(s.v)}">${esc(s.v)}</b><span>${esc(lang==="bn"?s.bn:s.en)}</span></div>`).join("");
+  if (!statsDone && !reduce){ statsDone = true; box.querySelectorAll("b").forEach(el => { const m = el.dataset.v.match(/^([\d.]+)(.*)$/); if (!m) return; const n = parseFloat(m[1]), suf = m[2], dec = (m[1].split(".")[1]||"").length, t0 = performance.now();
+    (function f(now){ const p=Math.min(1,(now-t0)/1400), e=1-Math.pow(1-p,3); el.textContent=(n*e).toFixed(dec)+suf; if(p<1) requestAnimationFrame(f); })(t0); }); }
 }
 function socialIcon(k){ return {facebook:"f",tiktok:"♪",youtube:"▶",instagram:"◎"}[k] || "•"; }
 function renderSocials(){
-  document.getElementById("socials").innerHTML = CONFIG.socials.map((s,i) => `<a class="chip" ${s.url?`href="${esc(s.url)}"`:`href="#megh"`} data-social="${i}"><span class="pf ${s.key}">${socialIcon(s.key)}</span><div><b>${esc(s.label)}</b><br><small>${esc(s.handle)} · ${esc(s.followers)}</small></div></a>`).join("");
+  document.getElementById("socials").innerHTML = CONFIG.socials.map(s => `<a class="chip" href="${esc(s.url)}"><span class="pf ${s.key}">${socialIcon(s.key)}</span><div><b>${esc(s.label)} ${s.followers?"· "+esc(s.followers):""}</b><small>${esc(s.handle)} · ${esc(pick(s.sub))}</small></div></a>`).join("");
 }
 function renderPages(){
-  document.getElementById("pageList").innerHTML = CONFIG.pages.map((p,i) => `<button type="button" class="card" data-page="${i}"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>${esc(p.name)}</b><span class="status ${p.status}">${t("d."+p.status)}</span></div><span>${esc(pick(p.niche))} · ${esc(p.followers)}</span><span class="pr">${esc(p.price)}</span></button>`).join("");
+  document.getElementById("pageList").innerHTML = CONFIG.pages.map((p,i) => `<button type="button" class="card" data-page="${i}"><img src="${esc(p.img)}" alt=""><div style="flex:1;min-width:0"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>${esc(p.name)}</b><span class="status ${p.status}">${t("d."+p.status)}</span></div><span>${esc(pick(p.category))} · ${esc(p.followers)} ${t("d.followers").toLowerCase()}</span><span class="pr">${p.price?esc(p.price):t("d.askprice")}</span></div></button>`).join("");
   document.querySelectorAll("[data-page]").forEach(b => b.onclick = () => openPage(+b.dataset.page));
 }
+function renderGuar(){
+  const ic = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>`;
+  document.getElementById("guar").innerHTML = CONFIG.guarantees.map(g => `<div class="g">${ic}<b>${esc(pick(g.t))}</b><span>${esc(pick(g.p))}</span></div>`).join("");
+}
 function renderReviews(){
-  document.getElementById("revList").innerHTML = CONFIG.reviews.map((r,i) => `<button type="button" class="rev" data-rev="${i}"><div class="av ${r.video?"vid":""}">${r.video?"▶":esc(r.name.split(" ").map(w=>w[0]).join("").slice(0,2))}</div><div><div class="stars">★★★★★</div><b>${esc(r.name)} · <span style="display:inline;color:var(--muted);font-weight:500">${esc(pick(r.role))}</span></b><span>${esc(pick(r.text))}</span></div></button>`).join("");
-  document.querySelectorAll("[data-rev]").forEach(b => b.onclick = () => openReview(+b.dataset.rev));
+  const box = document.getElementById("revList");
+  if (CONFIG.reviews.length){
+    box.innerHTML = CONFIG.reviews.map((r,i) => `<button type="button" class="rev" data-rev="${i}"><div class="av">▶</div><div><div class="stars">★★★★★</div><b>${esc(r.name)}</b><span>${esc(pick(r.role))}</span></div></button>`).join("");
+    box.querySelectorAll("[data-rev]").forEach(b => b.onclick = () => openReview(+b.dataset.rev));
+  } else {
+    box.innerHTML = `<a class="rev" href="${esc(CONFIG.agency.videosUrl)}"><div class="av">▶</div><div><div class="stars">★★★★★</div><b>${t("rv.watch")}</b><span>${t("rv.watch.s")}</span></div></a>
+      <a class="rev" href="${esc(CONFIG.agency.url)}"><div class="av" style="background:#000;padding:0;overflow:hidden"><img src="assets/logo.jpg" alt="" style="width:100%;height:100%;object-fit:cover"></div><div><b>${t("rv.page")}</b><span>${t("rv.page.s")}</span></div></a>`;
+  }
 }
 function renderSteps(){
   document.getElementById("steps").innerHTML = CONFIG.steps.map(s => `<div class="step"><div><b>${esc(pick(s.t))}</b><span>${esc(pick(s.p))}</span></div></div>`).join("");
   document.getElementById("faq").innerHTML = CONFIG.faq.map(f => `<details><summary>${esc(pick(f.q))}</summary><p>${esc(pick(f.a))}</p></details>`).join("");
 }
 function renderChannels(){
-  const wa = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.1.7a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.2c0-.1-.2-.2-.5-.3z"/></svg>`;
-  const tg = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.9 4.6L18.7 19.8c-.2 1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.4-5 9.1-8.2c.4-.4-.1-.5-.6-.2L6.2 13.5 1.4 12c-1-.3-1-1 .2-1.5L20.5 3.2c.9-.3 1.6.2 1.4 1.4z"/></svg>`;
-  const ms = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.1 2 11.3c0 2.9 1.4 5.5 3.7 7.2V22l3.4-1.9c.9.3 1.9.4 2.9.4 5.5 0 10-4.1 10-9.3S17.5 2 12 2zm1 12.5l-2.6-2.7-5 2.7 5.5-5.8 2.6 2.7 4.9-2.7-5.4 5.8z"/></svg>`;
+  const yt = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M22.5 6.4a2.8 2.8 0 0 0-2-2C18.8 4 12 4 12 4s-6.8 0-8.5.4a2.8 2.8 0 0 0-2 2A29 29 0 0 0 1 12a29 29 0 0 0 .5 5.6 2.8 2.8 0 0 0 2 2C5.2 20 12 20 12 20s6.8 0 8.5-.4a2.8 2.8 0 0 0 2-2A29 29 0 0 0 23 12a29 29 0 0 0-.5-5.6zM10 15.5v-7l5.5 3.5z"/></svg>`;
   const em = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>`;
   document.getElementById("channels").innerHTML = `
-    <a class="chn" href="${waLink("Hi MEGH, I saw the Fidah portfolio.")}"><span class="ci" style="background:rgba(31,191,98,.18);color:#3ddc97">${wa}</span><div><b>${t("ct.wa")} · ${esc(CONFIG.whatsappDisplay)}</b><span>${t("ct.wa.s")}</span></div></a>
-    <a class="chn" href="https://t.me/${esc(CONFIG.telegramUser)}"><span class="ci" style="background:rgba(59,130,255,.18);color:#6aa6ff">${tg}</span><div><b>${t("ct.tg")} · @${esc(CONFIG.telegramUser)}</b><span>${t("ct.tg.s")}</span></div></a>
-    <a class="chn" href="${esc(CONFIG.messengerUrl)}"><span class="ci" style="background:rgba(160,80,255,.18);color:#c08cff">${ms}</span><div><b>${t("ct.ms")}</b><span>${t("ct.ms.s")}</span></div></a>
+    <a class="chn wa" href="${esc(CONFIG.whatsappUrl)}"><span class="ci" style="background:rgba(37,211,102,.25);color:#3ddc97">${WA_SVG}</span><div><b>${t("ct.wa")}</b><span>${t("ct.wa.s")}</span></div></a>
+    <a class="chn" href="${esc(CONFIG.agency.url)}"><span class="ci"><img src="assets/logo.jpg" alt=""></span><div><b>${t("ct.fb")} · ${esc(CONFIG.agency.followers)}</b><span>${t("ct.fb.s")}</span></div></a>
+    <a class="chn" href="${esc(CONFIG.socials[0].url)}"><span class="ci" style="background:rgba(255,0,51,.18);color:#ff3d57">${yt}</span><div><b>${t("ct.yt")}</b><span>${t("ct.yt.s")}</span></div></a>
     <a class="chn" href="mailto:${esc(CONFIG.email)}"><span class="ci" style="background:rgba(255,200,87,.16);color:var(--gold)">${em}</span><div><b>${t("ct.em")} · ${esc(CONFIG.email)}</b><span>${t("ct.em.s")}</span></div></a>`;
 }
 function renderDots(){
   document.getElementById("dots").innerHTML = CH.map((id,i) => `<a href="#${id}" data-dot="${i}" aria-label="${t("ch."+i)}"><span>${t("ch."+i)}</span></a>`).join("");
 }
 
-/* ---------------- detail modal ---------------- */
 const detail = document.getElementById("detail");
 function openDetail(pfHtml, title, sub, body, foot){
   document.getElementById("dPf").outerHTML = pfHtml;
@@ -525,29 +547,32 @@ detail.addEventListener("click", e => { if (e.target === detail) closeDetail(); 
 addEventListener("keydown", e => { if (e.key === "Escape") closeDetail(); });
 function openPage(i){
   const p = CONFIG.pages[i];
-  openDetail(`<div class="pf" id="dPf" style="background:rgba(59,130,255,.18);color:var(--fb);border:1px solid rgba(59,130,255,.4)">f</div>`, p.name, pick(p.niche) + " · " + t("d."+p.status),
-    `<div class="kv"><div><span>${t("d.followers")}</span><b class="num">${esc(p.followers)}</b></div><div><span>${t("d.since")}</span><b class="num">${esc(p.since)}</b></div><div><span>${t("d.reach")}</span><b class="num">${esc(p.reach)}</b></div><div><span>${t("d.extra")}</span><b>${esc(pick(p.extra))}</b></div></div>`,
-    `<div class="price"><small>${t("d.price")}</small>${esc(p.price)}</div>${p.status==="sold"?"":`<a class="btn wa" href="${waLink("Hi MEGH, I am interested in the page: "+p.name+" ("+p.followers+")")}">${t("d.ask")}</a>`}`);
+  openDetail(`<div class="pf" id="dPf"><img src="${esc(p.img)}" alt=""></div>`, p.name, pick(p.category) + " · " + t("d."+p.status),
+    `<div class="kv"><div><span>${t("d.followers")}</span><b class="num">${esc(p.followers)}</b></div><div><span>${t("d.category")}</span><b>${esc(pick(p.category))}</b></div>${p.talking?`<div><span>${t("d.talking")}</span><b class="num">${esc(p.talking)}</b></div>`:""}<div><span>${t("d.status")}</span><b>${t("d."+p.status)}</b></div></div>`,
+    `<div class="price"><small>${t("d.price")}</small>${p.price?esc(p.price):t("d.askprice")}</div><a class="btn ghost" href="${esc(p.url)}">${t("d.open")}</a>${p.status==="sold"?"":`<a class="btn wa" style="margin-left:0" href="${esc(CONFIG.whatsappUrl)}">${WA_SVG}${t("d.ask")}</a>`}`);
 }
 function openReview(i){
   const r = CONFIG.reviews[i];
-  openDetail(`<div class="pf" id="dPf" style="background:linear-gradient(135deg,var(--gold),#ff9a3d);color:#1a1200">${esc(r.name.split(" ").map(w=>w[0]).join("").slice(0,2))}</div>`, r.name, pick(r.role),
-    `${r.video ? `<video controls playsinline preload="metadata" src="${esc(r.video)}"></video>` : `<p style="color:var(--muted);font-size:13px">${t("d.novideo")}</p>`}<div class="stars" style="margin-top:10px">★★★★★</div><p style="font-size:16px">“${esc(pick(r.text))}”</p>`, ``);
+  openDetail(`<div class="pf" id="dPf" style="background:var(--yt);color:#fff">▶</div>`, r.name, pick(r.role),
+    `<video controls playsinline preload="metadata" src="${esc(r.video)}"></video><div class="stars" style="margin-top:10px">★★★★★</div>${r.text?`<p style="font-size:15px">“${esc(pick(r.text))}”</p>`:""}`, ``);
   const v = detail.querySelector("video"); if (v) v.play().catch(()=>{});
 }
 function openSocial(i){
   const s = CONFIG.socials[i];
-  openDetail(`<div class="pf ${s.key} pf" id="dPf" style="color:#fff">${socialIcon(s.key)}</div>`, s.label + " · " + s.handle, s.followers,
-    ``, s.url ? `<a class="btn gold" href="${esc(s.url)}">${t("d.open")}</a>` : ``);
+  openDetail(`<div class="pf ${s.key}" id="dPf" style="color:#fff">${socialIcon(s.key)}</div>`, s.label + " · " + s.handle, (s.followers ? s.followers + " " : "") + pick(s.sub),
+    ``, `<a class="btn gold" href="${esc(s.url)}">${t("d.openp")}</a>`);
+}
+function openReviewsLink(){
+  openDetail(`<div class="pf" id="dPf" style="background:#000"><img src="assets/logo.jpg" alt=""></div>`, t("rv.page"), t("rv.page.s"), `<p style="color:var(--muted);font-size:14px">${esc(CONFIG.agency.tagline)}</p>`, `<a class="btn gold" href="${esc(CONFIG.agency.videosUrl)}">${t("rv.watch")}</a>`);
 }
 
-/* ---------------- cursor, magnet, ripple ---------------- */
+/* cursor, magnet, ripple */
 const cur = document.getElementById("cur");
 let cx = innerWidth/2, cy = innerHeight/2, rx = cx, ry = cy;
 if (fine && !reduce) document.body.classList.add("cur-on");
 addEventListener("pointermove", e => { cx = e.clientX; cy = e.clientY; }, {passive:true});
-addEventListener("pointerover", e => { if (e.target.closest("a,button,summary,.card,.rev,.chip")) cur.classList.add("hot"); }, true);
-addEventListener("pointerout", e => { if (e.target.closest("a,button,summary,.card,.rev,.chip")) cur.classList.remove("hot"); }, true);
+addEventListener("pointerover", e => { if (e.target.closest("a,button,summary,.card,.rev,.chip,.g")) cur.classList.add("hot"); }, true);
+addEventListener("pointerout", e => { if (e.target.closest("a,button,summary,.card,.rev,.chip,.g")) cur.classList.remove("hot"); }, true);
 addEventListener("pointerdown", e => { const r = document.createElement("div"); r.className = "ripple"; r.style.left = e.clientX+"px"; r.style.top = e.clientY+"px"; document.body.appendChild(r); setTimeout(()=>r.remove(), 650); beep(240,.08,.03,"square"); });
 function bindMagnet(){
   if (!fine || reduce) return;
@@ -557,10 +582,7 @@ function bindMagnet(){
     b.addEventListener("pointerleave", () => b.style.transform = "");
   });
 }
-
 applyLang();
-document.querySelectorAll("[data-social]").forEach(a => a.addEventListener("click", e => { if (!CONFIG.socials[+a.dataset.social].url){ e.preventDefault(); openSocial(+a.dataset.social); } }));
-document.getElementById("socials").addEventListener("click", e => { const a = e.target.closest("[data-social]"); if (a && !CONFIG.socials[+a.dataset.social].url){ e.preventDefault(); openSocial(+a.dataset.social); } });
 
 /* ============================================================
    THE 3D WORLD
@@ -574,19 +596,17 @@ document.getElementById("socials").addEventListener("click", e => { const a = e.
   const scene = new THREE.Scene();
   scene.fog = new THREE.FogExp2(0x06080f, 0.05);
   const camera = new THREE.PerspectiveCamera(52, 1, 0.1, 120);
-  const D = 16;                      // depth per chapter
-  const N = CH.length;
+  const D = 16, N = CH.length;
   let wide = innerWidth > 820;
   const sideX = () => wide ? 3.4 : 0;
-  const sideY = () => wide ? 0 : 2.5;
+  const sideY = () => wide ? 0 : 4.0;
 
-  scene.add(new THREE.AmbientLight(0x8fa3ff, 0.5));
+  scene.add(new THREE.AmbientLight(0x8fa3ff, 0.55));
   const keyB = new THREE.PointLight(0x3b82ff, 2.4, 40); scene.add(keyB);
   const keyR = new THREE.PointLight(0xff3d57, 1.6, 40); scene.add(keyR);
   const keyG = new THREE.PointLight(0xffc857, 1.2, 30); scene.add(keyG);
   const top = new THREE.DirectionalLight(0xffffff, .5); top.position.set(2,6,3); scene.add(top);
 
-  // tunnel: floor grid + ceiling grid + particles along the whole length
   const total = (N-1)*D + 30;
   const gridF = new THREE.GridHelper(total, total/2, 0x3b82ff, 0x152446); gridF.material.transparent = true; gridF.material.opacity = .22; gridF.position.set(0,-3.4,-(N-1)*D/2); gridF.rotation.y = Math.PI/2; scene.add(gridF);
   const gridC = gridF.clone(); gridC.position.y = 4.2; gridC.material = gridF.material.clone(); gridC.material.opacity = .08; scene.add(gridC);
@@ -595,92 +615,102 @@ document.getElementById("socials").addEventListener("click", e => { const a = e.
   const pGeo = new THREE.BufferGeometry(); pGeo.setAttribute("position", new THREE.BufferAttribute(pPos,3));
   const pts = new THREE.Points(pGeo, new THREE.PointsMaterial({color:0x9fb6ff, size:.06, transparent:true, opacity:.75})); scene.add(pts);
 
-  // texture helpers (canvas drawn, no external images)
   function tex(w,h,draw){ const c=document.createElement("canvas"); c.width=w; c.height=h; const g=c.getContext("2d"); draw(g,w,h); const tx=new THREE.CanvasTexture(c); tx.anisotropy=4; return tx; }
   function roundRect(g,x,y,w,h,r){ g.beginPath(); g.moveTo(x+r,y); g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r); g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath(); }
   const PF = {facebook:"#1877f2", tiktok:"#00f2ea", youtube:"#ff0033", instagram:"#e1306c"};
-  function pageTex(p){ return tex(512,320,(g,w,h)=>{
-    const bg=g.createLinearGradient(0,0,w,h); bg.addColorStop(0,"#182340"); bg.addColorStop(1,"#0b0f1c"); g.fillStyle=bg; g.fillRect(0,0,w,h);
-    g.fillStyle="#3b82ff"; g.fillRect(0,0,w,10);
-    g.beginPath(); g.arc(58,78,30,0,Math.PI*2); g.fillStyle="#3b82ff"; g.fill();
-    g.fillStyle="#fff"; g.font="bold 34px sans-serif"; g.textAlign="center"; g.textBaseline="middle"; g.fillText("f",58,80);
-    g.textAlign="left"; g.fillStyle="#edf1fb"; g.font="bold 30px sans-serif"; g.fillText(p.name,106,68);
-    g.fillStyle="#97a3c2"; g.font="20px sans-serif"; g.fillText(p.niche.en+" · since "+p.since,106,98);
-    g.fillStyle="#edf1fb"; g.font="bold 58px sans-serif"; g.fillText(p.followers,40,182);
-    g.fillStyle="#97a3c2"; g.font="18px sans-serif"; g.fillText("followers",40,218);
-    for(let i=0;i<14;i++){ const bh=18+((i*37)%50)+(i>10?25:0); g.fillStyle=i>10?"#3b82ff":"rgba(151,163,194,.35)"; g.fillRect(40+i*31,300-bh,20,bh); }
-    g.textAlign="right"; g.fillStyle=p.status==="sold"?"#ffc857":p.status==="reserved"?"#97a3c2":"#3ddc97"; g.font="bold 20px sans-serif"; g.fillText(p.status.toUpperCase(),w-30,182);
-    g.fillStyle="#ffc857"; g.font="bold 26px sans-serif"; g.fillText(p.price,w-30,222);
-  }); }
+  const imgCache = {};
+  function withImage(src, cb){ if (imgCache[src]) { if (imgCache[src].complete) cb(imgCache[src]); else imgCache[src].addEventListener("load", () => cb(imgCache[src])); return; } const im = new Image(); im.crossOrigin = "anonymous"; imgCache[src] = im; im.addEventListener("load", () => cb(im)); im.src = src; }
+  // page card: photo on the left, numbers on the right; redrawn when the photo arrives
+  function pageTex(p){
+    const c=document.createElement("canvas"); c.width=512; c.height=320; const g=c.getContext("2d"); const tx=new THREE.CanvasTexture(c); tx.anisotropy=4;
+    function draw(im){
+      const bg=g.createLinearGradient(0,0,512,320); bg.addColorStop(0,"#182340"); bg.addColorStop(1,"#0b0f1c"); g.fillStyle=bg; g.fillRect(0,0,512,320);
+      g.fillStyle="#3b82ff"; g.fillRect(0,0,512,10);
+      g.save(); roundRect(g,28,40,200,200,28); g.clip(); if (im) g.drawImage(im,28,40,200,200); else { g.fillStyle="#223055"; g.fillRect(28,40,200,200); } g.restore();
+      g.beginPath(); g.arc(218,230,22,0,Math.PI*2); g.fillStyle="#1877f2"; g.fill(); g.fillStyle="#fff"; g.font="bold 26px sans-serif"; g.textAlign="center"; g.textBaseline="middle"; g.fillText("f",218,232);
+      g.textAlign="left"; g.fillStyle="#edf1fb"; g.font="bold 28px sans-serif"; g.fillText(p.name,252,74);
+      g.fillStyle="#97a3c2"; g.font="19px sans-serif"; g.fillText(p.category.en,252,104);
+      g.fillStyle="#edf1fb"; g.font="bold 50px sans-serif"; g.fillText(p.followers,252,170);
+      g.fillStyle="#97a3c2"; g.font="18px sans-serif"; g.fillText("followers",252,204);
+      g.fillStyle=p.status==="sold"?"#ffc857":p.status==="reserved"?"#97a3c2":"#3ddc97"; g.font="bold 18px sans-serif"; g.fillText(p.status==="available"?"IN STOCK":p.status.toUpperCase(),252,240);
+      g.fillStyle="#ffc857"; g.font="bold 20px sans-serif"; g.textAlign="right"; g.fillText(p.price||"ASK PRICE",484,290);
+      g.fillStyle="#97a3c2"; g.font="16px sans-serif"; g.textAlign="left"; g.fillText("fidah · verified live",28,290);
+      tx.needsUpdate=true;
+    }
+    draw(null); withImage(p.img, draw); return tx;
+  }
   function socialTex(s){ return tex(400,400,(g,w,h)=>{
     g.fillStyle="#0b0f1c"; g.fillRect(0,0,w,h);
     const col=PF[s.key]||"#fff"; const gr=g.createRadialGradient(200,160,10,200,160,260); gr.addColorStop(0,col+"66"); gr.addColorStop(1,"#0b0f1c"); g.fillStyle=gr; g.fillRect(0,0,w,h);
-    roundRect(g,120,70,160,160,40); g.fillStyle=col; g.fill();
-    g.fillStyle="#fff"; g.font="bold 96px sans-serif"; g.textAlign="center"; g.textBaseline="middle"; g.fillText(socialIcon(s.key),200,152);
-    g.fillStyle="#edf1fb"; g.font="bold 34px sans-serif"; g.fillText(s.label,200,285);
-    g.fillStyle="#97a3c2"; g.font="22px sans-serif"; g.fillText(s.handle,200,325);
-    g.fillStyle="#ffc857"; g.font="bold 24px sans-serif"; g.fillText(s.followers,200,362);
+    roundRect(g,120,60,160,160,40); g.fillStyle=col; g.fill();
+    g.fillStyle="#fff"; g.font="bold 96px sans-serif"; g.textAlign="center"; g.textBaseline="middle"; g.fillText(socialIcon(s.key),200,142);
+    g.fillStyle="#edf1fb"; g.font="bold 52px sans-serif"; g.fillText(s.followers||s.label,200,282);
+    g.fillStyle="#97a3c2"; g.font="22px sans-serif"; g.fillText(s.followers?s.label+" · "+s.sub.en.split(" ·")[0]:s.handle,200,330);
+    g.fillStyle="#ffc857"; g.font="bold 20px sans-serif"; g.fillText(s.handle,200,366);
   }); }
-  function reviewTex(r){ return tex(360,480,(g,w,h)=>{
+  function photoTex(src, rot=0){ const c=document.createElement("canvas"); c.width=512; c.height=512; const g=c.getContext("2d"); g.fillStyle="#223055"; g.fillRect(0,0,512,512); const tx=new THREE.CanvasTexture(c); tx.center.set(.5,.5); tx.rotation=rot; withImage(src, im => { g.drawImage(im,0,0,512,512); tx.needsUpdate=true; }); return tx; }
+  function reviewTex(i){ return tex(360,480,(g,w,h)=>{
     const bg=g.createLinearGradient(0,0,0,h); bg.addColorStop(0,"#1a1430"); bg.addColorStop(1,"#0b0f1c"); g.fillStyle=bg; g.fillRect(0,0,w,h);
-    g.beginPath(); g.arc(w/2,170,54,0,Math.PI*2); g.fillStyle="#ffc857"; g.fill();
-    g.fillStyle="#1a1200"; g.font="bold 40px sans-serif"; g.textAlign="center"; g.textBaseline="middle"; g.fillText(r.name.split(" ").map(x=>x[0]).join("").slice(0,2),w/2,172);
-    g.beginPath(); g.arc(w/2,170,70,0,Math.PI*2); g.strokeStyle="rgba(255,255,255,.35)"; g.lineWidth=3; g.stroke();
-    g.fillStyle="#ffc857"; g.font="28px sans-serif"; g.fillText("★★★★★",w/2,268);
-    g.fillStyle="#edf1fb"; g.font="bold 28px sans-serif"; g.fillText(r.name,w/2,312);
-    g.fillStyle="#97a3c2"; g.font="20px sans-serif"; g.fillText(r.role.en,w/2,346);
-    roundRect(g,w/2-70,392,140,46,23); g.fillStyle=r.video?"#ff3d57":"rgba(255,255,255,.12)"; g.fill();
-    g.fillStyle="#fff"; g.font="bold 20px sans-serif"; g.fillText(r.video?"▶  PLAY":"READ",w/2,416);
+    g.beginPath(); g.arc(w/2,190,60,0,Math.PI*2); g.fillStyle="#ff3d57"; g.fill();
+    g.fillStyle="#fff"; g.font="bold 54px sans-serif"; g.textAlign="center"; g.textBaseline="middle"; g.fillText("▶",w/2+5,192);
+    g.fillStyle="#ffc857"; g.font="28px sans-serif"; g.fillText("★★★★★",w/2,290);
+    g.fillStyle="#edf1fb"; g.font="bold 26px sans-serif"; g.fillText("CLIENT REVIEW",w/2,336);
+    g.fillStyle="#97a3c2"; g.font="20px sans-serif"; g.fillText("#"+(i+1)+" · on Facebook",w/2,370);
+    roundRect(g,w/2-80,400,160,46,23); g.fillStyle="rgba(255,255,255,.12)"; g.fill(); g.fillStyle="#fff"; g.font="bold 18px sans-serif"; g.fillText("WATCH",w/2,424);
   }); }
-  function labelTex(txt, col="#ffc857"){ return tex(512,128,(g,w,h)=>{ g.clearRect(0,0,w,h); g.fillStyle=col; g.font="bold 54px sans-serif"; g.textAlign="center"; g.textBaseline="middle"; g.fillText(txt,w/2,h/2); }); }
+  function labelTex(txt, col="#ffc857"){ return tex(640,128,(g,w,h)=>{ g.clearRect(0,0,w,h); g.fillStyle=col; g.font="bold 52px sans-serif"; g.textAlign="center"; g.textBaseline="middle"; g.fillText(txt,w/2,h/2); }); }
 
-  const hot = [];   // interactive meshes
+  const hot = [];
   function makeHot(mesh, data){ Object.assign(mesh.userData, {base:mesh.scale.x, hov:0}, data); hot.push(mesh); return mesh; }
-  function glowPlane(w,h,col,op=.16){ return new THREE.Mesh(new THREE.PlaneGeometry(w,h), new THREE.MeshBasicMaterial({color:col, transparent:true, opacity:op, blending:THREE.AdditiveBlending, depthWrite:false})); }
+  const glowTex = tex(256,256,(g,w,h)=>{ const gr=g.createRadialGradient(128,128,0,128,128,128); gr.addColorStop(0,"rgba(255,255,255,1)"); gr.addColorStop(.35,"rgba(255,255,255,.45)"); gr.addColorStop(1,"rgba(255,255,255,0)"); g.fillStyle=gr; g.fillRect(0,0,w,h); });
+  function glowPlane(w,h,col,op=.16){ return new THREE.Mesh(new THREE.PlaneGeometry(w*1.6,h*1.6), new THREE.MeshBasicMaterial({map:glowTex, color:col, transparent:true, opacity:Math.min(1,op*2.2), blending:THREE.AdditiveBlending, depthWrite:false})); }
   const groups = [];
   function chapter(i){ const g = new THREE.Group(); g.position.z = -i*D; scene.add(g); groups[i] = g; return g; }
+  const side = () => new THREE.MeshStandardMaterial({color:0x1b2440, metalness:.5, roughness:.4});
+  function faced(geo, map, emissive=0x101a33){ const s = side(); return new THREE.Mesh(geo, [s,s,s,s,new THREE.MeshStandardMaterial({map, metalness:.2, roughness:.4, emissive, emissiveIntensity:.5}),s]); }
 
-  /* 0 HOME: reactive core + rings + orbiting mini cards */
+  /* 0 HOME: spinning Fidah logo coin + reactive core + orbiting page cards */
   const g0 = chapter(0);
-  const core = new THREE.Mesh(new THREE.IcosahedronGeometry(1.15, 1), new THREE.MeshStandardMaterial({color:0x0d1220, metalness:.9, roughness:.25, emissive:0x3b82ff, emissiveIntensity:.5, wireframe:true}));
-  const coreIn = new THREE.Mesh(new THREE.IcosahedronGeometry(.72, 2), new THREE.MeshStandardMaterial({color:0x3b82ff, emissive:0x3b82ff, emissiveIntensity:1.2, metalness:.3, roughness:.4}));
-  const coreGroup = new THREE.Group(); coreGroup.add(core, coreIn); coreGroup.add(glowPlane(5,5,0x3b82ff,.12));
-  g0.add(coreGroup); makeHot(core, {kind:"core"});
-  const r1 = new THREE.Mesh(new THREE.TorusGeometry(2.4,.025,10,160), new THREE.MeshBasicMaterial({color:0xffc857, transparent:true, opacity:.6})); r1.rotation.x = Math.PI/2.3; g0.add(r1);
-  const r2 = new THREE.Mesh(new THREE.TorusGeometry(3.1,.02,10,160), new THREE.MeshBasicMaterial({color:0x3b82ff, transparent:true, opacity:.45})); r2.rotation.x = Math.PI/1.8; r2.rotation.y = .6; g0.add(r2);
+  const logoMat = () => new THREE.MeshBasicMaterial({map:photoTex("assets/logo.jpg", Math.PI/2)});
+  const coin = new THREE.Mesh(new THREE.CylinderGeometry(1.15,1.15,.16,64), [new THREE.MeshStandardMaterial({color:0xffc857, metalness:.9, roughness:.25}), logoMat(), logoMat()]);
+  coin.rotation.x = Math.PI/2; const coinG = new THREE.Group(); coinG.add(coin); coinG.add(glowPlane(4.5,4.5,0xffc857,.14)); g0.add(coinG); makeHot(coin, {kind:"core"});
+  const core = new THREE.Mesh(new THREE.IcosahedronGeometry(2.1, 1), new THREE.MeshStandardMaterial({color:0x0d1220, metalness:.9, roughness:.25, emissive:0x3b82ff, emissiveIntensity:.5, wireframe:true})); g0.add(core);
+  const r1 = new THREE.Mesh(new THREE.TorusGeometry(2.9,.025,10,160), new THREE.MeshBasicMaterial({color:0xffc857, transparent:true, opacity:.6})); r1.rotation.x = Math.PI/2.3; g0.add(r1);
+  const r2 = new THREE.Mesh(new THREE.TorusGeometry(3.5,.02,10,160), new THREE.MeshBasicMaterial({color:0x3b82ff, transparent:true, opacity:.45})); r2.rotation.x = Math.PI/1.8; r2.rotation.y = .6; g0.add(r2);
   const orbit = new THREE.Group(); g0.add(orbit);
   const cardGeo = new THREE.BoxGeometry(2.0, 1.25, .07);
-  CONFIG.pages.slice(0,6).forEach((p,i) => {
-    const m = new THREE.Mesh(cardGeo, [0,1,2,3,4,5].map(k => k===4 ? new THREE.MeshStandardMaterial({map:pageTex(p), metalness:.2, roughness:.4, emissive:0x101a33, emissiveIntensity:.5}) : new THREE.MeshStandardMaterial({color:0x1b2440, metalness:.5, roughness:.4})));
-    m.scale.setScalar(.62); const a = i/6*Math.PI*2; m.userData.a = a; m.position.set(Math.cos(a)*4.2, Math.sin(a*2)*.6, Math.sin(a)*2.2);
-    orbit.add(m); makeHot(m, {kind:"page", i, ring:false});
+  CONFIG.pages.forEach((p,i) => {
+    const m = faced(cardGeo, pageTex(p)); m.scale.setScalar(.6); const a = i/CONFIG.pages.length*Math.PI*2; m.position.set(Math.cos(a)*4.6, Math.sin(a*2)*.6, Math.sin(a)*2.4);
+    orbit.add(m); makeHot(m, {kind:"page", i, a});
   });
 
-  /* 1 MEGH: four social tiles in an arc */
+  /* 1 MEGH: photo disc + social tiles */
   const g1 = chapter(1);
+  const meghMat = () => new THREE.MeshBasicMaterial({map:photoTex("assets/megh.jpg", Math.PI/2)});
+  const disc = new THREE.Mesh(new THREE.CylinderGeometry(1.25,1.25,.12,64), [new THREE.MeshStandardMaterial({color:0xffc857, metalness:.9, roughness:.3}), meghMat(), meghMat()]);
+  disc.rotation.x = Math.PI/2; const discG = new THREE.Group(); discG.add(disc); discG.add(glowPlane(3.6,3.6,0xffc857,.14)); discG.position.set(0,.2,1.0); g1.add(discG); makeHot(disc, {kind:"megh"});
   const tiles = [];
   CONFIG.socials.forEach((s,i) => {
-    const m = new THREE.Mesh(new THREE.BoxGeometry(1.7,1.7,.18), [0,1,2,3,4,5].map(k => k===4 ? new THREE.MeshStandardMaterial({map:socialTex(s), metalness:.3, roughness:.35, emissive:0x111a33, emissiveIntensity:.5}) : new THREE.MeshStandardMaterial({color:0x1b2440, metalness:.6, roughness:.4})));
-    const a = (i-1.5)*.55; m.position.set(Math.sin(a)*3.2, (i%2?.9:-.6), -Math.abs(Math.cos(a))*0.4); m.rotation.y = -a*.6; m.userData.ph = i;
-    const gl = glowPlane(2.4,2.4,new THREE.Color(PF[s.key]||"#fff"),.14); gl.position.z = -.12; m.add(gl);
+    const m = faced(new THREE.BoxGeometry(1.45,1.45,.16), socialTex(s), 0x111a33);
+    const a = (i-1.5)*.78; m.position.set(Math.sin(a)*3.9, (i%2?1.6:-1.4), -.6); m.rotation.y = -a*.5; m.userData.ph = i; m.userData.a = a;
+    const gl = glowPlane(2.1,2.1,new THREE.Color(PF[s.key]||"#fff"),.14); gl.position.z = -.1; m.add(gl);
     g1.add(m); tiles.push(m); makeHot(m, {kind:"social", i});
   });
-  const meghLabel = new THREE.Mesh(new THREE.PlaneGeometry(5,1.25), new THREE.MeshBasicMaterial({map:labelTex("VOICE OF MEGH","#ffffff"), transparent:true, opacity:.9})); meghLabel.position.set(0,2.6,-1.5); g1.add(meghLabel);
+  const meghLabel = new THREE.Mesh(new THREE.PlaneGeometry(5,1), new THREE.MeshBasicMaterial({map:labelTex("VOICE OF MEGH · 3.7M+","#ffffff"), transparent:true, opacity:.9})); meghLabel.position.set(0,3.2,-1.4); g1.add(meghLabel);
 
   /* 2 PAGES: draggable ring */
   const g2 = chapter(2);
   const ring = new THREE.Group(); g2.add(ring);
-  const RR = 4.0;
+  const RR = 3.8;
   CONFIG.pages.forEach((p,i) => {
-    const m = new THREE.Mesh(cardGeo, [0,1,2,3,4,5].map(k => k===4 ? new THREE.MeshStandardMaterial({map:pageTex(p), metalness:.2, roughness:.4, emissive:0x101a33, emissiveIntensity:.5}) : new THREE.MeshStandardMaterial({color:0x1b2440, metalness:.5, roughness:.4})));
-    const a = i/CONFIG.pages.length*Math.PI*2; m.position.set(Math.sin(a)*RR, 0, Math.cos(a)*RR); m.rotation.y = a; m.scale.setScalar(.95);
+    const m = faced(cardGeo, pageTex(p)); const a = i/CONFIG.pages.length*Math.PI*2; m.position.set(Math.sin(a)*RR, 0, Math.cos(a)*RR); m.rotation.y = a; m.scale.setScalar(1.05);
     const gl = glowPlane(2.4,1.6,0x3b82ff,.1); gl.position.z = -.08; m.add(gl);
     ring.add(m); makeHot(m, {kind:"page", i, ring:true});
   });
   const ringBase = new THREE.Mesh(new THREE.TorusGeometry(RR,.03,8,120), new THREE.MeshBasicMaterial({color:0x3b82ff, transparent:true, opacity:.5})); ringBase.rotation.x = Math.PI/2; ringBase.position.y = -1.1; ring.add(ringBase);
   let ringVel = 0, ringRot = 0, dragging = false, lastX = 0;
 
-  /* 3 YOUTUBE: play button that solidifies as you scroll, plus "ORDER" badges */
+  /* 3 YOUTUBE */
   const g3 = chapter(3);
   const ytBody = new THREE.Mesh(new THREE.BoxGeometry(3.6,2.5,.5), new THREE.MeshStandardMaterial({color:0xff0033, metalness:.3, roughness:.35, emissive:0xff3d57, emissiveIntensity:.35, transparent:true, opacity:.15, wireframe:true}));
   const tri = new THREE.Shape(); tri.moveTo(-.5,-.65); tri.lineTo(.7,0); tri.lineTo(-.5,.65); tri.closePath();
@@ -689,60 +719,70 @@ document.getElementById("socials").addEventListener("click", e => { const a = e.
   g3.add(glowPlane(6,4.5,0xff3d57,.1));
   const ytWire = new THREE.Mesh(new THREE.BoxGeometry(3.6,2.5,.5), new THREE.MeshBasicMaterial({color:0xff3d57, wireframe:true, transparent:true, opacity:.8})); g3.add(ytWire);
   const badges = [];
-  ["ORDER","NICHE","MONETIZED","CLEAN"].forEach((w,i) => { const b = new THREE.Mesh(new THREE.PlaneGeometry(2.2,.55), new THREE.MeshBasicMaterial({map:labelTex(w), transparent:true})); b.position.set(Math.cos(i*1.6)*3.2, Math.sin(i*1.6)*2, .6+Math.sin(i)*.5); b.userData.i = i; g3.add(b); badges.push(b); });
+  ["ORDER","NICHE","MONETIZED","CLEAN"].forEach((w,i) => { const b = new THREE.Mesh(new THREE.PlaneGeometry(2.4,.5), new THREE.MeshBasicMaterial({map:labelTex(w), transparent:true})); b.userData.i = i; g3.add(b); badges.push(b); });
 
-  /* 4 AGENCY: bars that grow with scroll */
+  /* 4 AGENCY: bars = services */
   const g4 = chapter(4);
   const bars = [];
-  CONFIG.agencyBars.forEach((b,i) => {
+  CONFIG.services.forEach((label,i) => {
+    const h = [.95,.65,.5,.8,.7][i%5];
     const m = new THREE.Mesh(new THREE.BoxGeometry(.7,1,.7), new THREE.MeshStandardMaterial({color:i%2?0x3b82ff:0xffc857, emissive:i%2?0x3b82ff:0xffc857, emissiveIntensity:.35, metalness:.4, roughness:.4}));
-    m.position.set((i-2)*1.05, -1.6, 0); m.userData.h = b.h*3.6; m.scale.y = .05; g4.add(m); bars.push(m);
-    const lab = new THREE.Mesh(new THREE.PlaneGeometry(2.4,.6), new THREE.MeshBasicMaterial({map:labelTex(b.label,"#ffffff"), transparent:true, opacity:0})); lab.position.set((i-2)*1.05,-1.6,.6); g4.add(lab); m.userData.lab = lab;
+    m.position.set((i-2)*1.05, -1.6, 0); m.userData.h = h*3.6; m.scale.y = .05; g4.add(m); bars.push(m);
+    const lab = new THREE.Mesh(new THREE.PlaneGeometry(2.6,.55), new THREE.MeshBasicMaterial({map:labelTex(label,"#ffffff"), transparent:true, opacity:0})); lab.position.set((i-2)*1.05,-1.6,.6); g4.add(lab); m.userData.lab = lab;
     makeHot(m, {kind:"bar", i});
   });
   const floor4 = new THREE.Mesh(new THREE.PlaneGeometry(7,3), new THREE.MeshBasicMaterial({color:0x3b82ff, transparent:true, opacity:.08})); floor4.rotation.x = -Math.PI/2; floor4.position.y = -1.6; g4.add(floor4);
 
-  /* 5 REVIEWS: curved wall of frames */
+  /* 5 TRUST: shield with check + orbiting guarantees */
   const g5 = chapter(5);
-  const frames = [];
-  CONFIG.reviews.forEach((r,i) => {
-    const m = new THREE.Mesh(new THREE.BoxGeometry(1.5,2,.08), [0,1,2,3,4,5].map(k => k===4 ? new THREE.MeshStandardMaterial({map:reviewTex(r), metalness:.2, roughness:.4, emissive:0x1a1430, emissiveIntensity:.6}) : new THREE.MeshStandardMaterial({color:0x2a2140, metalness:.5, roughness:.4})));
-    const n = CONFIG.reviews.length, a = (i-(n-1)/2)*.42; m.position.set(Math.sin(a)*5, (i%2?.5:-.3), -Math.abs(1-Math.cos(a))*4); m.rotation.y = -a; m.userData.ph = i*1.3;
-    const gl = glowPlane(1.9,2.4,0xffc857,.08); gl.position.z = -.08; m.add(gl);
-    g5.add(m); frames.push(m); makeHot(m, {kind:"review", i});
-  });
+  const sh = new THREE.Shape(); sh.moveTo(0,1.6); sh.lineTo(1.4,1.1); sh.lineTo(1.3,-.3); sh.quadraticCurveTo(1.1,-1.2,0,-1.7); sh.quadraticCurveTo(-1.1,-1.2,-1.3,-.3); sh.lineTo(-1.4,1.1); sh.closePath();
+  const shield = new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:.3,bevelEnabled:true,bevelSize:.06,bevelThickness:.06}), new THREE.MeshStandardMaterial({color:0x0f2a22, metalness:.6, roughness:.3, emissive:0x3ddc97, emissiveIntensity:.35}));
+  const check = new THREE.Mesh(new THREE.TorusGeometry(.55,.07,12,40,Math.PI*1.2), new THREE.MeshBasicMaterial({color:0x3ddc97})); check.position.z=.42; check.rotation.z=-.2;
+  const checkTxt = new THREE.Mesh(new THREE.PlaneGeometry(1.6,1.6), new THREE.MeshBasicMaterial({map:labelTex("✓","#3ddc97"), transparent:true})); checkTxt.position.z=.45; checkTxt.scale.set(1.6,1,1);
+  const shieldG = new THREE.Group(); shieldG.add(shield, checkTxt); shieldG.add(glowPlane(5,5,0x3ddc97,.12)); g5.add(shieldG); makeHot(shield, {kind:"shield"});
+  const sats = [];
+  ["LIVE VERIFY","MIDDLEMAN OK","PRICE IN WRITING","7-DAY SUPPORT"].forEach((w,i) => { const b = new THREE.Mesh(new THREE.PlaneGeometry(3,.55), new THREE.MeshBasicMaterial({map:labelTex(w,"#3ddc97"), transparent:true})); b.userData.i=i; g5.add(b); sats.push(b); });
+  const satRing = new THREE.Mesh(new THREE.TorusGeometry(3.3,.02,8,120), new THREE.MeshBasicMaterial({color:0x3ddc97, transparent:true, opacity:.4})); satRing.rotation.x = Math.PI/2.6; g5.add(satRing);
 
-  /* 6 PROCESS: five gates the camera flies through */
+  /* 6 REVIEWS: curved wall of frames */
   const g6 = chapter(6);
+  const frames = [];
+  const revN = CONFIG.reviews.length || 4;
+  for (let i=0;i<revN;i++){
+    const m = faced(new THREE.BoxGeometry(1.5,2,.08), reviewTex(i), 0x1a1430);
+    const a = (i-(revN-1)/2)*.42; m.position.set(Math.sin(a)*5, (i%2?.5:-.3), -Math.abs(1-Math.cos(a))*4); m.rotation.y = -a; m.userData.ph = i*1.3; m.userData.a = a;
+    const gl = glowPlane(1.9,2.4,0xffc857,.08); gl.position.z = -.08; m.add(gl);
+    g6.add(m); frames.push(m); makeHot(m, {kind:"review", i});
+  }
+
+  /* 7 PROCESS gates */
+  const g7 = chapter(7);
   const gates = [];
   CONFIG.steps.forEach((s,i) => {
     const gate = new THREE.Group();
     const tor = new THREE.Mesh(new THREE.TorusGeometry(3.2,.06,10,80), new THREE.MeshBasicMaterial({color:i%2?0x3b82ff:0xffc857, transparent:true, opacity:.7}));
-    const lab = new THREE.Mesh(new THREE.PlaneGeometry(2.6,.65), new THREE.MeshBasicMaterial({map:labelTex("0"+(i+1)+"  "+s.t.en.toUpperCase(),"#ffffff"), transparent:true}));
-    lab.position.y = 3.7; gate.add(tor, lab); gate.position.z = 5 - i*2.8; g6.add(gate); gates.push(gate);
+    const lab = new THREE.Mesh(new THREE.PlaneGeometry(3.2,.65), new THREE.MeshBasicMaterial({map:labelTex("0"+(i+1)+"  "+s.t.en.toUpperCase(),"#ffffff"), transparent:true}));
+    lab.position.y = 3.7; gate.add(tor, lab); gate.position.z = 5 - i*2.8; g7.add(gate); gates.push(gate);
   });
 
-  /* 7 CONTACT: big pulsing WhatsApp orb + returning core */
-  const g7 = chapter(7);
-  const orb = new THREE.Mesh(new THREE.SphereGeometry(1.3, 48, 48), new THREE.MeshStandardMaterial({color:0x1fbf62, emissive:0x1fbf62, emissiveIntensity:.7, metalness:.2, roughness:.3}));
+  /* 8 CONTACT: WhatsApp orb */
+  const g8 = chapter(8);
+  const orb = new THREE.Mesh(new THREE.SphereGeometry(1.3, 48, 48), new THREE.MeshStandardMaterial({color:0x25d366, emissive:0x25d366, emissiveIntensity:.7, metalness:.2, roughness:.3}));
   const orbRing = new THREE.Mesh(new THREE.TorusGeometry(2,.03,10,120), new THREE.MeshBasicMaterial({color:0x3ddc97, transparent:true, opacity:.6})); orbRing.rotation.x = Math.PI/2;
-  g7.add(orb, orbRing, glowPlane(5,5,0x1fbf62,.16)); makeHot(orb, {kind:"wa"});
-  const waTxt = new THREE.Mesh(new THREE.PlaneGeometry(4,1), new THREE.MeshBasicMaterial({map:labelTex("WHATSAPP ME","#ffffff"), transparent:true})); waTxt.position.y = -2.3; g7.add(waTxt);
+  g8.add(orb, orbRing, glowPlane(5,5,0x25d366,.16)); makeHot(orb, {kind:"wa"});
+  const waTxt = new THREE.Mesh(new THREE.PlaneGeometry(4.5,.9), new THREE.MeshBasicMaterial({map:labelTex("TAP · WHATSAPP MEGH","#ffffff"), transparent:true})); waTxt.position.y = -2.3; g8.add(waTxt);
 
-  /* layout per chapter: objects opposite the panel */
-  const sides = [1, -1, 1, -1, 1, -1, 0, -1];   // +1 = panel left so objects go right
+  const sides = [1, -1, 1, -1, 1, -1, 1, -1, 1];
   function layout(){
     wide = innerWidth > 820;
-    groups.forEach((g,i) => { g.position.x = sides[i]*sideX(); g.position.y = sides[i]===0 ? 0 : sideY(); });
-    g0.position.x = wide ? 3.8 : 0; g0.position.y = wide ? 0 : 3.4;
+    groups.forEach((g,i) => { g.position.x = sides[i]*sideX(); g.position.y = sideY(); });
+    g0.position.x = wide ? 3.8 : 0; g0.position.y = wide ? 0 : 4.3;
     const w = innerWidth, h = innerHeight;
-    renderer.setSize(w,h,false); camera.aspect = w/h; camera.updateProjectionMatrix();
-    camera.fov = wide ? 52 : 64; camera.updateProjectionMatrix();
+    renderer.setSize(w,h,false); camera.aspect = w/h; camera.fov = wide ? 52 : 64; camera.updateProjectionMatrix();
   }
   layout(); addEventListener("resize", layout);
 
-  /* scroll → progress */
-  let target = 0, prog = 0;   // target/prog are fractional chapter indices (0..N-1)
+  let target = 0, prog = 0;
   const secEls = CH.map(id => document.getElementById(id));
   function onScroll(){
     const y = scrollY + innerHeight/2;
@@ -754,61 +794,61 @@ document.getElementById("socials").addEventListener("click", e => { const a = e.
   }
   addEventListener("scroll", onScroll, {passive:true}); onScroll();
 
-  /* pointer → raycast, drag */
   const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(9,9);
-  let hovered = null, overUI = false, mxT = 0, myT = 0, mx = 0, my = 0;
+  let hovered = null, overUI = false, mxT = 0, myT = 0, mx = 0, my = 0, corePunch = 0, shieldPunch = 0;
+  const isUI = el => el && el.closest && el.closest(".panel, header, #detail, footer, .mbar");
   addEventListener("pointermove", e => {
-    overUI = !!e.target.closest(".panel, header, #detail, footer");
+    overUI = !!isUI(e.target);
     ndc.set(e.clientX/innerWidth*2-1, -(e.clientY/innerHeight)*2+1);
     mxT = e.clientX/innerWidth-.5; myT = e.clientY/innerHeight-.5;
     if (dragging){ ringVel = (e.clientX-lastX)*.012; ringRot += ringVel; lastX = e.clientX; }
   }, {passive:true});
-  addEventListener("pointerdown", e => { if (e.target.closest(".panel, header, #detail, footer")) return; dragging = true; lastX = e.clientX; cur.classList.add("grab"); });
+  addEventListener("pointerdown", e => { if (isUI(e.target)) return; dragging = true; lastX = e.clientX; cur.classList.add("grab"); ndc.set(e.clientX/innerWidth*2-1, -(e.clientY/innerHeight)*2+1); });
   addEventListener("pointerup", e => {
-    const wasDrag = dragging; dragging = false; cur.classList.remove("grab");
-    if (e.target.closest(".panel, header, #detail, footer")) return;
-    if (hovered && Math.abs(ringVel) < .02){
-      const u = hovered.userData;
+    dragging = false; cur.classList.remove("grab");
+    if (isUI(e.target)) return;
+    // on touch there is no hover, so raycast now
+    ray.setFromCamera(ndc, camera); const hits = ray.intersectObjects(hot.filter(m => m.parent && m.parent.visible !== false), false);
+    const h = hits.length ? hits[0].object : null;
+    if (h && Math.abs(ringVel) < .02){
+      const u = h.userData;
       if (u.kind === "page") openPage(u.i);
-      else if (u.kind === "social") { if (CONFIG.socials[u.i].url) openSocial(u.i); else openSocial(u.i); }
-      else if (u.kind === "review") openReview(u.i);
+      else if (u.kind === "social") openSocial(u.i);
+      else if (u.kind === "megh") openSocial(0);
+      else if (u.kind === "review") { CONFIG.reviews.length ? openReview(u.i) : openReviewsLink(); }
       else if (u.kind === "yt") location.hash = "#contact";
-      else if (u.kind === "wa") location.href = waLink("Hi MEGH, I saw the Fidah portfolio.");
+      else if (u.kind === "wa") location.href = CONFIG.whatsappUrl;
       else if (u.kind === "bar") { u.punch = 1; beep(900,.1,.05); }
       else if (u.kind === "core") { corePunch = 1; beep(330,.25,.06,"triangle"); }
+      else if (u.kind === "shield") { shieldPunch = 1; beep(500,.2,.06,"triangle"); }
     }
   });
   addEventListener("touchend", () => { dragging = false; }, {passive:true});
-  let corePunch = 0;
 
-  /* frame loop */
   const clock = new THREE.Clock();
   const dots = () => document.querySelectorAll("[data-dot]");
   const chEls = CH.map(id => document.querySelector("#"+id+" .panel"));
   let lastCh = -1;
   function frame(){
     requestAnimationFrame(frame);
-    const time = clock.getElapsedTime(), dt = reduce ? 0 : 1;
-    prog += (target-prog)*(reduce ? 1 : .08);
+    const delta = Math.min(clock.getDelta(), .1), time = clock.getElapsedTime(), dt = reduce ? 0 : 1;
+    const k = reduce ? 1 : 1 - Math.pow(.92, delta*60);   // frame-rate independent easing
+    prog += (target-prog)*k;
     const z = 7.5 - prog*D;
     mx += (mxT-mx)*.05; my += (myT-my)*.05;
     camera.position.set(mx*1.2, -my*.9, z);
     camera.rotation.set(-my*.08, -mx*.16, 0);
     keyB.position.set(-5, 3, z-4); keyR.position.set(5, -1, z-6); keyG.position.set(0, 4, z-10);
     document.getElementById("pbar").style.width = (prog/(N-1)*100)+"%";
-
     const chF = prog, chI = Math.round(chF);
     if (chI !== lastCh){ lastCh = chI; dots().forEach(a => a.classList.toggle("on", +a.dataset.dot === chI)); }
-    groups.forEach((g,i) => { const act = Math.max(0, 1-Math.abs(chF-i)); const s = .55+.45*act; g.scale.setScalar(s); g.visible = Math.abs(chF-i) < 1.6;
+    groups.forEach((g,i) => { const act = Math.max(0, 1-Math.abs(chF-i)); g.scale.setScalar(.55+.45*act); g.visible = Math.abs(chF-i) < 1.6;
       const el = chEls[i]; if (el){ const vis = Math.max(.08, Math.min(1, 1.25 - Math.abs(chF-i)*1.5)); el.style.opacity = vis; el.style.transform = `translateY(${(1-vis)*18}px)`; } });
 
-    // cursor
-    rx += (cx-rx)*.35; ry += (cy-ry)*.35;
-    cur.style.transform = `translate(${rx}px,${ry}px)`;
+    rx += (cx-rx)*.35; ry += (cy-ry)*.35; cur.style.transform = `translate(${rx}px,${ry}px)`;
 
-    // hover raycast (not when over UI or dragging)
     let h = null;
-    if (!overUI && !dragging && !detail.classList.contains("open")){
+    if (fine && !overUI && !dragging && !detail.classList.contains("open")){
       ray.setFromCamera(ndc, camera);
       const hits = ray.intersectObjects(hot.filter(m => m.parent && (m.parent.visible !== false)), false);
       if (hits.length) h = hits[0].object;
@@ -816,43 +856,40 @@ document.getElementById("socials").addEventListener("click", e => { const a = e.
     if (h !== hovered){ hovered = h; cur.classList.toggle("hot", !!h); if (h) beep(1200,.04,.02); }
     hot.forEach(m => { const u = m.userData; u.hov += ((m===hovered?1:0)-u.hov)*.15; });
 
-    // chapter 0
-    coreGroup.rotation.y = time*.35*dt; coreGroup.rotation.x = Math.sin(time*.3)*.2;
-    corePunch *= .92;
-    const cs = 1 + core.userData.hov*.18 + corePunch*.6 + Math.sin(time*2)*.02;
-    coreGroup.scale.setScalar(cs); coreIn.material.emissiveIntensity = 1.2 + core.userData.hov*1.5 + corePunch*3;
+    // 0
+    coinG.rotation.y = time*.6*dt + coin.userData.hov*mx*2; coinG.rotation.x = Math.sin(time*.4)*.15 + coin.userData.hov*(-my);
+    corePunch *= .92; coinG.scale.setScalar(1 + coin.userData.hov*.15 + corePunch*.5);
+    core.rotation.y = -time*.12*dt; core.rotation.x = time*.08*dt; core.scale.setScalar(1 + corePunch*.4 + Math.sin(time*2)*.02); core.material.emissiveIntensity = .5 + corePunch*2;
     r1.rotation.z = time*.15*dt; r2.rotation.z = -time*.2*dt;
     orbit.rotation.y = time*.12*dt;
-    orbit.children.forEach((m,i) => { m.rotation.y = -orbit.rotation.y + m.userData.a; m.position.y = Math.sin(time*.9+i)*.5; const s = .62*(1+m.userData.hov*.35); m.scale.setScalar(s); });
-
-    // chapter 1
-    tiles.forEach((m,i) => { m.position.y = (i%2?.9:-.6) + Math.sin(time*.9+m.userData.ph)*.22; m.rotation.x = Math.sin(time*.5+i)*.1 + m.userData.hov*(-my*.6); m.rotation.y = -(i-1.5)*.55*.6 + m.userData.hov*(mx*.8); const s = 1+m.userData.hov*.22; m.scale.setScalar(s); m.position.z = -Math.abs(Math.cos((i-1.5)*.55))*0.4 + m.userData.hov*.6; });
-    meghLabel.position.y = 2.6 + Math.sin(time*.7)*.1;
-
-    // chapter 2 ring
+    orbit.children.forEach((m,i) => { m.rotation.y = -orbit.rotation.y + m.userData.a; m.position.y = Math.sin(time*.9+i)*.5; m.scale.setScalar(.6*(1+m.userData.hov*.35)); });
+    // 1
+    discG.rotation.y = Math.sin(time*.5)*.35 + disc.userData.hov*mx*2; discG.rotation.x = Math.sin(time*.3)*.1 + disc.userData.hov*(-my); discG.scale.setScalar(1+disc.userData.hov*.15); discG.position.y = .2 + Math.sin(time*.8)*.15;
+    tiles.forEach((m,i) => { m.position.y = (i%2?1.5:-1.3) + Math.sin(time*.9+m.userData.ph)*.2; m.rotation.x = Math.sin(time*.5+i)*.1 + m.userData.hov*(-my*.6); m.rotation.y = -m.userData.a*.5 + m.userData.hov*(mx*.8); m.scale.setScalar(1+m.userData.hov*.22); m.position.z = -.6 + m.userData.hov*.7; });
+    meghLabel.position.y = 3.2 + Math.sin(time*.7)*.1;
+    // 2
     if (!dragging){ ringRot += ringVel + .0025*dt; ringVel *= .94; }
     ring.rotation.y = ringRot;
-    ring.children.forEach(m => { if (m.userData.kind !== "page") return; const s = .95*(1+m.userData.hov*.18); m.scale.setScalar(s); m.position.y = m.userData.hov*.25 + Math.sin(time+m.userData.i)*.08; });
-
-    // chapter 3 yt
+    ring.children.forEach(m => { if (m.userData.kind !== "page") return; m.scale.setScalar(1.05*(1+m.userData.hov*.18)); m.position.y = m.userData.hov*.25 + Math.sin(time+m.userData.i)*.08; });
+    // 3
     const a3 = Math.max(0, Math.min(1, (chF-2.3)/.6));
     ytBody.material.opacity = .15 + a3*.85; ytBody.material.wireframe = a3 < .55; ytWire.material.opacity = .8*(1-a3);
-    ytBody.rotation.y = Math.sin(time*.6)*.25 + ytBody.userData.hov*.6*mx*4 ; ytBody.rotation.x = ytBody.userData.hov*(-my*1.2); ytWire.rotation.copy(ytBody.rotation);
-    const ys = 1+ytBody.userData.hov*.12; ytBody.scale.setScalar(ys);
-    badges.forEach((b,i) => { b.position.x = Math.cos(time*.3+i*1.6)*3.3; b.position.y = Math.sin(time*.3+i*1.6)*2.1; b.lookAt(camera.position); });
-
-    // chapter 4 bars
+    ytBody.rotation.y = Math.sin(time*.6)*.25 + ytBody.userData.hov*mx*2.4; ytBody.rotation.x = ytBody.userData.hov*(-my*1.2); ytWire.rotation.copy(ytBody.rotation);
+    ytBody.scale.setScalar(1+ytBody.userData.hov*.12);
+    badges.forEach((b,i) => { b.position.x = Math.cos(time*.3+i*1.6)*3.3; b.position.y = Math.sin(time*.3+i*1.6)*2.1; b.position.z = .6+Math.sin(i)*.5; b.lookAt(camera.position); });
+    // 4
     const a4 = Math.max(0, Math.min(1, (chF-3.5)/.9));
-    bars.forEach((m,i) => { const e = Math.max(0, Math.min(1, (a4*1.3 - i*.08))); const hh = .05 + m.userData.h*e*(1+m.userData.hov*.12); m.userData.punch = (m.userData.punch||0)*.9; m.scale.y = hh + m.userData.punch*.5; m.position.y = -1.6 + m.scale.y/2; m.material.emissiveIntensity = .35 + m.userData.hov*1.2; m.userData.lab.position.y = -1.6 + m.scale.y + .55; m.userData.lab.material.opacity += ((m.userData.hov>.5?1:0) - m.userData.lab.material.opacity)*.15; });
-
-    // chapter 5 frames
-    frames.forEach((m,i) => { m.position.y = (i%2?.5:-.3) + Math.sin(time*.8+m.userData.ph)*.18; const s = 1+m.userData.hov*.16; m.scale.setScalar(s); m.rotation.y += ((-(i-(frames.length-1)/2)*.42 + m.userData.hov*mx*.9) - m.rotation.y)*.12; });
-
-    // chapter 6 gates
-    gates.forEach((g,i) => { const gz = g.position.z + g6.position.z; const near = Math.max(0, 1-Math.abs(camera.position.z-gz)/6); g.rotation.z = time*(i%2?.2:-.2)*dt; g.scale.setScalar(.8+near*.35); g.children[0].material.opacity = .35+near*.6; });
-
-    // chapter 7 orb
-    const os = 1 + orb.userData.hov*.2 + Math.sin(time*2.2)*.04; orb.scale.setScalar(os); orbRing.scale.setScalar(1+Math.sin(time*2.2)*.08+orb.userData.hov*.3); orbRing.rotation.z = time*.4*dt; orb.material.emissiveIntensity = .7+orb.userData.hov*1.2;
+    bars.forEach((m,i) => { const e = Math.max(0, Math.min(1, (a4*1.3 - i*.08))); m.userData.punch = (m.userData.punch||0)*.9; m.scale.y = .05 + m.userData.h*e*(1+m.userData.hov*.12) + m.userData.punch*.5; m.position.y = -1.6 + m.scale.y/2; m.material.emissiveIntensity = .35 + m.userData.hov*1.2; m.userData.lab.position.y = -1.6 + m.scale.y + .55; m.userData.lab.material.opacity += ((m.userData.hov>.5?1:0) - m.userData.lab.material.opacity)*.15; });
+    // 5
+    shieldPunch *= .93; shieldG.rotation.y = Math.sin(time*.6)*.3 + shield.userData.hov*mx*2.4; shieldG.rotation.x = shield.userData.hov*(-my); shieldG.scale.setScalar(1 + shield.userData.hov*.12 + shieldPunch*.35); shield.material.emissiveIntensity = .35 + shield.userData.hov*.8 + shieldPunch*2;
+    satRing.rotation.z = time*.25*dt;
+    sats.forEach((b,i) => { const a = time*.25 + i*Math.PI/2; b.position.set(Math.cos(a)*3.3, Math.sin(a)*1.2, Math.sin(a)*1.2); b.lookAt(camera.position); });
+    // 6
+    frames.forEach((m,i) => { m.position.y = (i%2?.5:-.3) + Math.sin(time*.8+m.userData.ph)*.18; m.scale.setScalar(1+m.userData.hov*.16); m.rotation.y += ((-m.userData.a + m.userData.hov*mx*.9) - m.rotation.y)*.12; });
+    // 7
+    gates.forEach((g,i) => { const gz = g.position.z + g7.position.z; const near = Math.max(0, 1-Math.abs(camera.position.z-gz)/6); g.rotation.z = time*(i%2?.2:-.2)*dt; g.scale.setScalar(.8+near*.35); g.children[0].material.opacity = .35+near*.6; });
+    // 8
+    orb.scale.setScalar(1 + orb.userData.hov*.2 + Math.sin(time*2.2)*.04); orbRing.scale.setScalar(1+Math.sin(time*2.2)*.08+orb.userData.hov*.3); orbRing.rotation.z = time*.4*dt; orb.material.emissiveIntensity = .7+orb.userData.hov*1.2;
 
     pts.rotation.z = Math.sin(time*.05)*.05;
     renderer.render(scene, camera);
