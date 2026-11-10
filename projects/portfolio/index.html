@@ -154,7 +154,8 @@ details p{padding:0 0 12px;color:var(--muted);font-size:14px}
 .vs .bad b{color:var(--yt)}.vs .good{border-color:rgba(255,200,87,.45)}.vs .good b{color:var(--gold)}
 .vs ul{margin:0;padding:0;list-style:none;display:grid;gap:5px;color:var(--muted)}
 .vs .good ul{color:var(--text)}
-.reviews-row{display:grid;gap:8px}
+.reviews-row{display:grid;gap:8px;grid-template-columns:1fr 1fr}
+@media (max-width:820px){.reviews-row{grid-template-columns:1fr}}
 .rev{display:flex;gap:12px;align-items:center;padding:11px 12px;border-radius:14px;background:rgba(20,27,48,.5);border:1px solid var(--line);text-decoration:none;transition:transform .15s,border-color .15s}
 .rev:hover{transform:translateX(4px);border-color:rgba(255,255,255,.3)}
 .rev .av{width:40px;height:40px;border-radius:12px;flex:0 0 auto;display:grid;place-items:center;font-weight:800;color:#fff;background:var(--yt);font-size:14px}
@@ -239,11 +240,21 @@ footer{position:relative;z-index:2;padding:20px clamp(16px,4vw,56px) 40px;color:
     <div class="cta">
       <a class="btn wa mag walink" href="#contact"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.1.7a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.2c0-.1-.2-.2-.5-.3z"/></svg><span data-i18n="home.cta1">Message MEGH on WhatsApp</span></a>
       <a class="btn ghost mag" href="#pages" data-i18n="home.cta2">See pages in stock</a>
+      <a class="btn ghost mag" href="#reviews" data-i18n="home.rev">▶ 7 video reviews</a>
     </div>
     <div class="stats" id="stats"></div>
     <div class="hint"><span class="k">↓</span><span data-i18n="home.hint">Scroll to fly through the vault. Hover and click anything that glows.</span></div>
   </div>
 </section>
+<section class="ch" id="reviews" data-ch="6">
+  <div class="panel">
+    <div class="eyebrow" data-i18n="rv.eyebrow">Client reviews</div>
+    <h2 data-i18n="rv.title">Seven buyers, on video, in their own words.</h2>
+    <p class="lead" data-i18n="rv.lead">Clients record a short review after their transfer and I post it on the Fidah Digital Product page, 11.6K followers strong. Watch them there, then message me.</p>
+    <div class="reviews-row" id="revList"></div>
+  </div>
+</section>
+
 
 <section class="ch right" id="megh" data-ch="1">
   <div class="panel">
@@ -307,14 +318,6 @@ footer{position:relative;z-index:2;padding:20px clamp(16px,4vw,56px) 40px;color:
   </div>
 </section>
 
-<section class="ch" id="reviews" data-ch="6">
-  <div class="panel">
-    <div class="eyebrow" data-i18n="rv.eyebrow">Client reviews</div>
-    <h2 data-i18n="rv.title">Real buyers, on video, on my agency page.</h2>
-    <p class="lead" data-i18n="rv.lead">Clients record a short review after their transfer and I post it on the Fidah Digital Product page, 11.6K followers strong. Watch them there, then message me.</p>
-    <div class="reviews-row" id="revList"></div>
-  </div>
-</section>
 
 <section class="ch right" id="process" data-ch="7">
   <div class="panel">
@@ -383,7 +386,15 @@ const CONFIG = {
   ],
 
   // Client review videos. video: a file published with this page (e.g. "assets/review1.mp4"); leave [] to link to the Facebook videos tab.
-  reviews: [],
+  reviews: [
+    { name:"Client review 1", role:{en:"Recorded after the deal",bn:"ডিলের পর রেকর্ড করা"}, video:"assets/r1.mp4", poster:"assets/r1.jpg", url:"https://www.facebook.com/share/r/1YoidYTLJq/" },
+    { name:"Client review 2", role:{en:"Best client review",bn:"সেরা ক্লায়েন্ট রিভিউ"}, video:"assets/r2.mp4", poster:"assets/r2.jpg", url:"https://www.facebook.com/share/r/1DbgWf8SNa/" },
+    { name:"Client review 3", role:{en:"Recorded after the deal",bn:"ডিলের পর রেকর্ড করা"}, video:"assets/r3.mp4", poster:"assets/r3.jpg", url:"https://www.facebook.com/share/r/1F5zkd4D9M/" },
+    { name:"Client review 4", role:{en:"Recorded after the deal",bn:"ডিলের পর রেকর্ড করা"}, video:"assets/r4.mp4", poster:"assets/r4.jpg", url:"https://www.facebook.com/share/r/1E1P7EGrBb/" },
+    { name:"Client review 5", role:{en:"Expat client (probashi)",bn:"প্রবাসী ভাইয়ের রিভিউ"}, video:"assets/r5.mp4", poster:"assets/r5.jpg", url:"https://www.facebook.com/share/r/1DcikAp5At/" },
+    { name:"Client review 6", role:{en:"From Malaysia, repeat client · YouTube monetization",bn:"মালয়েশিয়া থেকে, আবারও · ইউটিউব মনিটাইজেশন"}, video:"assets/r6.mp4", poster:"assets/r6.jpg", url:"https://www.facebook.com/share/r/19BgJnapA9/" },
+    { name:"Arsek Iqbal", role:{en:"Client from Malaysia",bn:"মালয়েশিয়ার ভাই"}, video:"assets/r7.mp4", poster:"assets/r7.jpg", url:"https://www.facebook.com/share/r/19vnx8bkeH/" }
+  ],
 
   services: ["Meta Ads", "Boosting", "Pixel setup", "YouTube Ads", "Page growth"],
 
@@ -422,13 +433,13 @@ const T = {
     "yt.eyebrow":"YouTube channels · on order","yt.title":"No channel in stock today. Order one built to your spec.","yt.lead":"I run a 1.98M-subscriber channel myself and have sold 60+ channels in two years. Tell me the niche, subscriber range, monetization need and budget, and I source or build it and hand it over as primary owner. TikTok and Instagram accounts on order too: 30+ and 20+ sold.","yt.l1":"Monetized or near-monetized, AdSense clean","yt.l2":"No copyright strikes, full analytics shown before payment","yt.l3":"Primary owner and recovery email transferred on the call","yt.cta":"Order a YouTube channel",
     "ag.eyebrow":"Fidah ads agency","ag.title":"Bought a page? Now make it earn.","ag.lead":"Meta and YouTube ad campaigns for the asset you just bought, or for your own product. Pixel setup, targeting, creatives and a weekly report you can read in two minutes.","ag.l1":"Meta Ads, boosting, pixel and catalog setup","ag.l2":"YouTube and Google Ads","ag.l3":"Page growth plan with a content calendar","ag.hint":"The bars grow as you scroll. Hover one to see the service.",
     "tr.eyebrow":"Security · what you get from me","tr.title":"You never pay for something you have not seen with your own eyes.","tr.bad":"RANDOM SELLER","tr.b1":"Fake name, no face","tr.b2":"Screenshots only","tr.b3":"Disappears after payment","tr.good":"FIDAH · MEGH","tr.g1":"Public creator, 3.7M+ followers, 230+ deals done","tr.g2":"Live screen-share before payment","tr.g3":"7 days of support after transfer",
-    "rv.eyebrow":"Client reviews","rv.title":"Real buyers, on video, on my agency page.","rv.lead":"Clients record a short review after their transfer and I post it on the Fidah Digital Product page, 11.6K followers strong. Watch them there, then message me.","rv.watch":"Watch client review videos","rv.watch.s":"On the Fidah Digital Product page","rv.page":"Fidah Digital Product","rv.page.s":"11.6K followers · agency page on Facebook","rv.frame":"Client review",
+    "rv.eyebrow":"Client reviews","rv.title":"Seven buyers, on video, in their own words.","rv.lead":"Clients record a short review after their transfer. Tap a frame in 3D or a name below to watch it right here. More on the Fidah Digital Product page.","rv.watch":"Watch client review videos","rv.more":"More reviews on the Fidah page","rv.onfb":"Watch on Facebook","home.rev":"▶ 7 video reviews","rv.watch.s":"On the Fidah Digital Product page","rv.page":"Fidah Digital Product","rv.page.s":"11.6K followers · agency page on Facebook","rv.frame":"Client review",
     "pr.eyebrow":"How a deal works","pr.title":"Five gates. You pass each one yourself.",
     "ct.eyebrow":"Contact · Jhenaidah, Bangladesh","ct.title":"One tap. Straight into my WhatsApp.","ct.lead":"Say which page you want, or your niche, size and budget. I reply with the price, screenshots and a time for the live walkthrough.","ct.hours":"Usually online 10:00 to 23:00, Bangladesh time",
     "ct.wa":"WhatsApp","ct.wa.s":"Opens my business chat directly","ct.fb":"Fidah Digital Product","ct.fb.s":"Agency page on Facebook","ct.yt":"Voice Of Megh on YouTube","ct.yt.s":"1.98M subscribers","ct.em":"Email","ct.em.s":"Agency and sponsorship proposals",
     "foot.tag":"Facebook pages, YouTube channels, ads.","foot.note":"Not affiliated with Meta, Google, TikTok or ByteDance.",
     "d.followers":"Followers","d.talking":"Talking about this","d.video":"Video","d.videonote":"Screen recording of the real page: followers, reels, monetisation eligibility.","d.topreel":"Top reel views","d.monet":"Monetisation","d.monet.yes":"Eligible ✓","d.category":"Category","d.status":"Status","d.price":"Price","d.askprice":"Ask for price","d.ask":"Ask MEGH about this page","d.open":"Open on Facebook","d.openp":"Open profile","d.sold":"Sold","d.available":"In stock","d.reserved":"Reserved",
-    "ch.0":"Home","ch.1":"MEGH","ch.2":"Pages","ch.3":"YouTube","ch.4":"Agency","ch.5":"Security","ch.6":"Reviews","ch.7":"Process","ch.8":"Contact"
+    "ch.home":"Home","ch.megh":"MEGH","ch.pages":"Pages","ch.youtube":"YouTube","ch.agency":"Agency","ch.trust":"Security","ch.reviews":"Reviews","ch.process":"Process","ch.contact":"Contact"
   },
   bn:{
     "nav.chat":"হোয়াটসঅ্যাপ","m.pages":"স্টকের পেজ",
@@ -441,13 +452,13 @@ const T = {
     "yt.eyebrow":"ইউটিউব চ্যানেল · অর্ডারে","yt.title":"আজ স্টকে চ্যানেল নেই। আপনার স্পেসিফিকেশনে একটা অর্ডার করুন।","yt.lead":"আমি নিজেই ১.৯৮M সাবস্ক্রাইবারের চ্যানেল চালাই, আর দুই বছরে ৬০+ চ্যানেল বিক্রি করেছি। নিশ, সাবস্ক্রাইবার রেঞ্জ, মনিটাইজেশন আর বাজেট বলুন, আমি জোগাড় বা তৈরি করে প্রাইমারি ওনার হিসেবে হ্যান্ডওভার করি। টিকটক আর ইনস্টাগ্রাম অ্যাকাউন্টও অর্ডারে: ৩০+ আর ২০+ বিক্রি।","yt.l1":"মনিটাইজড বা প্রায়-মনিটাইজড, অ্যাডসেন্স ক্লিন","yt.l2":"কপিরাইট স্ট্রাইক নেই, পেমেন্টের আগে ফুল অ্যানালিটিক্স","yt.l3":"কলেই প্রাইমারি ওনার আর রিকভারি ইমেইল ট্রান্সফার","yt.cta":"ইউটিউব চ্যানেল অর্ডার করুন",
     "ag.eyebrow":"ফিদাহ অ্যাডস এজেন্সি","ag.title":"পেজ কিনলেন? এবার আয় করান।","ag.lead":"যে অ্যাসেট কিনলেন বা নিজের প্রোডাক্টের জন্য Meta আর ইউটিউব অ্যাড ক্যাম্পেইন। পিক্সেল সেটআপ, টার্গেটিং, ক্রিয়েটিভ আর দুই মিনিটে পড়া যায় এমন সাপ্তাহিক রিপোর্ট।","ag.l1":"Meta Ads, বুস্টিং, পিক্সেল আর ক্যাটালগ সেটআপ","ag.l2":"ইউটিউব আর গুগল অ্যাডস","ag.l3":"কনটেন্ট ক্যালেন্ডারসহ পেজ গ্রোথ প্ল্যান","ag.hint":"স্ক্রল করলে বারগুলো বাড়ে। হোভার করলে সার্ভিস দেখাবে।",
     "tr.eyebrow":"সিকিউরিটি · আমার কাছ থেকে যা পাবেন","tr.title":"নিজের চোখে না দেখে আপনাকে কখনো টাকা দিতে হবে না।","tr.bad":"যেকোনো সেলার","tr.b1":"ভুয়া নাম, মুখ নেই","tr.b2":"শুধু স্ক্রিনশট","tr.b3":"পেমেন্টের পর গায়েব","tr.good":"ফিদাহ · MEGH","tr.g1":"পরিচিত ক্রিয়েটর, ৩৭ লাখ+ ফলোয়ার, ২৩০+ ডিল","tr.g2":"পেমেন্টের আগে লাইভ স্ক্রিন-শেয়ার","tr.g3":"ট্রান্সফারের পর ৭ দিন সাপোর্ট",
-    "rv.eyebrow":"ক্লায়েন্ট রিভিউ","rv.title":"আসল ক্রেতা, ভিডিওতে, আমার এজেন্সি পেজে।","rv.lead":"ট্রান্সফারের পর ক্লায়েন্টরা ছোট একটা রিভিউ রেকর্ড করেন, আমি সেটা ১১.৬K ফলোয়ারের Fidah Digital Product পেজে পোস্ট করি। ওখানে দেখুন, তারপর মেসেজ দিন।","rv.watch":"ক্লায়েন্ট রিভিউ ভিডিও দেখুন","rv.watch.s":"Fidah Digital Product পেজে","rv.page":"Fidah Digital Product","rv.page.s":"১১.৬K ফলোয়ার · ফেসবুকে এজেন্সি পেজ","rv.frame":"ক্লায়েন্ট রিভিউ",
+    "rv.eyebrow":"ক্লায়েন্ট রিভিউ","rv.title":"সাতজন ক্রেতা, ভিডিওতে, নিজের মুখে।","rv.lead":"ট্রান্সফারের পর ক্লায়েন্টরা ছোট একটা রিভিউ রেকর্ড করেন। 3D-তে ফ্রেমে বা নিচে নামে ট্যাপ করলে এখানেই দেখতে পাবেন। আরও আছে Fidah Digital Product পেজে।","rv.watch":"ক্লায়েন্ট রিভিউ ভিডিও দেখুন","rv.more":"আরও রিভিউ ফিদাহ পেজে","rv.onfb":"ফেসবুকে দেখুন","home.rev":"▶ ৭টা ভিডিও রিভিউ","rv.watch.s":"Fidah Digital Product পেজে","rv.page":"Fidah Digital Product","rv.page.s":"১১.৬K ফলোয়ার · ফেসবুকে এজেন্সি পেজ","rv.frame":"ক্লায়েন্ট রিভিউ",
     "pr.eyebrow":"ডিল কীভাবে হয়","pr.title":"পাঁচটা গেট। প্রতিটা নিজে পার হন।",
     "ct.eyebrow":"যোগাযোগ · ঝিনাইদহ, বাংলাদেশ","ct.title":"এক ট্যাপ। সোজা আমার হোয়াটসঅ্যাপে।","ct.lead":"কোন পেজটা চান বলুন, বা নিশ, সাইজ আর বাজেট। আমি দাম, স্ক্রিনশট আর লাইভ ওয়াকথ্রুর সময় জানিয়ে রিপ্লাই দিই।","ct.hours":"সাধারণত অনলাইন সকাল ১০টা থেকে রাত ১১টা",
     "ct.wa":"হোয়াটসঅ্যাপ","ct.wa.s":"সরাসরি আমার বিজনেস চ্যাট খোলে","ct.fb":"Fidah Digital Product","ct.fb.s":"ফেসবুকে এজেন্সি পেজ","ct.yt":"ইউটিউবে Voice Of Megh","ct.yt.s":"১.৯৮M সাবস্ক্রাইবার","ct.em":"ইমেইল","ct.em.s":"এজেন্সি আর স্পন্সরশিপ প্রপোজাল",
     "foot.tag":"ফেসবুক পেজ, ইউটিউব চ্যানেল, অ্যাডস।","foot.note":"Meta, Google, TikTok বা ByteDance-এর সাথে সম্পর্কিত নয়।",
     "d.followers":"ফলোয়ার","d.talking":"টকিং অ্যাবাউট","d.video":"ভিডিও","d.videonote":"আসল পেজের স্ক্রিন রেকর্ডিং: ফলোয়ার, রিলস, মনিটাইজেশন এলিজিবিলিটি।","d.topreel":"সেরা রিলের ভিউ","d.monet":"মনিটাইজেশন","d.monet.yes":"এলিজিবল ✓","d.category":"ক্যাটাগরি","d.status":"স্ট্যাটাস","d.price":"দাম","d.askprice":"দাম জানতে মেসেজ দিন","d.ask":"এই পেজ নিয়ে MEGH-কে জিজ্ঞেস করুন","d.open":"ফেসবুকে খুলুন","d.openp":"প্রোফাইল খুলুন","d.sold":"বিক্রি হয়েছে","d.available":"স্টকে আছে","d.reserved":"রিজার্ভড",
-    "ch.0":"হোম","ch.1":"MEGH","ch.2":"পেজ","ch.3":"ইউটিউব","ch.4":"এজেন্সি","ch.5":"সিকিউরিটি","ch.6":"রিভিউ","ch.7":"প্রসেস","ch.8":"যোগাযোগ"
+    "ch.home":"হোম","ch.megh":"MEGH","ch.pages":"পেজ","ch.youtube":"ইউটিউব","ch.agency":"এজেন্সি","ch.trust":"সিকিউরিটি","ch.reviews":"রিভিউ","ch.process":"প্রসেস","ch.contact":"যোগাযোগ"
   }
 };
 
@@ -459,7 +470,7 @@ const pick = o => (o && typeof o === "object") ? (o[lang] || o.en) : o;
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const fine = matchMedia("(hover:hover) and (pointer:fine)").matches;
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const CH = ["home","megh","pages","youtube","agency","trust","reviews","process","contact"];
+const CH = ["home","reviews","megh","pages","youtube","agency","trust","process","contact"];
 const WA_SVG = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.1.7a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.2c0-.1-.2-.2-.5-.3z"/></svg>`;
 
 let AC = null, soundOn = false;
@@ -510,7 +521,7 @@ function renderGuar(){
 function renderReviews(){
   const box = document.getElementById("revList");
   if (CONFIG.reviews.length){
-    box.innerHTML = CONFIG.reviews.map((r,i) => `<button type="button" class="rev" data-rev="${i}"><div class="av">▶</div><div><div class="stars">★★★★★</div><b>${esc(r.name)}</b><span>${esc(pick(r.role))}</span></div></button>`).join("");
+    box.innerHTML = CONFIG.reviews.map((r,i) => `<button type="button" class="rev" data-rev="${i}"><div class="av" style="background:#000 url('${esc(r.poster||"")}') center/cover;position:relative"><span style="position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.35);border-radius:12px">▶</span></div><div><div class="stars">★★★★★</div><b>${esc(r.name)}</b><span>${esc(pick(r.role))}</span></div></button>`).join("") + `<a class="rev" href="${esc(CONFIG.agency.videosUrl)}"><div class="av" style="background:#000;padding:0;overflow:hidden"><img src="assets/logo.jpg" alt="" style="width:100%;height:100%;object-fit:cover"></div><div><b>${t("rv.more")}</b><span>${t("rv.watch.s")}</span></div></a>`;
     box.querySelectorAll("[data-rev]").forEach(b => b.onclick = () => openReview(+b.dataset.rev));
   } else {
     box.innerHTML = `<a class="rev" href="${esc(CONFIG.agency.videosUrl)}"><div class="av">▶</div><div><div class="stars">★★★★★</div><b>${t("rv.watch")}</b><span>${t("rv.watch.s")}</span></div></a>
@@ -531,7 +542,7 @@ function renderChannels(){
     <a class="chn" href="mailto:${esc(CONFIG.email)}"><span class="ci" style="background:rgba(255,200,87,.16);color:var(--gold)">${em}</span><div><b>${t("ct.em")} · ${esc(CONFIG.email)}</b><span>${t("ct.em.s")}</span></div></a>`;
 }
 function renderDots(){
-  document.getElementById("dots").innerHTML = CH.map((id,i) => `<a href="#${id}" data-dot="${i}" aria-label="${t("ch."+i)}"><span>${t("ch."+i)}</span></a>`).join("");
+  document.getElementById("dots").innerHTML = CH.map((id,i) => `<a href="#${id}" data-dot="${i}" aria-label="${t("ch."+id)}"><span>${t("ch."+id)}</span></a>`).join("");
 }
 
 const detail = document.getElementById("detail");
@@ -557,7 +568,7 @@ function openPage(i){
 function openReview(i){
   const r = CONFIG.reviews[i];
   openDetail(`<div class="pf" id="dPf" style="background:var(--yt);color:#fff">▶</div>`, r.name, pick(r.role),
-    `<video controls playsinline preload="metadata" src="${esc(r.video)}"></video><div class="stars" style="margin-top:10px">★★★★★</div>${r.text?`<p style="font-size:15px">“${esc(pick(r.text))}”</p>`:""}`, ``);
+    `<video controls playsinline preload="metadata" poster="${esc(r.poster||"")}" src="${esc(r.video)}" style="max-height:60vh;aspect-ratio:9/16;margin:0 auto;display:block"></video><div class="stars" style="margin-top:10px;text-align:center">★★★★★</div>${r.text?`<p style="font-size:15px">“${esc(pick(r.text))}”</p>`:""}`, r.url?`<a class="btn ghost" href="${esc(r.url)}">${t("rv.onfb")}</a>`:``);
   const v = detail.querySelector("video"); if (v) v.play().catch(()=>{});
 }
 function openSocial(i){
@@ -651,6 +662,7 @@ applyLang();
     g.fillStyle="#97a3c2"; g.font="22px sans-serif"; g.fillText(s.followers?s.label+" · "+s.sub.en.split(" ·")[0]:s.handle,200,330);
     g.fillStyle="#ffc857"; g.font="bold 20px sans-serif"; g.fillText(s.handle,200,366);
   }); }
+  function posterTex(src){ const c=document.createElement("canvas"); c.width=288; c.height=512; const g=c.getContext("2d"); g.fillStyle="#1a1430"; g.fillRect(0,0,288,512); const tx=new THREE.CanvasTexture(c); withImage(src, im => { g.drawImage(im,0,0,288,512); g.fillStyle="rgba(0,0,0,.25)"; g.fillRect(0,0,288,512); g.beginPath(); g.arc(144,256,44,0,Math.PI*2); g.fillStyle="rgba(255,61,87,.95)"; g.fill(); g.fillStyle="#fff"; g.font="bold 40px sans-serif"; g.textAlign="center"; g.textBaseline="middle"; g.fillText("▶",148,258); tx.needsUpdate=true; }); return tx; }
   function photoTex(src, rot=0){ const c=document.createElement("canvas"); c.width=512; c.height=512; const g=c.getContext("2d"); g.fillStyle="#223055"; g.fillRect(0,0,512,512); const tx=new THREE.CanvasTexture(c); tx.center.set(.5,.5); tx.rotation=rot; withImage(src, im => { g.drawImage(im,0,0,512,512); tx.needsUpdate=true; }); return tx; }
   function reviewTex(i){ return tex(360,480,(g,w,h)=>{
     const bg=g.createLinearGradient(0,0,0,h); bg.addColorStop(0,"#1a1430"); bg.addColorStop(1,"#0b0f1c"); g.fillStyle=bg; g.fillRect(0,0,w,h);
@@ -668,12 +680,12 @@ applyLang();
   const glowTex = tex(256,256,(g,w,h)=>{ const gr=g.createRadialGradient(128,128,0,128,128,128); gr.addColorStop(0,"rgba(255,255,255,1)"); gr.addColorStop(.35,"rgba(255,255,255,.45)"); gr.addColorStop(1,"rgba(255,255,255,0)"); g.fillStyle=gr; g.fillRect(0,0,w,h); });
   function glowPlane(w,h,col,op=.16){ return new THREE.Mesh(new THREE.PlaneGeometry(w*1.6,h*1.6), new THREE.MeshBasicMaterial({map:glowTex, color:col, transparent:true, opacity:Math.min(1,op*2.2), blending:THREE.AdditiveBlending, depthWrite:false})); }
   const groups = [];
-  function chapter(i){ const g = new THREE.Group(); g.position.z = -i*D; scene.add(g); groups[i] = g; return g; }
+  function chapter(name){ const i = CH.indexOf(name); const g = new THREE.Group(); g.position.z = -i*D; scene.add(g); groups[i] = g; return g; }
   const side = () => new THREE.MeshStandardMaterial({color:0x1b2440, metalness:.5, roughness:.4});
   function faced(geo, map, emissive=0x101a33){ const s = side(); return new THREE.Mesh(geo, [s,s,s,s,new THREE.MeshStandardMaterial({map, metalness:.2, roughness:.4, emissive, emissiveIntensity:.5}),s]); }
 
   /* 0 HOME: spinning Fidah logo coin + reactive core + orbiting page cards */
-  const g0 = chapter(0);
+  const g0 = chapter("home");
   const logoMat = () => new THREE.MeshBasicMaterial({map:photoTex("assets/logo.jpg", Math.PI/2)});
   const coin = new THREE.Mesh(new THREE.CylinderGeometry(1.15,1.15,.16,64), [new THREE.MeshStandardMaterial({color:0xffc857, metalness:.9, roughness:.25}), logoMat(), logoMat()]);
   coin.rotation.x = Math.PI/2; const coinG = new THREE.Group(); coinG.add(coin); coinG.add(glowPlane(4.5,4.5,0xffc857,.14)); g0.add(coinG); makeHot(coin, {kind:"core"});
@@ -688,7 +700,7 @@ applyLang();
   });
 
   /* 1 MEGH: photo disc + social tiles */
-  const g1 = chapter(1);
+  const g1 = chapter("megh");
   const meghMat = () => new THREE.MeshBasicMaterial({map:photoTex("assets/megh.jpg", Math.PI/2)});
   const disc = new THREE.Mesh(new THREE.CylinderGeometry(1.25,1.25,.12,64), [new THREE.MeshStandardMaterial({color:0xffc857, metalness:.9, roughness:.3}), meghMat(), meghMat()]);
   disc.rotation.x = Math.PI/2; const discG = new THREE.Group(); discG.add(disc); discG.add(glowPlane(3.6,3.6,0xffc857,.14)); discG.position.set(0,.2,1.0); g1.add(discG); makeHot(disc, {kind:"megh"});
@@ -702,7 +714,7 @@ applyLang();
   const meghLabel = new THREE.Mesh(new THREE.PlaneGeometry(5,1), new THREE.MeshBasicMaterial({map:labelTex("VOICE OF MEGH · 3.7M+","#ffffff"), transparent:true, opacity:.9})); meghLabel.position.set(0,3.2,-1.4); g1.add(meghLabel);
 
   /* 2 PAGES: draggable ring */
-  const g2 = chapter(2);
+  const g2 = chapter("pages");
   const ring = new THREE.Group(); g2.add(ring);
   const RR = 3.8;
   CONFIG.pages.forEach((p,i) => {
@@ -714,7 +726,7 @@ applyLang();
   let ringVel = 0, ringRot = 0, dragging = false, lastX = 0;
 
   /* 3 YOUTUBE */
-  const g3 = chapter(3);
+  const g3 = chapter("youtube");
   const ytBody = new THREE.Mesh(new THREE.BoxGeometry(3.6,2.5,.5), new THREE.MeshStandardMaterial({color:0xff0033, metalness:.3, roughness:.35, emissive:0xff3d57, emissiveIntensity:.35, transparent:true, opacity:.15, wireframe:true}));
   const tri = new THREE.Shape(); tri.moveTo(-.5,-.65); tri.lineTo(.7,0); tri.lineTo(-.5,.65); tri.closePath();
   const ytTri = new THREE.Mesh(new THREE.ExtrudeGeometry(tri,{depth:.3,bevelEnabled:false}), new THREE.MeshStandardMaterial({color:0xffffff, emissive:0xffffff, emissiveIntensity:.6}));
@@ -725,7 +737,7 @@ applyLang();
   ["ORDER","NICHE","MONETIZED","CLEAN"].forEach((w,i) => { const b = new THREE.Mesh(new THREE.PlaneGeometry(2.4,.5), new THREE.MeshBasicMaterial({map:labelTex(w), transparent:true})); b.userData.i = i; g3.add(b); badges.push(b); });
 
   /* 4 AGENCY: bars = services */
-  const g4 = chapter(4);
+  const g4 = chapter("agency");
   const bars = [];
   CONFIG.services.forEach((label,i) => {
     const h = [.95,.65,.5,.8,.7][i%5];
@@ -737,7 +749,7 @@ applyLang();
   const floor4 = new THREE.Mesh(new THREE.PlaneGeometry(7,3), new THREE.MeshBasicMaterial({color:0x3b82ff, transparent:true, opacity:.08})); floor4.rotation.x = -Math.PI/2; floor4.position.y = -1.6; g4.add(floor4);
 
   /* 5 TRUST: shield with check + orbiting guarantees */
-  const g5 = chapter(5);
+  const g5 = chapter("trust");
   const sh = new THREE.Shape(); sh.moveTo(0,1.6); sh.lineTo(1.4,1.1); sh.lineTo(1.3,-.3); sh.quadraticCurveTo(1.1,-1.2,0,-1.7); sh.quadraticCurveTo(-1.1,-1.2,-1.3,-.3); sh.lineTo(-1.4,1.1); sh.closePath();
   const shield = new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:.3,bevelEnabled:true,bevelSize:.06,bevelThickness:.06}), new THREE.MeshStandardMaterial({color:0x0f2a22, metalness:.6, roughness:.3, emissive:0x3ddc97, emissiveIntensity:.35}));
   const check = new THREE.Mesh(new THREE.TorusGeometry(.55,.07,12,40,Math.PI*1.2), new THREE.MeshBasicMaterial({color:0x3ddc97})); check.position.z=.42; check.rotation.z=-.2;
@@ -748,18 +760,19 @@ applyLang();
   const satRing = new THREE.Mesh(new THREE.TorusGeometry(3.3,.02,8,120), new THREE.MeshBasicMaterial({color:0x3ddc97, transparent:true, opacity:.4})); satRing.rotation.x = Math.PI/2.6; g5.add(satRing);
 
   /* 6 REVIEWS: curved wall of frames */
-  const g6 = chapter(6);
+  const g6 = chapter("reviews");
   const frames = [];
   const revN = CONFIG.reviews.length || 4;
   for (let i=0;i<revN;i++){
-    const m = faced(new THREE.BoxGeometry(1.5,2,.08), reviewTex(i), 0x1a1430);
-    const a = (i-(revN-1)/2)*.42; m.position.set(Math.sin(a)*5, (i%2?.5:-.3), -Math.abs(1-Math.cos(a))*4); m.rotation.y = -a; m.userData.ph = i*1.3; m.userData.a = a;
-    const gl = glowPlane(1.9,2.4,0xffc857,.08); gl.position.z = -.08; m.add(gl);
+    const r = CONFIG.reviews[i];
+    const m = faced(new THREE.BoxGeometry(1.35,2.4,.08), r && r.poster ? posterTex(r.poster) : reviewTex(i), 0x1a1430);
+    const a = (i-(revN-1)/2)*.36; m.position.set(Math.sin(a)*5.2, (i%2?.6:-.4), -Math.abs(1-Math.cos(a))*4); m.rotation.y = -a; m.userData.ph = i*1.3; m.userData.a = a;
+    const gl = glowPlane(1.8,2.8,0xffc857,.08); gl.position.z = -.08; m.add(gl);
     g6.add(m); frames.push(m); makeHot(m, {kind:"review", i});
   }
 
   /* 7 PROCESS gates */
-  const g7 = chapter(7);
+  const g7 = chapter("process");
   const gates = [];
   CONFIG.steps.forEach((s,i) => {
     const gate = new THREE.Group();
@@ -769,13 +782,13 @@ applyLang();
   });
 
   /* 8 CONTACT: WhatsApp orb */
-  const g8 = chapter(8);
+  const g8 = chapter("contact");
   const orb = new THREE.Mesh(new THREE.SphereGeometry(1.3, 48, 48), new THREE.MeshStandardMaterial({color:0x25d366, emissive:0x25d366, emissiveIntensity:.7, metalness:.2, roughness:.3}));
   const orbRing = new THREE.Mesh(new THREE.TorusGeometry(2,.03,10,120), new THREE.MeshBasicMaterial({color:0x3ddc97, transparent:true, opacity:.6})); orbRing.rotation.x = Math.PI/2;
   g8.add(orb, orbRing, glowPlane(5,5,0x25d366,.16)); makeHot(orb, {kind:"wa"});
   const waTxt = new THREE.Mesh(new THREE.PlaneGeometry(4.5,.9), new THREE.MeshBasicMaterial({map:labelTex("TAP · WHATSAPP MEGH","#ffffff"), transparent:true})); waTxt.position.y = -2.3; g8.add(waTxt);
 
-  const sides = [1, -1, 1, -1, 1, -1, 1, -1, 1];
+  const sides = CH.map((_,i) => i%2 ? -1 : 1);
   function layout(){
     wide = innerWidth > 820;
     groups.forEach((g,i) => { g.position.x = sides[i]*sideX(); g.position.y = sideY(); });
@@ -830,6 +843,7 @@ applyLang();
 
   const clock = new THREE.Clock();
   const dots = () => document.querySelectorAll("[data-dot]");
+  secEls.forEach((el,i) => el.classList.toggle("right", i%2===1));
   const chEls = CH.map(id => document.querySelector("#"+id+" .panel"));
   let lastCh = -1;
   function frame(){
@@ -875,13 +889,13 @@ applyLang();
     ring.rotation.y = ringRot;
     ring.children.forEach(m => { if (m.userData.kind !== "page") return; m.scale.setScalar(1.05*(1+m.userData.hov*.18)); m.position.y = m.userData.hov*.25 + Math.sin(time+m.userData.i)*.08; });
     // 3
-    const a3 = Math.max(0, Math.min(1, (chF-2.3)/.6));
+    const a3 = Math.max(0, Math.min(1, (chF-(CH.indexOf("youtube")-.7))/.6));
     ytBody.material.opacity = .15 + a3*.85; ytBody.material.wireframe = a3 < .55; ytWire.material.opacity = .8*(1-a3);
     ytBody.rotation.y = Math.sin(time*.6)*.25 + ytBody.userData.hov*mx*2.4; ytBody.rotation.x = ytBody.userData.hov*(-my*1.2); ytWire.rotation.copy(ytBody.rotation);
     ytBody.scale.setScalar(1+ytBody.userData.hov*.12);
     badges.forEach((b,i) => { b.position.x = Math.cos(time*.3+i*1.6)*3.3; b.position.y = Math.sin(time*.3+i*1.6)*2.1; b.position.z = .6+Math.sin(i)*.5; b.lookAt(camera.position); });
     // 4
-    const a4 = Math.max(0, Math.min(1, (chF-3.5)/.9));
+    const a4 = Math.max(0, Math.min(1, (chF-(CH.indexOf("agency")-.5))/.9));
     bars.forEach((m,i) => { const e = Math.max(0, Math.min(1, (a4*1.3 - i*.08))); m.userData.punch = (m.userData.punch||0)*.9; m.scale.y = .05 + m.userData.h*e*(1+m.userData.hov*.12) + m.userData.punch*.5; m.position.y = -1.6 + m.scale.y/2; m.material.emissiveIntensity = .35 + m.userData.hov*1.2; m.userData.lab.position.y = -1.6 + m.scale.y + .55; m.userData.lab.material.opacity += ((m.userData.hov>.5?1:0) - m.userData.lab.material.opacity)*.15; });
     // 5
     shieldPunch *= .93; shieldG.rotation.y = Math.sin(time*.6)*.3 + shield.userData.hov*mx*2.4; shieldG.rotation.x = shield.userData.hov*(-my); shieldG.scale.setScalar(1 + shield.userData.hov*.12 + shieldPunch*.35); shield.material.emissiveIntensity = .35 + shield.userData.hov*.8 + shieldPunch*2;
@@ -889,6 +903,7 @@ applyLang();
     sats.forEach((b,i) => { const a = time*.25 + i*Math.PI/2; b.position.set(Math.cos(a)*3.3, Math.sin(a)*1.2, Math.sin(a)*1.2); b.lookAt(camera.position); });
     // 6
     frames.forEach((m,i) => { m.position.y = (i%2?.5:-.3) + Math.sin(time*.8+m.userData.ph)*.18; m.scale.setScalar(1+m.userData.hov*.16); m.rotation.y += ((-m.userData.a + m.userData.hov*mx*.9) - m.rotation.y)*.12; });
+    frames.forEach((m,i) => { m.position.y = (i%2?.6:-.4) + Math.sin(time*.8+m.userData.ph)*.18; });
     // 7
     gates.forEach((g,i) => { const gz = g.position.z + g7.position.z; const near = Math.max(0, 1-Math.abs(camera.position.z-gz)/6); g.rotation.z = time*(i%2?.2:-.2)*dt; g.scale.setScalar(.8+near*.35); g.children[0].material.opacity = .35+near*.6; });
     // 8
