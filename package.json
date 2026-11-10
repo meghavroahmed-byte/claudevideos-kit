@@ -3,10 +3,11 @@
   "private": true,
   "description": "Megh video workflow kits (MG templates, 3D map engine, character rig)",
   "dependencies": {
+    "@fontsource-variable/anek-bangla": "^5.0.0",
+    "@fontsource/plus-jakarta-sans": "^5.3.0",
     "puppeteer-core": "^23.0.0",
     "three": "^0.170.0",
     "topojson-client": "^3.1.0",
-    "world-atlas": "^2.0.2",
-    "@fontsource-variable/anek-bangla": "^5.0.0"
+    "world-atlas": "^2.0.2"
   }
 }

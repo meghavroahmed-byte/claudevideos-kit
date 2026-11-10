@@ -22,3 +22,5 @@
 - [Continuous explainer style](continuous-explainer-style.md) — user wants healthbyvipul-like "one continuous" soft flat-vector reels (organ mascots, zoom-through, no cuts)
 - [Full-body character](feedback-full-body-character.md) — use user's character full body with walk/run/eat etc. (char-rig/kit rig2.js + anim2.js), never half-body bust
 - [Video style preferences](video-style-preferences.md) — original voice, minimal text, user's own character sheet, pro motion graphics
+- [Neon Tech style](neon-tech-style.md) — dark 3D-grid tech shorts copied from a reference creator (2026-11-09); kit projects/neon-tech-short/kit; subtitles OFF (user said no)
+- [neon-3d-short skill](../skills/neon-3d-short/SKILL.md) — user asked (2026-11-09) to turn the anaros-dudh 3D short workflow into a reusable skill; use it for every voice+script Neon 3D video
