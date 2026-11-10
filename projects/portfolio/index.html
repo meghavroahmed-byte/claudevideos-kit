@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -453,7 +453,7 @@ const T = {
 };
 
 /* ---------------- helpers ---------------- */
-let lang = "en";
+let lang = "bn";
 try { const s = localStorage.getItem("fidah-lang"); if (s === "bn" || s === "en") lang = s; } catch (e) {}
 const t = k => (T[lang] && T[lang][k]) || T.en[k] || k;
 const pick = o => (o && typeof o === "object") ? (o[lang] || o.en) : o;
