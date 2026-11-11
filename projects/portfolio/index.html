@@ -47,7 +47,16 @@ html[lang="bn"] .eyebrow{letter-spacing:0;font-size:14px;text-transform:none}
 /* ambient red light that follows the pointer */
 .glow{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(600px 420px at var(--gx,70%) var(--gy,20%),rgba(255,42,60,.14),transparent 70%)}
 .grain{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;background-image:radial-gradient(rgba(255,255,255,.035) 1px,transparent 1px);background-size:3px 3px}
+#gl{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
 main,header,footer,.fab{position:relative;z-index:1}
+.hero,.hero .wrap{position:relative}
+.hero h1,.hero-bottom,.trust,.hero .eyebrow{position:relative;z-index:2}
+.stage{z-index:2}
+.tilt{transform-style:preserve-3d;will-change:transform}
+.tilt .shine{position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(500px 300px at var(--sx,50%) var(--sy,50%),rgba(255,255,255,.14),transparent 60%);opacity:0;transition:opacity .2s;z-index:3}
+.tilt:hover .shine{opacity:1}
+@media (prefers-reduced-motion:no-preference){.rv.in{animation:rise3d .8s cubic-bezier(.2,.7,.2,1) both}@keyframes rise3d{from{opacity:.001;transform:perspective(900px) translateY(26px) rotateX(10deg)}to{opacity:1;transform:none}}}
+.giant .word{transform-origin:50% 100%}
 
 /* pill nav */
 .nav{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:40;display:flex;align-items:center;gap:6px;padding:6px 6px 6px 8px;border-radius:999px;background:rgba(18,18,22,.78);border:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 10px 40px rgba(0,0,0,.5);max-width:calc(100% - 20px)}
@@ -260,6 +269,7 @@ details p{padding:0 0 16px;color:var(--muted);font-size:14px;max-width:65ch}
 </style>
 </head>
 <body>
+<canvas id="gl" aria-hidden="true"></canvas>
 <div class="glow" id="glow" aria-hidden="true"></div>
 <div class="grain" aria-hidden="true"></div>
 
@@ -377,6 +387,7 @@ details p{padding:0 0 16px;color:var(--muted);font-size:14px;max-width:65ch}
   <div class="foot" id="dFoot"></div>
 </div></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="assets/rig/common.js"></script><script src="assets/rig/rigcore.js"></script><script src="assets/rig/rig2.js"></script><script src="assets/rig/anim2.js"></script>
 <script>
 const CONFIG = {
@@ -642,6 +653,119 @@ const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting
 new MutationObserver(() => document.querySelectorAll(".rv:not(.in)").forEach(el => io.observe(el))).observe(document.body, {subtree:true, childList:true});
 document.querySelectorAll(".rv:not(.in)").forEach(el => io.observe(el));
 if (!reduce) addEventListener("pointermove", e => { document.getElementById("glow").style.setProperty("--gx", (e.clientX/innerWidth*100)+"%"); document.getElementById("glow").style.setProperty("--gy", (e.clientY/innerHeight*100)+"%"); }, {passive:true});
+
+/* ---------------- 3D tilt on cards ---------------- */
+const fine = matchMedia("(hover:hover) and (pointer:fine)").matches;
+function bindTilt(){
+  if (!fine || reduce) return;
+  document.querySelectorAll(".proj, .rev, .g, .photo, .svcitem, .ytcard, .stat").forEach(c => {
+    if (c.dataset.tilt) return; c.dataset.tilt = "1"; c.classList.add("tilt");
+    if (getComputedStyle(c).position === "static") c.style.position = "relative";
+    const sh = document.createElement("span"); sh.className = "shine"; c.appendChild(sh);
+    c.addEventListener("pointermove", e => { const r = c.getBoundingClientRect(), x = (e.clientX-r.left)/r.width, y = (e.clientY-r.top)/r.height;
+      c.style.transform = `perspective(900px) rotateX(${(0.5-y)*8}deg) rotateY(${(x-0.5)*10}deg) translateY(-4px)`; c.style.setProperty("--sx",(x*100)+"%"); c.style.setProperty("--sy",(y*100)+"%"); });
+    c.addEventListener("pointerleave", () => { c.style.transform = ""; });
+  });
+}
+bindTilt(); new MutationObserver(bindTilt).observe(document.body, {subtree:true, childList:true});
+// giant name leans back in 3D as it scrolls into view
+addEventListener("scroll", () => { const w = document.querySelector(".giant .word"); if (!w || reduce) return; const r = w.getBoundingClientRect(); const k = Math.max(0, Math.min(1, (innerHeight - r.top) / (innerHeight*.9))); w.style.transform = `perspective(900px) rotateX(${(1-k)*45}deg) scale(${.8+.2*k})`; w.style.opacity = .3+.7*k; }, {passive:true});
+
+/* ---------------- 3D world: page cards orbiting behind the character, red wireframes everywhere ---------------- */
+(function(){
+  if (!window.THREE) return;
+  const canvas = document.getElementById("gl");
+  let renderer; try { renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true, powerPreference:"high-performance"}); } catch(e){ return; }
+  const wide = () => innerWidth > 720;
+  renderer.setPixelRatio(Math.min(devicePixelRatio, wide() ? 1.6 : 1.25));
+  renderer.setClearColor(0x000000, 0);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100); camera.position.set(0,0,10);
+  scene.add(new THREE.AmbientLight(0xffffff, .55));
+  const key = new THREE.PointLight(0xff2a3c, 2.2, 40); key.position.set(-5,4,6); scene.add(key);
+  const fill = new THREE.PointLight(0xffffff, 1.0, 40); fill.position.set(6,-2,6); scene.add(fill);
+
+  function roundRect(g,x,y,w,h,r){ g.beginPath(); g.moveTo(x+r,y); g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r); g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath(); }
+  const imgCache = {};
+  function withImage(src, cb){ if (imgCache[src]) { if (imgCache[src].complete) cb(imgCache[src]); else imgCache[src].addEventListener("load", () => cb(imgCache[src])); return; } const im = new Image(); im.crossOrigin = "anonymous"; imgCache[src] = im; im.addEventListener("load", () => cb(im)); im.src = src; }
+  function cardTex(p){
+    const c = document.createElement("canvas"); c.width = 512; c.height = 320; const g = c.getContext("2d"); const tx = new THREE.CanvasTexture(c); tx.anisotropy = 4;
+    function draw(im){
+      g.fillStyle = "#15151b"; g.fillRect(0,0,512,320);
+      g.save(); roundRect(g,0,0,512,320,28); g.clip();
+      if (im){ g.drawImage(im, 0, -60, 512, 512); const gr = g.createLinearGradient(0,120,0,320); gr.addColorStop(0,"rgba(10,10,12,0)"); gr.addColorStop(1,"rgba(10,10,12,.95)"); g.fillStyle = gr; g.fillRect(0,0,512,320); }
+      g.restore();
+      g.fillStyle = "#ff2a3c"; roundRect(g,22,22,150,34,17); g.fill(); g.fillStyle = "#fff"; g.font = "bold 17px sans-serif"; g.textBaseline = "middle"; g.textAlign = "center"; g.fillText("MONETISED ✓", 97, 40);
+      g.textAlign = "left"; g.fillStyle = "#fff"; g.font = "bold 34px sans-serif"; g.fillText(p.name, 24, 250);
+      g.fillStyle = "#c9c9d0"; g.font = "20px sans-serif"; g.fillText(p.followers + " followers · " + p.category.en, 24, 288);
+      tx.needsUpdate = true;
+    }
+    draw(null); withImage(p.img, draw); return tx;
+  }
+  const hot = [];
+  const ring = new THREE.Group(); scene.add(ring);
+  const RR = wide() ? 3.6 : 2.6;
+  CONFIG.pages.forEach((p,i) => {
+    const side = new THREE.MeshStandardMaterial({color:0x2a2a33, metalness:.6, roughness:.4});
+    const m = new THREE.Mesh(new THREE.BoxGeometry(2.0,1.25,.08), [side,side,side,side,new THREE.MeshStandardMaterial({map:cardTex(p), roughness:.5, emissive:0x111111, emissiveIntensity:.4}),side]);
+    const a = i/CONFIG.pages.length*Math.PI*2; m.position.set(Math.sin(a)*RR, 0, Math.cos(a)*RR); m.rotation.y = a; m.userData = {i, a, hov:0};
+    ring.add(m); hot.push(m);
+  });
+  const base = new THREE.Mesh(new THREE.TorusGeometry(RR,.025,8,140), new THREE.MeshBasicMaterial({color:0xff2a3c, transparent:true, opacity:.55})); base.rotation.x = Math.PI/2; base.position.y = -1.1; ring.add(base);
+  const base2 = new THREE.Mesh(new THREE.TorusGeometry(RR*1.25,.015,8,140), new THREE.MeshBasicMaterial({color:0xffffff, transparent:true, opacity:.18})); base2.rotation.x = Math.PI/2.2; base2.position.y = .6; ring.add(base2);
+
+  // ambient shapes with parallax
+  const amb = new THREE.Group(); scene.add(amb);
+  const ico = new THREE.Mesh(new THREE.IcosahedronGeometry(2.6,1), new THREE.MeshBasicMaterial({color:0xff2a3c, wireframe:true, transparent:true, opacity:.35})); ico.position.set(5.5,2.5,-4); amb.add(ico);
+  const knot = new THREE.Mesh(new THREE.TorusKnotGeometry(1.1,.3,120,12), new THREE.MeshStandardMaterial({color:0x1a1a20, metalness:.9, roughness:.3, emissive:0xff2a3c, emissiveIntensity:.25})); knot.position.set(-6,-3,-3); amb.add(knot);
+  const octa = new THREE.Mesh(new THREE.OctahedronGeometry(1.2,0), new THREE.MeshBasicMaterial({color:0xffffff, wireframe:true, transparent:true, opacity:.15})); octa.position.set(-5,4,-6); amb.add(octa);
+  const pN = wide() ? 700 : 300, pos = new Float32Array(pN*3);
+  for (let i=0;i<pN;i++){ pos[i*3]=(Math.random()-.5)*30; pos[i*3+1]=(Math.random()-.5)*40; pos[i*3+2]=-Math.random()*12-2; }
+  const pGeo = new THREE.BufferGeometry(); pGeo.setAttribute("position", new THREE.BufferAttribute(pos,3));
+  const pts = new THREE.Points(pGeo, new THREE.PointsMaterial({color:0xff6b78, size:.05, transparent:true, opacity:.7})); amb.add(pts);
+
+  const stage = document.querySelector(".stage");
+  let pxPerUnit = 1, stageY = 0;
+  function layout(){
+    const w = innerWidth, h = innerHeight; renderer.setSize(w,h,false); camera.aspect = w/h; camera.updateProjectionMatrix();
+    pxPerUnit = h / (2*10*Math.tan(camera.fov*Math.PI/360));
+    const r = stage.getBoundingClientRect(); stageY = r.top + scrollY + r.height*0.42;   // document px of the ring centre
+    ring.scale.setScalar(wide() ? 1 : .8);
+  }
+  layout(); addEventListener("resize", layout); addEventListener("load", layout);
+
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(9,9);
+  let mx = 0, my = 0, mxT = 0, myT = 0, hovered = null, ringRot = 0, ringVel = 0, dragging = false, lastX = 0;
+  const isUI = el => el && el.closest && el.closest("a, button, summary, video, header, #detail, .svcitem, input, .fab");
+  addEventListener("pointermove", e => { ndc.set(e.clientX/innerWidth*2-1, -(e.clientY/innerHeight)*2+1); mxT = e.clientX/innerWidth-.5; myT = e.clientY/innerHeight-.5; if (dragging){ ringVel = (e.clientX-lastX)*.01; ringRot += ringVel; lastX = e.clientX; } }, {passive:true});
+  addEventListener("pointerdown", e => { if (isUI(e.target)) return; ndc.set(e.clientX/innerWidth*2-1, -(e.clientY/innerHeight)*2+1); if (e.target.closest(".hero")) { dragging = true; lastX = e.clientX; } });
+  addEventListener("pointerup", e => { const was = dragging; dragging = false; if (isUI(e.target)) return; if (!e.target.closest(".hero")) return;
+    ray.setFromCamera(ndc, camera); const hits = ray.intersectObjects(hot, false); if (hits.length && Math.abs(ringVel) < .02) openPage(hits[0].object.userData.i); });
+  addEventListener("touchend", () => { dragging = false; }, {passive:true});
+
+  const clock = new THREE.Clock();
+  function frame(){
+    requestAnimationFrame(frame);
+    const time = clock.getElapsedTime(), dt = reduce ? 0 : 1;
+    mx += (mxT-mx)*.05; my += (myT-my)*.05;
+    const sy = scrollY;
+    // ring follows the hero stage; ambient shapes drift slower (parallax)
+    ring.position.y = (sy - (stageY - innerHeight/2)) / pxPerUnit;
+    ring.position.x = mx*.6; ring.rotation.x = my*.25 + .08;
+    amb.position.y = sy/pxPerUnit*.35; amb.position.x = -mx*1.2; amb.rotation.y = mx*.2;
+    if (!dragging){ ringRot += ringVel + .0035*dt; ringVel *= .94; }
+    ring.rotation.y = ringRot;
+    // hover
+    let h = null;
+    if (fine && !detail.classList.contains("open")){ ray.setFromCamera(ndc, camera); const hits = ray.intersectObjects(hot, false); if (hits.length) h = hits[0].object; }
+    if (h !== hovered){ hovered = h; document.body.style.cursor = h ? "pointer" : ""; }
+    hot.forEach(m => { const u = m.userData; u.hov += ((m===hovered?1:0)-u.hov)*.15; m.scale.setScalar(1+u.hov*.18); m.position.y = u.hov*.3 + Math.sin(time*1.2+u.i)*.08; });
+    ico.rotation.y = time*.15*dt; ico.rotation.x = time*.1*dt; knot.rotation.y = -time*.25*dt; knot.rotation.z = time*.1*dt; octa.rotation.y = time*.3*dt; pts.rotation.z = Math.sin(time*.05)*.05;
+    key.position.x = -5 + mx*4; key.position.y = 4 - my*4;
+    renderer.render(scene, camera);
+  }
+  frame();
+})();
 
 /* ---------------- MEGH's own character in the hero ---------------- */
 (async function(){
