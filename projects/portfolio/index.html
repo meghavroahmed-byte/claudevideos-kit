@@ -195,6 +195,8 @@ details p{padding:0 0 12px;color:var(--muted);font-size:14px}
 #detail .price small{display:block;font-family:var(--body);font-size:12px;color:var(--muted);font-weight:500}
 #detail .foot .btn{margin-left:auto}
 
+#toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%) translateY(20px);z-index:70;background:var(--gold);color:#1a1200;font-weight:700;font-size:13px;padding:10px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:calc(100% - 32px);text-align:center}
+#toast.on{opacity:1;transform:translateX(-50%)}
 .mbar{display:none}
 footer{position:relative;z-index:2;padding:20px clamp(16px,4vw,56px) 40px;color:var(--muted);font-size:13px;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
 
@@ -444,7 +446,7 @@ const T = {
     "ct.eyebrow":"Contact · Jhenaidah, Bangladesh","ct.title":"One tap. Straight into my WhatsApp.","ct.lead":"Say which page you want, or your niche, size and budget. I reply with the price, screenshots and a time for the live walkthrough.","ct.hours":"Usually online 10:00 to 23:00, Bangladesh time",
     "ct.wa":"WhatsApp","ct.wa.s":"Opens my business chat directly","ct.fb":"Fidah Digital Product","ct.fb.s":"Agency page on Facebook","ct.yt":"Voice Of Megh on YouTube","ct.yt.s":"1.98M subscribers","ct.em":"Email","ct.em.s":"Agency and sponsorship proposals",
     "foot.tag":"Facebook pages, YouTube channels, ads.","foot.note":"Not affiliated with Meta, Google, TikTok or ByteDance.",
-    "d.followers":"Followers","d.talking":"Talking about this","d.video":"Video","d.watch":"Watch video","d.loading":"Loading video…","d.vfail":"The video could not load on this browser. Use the Facebook link below.","d.videonote":"Screen recording of the real page: followers, reels, monetisation eligibility.","d.topreel":"Top reel views","d.monet":"Monetisation","d.monet.yes":"Eligible ✓","d.category":"Category","d.status":"Status","d.price":"Price","d.askprice":"Ask for price","d.ask":"Ask MEGH about this page","d.open":"Open on Facebook","d.openp":"Open profile","d.sold":"Sold","d.available":"In stock","d.reserved":"Reserved",
+    "d.followers":"Followers","d.talking":"Talking about this","d.video":"Video","d.watch":"Watch video","wa.copied":"Message copied. Paste it in WhatsApp and send.","d.loading":"Loading video…","d.vfail":"The video could not load on this browser. Use the Facebook link below.","d.videonote":"Screen recording of the real page: followers, reels, monetisation eligibility.","d.topreel":"Top reel views","d.monet":"Monetisation","d.monet.yes":"Eligible ✓","d.category":"Category","d.status":"Status","d.price":"Price","d.askprice":"Ask for price","d.ask":"Ask MEGH about this page","d.open":"Open on Facebook","d.openp":"Open profile","d.sold":"Sold","d.available":"In stock","d.reserved":"Reserved",
     "ch.home":"Home","ch.megh":"MEGH","ch.pages":"Pages","ch.youtube":"YouTube","ch.agency":"Agency","ch.trust":"Security","ch.reviews":"Reviews","ch.process":"Process","ch.contact":"Contact"
   },
   bn:{
@@ -463,7 +465,7 @@ const T = {
     "ct.eyebrow":"যোগাযোগ · ঝিনাইদহ, বাংলাদেশ","ct.title":"এক ট্যাপ। সোজা আমার হোয়াটসঅ্যাপে।","ct.lead":"কোন পেজটা চান বলুন, বা নিশ, সাইজ আর বাজেট। আমি দাম, স্ক্রিনশট আর লাইভ ওয়াকথ্রুর সময় জানিয়ে রিপ্লাই দিই।","ct.hours":"সাধারণত অনলাইন সকাল ১০টা থেকে রাত ১১টা",
     "ct.wa":"হোয়াটসঅ্যাপ","ct.wa.s":"সরাসরি আমার বিজনেস চ্যাট খোলে","ct.fb":"Fidah Digital Product","ct.fb.s":"ফেসবুকে এজেন্সি পেজ","ct.yt":"ইউটিউবে Voice Of Megh","ct.yt.s":"১.৯৮M সাবস্ক্রাইবার","ct.em":"ইমেইল","ct.em.s":"এজেন্সি আর স্পন্সরশিপ প্রপোজাল",
     "foot.tag":"ফেসবুক পেজ, ইউটিউব চ্যানেল, অ্যাডস।","foot.note":"Meta, Google, TikTok বা ByteDance-এর সাথে সম্পর্কিত নয়।",
-    "d.followers":"ফলোয়ার","d.talking":"টকিং অ্যাবাউট","d.video":"ভিডিও","d.watch":"ভিডিও দেখুন","d.loading":"ভিডিও লোড হচ্ছে…","d.vfail":"এই ব্রাউজারে ভিডিওটা লোড হলো না। নিচের ফেসবুক লিঙ্কে দেখুন।","d.videonote":"আসল পেজের স্ক্রিন রেকর্ডিং: ফলোয়ার, রিলস, মনিটাইজেশন এলিজিবিলিটি।","d.topreel":"সেরা রিলের ভিউ","d.monet":"মনিটাইজেশন","d.monet.yes":"এলিজিবল ✓","d.category":"ক্যাটাগরি","d.status":"স্ট্যাটাস","d.price":"দাম","d.askprice":"দাম জানতে মেসেজ দিন","d.ask":"এই পেজ নিয়ে MEGH-কে জিজ্ঞেস করুন","d.open":"ফেসবুকে খুলুন","d.openp":"প্রোফাইল খুলুন","d.sold":"বিক্রি হয়েছে","d.available":"স্টকে আছে","d.reserved":"রিজার্ভড",
+    "d.followers":"ফলোয়ার","d.talking":"টকিং অ্যাবাউট","d.video":"ভিডিও","d.watch":"ভিডিও দেখুন","wa.copied":"মেসেজ কপি হয়েছে। হোয়াটসঅ্যাপে পেস্ট করে পাঠান।","d.loading":"ভিডিও লোড হচ্ছে…","d.vfail":"এই ব্রাউজারে ভিডিওটা লোড হলো না। নিচের ফেসবুক লিঙ্কে দেখুন।","d.videonote":"আসল পেজের স্ক্রিন রেকর্ডিং: ফলোয়ার, রিলস, মনিটাইজেশন এলিজিবিলিটি।","d.topreel":"সেরা রিলের ভিউ","d.monet":"মনিটাইজেশন","d.monet.yes":"এলিজিবল ✓","d.category":"ক্যাটাগরি","d.status":"স্ট্যাটাস","d.price":"দাম","d.askprice":"দাম জানতে মেসেজ দিন","d.ask":"এই পেজ নিয়ে MEGH-কে জিজ্ঞেস করুন","d.open":"ফেসবুকে খুলুন","d.openp":"প্রোফাইল খুলুন","d.sold":"বিক্রি হয়েছে","d.available":"স্টকে আছে","d.reserved":"রিজার্ভড",
     "ch.home":"হোম","ch.megh":"MEGH","ch.pages":"পেজ","ch.youtube":"ইউটিউব","ch.agency":"এজেন্সি","ch.trust":"সিকিউরিটি","ch.reviews":"রিভিউ","ch.process":"প্রসেস","ch.contact":"যোগাযোগ"
   }
 };
@@ -567,11 +569,24 @@ function waUrl(kind, p){
     if (viewed.length){ msg += (bn ? `\n\nআমি এই পেজগুলো দেখেছি:\n` : `\n\nI looked at these pages:\n`) + viewed.map(v => `• ${v.name} (${v.followers}) ${v.url||""}`).join("\n"); }
   }
   msg += bn ? `\n\n— Fidah পোর্টফোলিও থেকে` : `\n\n— from the Fidah portfolio`;
+  lastMsg = msg;
   if (!CONFIG.whatsappNumber) return CONFIG.whatsappUrl;
   return "https://wa.me/" + CONFIG.whatsappNumber + "?text=" + encodeURIComponent(msg);
 }
+let lastMsg = "";
 function refreshWaLinks(){
-  document.querySelectorAll(".walink").forEach(a => a.href = waUrl(a.dataset.wa || "general"));
+  document.querySelectorAll(".walink").forEach(a => { a.href = waUrl(a.dataset.wa || "general"); a.dataset.msg = lastMsg; });
+}
+// Short-link fallback: wa.me/message/... cannot carry text, so copy the message to the clipboard first and tell the client to paste it.
+document.addEventListener("click", e => {
+  const a = e.target.closest("a[href*='wa.me/message/']"); if (!a) return;
+  const msg = a.dataset.msg || lastMsg; if (!msg || !navigator.clipboard) return;
+  navigator.clipboard.writeText(msg).then(() => toast(t("wa.copied"))).catch(() => {});
+}, true);
+function toast(text){
+  let el = document.getElementById("toast");
+  if (!el){ el = document.createElement("div"); el.id = "toast"; document.body.appendChild(el); }
+  el.textContent = text; el.classList.add("on"); clearTimeout(toast.tm); toast.tm = setTimeout(() => el.classList.remove("on"), 3500);
 }
 const detail = document.getElementById("detail");
 const blobCache = {};
@@ -603,7 +618,7 @@ function openPage(i){
   openDetail(`<div class="pf" id="dPf"><img src="${esc(p.img)}" alt=""></div>`, p.name, pick(p.category) + " · " + t("d."+p.status),
     `${p.video?`<video controls playsinline preload="none" poster="${esc(p.poster||"")}" style="max-height:52vh;aspect-ratio:9/19.5;margin:0 auto;display:block"></video><p style="font-size:12px;color:var(--muted);text-align:center;margin-top:6px">${t("d.videonote")}</p>`:""}
      <div class="kv" style="margin-top:12px"><div><span>${t("d.followers")}</span><b class="num">${esc(p.followers)}</b></div><div><span>${t("d.category")}</span><b>${esc(pick(p.category))}</b></div>${p.topReel?`<div><span>${t("d.topreel")}</span><b class="num">${esc(p.topReel)}</b></div>`:""}${p.talking?`<div><span>${t("d.talking")}</span><b class="num">${esc(p.talking)}</b></div>`:""}<div><span>${t("d.monet")}</span><b style="color:var(--ok)">${p.monet?t("d.monet.yes"):"—"}</b></div><div><span>${t("d.status")}</span><b>${t("d."+p.status)}</b></div></div>`,
-    `<div class="price"><small>${t("d.price")}</small>${p.price?esc(p.price):t("d.askprice")}</div>${p.url?`<a class="btn ghost" href="${esc(p.url)}" style="max-width:100%;flex-direction:column;align-items:flex-start;gap:2px;border-radius:14px;padding:10px 14px"><span>↗ ${t("d.open")}</span><small style="font-weight:500;color:var(--muted);font-size:11px;word-break:break-all;text-align:left">${esc(p.url.replace(/^https?:\/\//,""))}</small></a>`:""}${p.status==="sold"?"":`<a class="btn wa" style="margin-left:0" href="${esc(waUrl("page", p))}">${WA_SVG}${t("d.ask")}</a>`}`);
+    `<div class="price"><small>${t("d.price")}</small>${p.price?esc(p.price):t("d.askprice")}</div>${p.url?`<a class="btn ghost" href="${esc(p.url)}" style="max-width:100%;flex-direction:column;align-items:flex-start;gap:2px;border-radius:14px;padding:10px 14px"><span>↗ ${t("d.open")}</span><small style="font-weight:500;color:var(--muted);font-size:11px;word-break:break-all;text-align:left">${esc(p.url.replace(/^https?:\/\//,""))}</small></a>`:""}${p.status==="sold"?"":`<a class="btn wa" style="margin-left:0" href="${esc(waUrl("page", p))}" data-msg="${esc(lastMsg)}">${WA_SVG}${t("d.ask")}</a>`}`);
   attachVideo(detail.querySelector("video"), p.video);
 }
 function openReview(i){
