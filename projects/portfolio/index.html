@@ -143,7 +143,9 @@ html[lang="bn"] .proj .badge{letter-spacing:0;text-transform:none;font-size:12px
 /* about */
 .about{display:grid;grid-template-columns:.9fr 1.1fr;gap:34px;align-items:center}
 .photo{position:relative;border-radius:var(--r);overflow:hidden;background:linear-gradient(160deg,#ff2a3c,#7a0010);padding:14px;box-shadow:0 30px 80px rgba(255,42,60,.25)}
-.photo img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:14px}
+.photo>img:first-child{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:14px}
+.photo .mini{position:absolute;right:-8px;bottom:92px;width:36%;aspect-ratio:4/5;object-fit:cover;border-radius:14px;border:4px solid var(--bg);transform:rotate(6deg);box-shadow:0 20px 40px rgba(0,0,0,.5)}
+.photo .cap .gold{display:block;margin-top:4px;font-size:12px;color:#ffd96b;font-weight:700}
 .photo .cap{padding:14px 6px 2px;display:flex;align-items:center;gap:10px}
 .photo .cap b{display:block;font-family:var(--display);font-size:18px;font-weight:800}
 .photo .cap span{font-size:13px;color:rgba(255,255,255,.85)}
@@ -262,7 +264,7 @@ details p{padding:0 0 16px;color:var(--muted);font-size:14px;max-width:65ch}
 <div class="grain" aria-hidden="true"></div>
 
 <header class="nav">
-  <a class="me" href="#top"><img src="assets/megh.jpg" alt="">MEGH</a>
+  <a class="me" href="#top"><img src="assets/avatar.jpg" alt="">MEGH</a>
   <nav class="links">
     <a href="#stock" data-i18n="nav.stock">Stock</a>
     <a href="#reviews" data-i18n="nav.reviews">Reviews</a>
@@ -328,7 +330,7 @@ details p{padding:0 0 16px;color:var(--muted);font-size:14px;max-width:65ch}
 <section id="about">
   <div class="wrap">
     <div class="about">
-      <div class="photo rv"><img src="assets/megh.jpg" alt="MEGH"><div class="cap"><div><b>MEGH</b><span data-i18n="ab.role">Voice of MEGH · Founder, Fidah Digital Agency</span></div><span class="sig">FIDAH</span></div></div>
+      <div class="photo rv"><img src="assets/megh-gold.jpg" alt="MEGH with the YouTube Gold Play Button"><img class="mini" src="assets/megh-gold2.jpg" alt=""><div class="cap"><div><b>MEGH</b><span data-i18n="ab.role">Voice of MEGH · Founder, Fidah Digital Agency</span><span class="gold" data-i18n="ab.cap">YouTube Gold Play Button · 1,000,000+ subscribers</span></div><span class="sig">FIDAH</span></div></div>
       <div class="bio rv">
         <span class="eyebrow" data-i18n="ab.eyebrow">About me</span>
         <h2 data-i18n-html="ab.title">A public face, <span class="r">not an anonymous seller.</span></h2>
@@ -466,7 +468,7 @@ const T = {
     "yt.title":"YouTube channels: none in stock, built to order.","yt.lead":"I run a 1.98M-subscriber channel myself and have sold 60+ channels. Tell me the niche, subscriber range, monetization need and budget. TikTok and Instagram accounts on order too.","yt.cta":"Order a channel",
     "sv.eyebrow":"What I do","sv.title":"What I help you <span class=\"r\">get…</span>","sv.lead":"Tap a service to see what is included. Everything ends with a live handover and seven days of support.","sv.tools":"Platforms I work on",
     "tr.eyebrow":"Security","tr.title":"You never pay for what you <span class=\"r\">have not seen.</span>","tr.bad":"RANDOM SELLER","tr.b1":"Fake name, no face","tr.b2":"Screenshots only","tr.b3":"Disappears after payment","tr.good":"FIDAH · MEGH","tr.g1":"Public creator, 3.7M+ followers, 230+ deals","tr.g2":"Live screen-share before payment","tr.g3":"7 days of support after transfer",
-    "ab.eyebrow":"About me","ab.role":"Voice of MEGH · Founder, Fidah Digital Agency","ab.title":"A public face, <span class=\"r\">not an anonymous seller.</span>","ab.p1":"I am MEGH, a content creator from Jhenaidah known as Voice of MEGH. I grow my own audiences on YouTube, TikTok and Facebook every day, so every page I sell is one I know how to build and keep safe.","ab.p2":"Two years into Fidah Digital Agency: 120+ Facebook pages, 60+ YouTube channels and 50+ TikTok and Instagram accounts handed over, every one on a live call with the buyer watching.",
+    "ab.eyebrow":"About me","ab.role":"Voice of MEGH · Founder, Fidah Digital Agency","ab.cap":"YouTube Gold Play Button · 1,000,000+ subscribers","ab.title":"A public face, <span class=\"r\">not an anonymous seller.</span>","ab.p1":"I am MEGH, a content creator from Jhenaidah known as Voice of MEGH, holder of the YouTube Gold Play Button. I grow my own audiences on YouTube, TikTok and Facebook every day, so every page I sell is one I know how to build and keep safe.","ab.p2":"Two years into Fidah Digital Agency: 120+ Facebook pages, 60+ YouTube channels and 50+ TikTok and Instagram accounts handed over, every one on a live call with the buyer watching.",
     "rv.eyebrow":"Client reviews","rv.title":"Hear what my <span class=\"r\">clients say.</span>","rv.happy":"7 happy clients on video","rv.more":"More reviews on the Fidah page","rv.onfb":"Watch on Facebook","rv.watch.s":"On the Fidah Digital Product page",
     "fq.title":"Questions buyers <span class=\"r\">ask first.</span>",
     "ct.eyebrow":"Contact · Jhenaidah, Bangladesh","ct.title":"Let's make the deal <span class=\"r\">today.</span>","ct.lead":"Say which page you want, or your niche, size and budget. I reply with the price, screenshots and a time for the live walkthrough.",
@@ -483,7 +485,7 @@ const T = {
     "yt.title":"ইউটিউব চ্যানেল: স্টকে নেই, অর্ডারে বানিয়ে দিই।","yt.lead":"আমি নিজেই ১.৯৮M সাবস্ক্রাইবারের চ্যানেল চালাই, ৬০+ চ্যানেল বিক্রি করেছি। নিশ, সাবস্ক্রাইবার রেঞ্জ, মনিটাইজেশন আর বাজেট বলুন। টিকটক আর ইনস্টাগ্রাম অ্যাকাউন্টও অর্ডারে।","yt.cta":"চ্যানেল অর্ডার করুন",
     "sv.eyebrow":"আমি যা করি","sv.title":"আমার কাছ থেকে <span class=\"r\">যা পাবেন…</span>","sv.lead":"একটা সার্ভিসে ট্যাপ করলে কী কী থাকছে দেখবেন। সব কিছু শেষ হয় লাইভ হ্যান্ডওভার আর সাত দিনের সাপোর্ট দিয়ে।","sv.tools":"যে প্ল্যাটফর্মে কাজ করি",
     "tr.eyebrow":"সিকিউরিটি","tr.title":"নিজের চোখে না দেখে <span class=\"r\">টাকা দিতে হবে না।</span>","tr.bad":"যেকোনো সেলার","tr.b1":"ভুয়া নাম, মুখ নেই","tr.b2":"শুধু স্ক্রিনশট","tr.b3":"পেমেন্টের পর গায়েব","tr.good":"ফিদাহ · MEGH","tr.g1":"পরিচিত ক্রিয়েটর, ৩৭ লাখ+ ফলোয়ার, ২৩০+ ডিল","tr.g2":"পেমেন্টের আগে লাইভ স্ক্রিন-শেয়ার","tr.g3":"ট্রান্সফারের পর ৭ দিন সাপোর্ট",
-    "ab.eyebrow":"আমি কে","ab.role":"ভয়েস অফ MEGH · ফাউন্ডার, ফিদাহ ডিজিটাল এজেন্সি","ab.title":"একটা পরিচিত মুখ, <span class=\"r\">অচেনা সেলার না।</span>","ab.p1":"আমি MEGH, ঝিনাইদহের কনটেন্ট ক্রিয়েটর, ভয়েস অফ MEGH নামে পরিচিত। ইউটিউব, টিকটক আর ফেসবুকে প্রতিদিন নিজের অডিয়েন্স বড় করি, তাই যে পেজ বিক্রি করি সেটা কীভাবে বানাতে আর নিরাপদ রাখতে হয় জানি।","ab.p2":"ফিদাহ ডিজিটাল এজেন্সির দুই বছর: ১২০+ ফেসবুক পেজ, ৬০+ ইউটিউব চ্যানেল আর ৫০+ টিকটক-ইনস্টাগ্রাম অ্যাকাউন্ট হ্যান্ডওভার, প্রতিটা লাইভ কলে ক্রেতার চোখের সামনে।",
+    "ab.eyebrow":"আমি কে","ab.role":"ভয়েস অফ MEGH · ফাউন্ডার, ফিদাহ ডিজিটাল এজেন্সি","ab.cap":"ইউটিউব গোল্ড প্লে বাটন · ১০ লাখ+ সাবস্ক্রাইবার","ab.title":"একটা পরিচিত মুখ, <span class=\"r\">অচেনা সেলার না।</span>","ab.p1":"আমি MEGH, ঝিনাইদহের কনটেন্ট ক্রিয়েটর, ভয়েস অফ MEGH নামে পরিচিত, ইউটিউবের গোল্ড প্লে বাটন পাওয়া ক্রিয়েটর। ইউটিউব, টিকটক আর ফেসবুকে প্রতিদিন নিজের অডিয়েন্স বড় করি, তাই যে পেজ বিক্রি করি সেটা কীভাবে বানাতে আর নিরাপদ রাখতে হয় জানি।","ab.p2":"ফিদাহ ডিজিটাল এজেন্সির দুই বছর: ১২০+ ফেসবুক পেজ, ৬০+ ইউটিউব চ্যানেল আর ৫০+ টিকটক-ইনস্টাগ্রাম অ্যাকাউন্ট হ্যান্ডওভার, প্রতিটা লাইভ কলে ক্রেতার চোখের সামনে।",
     "rv.eyebrow":"ক্লায়েন্ট রিভিউ","rv.title":"ক্লায়েন্টরা <span class=\"r\">কী বলে।</span>","rv.happy":"৭ জন খুশি ক্লায়েন্ট, ভিডিওতে","rv.more":"আরও রিভিউ ফিদাহ পেজে","rv.onfb":"ফেসবুকে দেখুন","rv.watch.s":"Fidah Digital Product পেজে",
     "fq.title":"ক্রেতারা প্রথমে <span class=\"r\">যা জিজ্ঞেস করেন।</span>",
     "ct.eyebrow":"যোগাযোগ · ঝিনাইদহ, বাংলাদেশ","ct.title":"চলুন, ডিলটা <span class=\"r\">আজই করি।</span>","ct.lead":"কোন পেজটা চান বলুন, বা নিশ, সাইজ আর বাজেট। আমি দাম, স্ক্রিনশট আর লাইভ ওয়াকথ্রুর সময় জানিয়ে রিপ্লাই দিই।",
