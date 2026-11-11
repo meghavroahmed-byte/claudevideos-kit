@@ -78,13 +78,44 @@ main,header,footer,.fab{position:relative;z-index:1}
 .nav .btn{padding:8px 14px;font-size:13px}
 
 /* hero */
-.hero{padding:118px 0 40px;min-height:auto}
+.hero{padding:112px 0 30px;min-height:auto}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:34px;align-items:center}
+.hero-text{display:grid;gap:18px;justify-items:start}
+.hero h1{text-align:left;font-size:clamp(38px,5.4vw,72px);letter-spacing:-.035em;text-transform:none}
+html[lang="bn"] .hero h1{font-size:clamp(32px,4.5vw,58px);line-height:1.08}
+.hero-visual{position:relative}
+.hero-photo{position:relative;border-radius:28px;overflow:hidden;border:3px solid var(--red);aspect-ratio:4/5;box-shadow:0 40px 100px rgba(255,42,60,.25),0 0 0 10px rgba(255,42,60,.08);transform:rotate(1.5deg)}
+.hero-photo img{width:100%;height:100%;object-fit:cover}
+.hero-photo .tag{position:absolute;padding:8px 12px;border-radius:999px;background:rgba(10,10,12,.82);border:1px solid var(--line);font-size:12px;font-weight:700;backdrop-filter:blur(8px);white-space:nowrap}
+.hero-photo .tag.gold{top:14px;left:14px;color:#ffd96b;border-color:rgba(255,217,107,.45)}
+.hero-photo .tag.subs{bottom:14px;right:14px}
+.hero-photo .tag.subs b{color:var(--red);font-family:var(--display);font-size:16px}
+.hero-visual .stage{position:absolute;left:-14%;bottom:-18px;height:58%;margin:0;z-index:3;width:auto}
+.creds{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.cred{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;background:var(--card);border:1px solid var(--line);font-size:13px;font-weight:600}
+.cred b{font-family:var(--display);font-size:16px;color:var(--text)}
+.cred.gold{border-color:rgba(255,217,107,.45);color:#ffd96b}
+.marquee{overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg2);padding:12px 0;margin-top:28px}
+.marquee .track{display:flex;gap:40px;white-space:nowrap;width:max-content;animation:mq 38s linear infinite;font-family:var(--display);font-weight:800;font-size:15px;letter-spacing:.06em;text-transform:uppercase}
+.marquee .track span{display:inline-flex;align-items:center;gap:14px;color:var(--muted)}
+.marquee .track span i{font-style:normal;color:var(--red)}
+@keyframes mq{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.marquee .track{animation:none}}
+.socgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:22px}
+.soc{display:grid;gap:8px;padding:18px;border-radius:18px;background:var(--card);border:1px solid var(--line);text-decoration:none;position:relative;overflow:hidden;transition:transform .2s,border-color .2s}
+.soc:hover{transform:translateY(-4px);border-color:rgba(255,42,60,.5)}
+.soc .top{display:flex;align-items:center;gap:10px}
+.soc .top img{width:34px;height:34px;border-radius:50%;object-fit:cover}
+.soc .pf{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-weight:800;color:#fff;font-size:14px}
+.soc b.big{font-family:var(--display);font-size:clamp(26px,3vw,38px);font-weight:900;letter-spacing:-.02em;line-height:1}
+.soc span{font-size:12px;color:var(--muted)}
+.soc .go{position:absolute;right:14px;top:14px;color:var(--muted);font-size:12px}
 .hero .wrap{position:relative}
 .hero .eyebrow{margin-bottom:14px}
 .hero h1{font-size:clamp(54px,11.5vw,150px);font-weight:900;letter-spacing:-.04em;line-height:.92;text-align:center;text-transform:uppercase}
 html[lang="bn"] .hero h1{letter-spacing:-.01em;line-height:1.02;text-transform:none;font-size:clamp(46px,10.5vw,132px);font-weight:700}
 .hero h1 .l2{display:block;color:var(--red)}
-.stage{position:relative;height:clamp(300px,36vw,460px);margin-top:clamp(-70px,-7vw,-120px);display:flex;justify-content:center;align-items:flex-end;pointer-events:none}
+.stage{position:relative;display:flex;justify-content:center;align-items:flex-end;pointer-events:none}
 #rig{height:100%;width:auto;aspect-ratio:520/700;max-width:100%;filter:drop-shadow(0 30px 40px rgba(0,0,0,.6));display:block}
 .stage .floor{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);width:min(520px,80%);height:28px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,42,60,.35),transparent)}
 .hero-bottom{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:end;margin-top:18px}
@@ -254,9 +285,14 @@ details p{padding:0 0 16px;color:var(--muted);font-size:14px;max-width:65ch}
   section{padding:56px 0}
   .nav .links{display:none}
   .nav .btn span{display:none}
-  .hero{padding-top:96px}
-  .stage{height:clamp(240px,62vw,320px);margin-top:-4vw}
-  .hero-bottom{margin-top:26px}
+  .hero{padding-top:92px}
+  .hero-grid{grid-template-columns:1fr;gap:22px}
+  .hero-visual{order:-1;margin:0 10px}
+  .hero-photo{transform:none}
+  .hero-visual .stage{height:52%;left:-8%;bottom:-14px}
+  .hero h1{font-size:clamp(34px,9vw,52px)}
+  .socgrid{grid-template-columns:1fr 1fr}
+  .marquee{margin-top:18px}
   .hero-bottom{grid-template-columns:1fr}
   .hero .cta{justify-content:flex-start}
   .grid2,.grid3{grid-template-columns:1fr}
@@ -276,10 +312,10 @@ details p{padding:0 0 16px;color:var(--muted);font-size:14px;max-width:65ch}
 <header class="nav">
   <a class="me" href="#top"><img src="assets/avatar.jpg" alt="">MEGH</a>
   <nav class="links">
-    <a href="#stock" data-i18n="nav.stock">Stock</a>
-    <a href="#reviews" data-i18n="nav.reviews">Reviews</a>
-    <a href="#services" data-i18n="nav.services">Services</a>
     <a href="#about" data-i18n="nav.about">About</a>
+    <a href="#reviews" data-i18n="nav.reviews">Reviews</a>
+    <a href="#stock" data-i18n="nav.stock">Stock</a>
+    <a href="#services" data-i18n="nav.services">Services</a>
     <a href="#contact" data-i18n="nav.contact">Contact</a>
   </nav>
   <div class="lang" role="group" aria-label="Language"><button type="button" id="langEn" aria-pressed="false">EN</button><button type="button" id="langBn" aria-pressed="true">বাং</button></div>
@@ -289,20 +325,53 @@ details p{padding:0 0 16px;color:var(--muted);font-size:14px;max-width:65ch}
 <main id="top">
 <section class="hero">
   <div class="wrap">
-    <div style="text-align:center"><span class="eyebrow" data-i18n="home.eyebrow">Fidah Digital Agency · Jhenaidah, Bangladesh</span></div>
-    <h1><span data-i18n="home.l1">Buy pages</span><span class="l2" data-i18n="home.l2">without fear.</span></h1>
-    <div class="stage"><div class="floor"></div><canvas id="rig" width="520" height="700" aria-label="MEGH, animated character"></canvas></div>
-    <div class="hero-bottom">
-      <p class="lead" data-i18n="home.lead">Facebook pages in stock, YouTube channels on order, ads agency. Everything verified live on a call before you pay. Run by MEGH, a creator with 3.7M followers of his own.</p>
-      <div class="cta">
-        <a class="btn red walink" href="#contact"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.1.7a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.2c0-.1-.2-.2-.5-.3z"/></svg><span data-i18n="home.cta1">Talk on WhatsApp</span></a>
-        <a class="btn ghost" href="#stock" data-i18n="home.cta2">See stock</a>
+    <div class="hero-grid">
+      <div class="hero-text">
+        <span class="eyebrow" data-i18n="home.eyebrow">Fidah Digital Agency · Jhenaidah, Bangladesh</span>
+        <h1><span data-i18n="home.l1">Not a random seller.</span><span class="l2" data-i18n="home.l2">A YouTuber you know.</span></h1>
+        <p class="lead" data-i18n="home.lead">I am MEGH, Voice of MEGH. YouTube Gold Play Button, 1.98M subscribers, 1.5M on TikTok. I sell Facebook pages and YouTube channels under my own name and face, verified live before you pay.</p>
+        <div class="cta">
+          <a class="btn red walink" href="#contact"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.1.7a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.2c0-.1-.2-.2-.5-.3z"/></svg><span data-i18n="home.cta1">Talk on WhatsApp</span></a>
+          <a class="btn ghost" href="#stock" data-i18n="home.cta2">See pages in stock</a>
+        </div>
+        <div class="creds" id="creds"></div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-photo"><img src="assets/megh-gold.jpg" alt="MEGH with the YouTube Gold Play Button"><span class="tag gold">🏆 <span data-i18n="home.tag1">YouTube Gold Play Button</span></span><span class="tag subs"><b>1.98M</b> <span data-i18n="home.tag2">subscribers</span></span></div>
+        <div class="stage"><canvas id="rig" width="520" height="700" aria-label="MEGH, animated character"></canvas></div>
       </div>
     </div>
-    <div class="trust" id="trust"></div>
   </div>
 </section>
+<div class="marquee" aria-hidden="true"><div class="track" id="marquee"></div></div>
 
+
+
+
+
+
+
+<section id="about">
+  <div class="wrap">
+    <div class="about">
+      <div class="photo rv"><img src="assets/megh-gold2.jpg" alt="MEGH with the YouTube Gold Play Button"><div class="cap"><div><b>MEGH</b><span data-i18n="ab.role">Voice of MEGH · Founder, Fidah Digital Agency</span><span class="gold" data-i18n="ab.cap">YouTube Gold Play Button · 1,000,000+ subscribers</span></div><span class="sig">FIDAH</span></div></div>
+      <div class="bio rv">
+        <span class="eyebrow" data-i18n="ab.eyebrow">About me</span>
+        <h2 data-i18n-html="ab.title">3.7 million people already <span class="r">know this face.</span></h2>
+        <p style="margin-top:14px" data-i18n="ab.p1">I am MEGH, a content creator from Jhenaidah known as Voice of MEGH. I grow my own audiences on YouTube, TikTok and Facebook every day, so every page I sell is one I know how to build and keep safe.</p>
+        <p data-i18n="ab.p2">Two years into Fidah Digital Agency: 120+ Facebook pages, 60+ YouTube channels and 50+ TikTok and Instagram accounts handed over, every one on a live call with the buyer watching.</p>
+        <div class="stats" id="stats"></div>
+        </div>
+    </div>
+    <div class="socgrid rv" id="socials"></div>
+  </div>
+</section>
+<section id="reviews">
+  <div class="wrap">
+    <div class="rvhead rv"><div class="sec-head" style="margin:0"><span class="eyebrow" data-i18n="rv.eyebrow">Client reviews</span><h2 data-i18n-html="rv.title">Hear what my <span class="r">clients say.</span></h2></div><div class="happy"><span class="faces" id="faces"></span><span data-i18n="rv.happy">7 happy clients on video</span></div></div>
+    <div class="grid3" id="revGrid" style="margin-top:26px"></div>
+  </div>
+</section>
 <section id="stock">
   <div class="wrap">
     <div class="sec-head rv"><span class="eyebrow" data-i18n="st.eyebrow">In stock now</span><h2 data-i18n-html="st.title">Pages ready <span class="r">today.</span></h2><p data-i18n="st.lead">Every page is live on Facebook and eligible for content monetisation. Watch the screen recording, open the page yourself, then message me for the price.</p></div>
@@ -310,7 +379,6 @@ details p{padding:0 0 16px;color:var(--muted);font-size:14px;max-width:65ch}
     <div class="ytcard rv"><div><h3 data-i18n="yt.title">YouTube channels: none in stock, built to order.</h3><p data-i18n="yt.lead">I run a 1.98M-subscriber channel myself and have sold 60+ channels. Tell me the niche, subscriber range, monetization need and budget. TikTok and Instagram accounts on order too.</p></div><a class="btn walink" data-wa="yt" href="#contact" data-i18n="yt.cta">Order a channel</a></div>
   </div>
 </section>
-
 <section id="services">
   <div class="wrap">
     <div class="svc">
@@ -325,7 +393,6 @@ details p{padding:0 0 16px;color:var(--muted);font-size:14px;max-width:65ch}
     </div>
   </div>
 </section>
-
 <section id="security">
   <div class="wrap">
     <div class="sec-head rv"><span class="eyebrow" data-i18n="tr.eyebrow">Security</span><h2 data-i18n-html="tr.title">You never pay for what you <span class="r">have not seen.</span></h2></div>
@@ -336,37 +403,12 @@ details p{padding:0 0 16px;color:var(--muted);font-size:14px;max-width:65ch}
     </div>
   </div>
 </section>
-
-<section id="about">
-  <div class="wrap">
-    <div class="about">
-      <div class="photo rv"><img src="assets/megh-gold.jpg" alt="MEGH with the YouTube Gold Play Button"><img class="mini" src="assets/megh-gold2.jpg" alt=""><div class="cap"><div><b>MEGH</b><span data-i18n="ab.role">Voice of MEGH · Founder, Fidah Digital Agency</span><span class="gold" data-i18n="ab.cap">YouTube Gold Play Button · 1,000,000+ subscribers</span></div><span class="sig">FIDAH</span></div></div>
-      <div class="bio rv">
-        <span class="eyebrow" data-i18n="ab.eyebrow">About me</span>
-        <h2 data-i18n-html="ab.title">A public face, <span class="r">not an anonymous seller.</span></h2>
-        <p style="margin-top:14px" data-i18n="ab.p1">I am MEGH, a content creator from Jhenaidah known as Voice of MEGH. I grow my own audiences on YouTube, TikTok and Facebook every day, so every page I sell is one I know how to build and keep safe.</p>
-        <p data-i18n="ab.p2">Two years into Fidah Digital Agency: 120+ Facebook pages, 60+ YouTube channels and 50+ TikTok and Instagram accounts handed over, every one on a live call with the buyer watching.</p>
-        <div class="stats" id="stats"></div>
-        <div class="chips" id="socials"></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="reviews">
-  <div class="wrap">
-    <div class="rvhead rv"><div class="sec-head" style="margin:0"><span class="eyebrow" data-i18n="rv.eyebrow">Client reviews</span><h2 data-i18n-html="rv.title">Hear what my <span class="r">clients say.</span></h2></div><div class="happy"><span class="faces" id="faces"></span><span data-i18n="rv.happy">7 happy clients on video</span></div></div>
-    <div class="grid3" id="revGrid" style="margin-top:26px"></div>
-  </div>
-</section>
-
 <section id="faq">
   <div class="wrap">
     <div class="sec-head rv"><span class="eyebrow">FAQ</span><h2 data-i18n-html="fq.title">Questions buyers <span class="r">ask first.</span></h2></div>
     <div class="faq rv" id="faqList"></div>
   </div>
 </section>
-
 <section id="contact">
   <div class="wrap">
     <div class="contact rv">
@@ -472,14 +514,17 @@ CONFIG.tools = ["Facebook","YouTube","TikTok","Instagram","Meta Ads","Google Ads
 const T = {
   en:{
     "nav.stock":"Stock","nav.reviews":"Reviews","nav.services":"Services","nav.about":"About","nav.contact":"Contact","nav.chat":"WhatsApp","fab":"Speak to MEGH",
-    "home.eyebrow":"Fidah Digital Agency · Jhenaidah, Bangladesh","home.l1":"Buy pages","home.l2":"without fear.",
-    "home.lead":"Facebook pages in stock, YouTube channels on order, ads agency. Everything verified live on a call before you pay. Run by MEGH, a creator with 3.7M followers of his own.",
-    "home.cta1":"Talk on WhatsApp","home.cta2":"See stock","trust.deals":"deals done","trust.yt":"YouTube","trust.tt":"TikTok","trust.fb":"Facebook",
+    "home.eyebrow":"Fidah Digital Agency · Jhenaidah, Bangladesh","home.l1":"Not a random seller.","home.l2":"A YouTuber you know.",
+    "home.lead":"I am MEGH, Voice of MEGH. YouTube Gold Play Button, 1.98M subscribers, 1.5M on TikTok. I sell Facebook pages and YouTube channels under my own name and face, verified live before you pay.",
+    "home.cta1":"Talk on WhatsApp","home.cta2":"See pages in stock","home.tag1":"YouTube Gold Play Button","home.tag2":"subscribers",
+    "cred.gold":"Gold Play Button","cred.deals":"deals done","cred.years":"years","cred.subs":"YouTube subs","cred.tt":"TikTok","cred.fb":"Facebook",
+    "mq":["YouTube Gold Play Button","1.98M subscribers","1.5M on TikTok","265K on Facebook","Voice of MEGH","230+ deals done","Live verification before payment","Jhenaidah, Bangladesh"],
+    "soc.open":"open ↗","soc.agency":"Agency page","trust.deals":"deals done","trust.yt":"YouTube","trust.tt":"TikTok","trust.fb":"Facebook",
     "st.eyebrow":"In stock now","st.title":"Pages ready <span class=\"r\">today.</span>","st.lead":"Every page is live on Facebook and eligible for content monetisation. Watch the screen recording, open the page yourself, then message me for the price.","st.monet":"Monetisation ✓","st.followers":"followers",
     "yt.title":"YouTube channels: none in stock, built to order.","yt.lead":"I run a 1.98M-subscriber channel myself and have sold 60+ channels. Tell me the niche, subscriber range, monetization need and budget. TikTok and Instagram accounts on order too.","yt.cta":"Order a channel",
     "sv.eyebrow":"What I do","sv.title":"What I help you <span class=\"r\">get…</span>","sv.lead":"Tap a service to see what is included. Everything ends with a live handover and seven days of support.","sv.tools":"Platforms I work on",
     "tr.eyebrow":"Security","tr.title":"You never pay for what you <span class=\"r\">have not seen.</span>","tr.bad":"RANDOM SELLER","tr.b1":"Fake name, no face","tr.b2":"Screenshots only","tr.b3":"Disappears after payment","tr.good":"FIDAH · MEGH","tr.g1":"Public creator, 3.7M+ followers, 230+ deals","tr.g2":"Live screen-share before payment","tr.g3":"7 days of support after transfer",
-    "ab.eyebrow":"About me","ab.role":"Voice of MEGH · Founder, Fidah Digital Agency","ab.cap":"YouTube Gold Play Button · 1,000,000+ subscribers","ab.title":"A public face, <span class=\"r\">not an anonymous seller.</span>","ab.p1":"I am MEGH, a content creator from Jhenaidah known as Voice of MEGH, holder of the YouTube Gold Play Button. I grow my own audiences on YouTube, TikTok and Facebook every day, so every page I sell is one I know how to build and keep safe.","ab.p2":"Two years into Fidah Digital Agency: 120+ Facebook pages, 60+ YouTube channels and 50+ TikTok and Instagram accounts handed over, every one on a live call with the buyer watching.",
+    "ab.eyebrow":"About me","ab.role":"Voice of MEGH · Founder, Fidah Digital Agency","ab.cap":"YouTube Gold Play Button · 1,000,000+ subscribers","ab.title":"3.7 million people already <span class=\"r\">know this face.</span>","ab.p1":"I am MEGH, a content creator from Jhenaidah known as Voice of MEGH, holder of the YouTube Gold Play Button. I grow my own audiences on YouTube, TikTok and Facebook every day, so every page I sell is one I know how to build and keep safe.","ab.p2":"Two years into Fidah Digital Agency: 120+ Facebook pages, 60+ YouTube channels and 50+ TikTok and Instagram accounts handed over, every one on a live call with the buyer watching.",
     "rv.eyebrow":"Client reviews","rv.title":"Hear what my <span class=\"r\">clients say.</span>","rv.happy":"7 happy clients on video","rv.more":"More reviews on the Fidah page","rv.onfb":"Watch on Facebook","rv.watch.s":"On the Fidah Digital Product page",
     "fq.title":"Questions buyers <span class=\"r\">ask first.</span>",
     "ct.eyebrow":"Contact · Jhenaidah, Bangladesh","ct.title":"Let's make the deal <span class=\"r\">today.</span>","ct.lead":"Say which page you want, or your niche, size and budget. I reply with the price, screenshots and a time for the live walkthrough.",
@@ -489,14 +534,17 @@ const T = {
   },
   bn:{
     "nav.stock":"স্টক","nav.reviews":"রিভিউ","nav.services":"সার্ভিস","nav.about":"আমি কে","nav.contact":"যোগাযোগ","nav.chat":"হোয়াটসঅ্যাপ","fab":"MEGH-কে মেসেজ দিন",
-    "home.eyebrow":"ফিদাহ ডিজিটাল এজেন্সি · ঝিনাইদহ, বাংলাদেশ","home.l1":"পেজ কিনুন","home.l2":"নিশ্চিন্তে।",
-    "home.lead":"স্টকে ফেসবুক পেজ, অর্ডারে ইউটিউব চ্যানেল, সাথে অ্যাডস এজেন্সি। টাকা দেওয়ার আগে সব কিছু লাইভ কলে ভেরিফাই। চালাচ্ছেন MEGH, যার নিজেরই ৩৭ লাখ ফলোয়ার।",
-    "home.cta1":"হোয়াটসঅ্যাপে কথা বলুন","home.cta2":"স্টক দেখুন","trust.deals":"ডিল সম্পন্ন","trust.yt":"ইউটিউব","trust.tt":"টিকটক","trust.fb":"ফেসবুক",
+    "home.eyebrow":"ফিদাহ ডিজিটাল এজেন্সি · ঝিনাইদহ, বাংলাদেশ","home.l1":"সাধারণ কোনো সেলার না।","home.l2":"একজন পরিচিত ইউটিউবার।",
+    "home.lead":"আমি MEGH, ভয়েস অফ MEGH। ইউটিউবের গোল্ড প্লে বাটন, ১৯.৮ লাখ সাবস্ক্রাইবার, টিকটকে ১৫ লাখ। নিজের নাম আর মুখ দিয়ে ফেসবুক পেজ আর ইউটিউব চ্যানেল বিক্রি করি, টাকা দেওয়ার আগে লাইভ ভেরিফাই।",
+    "home.cta1":"হোয়াটসঅ্যাপে কথা বলুন","home.cta2":"স্টকের পেজ দেখুন","home.tag1":"ইউটিউব গোল্ড প্লে বাটন","home.tag2":"সাবস্ক্রাইবার",
+    "cred.gold":"গোল্ড প্লে বাটন","cred.deals":"ডিল সম্পন্ন","cred.years":"বছর","cred.subs":"ইউটিউব সাবস","cred.tt":"টিকটক","cred.fb":"ফেসবুক",
+    "mq":["ইউটিউব গোল্ড প্লে বাটন","১৯.৮ লাখ সাবস্ক্রাইবার","টিকটকে ১৫ লাখ","ফেসবুকে ২.৬৫ লাখ","ভয়েস অফ MEGH","২৩০+ ডিল সম্পন্ন","পেমেন্টের আগে লাইভ ভেরিফিকেশন","ঝিনাইদহ, বাংলাদেশ"],
+    "soc.open":"খুলুন ↗","soc.agency":"এজেন্সি পেজ","trust.deals":"ডিল সম্পন্ন","trust.yt":"ইউটিউব","trust.tt":"টিকটক","trust.fb":"ফেসবুক",
     "st.eyebrow":"এখন স্টকে","st.title":"আজই নেওয়ার মতো <span class=\"r\">পেজ।</span>","st.lead":"প্রতিটা পেজ ফেসবুকে লাইভ আর কনটেন্ট মনিটাইজেশনের জন্য এলিজিবল। স্ক্রিন রেকর্ডিং দেখুন, নিজে পেজটা খুলুন, তারপর দামের জন্য মেসেজ দিন।","st.monet":"মনিটাইজেশন ✓","st.followers":"ফলোয়ার",
     "yt.title":"ইউটিউব চ্যানেল: স্টকে নেই, অর্ডারে বানিয়ে দিই।","yt.lead":"আমি নিজেই ১.৯৮M সাবস্ক্রাইবারের চ্যানেল চালাই, ৬০+ চ্যানেল বিক্রি করেছি। নিশ, সাবস্ক্রাইবার রেঞ্জ, মনিটাইজেশন আর বাজেট বলুন। টিকটক আর ইনস্টাগ্রাম অ্যাকাউন্টও অর্ডারে।","yt.cta":"চ্যানেল অর্ডার করুন",
     "sv.eyebrow":"আমি যা করি","sv.title":"আমার কাছ থেকে <span class=\"r\">যা পাবেন…</span>","sv.lead":"একটা সার্ভিসে ট্যাপ করলে কী কী থাকছে দেখবেন। সব কিছু শেষ হয় লাইভ হ্যান্ডওভার আর সাত দিনের সাপোর্ট দিয়ে।","sv.tools":"যে প্ল্যাটফর্মে কাজ করি",
     "tr.eyebrow":"সিকিউরিটি","tr.title":"নিজের চোখে না দেখে <span class=\"r\">টাকা দিতে হবে না।</span>","tr.bad":"যেকোনো সেলার","tr.b1":"ভুয়া নাম, মুখ নেই","tr.b2":"শুধু স্ক্রিনশট","tr.b3":"পেমেন্টের পর গায়েব","tr.good":"ফিদাহ · MEGH","tr.g1":"পরিচিত ক্রিয়েটর, ৩৭ লাখ+ ফলোয়ার, ২৩০+ ডিল","tr.g2":"পেমেন্টের আগে লাইভ স্ক্রিন-শেয়ার","tr.g3":"ট্রান্সফারের পর ৭ দিন সাপোর্ট",
-    "ab.eyebrow":"আমি কে","ab.role":"ভয়েস অফ MEGH · ফাউন্ডার, ফিদাহ ডিজিটাল এজেন্সি","ab.cap":"ইউটিউব গোল্ড প্লে বাটন · ১০ লাখ+ সাবস্ক্রাইবার","ab.title":"একটা পরিচিত মুখ, <span class=\"r\">অচেনা সেলার না।</span>","ab.p1":"আমি MEGH, ঝিনাইদহের কনটেন্ট ক্রিয়েটর, ভয়েস অফ MEGH নামে পরিচিত, ইউটিউবের গোল্ড প্লে বাটন পাওয়া ক্রিয়েটর। ইউটিউব, টিকটক আর ফেসবুকে প্রতিদিন নিজের অডিয়েন্স বড় করি, তাই যে পেজ বিক্রি করি সেটা কীভাবে বানাতে আর নিরাপদ রাখতে হয় জানি।","ab.p2":"ফিদাহ ডিজিটাল এজেন্সির দুই বছর: ১২০+ ফেসবুক পেজ, ৬০+ ইউটিউব চ্যানেল আর ৫০+ টিকটক-ইনস্টাগ্রাম অ্যাকাউন্ট হ্যান্ডওভার, প্রতিটা লাইভ কলে ক্রেতার চোখের সামনে।",
+    "ab.eyebrow":"আমি কে","ab.role":"ভয়েস অফ MEGH · ফাউন্ডার, ফিদাহ ডিজিটাল এজেন্সি","ab.cap":"ইউটিউব গোল্ড প্লে বাটন · ১০ লাখ+ সাবস্ক্রাইবার","ab.title":"৩৭ লাখ মানুষ এই মুখটা <span class=\"r\">আগে থেকেই চেনে।</span>","ab.p1":"আমি MEGH, ঝিনাইদহের কনটেন্ট ক্রিয়েটর, ভয়েস অফ MEGH নামে পরিচিত, ইউটিউবের গোল্ড প্লে বাটন পাওয়া ক্রিয়েটর। ইউটিউব, টিকটক আর ফেসবুকে প্রতিদিন নিজের অডিয়েন্স বড় করি, তাই যে পেজ বিক্রি করি সেটা কীভাবে বানাতে আর নিরাপদ রাখতে হয় জানি।","ab.p2":"ফিদাহ ডিজিটাল এজেন্সির দুই বছর: ১২০+ ফেসবুক পেজ, ৬০+ ইউটিউব চ্যানেল আর ৫০+ টিকটক-ইনস্টাগ্রাম অ্যাকাউন্ট হ্যান্ডওভার, প্রতিটা লাইভ কলে ক্রেতার চোখের সামনে।",
     "rv.eyebrow":"ক্লায়েন্ট রিভিউ","rv.title":"ক্লায়েন্টরা <span class=\"r\">কী বলে।</span>","rv.happy":"৭ জন খুশি ক্লায়েন্ট, ভিডিওতে","rv.more":"আরও রিভিউ ফিদাহ পেজে","rv.onfb":"ফেসবুকে দেখুন","rv.watch.s":"Fidah Digital Product পেজে",
     "fq.title":"ক্রেতারা প্রথমে <span class=\"r\">যা জিজ্ঞেস করেন।</span>",
     "ct.eyebrow":"যোগাযোগ · ঝিনাইদহ, বাংলাদেশ","ct.title":"চলুন, ডিলটা <span class=\"r\">আজই করি।</span>","ct.lead":"কোন পেজটা চান বলুন, বা নিশ, সাইজ আর বাজেট। আমি দাম, স্ক্রিনশট আর লাইভ ওয়াকথ্রুর সময় জানিয়ে রিপ্লাই দিই।",
@@ -563,7 +611,9 @@ document.getElementById("langBn").onclick = () => { lang="bn"; try{localStorage.
 
 function renderTrust(){
   const s = CONFIG.socials;
-  document.getElementById("trust").innerHTML = s.filter(x => x.followers).map(x => `<span><span class="pf ${x.key}">${socialIcon(x.key)}</span><b class="num">${esc(x.followers)}</b>${esc(x.label)}</span>`).join("") + `<span><b class="num">230+</b>${t("trust.deals")}</span>`;
+  document.getElementById("creds").innerHTML = `<span class="cred gold">🏆 ${t("cred.gold")}</span>` + s.filter(x => x.followers).map(x => `<span class="cred"><span class="pf ${x.key}" style="width:22px;height:22px;border-radius:6px;display:inline-grid;place-items:center;font-size:11px;font-weight:800;color:#fff">${socialIcon(x.key)}</span><b class="num">${esc(x.followers)}</b></span>`).join("") + `<span class="cred"><b class="num">230+</b>${t("cred.deals")}</span>`;
+  const items = T[lang].mq || T.en.mq; const row = items.map(x => `<span><i>✦</i>${esc(x)}</span>`).join("");
+  document.getElementById("marquee").innerHTML = row + row;
 }
 function renderStock(){
   document.getElementById("stockGrid").innerHTML = CONFIG.pages.map((p,i) => `<button type="button" class="proj rv" data-page="${i}">
@@ -586,7 +636,8 @@ function renderStats(){
   document.getElementById("stats").innerHTML = CONFIG.stats.map(s => `<div class="stat"><b class="num">${esc(lang==="bn"&&s.bn_v?s.bn_v:s.v)}</b><span>${esc(lang==="bn"?s.bn:s.en)}</span></div>`).join("");
 }
 function renderSocials(){
-  document.getElementById("socials").innerHTML = CONFIG.socials.map(s => `<a class="chip" href="${esc(s.url)}"><span class="pf ${s.key}">${socialIcon(s.key)}</span><div><b>${esc(s.label)} ${s.followers?"· "+esc(s.followers):""}</b><small>${esc(s.handle)} · ${esc(pick(s.sub))}</small></div></a>`).join("");
+  const tiles = CONFIG.socials.map(s => `<a class="soc" href="${esc(s.url)}"><span class="go">${t("soc.open")}</span><div class="top">${s.key==="youtube"?`<img src="assets/yt.jpg" alt="">`:`<span class="pf ${s.key}">${socialIcon(s.key)}</span>`}<div><span style="color:var(--text);font-weight:700">${esc(s.label)}</span><br><span>${esc(s.handle)}</span></div></div><b class="big num">${s.followers?esc(s.followers):"@"}</b><span>${esc(pick(s.sub))}</span></a>`).join("");
+  document.getElementById("socials").innerHTML = tiles + `<a class="soc" href="${esc(CONFIG.agency.url)}"><span class="go">${t("soc.open")}</span><div class="top"><img src="assets/logo.jpg" alt=""><div><span style="color:var(--text);font-weight:700">${esc(CONFIG.agency.name)}</span><br><span>${t("soc.agency")}</span></div></div><b class="big num">${esc(CONFIG.agency.followers)}</b><span>${esc(CONFIG.agency.tagline)}</span></a>`;
 }
 function renderReviews(){
   document.getElementById("faces").innerHTML = CONFIG.reviews.slice(0,4).map(r => `<img src="${esc(r.poster)}" alt="">`).join("");
@@ -704,7 +755,7 @@ addEventListener("scroll", () => { const w = document.querySelector(".giant .wor
   }
   const hot = [];
   const ring = new THREE.Group(); scene.add(ring);
-  const RR = wide() ? 3.6 : 2.6;
+  const RR = wide() ? 4.4 : 2.9;
   CONFIG.pages.forEach((p,i) => {
     const side = new THREE.MeshStandardMaterial({color:0x2a2a33, metalness:.6, roughness:.4});
     const m = new THREE.Mesh(new THREE.BoxGeometry(2.0,1.25,.08), [side,side,side,side,new THREE.MeshStandardMaterial({map:cardTex(p), roughness:.5, emissive:0x111111, emissiveIntensity:.4}),side]);
@@ -724,12 +775,12 @@ addEventListener("scroll", () => { const w = document.querySelector(".giant .wor
   const pGeo = new THREE.BufferGeometry(); pGeo.setAttribute("position", new THREE.BufferAttribute(pos,3));
   const pts = new THREE.Points(pGeo, new THREE.PointsMaterial({color:0xff6b78, size:.05, transparent:true, opacity:.7})); amb.add(pts);
 
-  const stage = document.querySelector(".stage");
+  const stage = document.querySelector(".hero-visual");
   let pxPerUnit = 1, stageY = 0;
   function layout(){
     const w = innerWidth, h = innerHeight; renderer.setSize(w,h,false); camera.aspect = w/h; camera.updateProjectionMatrix();
     pxPerUnit = h / (2*10*Math.tan(camera.fov*Math.PI/360));
-    const r = stage.getBoundingClientRect(); stageY = r.top + scrollY + r.height*0.42;   // document px of the ring centre
+    const r = stage.getBoundingClientRect(); stageY = r.top + scrollY + r.height*0.55;   // document px of the ring centre
     ring.scale.setScalar(wide() ? 1 : .8);
   }
   layout(); addEventListener("resize", layout); addEventListener("load", layout);
@@ -751,7 +802,7 @@ addEventListener("scroll", () => { const w = document.querySelector(".giant .wor
     const sy = scrollY;
     // ring follows the hero stage; ambient shapes drift slower (parallax)
     ring.position.y = (sy - (stageY - innerHeight/2)) / pxPerUnit;
-    ring.position.x = mx*.6; ring.rotation.x = my*.25 + .08;
+    const rx = stage.getBoundingClientRect(); ring.position.x = ((rx.left + rx.width/2) - innerWidth/2) / pxPerUnit + mx*.4; ring.rotation.x = my*.2 + .12;
     amb.position.y = sy/pxPerUnit*.35; amb.position.x = -mx*1.2; amb.rotation.y = mx*.2;
     if (!dragging){ ringRot += ringVel + .0035*dt; ringVel *= .94; }
     ring.rotation.y = ringRot;
