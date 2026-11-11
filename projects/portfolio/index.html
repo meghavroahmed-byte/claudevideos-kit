@@ -293,7 +293,7 @@ footer{position:relative;z-index:2;padding:20px clamp(16px,4vw,56px) 40px;color:
       <li data-i18n="yt.l2">No copyright strikes, full analytics shown before payment</li>
       <li data-i18n="yt.l3">Primary owner and recovery email transferred on the call</li>
     </ul>
-    <div class="cta"><a class="btn gold mag walink" href="#contact" data-i18n="yt.cta">Order a YouTube channel</a></div>
+    <div class="cta"><a class="btn gold mag walink" data-wa="yt" href="#contact" data-i18n="yt.cta">Order a YouTube channel</a></div>
   </div>
 </section>
 
@@ -362,7 +362,8 @@ const CONFIG = {
   brand: "Fidah Digital Agency",
   owner: "MEGH",
   location: "Jhenaidah, Bangladesh",
-  whatsappUrl: "https://wa.me/message/LQYHIY5O5KYME1",
+  whatsappUrl: "https://wa.me/message/LQYHIY5O5KYME1",   // short link (cannot carry a pre-written message)
+  whatsappNumber: "",   // e.g. "8801712345678" (no +). When set, every WhatsApp button opens a chat with the page name and link pre-written.
   email: "iammegh143143@gmail.com",
   agency: { name:"Fidah Digital Product", url:"https://www.facebook.com/Fidahdigitalproduct/", videosUrl:"https://www.facebook.com/Fidahdigitalproduct/videos", followers:"11.6K", tagline:"একটা বিশ্বাসযোগ্য Digital Product's Agency যা আপনি খুঁজছিলেন!" },
 
@@ -498,11 +499,11 @@ function applyLang(){
   document.querySelectorAll("[data-i18n]").forEach(el => el.textContent = t(el.dataset.i18n));
   document.querySelectorAll("[data-i18n-html]").forEach(el => el.innerHTML = t(el.dataset.i18nHtml));
   renderStats(); renderSocials(); renderPages(); renderGuar(); renderReviews(); renderSteps(); renderChannels(); renderDots();
-  bindMagnet();
+  bindMagnet(); refreshWaLinks();
 }
 document.getElementById("langEn").onclick = () => { lang="en"; try{localStorage.setItem("fidah-lang",lang)}catch(e){}; applyLang(); };
 document.getElementById("langBn").onclick = () => { lang="bn"; try{localStorage.setItem("fidah-lang",lang)}catch(e){}; applyLang(); };
-document.querySelectorAll(".walink").forEach(a => a.href = CONFIG.whatsappUrl);
+// WhatsApp links are filled in by applyLang() below
 
 let statsDone = false;
 function renderStats(){
@@ -541,7 +542,7 @@ function renderChannels(){
   const yt = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M22.5 6.4a2.8 2.8 0 0 0-2-2C18.8 4 12 4 12 4s-6.8 0-8.5.4a2.8 2.8 0 0 0-2 2A29 29 0 0 0 1 12a29 29 0 0 0 .5 5.6 2.8 2.8 0 0 0 2 2C5.2 20 12 20 12 20s6.8 0 8.5-.4a2.8 2.8 0 0 0 2-2A29 29 0 0 0 23 12a29 29 0 0 0-.5-5.6zM10 15.5v-7l5.5 3.5z"/></svg>`;
   const em = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>`;
   document.getElementById("channels").innerHTML = `
-    <a class="chn wa" href="${esc(CONFIG.whatsappUrl)}"><span class="ci" style="background:rgba(37,211,102,.25);color:#3ddc97">${WA_SVG}</span><div><b>${t("ct.wa")}</b><span>${t("ct.wa.s")}</span></div></a>
+    <a class="chn wa walink" href="${esc(waUrl("general"))}"><span class="ci" style="background:rgba(37,211,102,.25);color:#3ddc97">${WA_SVG}</span><div><b>${t("ct.wa")}</b><span>${t("ct.wa.s")}</span></div></a>
     <a class="chn" href="${esc(CONFIG.agency.url)}"><span class="ci"><img src="assets/logo.jpg" alt=""></span><div><b>${t("ct.fb")} · ${esc(CONFIG.agency.followers)}</b><span>${t("ct.fb.s")}</span></div></a>
     <a class="chn" href="${esc(CONFIG.socials[0].url)}"><span class="ci" style="background:rgba(255,0,51,.18);color:#ff3d57">${yt}</span><div><b>${t("ct.yt")}</b><span>${t("ct.yt.s")}</span></div></a>
     <a class="chn" href="mailto:${esc(CONFIG.email)}"><span class="ci" style="background:rgba(255,200,87,.16);color:var(--gold)">${em}</span><div><b>${t("ct.em")} · ${esc(CONFIG.email)}</b><span>${t("ct.em.s")}</span></div></a>`;
@@ -550,6 +551,28 @@ function renderDots(){
   document.getElementById("dots").innerHTML = CH.map((id,i) => `<a href="#${id}" data-dot="${i}" aria-label="${t("ch."+id)}"><span>${t("ch."+id)}</span></a>`).join("");
 }
 
+/* WhatsApp links that carry what the client was looking at */
+const viewed = [];
+function waUrl(kind, p){
+  const bn = lang === "bn";
+  let msg;
+  if (kind === "page" && p){
+    msg = bn ? `আসসালামু আলাইকুম MEGH ভাই। আমি এই পেজটা কিনতে চাই:\n\n📄 পেজ: ${p.name}\n📂 ${pick(p.category)} · ${p.followers} ফলোয়ার\n🔗 ${p.url||"(লিঙ্ক নেই)"}\n\nদাম আর লাইভ ওয়াকথ্রুর সময় জানাবেন প্লিজ।`
+             : `Hi MEGH, I want to buy this page:\n\n📄 Page: ${p.name}\n📂 ${pick(p.category)} · ${p.followers} followers\n🔗 ${p.url||"(no link)"}\n\nPlease send the price and a time for the live walkthrough.`;
+  } else if (kind === "yt"){
+    msg = bn ? `আসসালামু আলাইকুম MEGH ভাই। আমি একটা ইউটিউব চ্যানেল অর্ডার করতে চাই।\n\n🎯 নিশ: \n👥 সাবস্ক্রাইবার: \n💰 বাজেট: \n💵 মনিটাইজড লাগবে: হ্যাঁ / না`
+             : `Hi MEGH, I want to order a YouTube channel.\n\n🎯 Niche: \n👥 Subscribers: \n💰 Budget: \n💵 Monetized needed: yes / no`;
+  } else {
+    msg = bn ? `আসসালামু আলাইকুম MEGH ভাই। Fidah পোর্টফোলিও দেখে মেসেজ দিচ্ছি।` : `Hi MEGH, I saw the Fidah portfolio and I am interested.`;
+    if (viewed.length){ msg += (bn ? `\n\nআমি এই পেজগুলো দেখেছি:\n` : `\n\nI looked at these pages:\n`) + viewed.map(v => `• ${v.name} (${v.followers}) ${v.url||""}`).join("\n"); }
+  }
+  msg += bn ? `\n\n— Fidah পোর্টফোলিও থেকে` : `\n\n— from the Fidah portfolio`;
+  if (!CONFIG.whatsappNumber) return CONFIG.whatsappUrl;
+  return "https://wa.me/" + CONFIG.whatsappNumber + "?text=" + encodeURIComponent(msg);
+}
+function refreshWaLinks(){
+  document.querySelectorAll(".walink").forEach(a => a.href = waUrl(a.dataset.wa || "general"));
+}
 const detail = document.getElementById("detail");
 const blobCache = {};
 function attachVideo(v, src){
@@ -576,10 +599,11 @@ detail.addEventListener("click", e => { if (e.target === detail) closeDetail(); 
 addEventListener("keydown", e => { if (e.key === "Escape") closeDetail(); });
 function openPage(i){
   const p = CONFIG.pages[i];
+  if (!viewed.includes(p)) viewed.push(p); if (viewed.length > 4) viewed.shift(); refreshWaLinks();
   openDetail(`<div class="pf" id="dPf"><img src="${esc(p.img)}" alt=""></div>`, p.name, pick(p.category) + " · " + t("d."+p.status),
     `${p.video?`<video controls playsinline preload="none" poster="${esc(p.poster||"")}" style="max-height:52vh;aspect-ratio:9/19.5;margin:0 auto;display:block"></video><p style="font-size:12px;color:var(--muted);text-align:center;margin-top:6px">${t("d.videonote")}</p>`:""}
      <div class="kv" style="margin-top:12px"><div><span>${t("d.followers")}</span><b class="num">${esc(p.followers)}</b></div><div><span>${t("d.category")}</span><b>${esc(pick(p.category))}</b></div>${p.topReel?`<div><span>${t("d.topreel")}</span><b class="num">${esc(p.topReel)}</b></div>`:""}${p.talking?`<div><span>${t("d.talking")}</span><b class="num">${esc(p.talking)}</b></div>`:""}<div><span>${t("d.monet")}</span><b style="color:var(--ok)">${p.monet?t("d.monet.yes"):"—"}</b></div><div><span>${t("d.status")}</span><b>${t("d."+p.status)}</b></div></div>`,
-    `<div class="price"><small>${t("d.price")}</small>${p.price?esc(p.price):t("d.askprice")}</div>${p.url?`<a class="btn ghost" href="${esc(p.url)}" style="max-width:100%;flex-direction:column;align-items:flex-start;gap:2px;border-radius:14px;padding:10px 14px"><span>↗ ${t("d.open")}</span><small style="font-weight:500;color:var(--muted);font-size:11px;word-break:break-all;text-align:left">${esc(p.url.replace(/^https?:\/\//,""))}</small></a>`:""}${p.status==="sold"?"":`<a class="btn wa" style="margin-left:0" href="${esc(CONFIG.whatsappUrl)}">${WA_SVG}${t("d.ask")}</a>`}`);
+    `<div class="price"><small>${t("d.price")}</small>${p.price?esc(p.price):t("d.askprice")}</div>${p.url?`<a class="btn ghost" href="${esc(p.url)}" style="max-width:100%;flex-direction:column;align-items:flex-start;gap:2px;border-radius:14px;padding:10px 14px"><span>↗ ${t("d.open")}</span><small style="font-weight:500;color:var(--muted);font-size:11px;word-break:break-all;text-align:left">${esc(p.url.replace(/^https?:\/\//,""))}</small></a>`:""}${p.status==="sold"?"":`<a class="btn wa" style="margin-left:0" href="${esc(waUrl("page", p))}">${WA_SVG}${t("d.ask")}</a>`}`);
   attachVideo(detail.querySelector("video"), p.video);
 }
 function openReview(i){
@@ -859,7 +883,7 @@ document.addEventListener("click", e => {
       else if (u.kind === "megh") openSocial(0);
       else if (u.kind === "review") { CONFIG.reviews.length ? openReview(u.i) : openReviewsLink(); }
       else if (u.kind === "yt") location.hash = "#contact";
-      else if (u.kind === "wa") location.href = CONFIG.whatsappUrl;
+      else if (u.kind === "wa") location.href = waUrl("general");
       else if (u.kind === "bar") { u.punch = 1; beep(900,.1,.05); }
       else if (u.kind === "core") { corePunch = 1; beep(330,.25,.06,"triangle"); }
       else if (u.kind === "shield") { shieldPunch = 1; beep(500,.2,.06,"triangle"); }
