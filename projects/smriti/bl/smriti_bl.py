@@ -27,9 +27,10 @@ S.cycles.max_bounces = 4; S.cycles.diffuse_bounces = 2; S.cycles.glossy_bounces 
 S.render.resolution_x, S.render.resolution_y, S.render.resolution_percentage = 1080, 1920, PCT
 S.render.fps = 30; S.frame_start, S.frame_end = 1, NF
 S.render.use_persistent_data = True
-S.render.use_motion_blur = True; S.render.motion_blur_shutter = 0.4
+S.render.use_motion_blur = (SHOT == 'wall'); S.render.motion_blur_shutter = 0.4
 S.view_settings.view_transform = 'AgX'; S.view_settings.look = 'AgX - Punchy'
 S.render.image_settings.file_format = 'PNG'
+S.render.use_overwrite = False; S.render.use_placeholder = True  # resumable: skip frames already on disk
 
 # ---------- helpers ----------
 def mat(name, color=(1, 1, 1), rough=0.5, emit=None, estr=0.0, sss=0.0, metal=0.0, alpha=1.0, trans=0.0):
@@ -79,7 +80,7 @@ ground = prim('primitive_plane_add', gm, size=400)
 bed = prim('primitive_plane_add', gm, size=60, location=(0, 18, 0.005))
 grass_m = mat('grass', (0.2, 0.42, 0.1), 0.6); bed.data.materials.append(grass_m)
 ps = bed.modifiers.new('grass', 'PARTICLE_SYSTEM').particle_system.settings
-ps.type = 'HAIR'; ps.count = 90000; ps.hair_length = 0.32; ps.emit_from = 'FACE'; ps.use_emit_random = True
+ps.type = 'HAIR'; ps.count = 60000; ps.hair_length = 0.32; ps.emit_from = 'FACE'; ps.use_emit_random = True
 ps.root_radius = 0.5; ps.tip_radius = 0.0; ps.material = 2; ps.child_type = 'NONE'
 bed.particle_systems[0].seed = 3
 # trees (background, blurred by DOF)
@@ -97,7 +98,7 @@ for i in range(70):
 stone = mat('stone', (0.36, 0.35, 0.40), 0.75)
 def pedestal(x, y, r, col):
     p = prim('primitive_cylinder_add', stone, vertices=6, radius=r, depth=1.2, location=(x, y, 0.6))
-    rim = prim('primitive_torus_add', mat('rim' + str(x), col, 0.3, col, 6.0), major_radius=r * 1.0, minor_radius=0.03, major_segments=6, minor_segments=8, location=(x, y, 1.2))
+    rim = prim('primitive_cylinder_add', mat('rim' + str(x), col, 0.3, col, 5.0), vertices=6, radius=r * 1.012, depth=0.07, location=(x, y, 1.18), end_fill_type='NOTHING')
     return p
 
 def pic_mat(name):
@@ -116,12 +117,16 @@ def polaroid(name, loc, s=1.0):
 
 def brain(loc, s, col):
     parts = []
-    m = mat('brain', col, 0.42, col, 0.0, sss=0.55)
+    m = mat('brain', col, 0.42, col, 0.0, sss=0.35)
+    n = m.node_tree.nodes; geo = n.new('ShaderNodeNewGeometry'); cr = n.new('ShaderNodeValToRGB')
+    cr.color_ramp.elements[0].position = 0.47; cr.color_ramp.elements[0].color = (col[0] * 0.35, col[1] * 0.25, col[2] * 0.3, 1)
+    cr.color_ramp.elements[1].position = 0.53; cr.color_ramp.elements[1].color = (*col, 1)
+    m.node_tree.links.new(geo.outputs['Pointiness'], cr.inputs['Fac']); m.node_tree.links.new(cr.outputs['Color'], bsdf(m).inputs['Base Color'])
     for sx in (-1, 1):
-        o = prim('primitive_uv_sphere_add', m, segments=96, ring_count=72, radius=1, location=loc)
+        o = prim('primitive_uv_sphere_add', m, segments=160, ring_count=120, radius=1, location=loc)
         for v in o.data.vertices:
             x, y, z = v.co
-            fold = 0.055 * math.sin(9 * x + 4 * math.sin(6 * z)) * math.sin(8 * y + 3 * math.sin(5 * x)) + 0.03 * math.sin(17 * z + 7 * y)
+            fold = 0.06 * abs(math.sin(11 * x + 5 * math.sin(7 * z)) * math.sin(10 * y + 4 * math.sin(6 * x))) + 0.035 * abs(math.sin(23 * z + 9 * y + 3 * math.sin(8 * x)))
             v.co *= (1 + fold)
         o.scale = (0.55 * s, 1.15 * s, 0.78 * s); o.location = (loc[0] + sx * 0.52 * s, loc[1], loc[2])
         smooth(o); o.modifiers.new('sub', 'SUBSURF').levels = 1; parts.append(o)
@@ -158,29 +163,30 @@ def shake(co, t, amp):
 if SHOT in ('brain', 'hippo'):
     BL = (0, 20, 5.2)
     pedestal(0, 20, 3.2, (1.0, 0.55, 0.75))
-    bm, hm = brain(BL, 3.0, (0.95, 0.55, 0.68))
+    bm, hm = brain(BL, 3.0, (0.86, 0.36, 0.52))
+    bsdf(bm).inputs['Coat Weight'].default_value = 0.4
     fo = obj('fill', fill, (6, 4, 12)); fo.rotation_euler = (math.radians(55), 0, math.radians(200))
 
 if SHOT == 'brain':
     b = bsdf(bm)
-    kv(b.inputs['Emission Strength'], fr(18.97), 0.0); kv(b.inputs['Emission Strength'], fr(19.6), 0.9)
-    co, tg = camera('cam', [(18.97, (5, 4, 9), BL), (22.0, (2.5, 5.5, 8.5), BL), (25.37, (-3, 6.5, 8.2), BL)], fstop=2.4, lens=42)
+    kv(b.inputs['Emission Strength'], fr(18.97), 0.0); kv(b.inputs['Emission Strength'], fr(19.6), 0.3)
+    co, tg = camera('cam', [(18.97, (16, 12.5, 8.0), BL), (22.0, (16.5, 19.5, 8.8), BL), (25.37, (15, 27, 9.4), BL)], fstop=1.6, lens=42)
     shake(co, 19.0, 0.18)
     # REC light
-    rec = prim('primitive_uv_sphere_add', mat('rec', (1, 0.1, 0.1), 0.3, (1, 0.12, 0.12), 0.0), radius=0.22, location=(BL[0] + 1.8, BL[1] - 1.2, BL[2] + 2.0))
+    rec = prim('primitive_uv_sphere_add', mat('rec', (1, 0.1, 0.1), 0.3, (1, 0.12, 0.12), 0.0), radius=0.22, location=(BL[0] + 2.2, BL[1] - 2.0, BL[2] + 2.4))
     rb = bsdf(rec.data.materials[0])
     for f in range(fr(21.4), fr(25.37) + 1, 6):
         kv(rb.inputs['Emission Strength'], f, 25.0 if (f // 6) % 2 else 0.5)
     # memory photos spiral into the brain
     names = ['steps', 'ma', 'cake', 'ball', 'mom', 'home', 'moon']
     for i, n in enumerate(names):
-        p = polaroid(n, (0, 0, 0), 0.6)
+        p = polaroid(n, (0, 0, 0), 1.0)
         for f in range(fr(21.0), fr(25.37) + 1, 2):
             t = T0 + (f - 1) / 30
             k = ((t - 21.6) * 0.45 + i / len(names)) % 1 if t > 21.6 else 0
             a = i * 0.9 + t * 0.6; r = 6.5 * (1 - k)
             p.location = (BL[0] + math.cos(a) * r, BL[1] + math.sin(a) * r * 0.7, BL[2] + math.sin(a * 1.7) * 1.4 * (1 - k))
-            sc = 0.6 * (1 - k * 0.8) if t > 21.6 else 0.001
+            sc = 1.0 * (1 - k * 0.8) if t > 21.6 else 0.001
             p.scale = (sc, sc, sc); p.rotation_euler = (0, 0, a * 0.3)
             p.keyframe_insert('location', frame=f); p.keyframe_insert('scale', frame=f); p.keyframe_insert('rotation_euler', frame=f)
 
