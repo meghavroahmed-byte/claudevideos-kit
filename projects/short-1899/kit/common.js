@@ -5,7 +5,7 @@ function loadImg(src) {
 function mk(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
 
 async function prepareSheet() {
-  const img = await loadImg('sheet.jpg');
+  const img = await loadImg(window.SHEET_URL || 'sheet.jpg');
   const W = img.width, H = img.height;
   const c = mk(W, H), x = c.getContext('2d');
   x.drawImage(img, 0, 0);

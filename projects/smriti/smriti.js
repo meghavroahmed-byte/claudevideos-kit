@@ -6,6 +6,7 @@ import * as K from '../neon-tech-short/kit/core3d.js';
 import { natureWorld } from '../neon-tech-short/kit/nature.js';
 import { V, cl, sm, pedestal, brain, polaroid, fadeGroup, baby, babyLive, burstPool, burst, updateBursts } from '../neon-tech-short/kit/objects3d.js';
 import { character } from '../neon-tech-short/kit/chars.js';
+import { hero } from '../neon-tech-short/kit/hero3d.js';
 const { THREE } = K;
 const env = (t, a, b, fi = 0.4, fo = 0.4) => sm(a, a + fi, t) * (1 - sm(b - fo, b, t));
 document.fonts.add(await new FontFace('Anek', 'url(../neon-tech-short/kit/fonts/anek.woff2)', { weight: '100 800' }).load());
@@ -82,8 +83,11 @@ const Gp = pedestal(4, 180, 0xffc93c, 3.4, 1.2);
 const G = brain(null, 4, 5.6, 180, 3.3, 0xffb86b); G.rotation.y = -Math.PI / 2;
 const offer = PICS.map(d => polaroid(null, 0, 0, 0, 0.7, d));
 const flames = offer.map(() => K.glowSprite(0xff8a3d, 1.8, 0));
-// grown-up 'you' beside the brain (Ready Player Me avatar nodding)
-const YOU = await character('readyplayer.me', { clip: ['Xbot', 'agree'], scale: 2.3, pos: [0.6, 0, 172.5], rotY: Math.PI - 0.25 });
+// the user's own character narrates at every station (2D cut-out rig, lip-synced to the voice)
+const HERO = await hero({ height: 4.4 });
+// presenter rig: walks beside the camera at a fixed distance, on one side of the frame.
+// [t0, t1, side (+1 = frame left, -1 = frame right), arm-up windows]; hidden in the hippocampus close-up.
+const HERO_AT = [[0, 10.2, -1, [[4.2, 6.8]]], [10.2, 14.8, 1, []], [14.8, 30, -1, [[19.0, 25.0]]], [38.6, 49.5, 1, [[41.4, 43.6]]], [49.5, 55.6, -1, []], [55.6, 59.2, 1, []], [59.2, 66.3, -1, [[61.0, 63.4]]]];
 const oldest = polaroid(null, 4, 6.0, 172.5, 1.6, P.mom);
 const oldGlow = K.glowSprite(0xffc93c, 5, 0); oldGlow.position.set(4, 6.0, 172.4);
 
@@ -117,7 +121,7 @@ K.hooks.shake = t => { let a = 0; for (const [s, amp] of SHAKE_T) { const k = (t
 
 const VIS = [
   [[Ap, ...Aph, MOM.root], 0, 13], [[A2a, A2b], 8, 16.5], [[Bp, B, ...inflow, neur], 13, 41.5], [[D], 36, 51.5],
-  [[Ep], 47, 59], [[F], 53, 62], [[Gp, G, ...offer, ...flames, oldest, oldGlow, YOU.root], 56, 71.2],
+  [[Ep], 47, 59], [[F], 53, 62], [[Gp, G, ...offer, ...flames, oldest, oldGlow], 56, 71.2],
 ];
 burst(shards, 0, V(-3.2, 4.6, 20), 12.85); burst(shards, 1, V(3.2, 4.6, 20), 13.0);
 
@@ -125,7 +129,16 @@ burst(shards, 0, V(-3.2, 4.6, 20), 12.85); burst(shards, 1, V(3.2, 4.6, 20), 13.
 for (const pd of [Ap, A2a, A2b, Bp, Ep, Gp]) pd.children[0].material = K.std({ color: 0x6a6878, roughness: 0.8 });
 function update(t) {
   NAT.update(t);
-  MOM.set(t); YOU.set(t); babyLive(Ababy, t); babyLive(Ebaby, t, 1.3);
+  MOM.set(t); babyLive(Ababy, t); babyLive(Ebaby, t, 1.3);
+  const hs = HERO_AT.find(([a, b]) => t >= a && t < b);
+  HERO.obj.visible = !!hs;
+  if (hs) {
+    const c = K.camera.position, f = new THREE.Vector3(); K.camera.getWorldDirection(f); f.y = 0; f.normalize();
+    const r = new THREE.Vector3(-f.z, 0, f.x); // camera-left on the ground
+    const dd = t > 59 ? 15 : 12; HERO.obj.position.set(c.x + f.x * dd + r.x * 2.1 * hs[2], 0, c.z + f.z * dd + r.z * 2.1 * hs[2]);
+    HERO.obj.position.y = NAT.heightAt(HERO.obj.position.x, HERO.obj.position.z);
+    const up = Math.max(0, ...hs[3].map(([a, b]) => env(t, a, b, 0.35, 0.35))); HERO.set(t, { up });
+  }
   for (const [objs, a, b] of VIS) for (const o of objs) o.visible = t >= a && t <= b;
   const cam = K.camera.position;
   // A: photos orbit the baby; they go blank 7.3-8.6 (no memory left), then fade out
