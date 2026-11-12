@@ -360,7 +360,7 @@ function drawScrim(g) {
 }
 function drawFinish(g, i) {
   const v = g.createRadialGradient(W / 2, H * 0.52, H * 0.25, W / 2, H * 0.52, H * 0.78);
-  v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,0.6)');
+  v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, `rgba(0,0,0,${CFG.vignette ?? 0.6})`);
   g.fillStyle = v; g.fillRect(0, 0, W, H);
   g.save(); g.globalAlpha = 0.05; g.globalCompositeOperation = 'overlay';
   g.drawImage(GRAIN[i % GRAIN.length], 0, 0, W, H); g.restore();

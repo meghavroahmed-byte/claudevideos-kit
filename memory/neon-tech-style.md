@@ -19,3 +19,5 @@ What the reference does (studied from contact sheets):
 
 **Also NO branding UI.** On 2026-11-09 the user said not to add the Instagram follow card or the top tags. Keep these off: the EP tag, the handle chip and the FOLLOW/profile CTA (`CFG.tag`, `CFG.handle_chip`, `CFG.cta` are all false). The thin progress bar stays.
 The user wants videos made from their own voiceover plus script, "exactly" like the 2 reference reels (train/rail one and food-delivery city one).
+
+**Brightness (2026-11-12):** the user said the smriti video looked too dark ("ondhokar ondhokar lage"). Keep the night style, but make it brighter: a lighter purple sky, a brighter grid, less fog and vignette. The preset is in the skill gotchas.

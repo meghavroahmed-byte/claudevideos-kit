@@ -10,8 +10,14 @@ document.fonts.add(await new FontFace('Anek', 'url(../neon-tech-short/kit/fonts/
 
 CFG.duration = 71.04; CFG.captions = false;
 K.seed(1912);
-K.gridFloor(1400, 6);
-K.scene.fog = new THREE.FogExp2(0x10143a, 0.0105);
+// brighter night (user found v1 too dark): lighter sky/floor, more exposure, thinner fog, softer vignette
+CFG.vignette = 0.28;
+K.renderer.toneMappingExposure = 1.5;
+K.hemi.intensity = 2.0; K.hemi.groundColor.set(0x2a3050);
+K.sky.material.fragmentShader = 'varying vec3 vp; void main(){ float k = clamp(vp.y*2.2,0.,1.); vec3 c = mix(vec3(0.30,0.26,0.55), vec3(0.08,0.10,0.26), pow(k,0.6)); gl_FragColor = vec4(c,1.); }';
+K.sky.material.needsUpdate = true;
+K.gridFloor(1400, 6, { bg: '#1a2050', line: 'rgba(110,140,255,0.6)', line2: 'rgba(110,140,255,0.22)' });
+K.scene.fog = new THREE.FogExp2(0x2a2f66, 0.0062);
 K.dust(900, -60, 60, -30, 220, 25);
 
 // ---- picture painters for the memory photos ----
