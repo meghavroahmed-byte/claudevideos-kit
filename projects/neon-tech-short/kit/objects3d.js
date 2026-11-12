@@ -175,3 +175,86 @@ export function enzyme(parent, color = 0xffc93c) {
   return g;
 }
 
+
+// ---- added for "smriti" (brain / memory topics) ----
+export function rimShader(color, a = 1) { // additive fresnel edge glow for translucent organs
+  return new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: { c: { value: new THREE.Color(color) }, a: { value: a } },
+    vertexShader: 'varying vec3 n; varying vec3 v; void main(){ vec4 mv = modelViewMatrix*vec4(position,1.); n = normalize(normalMatrix*normal); v = normalize(-mv.xyz); gl_Position = projectionMatrix*mv; }',
+    fragmentShader: 'uniform vec3 c; uniform float a; varying vec3 n; varying vec3 v; void main(){ float f = pow(1.-abs(dot(n,v)),2.5); gl_FragColor = vec4(c*f*1.4*a,1.); }' });
+}
+// brain: two folded hemispheres + cerebellum + stem, translucent with rim glow; glowing hippocampus inside.
+// userData: { shellM, rimM, hippoM, hippo }  (fade the shell to show the hippocampus)
+export function brain(parent, x, y, z, s = 1, color = 0xff8fc0) {
+  const g = K.group(x, y, z, parent); g.scale.setScalar(s);
+  const geo = new THREE.SphereGeometry(1, 72, 54), p = geo.attributes.position;
+  for (let i = 0; i < p.count; i++) {
+    const v = V(p.getX(i), p.getY(i), p.getZ(i));
+    const fold = 0.055 * Math.sin(9 * v.x + 4 * Math.sin(6 * v.y)) * Math.sin(8 * v.z + 3 * Math.sin(5 * v.x)) + 0.03 * Math.sin(17 * v.y + 7 * v.z);
+    v.multiplyScalar(1 + fold); p.setXYZ(i, v.x, v.y, v.z);
+  }
+  geo.computeVertexNormals();
+  const shellM = K.std({ color, roughness: 0.45, transparent: true, opacity: 0.62, emissive: color, emissiveIntensity: 0.2, depthWrite: false, side: THREE.DoubleSide });
+  const rimM = rimShader(color);
+  for (const sx of [-1, 1]) {
+    for (const m of [shellM, rimM]) { const h = K.mesh(geo, m, sx * 0.52, 0, 0, g); h.scale.set(0.55, 0.78, 1.15); }
+  }
+  for (const m of [shellM, rimM]) { const c = K.mesh(geo, m, 0, -0.62, -0.78, g); c.scale.set(0.75, 0.36, 0.4); }
+  K.mesh(new THREE.CylinderGeometry(0.17, 0.12, 0.9, 16), shellM, 0, -0.95, -0.35, g).rotation.x = 0.35;
+  // hippocampus: curled seahorse tube deep inside each hemisphere
+  const hippoM = K.std({ color: 0x53e0ff, emissive: 0x53e0ff, emissiveIntensity: 0.4, roughness: 0.3, transparent: true, opacity: 1 });
+  const hippo = [];
+  for (const sx of [-1, 1]) {
+    const c = new THREE.CatmullRomCurve3([V(sx * 0.3, -0.35, 0.45), V(sx * 0.45, -0.3, 0.1), V(sx * 0.48, -0.15, -0.3), V(sx * 0.4, 0.1, -0.5), V(sx * 0.28, 0.25, -0.35)]);
+    hippo.push(K.mesh(new THREE.TubeGeometry(c, 40, 0.055, 10, false), hippoM, 0, 0, 0, g));
+  }
+  g.userData = { shellM, rimM, hippoM, hippo };
+  return g;
+}
+// polaroid photo: white frame + canvas-drawn picture. draw(ctx, 256) paints the picture. userData.mats to fade.
+export function polaroid(parent, x, y, z, s = 1, draw) {
+  const g = K.group(x, y, z, parent); g.scale.setScalar(s);
+  const pic = K.canvasTex(256, 256, (c) => { c.fillStyle = '#2b3157'; c.fillRect(0, 0, 256, 256); draw && draw(c, 256); });
+  const fm = K.std({ color: 0xf3efe6, roughness: 0.6, emissive: 0xf3efe6, emissiveIntensity: 0.08, transparent: true });
+  const pm = K.std({ map: pic, emissive: 0xffffff, emissiveMap: pic, emissiveIntensity: 0.35, roughness: 0.5, transparent: true });
+  K.box(1.0, 1.2, 0.03, fm, 0, 0, 0, g);
+  K.mesh(new THREE.PlaneGeometry(0.86, 0.86), pm, 0, 0.08, 0.02, g);
+  K.mesh(new THREE.PlaneGeometry(0.86, 0.86), pm, 0, 0.08, -0.02, g).rotation.y = Math.PI;
+  g.userData.mats = [fm, pm];
+  return g;
+}
+export function fadeGroup(g, a) { for (const m of g.userData.mats) { m.opacity = a; } g.visible = a > 0.01; }
+// toddler: simple rounded figure (head, onesie body, limbs). userData parts for poses.
+export function baby(parent, x, y, z, s = 1, suit = 0x7fc8ff) {
+  const g = K.group(x, y, z, parent); g.scale.setScalar(s);
+  const skin = K.std({ color: 0xf2c29b, roughness: 0.6 }), cloth = K.std({ color: suit, roughness: 0.55 }), dark = K.basic({ color: 0x1a1410 });
+  const body = K.mesh(new THREE.CapsuleGeometry(0.42, 0.45, 6, 16), cloth, 0, 1.0, 0, g);
+  const head = K.group(0, 1.95, 0, g);
+  K.mesh(new THREE.SphereGeometry(0.5, 32, 24), skin, 0, 0, 0, head);
+  for (const sx of [-1, 1]) { K.mesh(new THREE.SphereGeometry(0.06, 10, 8), dark, sx * 0.17, 0.02, 0.45, head); K.mesh(new THREE.SphereGeometry(0.1, 10, 8), skin, sx * 0.5, 0, 0, head); }
+  K.mesh(new THREE.TorusGeometry(0.08, 0.02, 6, 16, Math.PI), dark, 0, -0.17, 0.46, head).rotation.z = Math.PI;
+  K.mesh(new THREE.SphereGeometry(0.12, 10, 8), K.std({ color: 0x5a3a22 }), 0, 0.5, 0.05, head);
+  const limbs = [];
+  for (const [lx, ly, len] of [[-0.5, 1.2, 0.45], [0.5, 1.2, 0.45], [-0.2, 0.45, 0.4], [0.2, 0.45, 0.4]]) {
+    const piv = K.group(lx, ly, 0, g); K.mesh(new THREE.CapsuleGeometry(0.13, len, 4, 10), ly > 1 ? cloth : cloth, 0, -len / 2, 0, piv); limbs.push(piv);
+  }
+  g.userData = { head, body, limbs };
+  return g;
+}
+// one-shot shard bursts: pool of small glowing squares. burst(pool, i, center, t0) then updateBursts(pool, t)
+export function burstPool(n = 6, per = 40, color = 0xffc93c) {
+  const m = K.instanced(new THREE.PlaneGeometry(0.14, 0.14), K.basic({ color, side: THREE.DoubleSide, transparent: true }), n * per);
+  const dirs = []; for (let i = 0; i < n * per; i++) dirs.push(V(K.rnd(-1, 1), K.rnd(-0.3, 1.2), K.rnd(-1, 1)).normalize().multiplyScalar(K.rnd(1.5, 4)));
+  return { m, per, dirs, slots: Array(n).fill(null) };
+}
+export function burst(pool, i, center, t0) { pool.slots[i] = { c: center.clone(), t0 }; }
+export function updateBursts(pool, t) {
+  pool.slots.forEach((sl, i) => {
+    for (let k = 0; k < pool.per; k++) {
+      const idx = i * pool.per + k, d = pool.dirs[idx];
+      if (!sl || t < sl.t0 || t > sl.t0 + 1.6) { K.setInst(pool.m, idx, [0, -99, 0], 0.001); continue; }
+      const u = t - sl.t0;
+      K.setInst(pool.m, idx, [sl.c.x + d.x * u, sl.c.y + d.y * u - 2 * u * u, sl.c.z + d.z * u], 1 - u / 1.6, u * 5 + k, u * 3, 0);
+    }
+  });
+  pool.m.instanceMatrix.needsUpdate = true;
+}

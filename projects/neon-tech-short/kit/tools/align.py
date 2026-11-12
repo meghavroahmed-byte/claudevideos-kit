@@ -3,7 +3,7 @@
 # silencedetect, then a DP assigns consecutive clauses to each segment so that
 # (chars / speaking-rate) matches each segment's length. Works well for clean TTS / studio voice.
 # Usage: python3 align.py voice.wav script.txt lines.json [noise_db=-35] [min_sil=0.25]
-# Output: [[start, end, "text"], ...] and a printed table. Check the cost: < ~15 is a good fit.
+# Output: one [start, end, "text"] per clause and a printed table. Check the cost: < ~15 is a good fit.
 import re, sys, json, subprocess, functools
 
 wav, script, out = sys.argv[1:4]
@@ -38,9 +38,19 @@ def f(i, j):
 
 sys.setrecursionlimit(10000)
 cost, asg = f(0, 0)
+# Split each multi-clause segment by character share, snapped to the nearest short pause (real voices).
+flog = subprocess.run(['ffmpeg', '-i', wav, '-af', 'silencedetect=noise=-30dB:d=0.1', '-f', 'null', '-'], capture_output=True, text=True).stderr
+fine = [(float(a) + float(b)) / 2 for a, b in zip(re.findall(r'silence_start: ([\d.]+)', flog), re.findall(r'silence_end: ([\d.]+)', flog))]
 res = []
 for (i, k), (a, b) in zip(asg, segs):
-    s = ' '.join(cl[i:k + 1]); res.append([round(a, 2), round(b, 2), s])
-    print(f'{a:6.2f}-{b:6.2f} ({b - a:4.1f}s) | {s}')
+    t = a; tot = sum(L(c) for c in cl[i:k + 1])
+    for q in range(i, k + 1):
+        e = b if q == k else t + (b - a) * L(cl[q]) / tot
+        if q < k:
+            near = [x for x in fine if t + 0.3 < x < b - 0.3 and abs(x - e) < 0.6]
+            if near: e = min(near, key=lambda x: abs(x - e))
+        res.append([round(t, 2), round(e, 2), cl[q]])
+        print(f'{t:6.2f}-{e:6.2f} ({e - t:4.1f}s) | {cl[q]}')
+        t = e
 print(f'clauses {n}  segments {m}  cost {cost:.1f}  duration {dur:.2f}s')
 json.dump(res, open(out, 'w', encoding='utf-8'), ensure_ascii=False, indent=0)

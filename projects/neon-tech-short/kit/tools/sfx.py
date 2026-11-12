@@ -95,10 +95,55 @@ def gurgle(v):
         out[s:s + len(tt)] += sweep(0.28, f0, f0 * 1.8, 1.2) * np.exp(-tt * 9) * 0.5
     return lp(out, 0.15) * 2.2
 
+
+# ---- added for smriti (memory/brain theme) ----
+def sparkle(v):
+    d = 1.2; n = len(t_(d)); out = np.zeros(n)
+    for i in range(10):
+        s = int(i * 0.07 * SR); tt = t_(0.5); f = 1400 * 2 ** (rng.integers(0, 12) / 12)
+        out[s:s + len(tt)] += np.sin(2 * np.pi * f * tt) * np.exp(-tt * 9) * 0.18
+    return out
+def erase(v):
+    d = 0.7; t = t_(d); x = bp_noise(d, 0.08, 0.5)
+    return (x * np.sin(np.pi * t / d) ** 2 + sweep(d, 900, 220, 0.8) * np.exp(-t * 4) * 0.25) * 0.6
+def shatter(v):
+    d = 1.2; t = t_(d); n = len(t); out = bp_noise(d, 0.3, 0.98) * np.exp(-t * 9) * 0.6
+    for _ in range(18):
+        s = int(rng.uniform(0, 0.5) * SR); tt = t_(0.25); f = rng.uniform(2500, 6500)
+        out[s:s + len(tt)] += np.sin(2 * np.pi * f * tt) * np.exp(-tt * 30) * 0.25
+    return out
+def rec(v):
+    out = np.zeros(int(0.45 * SR)); tt = t_(0.02); out[:len(tt)] += bp_noise(0.02, 0.2, 0.9) * 0.8
+    b = t_(0.18); s = int(0.12 * SR); out[s:s + len(b)] += np.sin(2 * np.pi * 1760 * b) * env(len(b), 0.005, 0.05) * 0.35
+    return out
+def zap(v):
+    d = 0.35; t = t_(d); f = [600, 820, 700, 950][v % 4]
+    return np.sin(2 * np.pi * f * t + 6 * np.sin(2 * np.pi * 37 * t)) * np.exp(-t * 11) * 0.35
+def rumble(v):
+    d = 2.2; t = t_(d); n = len(t)
+    out = lp(rng.standard_normal(n), 0.015) * 6 * np.exp(-t * 1.6)
+    for _ in range(9):
+        s = int(rng.uniform(0, 1.4) * SR); tt = t_(0.3); out[s:s + len(tt)] += sweep(0.3, 120, 50, 0.5) * np.exp(-tt * 14) * 0.6
+    return out * 0.7
+def build(v):
+    d = 2.0; n = len(t_(d)); out = np.zeros(n)
+    for i in range(12):
+        s = int(i * 0.15 * SR); tt = t_(0.12); f = 300 + i * 40
+        out[s:s + len(tt)] += (np.sin(2 * np.pi * f * tt) + bp_noise(0.12, 0.1, 0.5) * 0.4) * np.exp(-tt * 35) * 0.4
+    return out
+def burn(v):
+    d = 4.0; t = t_(d); n = len(t); x = bp_noise(d, 0.02, 0.3) * 0.5
+    cr = np.zeros(n)
+    for _ in range(60):
+        s = int(rng.uniform(0, d - 0.02) * SR); tt = t_(0.01); cr[s:s + len(tt)] += rng.uniform(-1, 1) * np.exp(-tt * 400)
+    return (x + cr * 0.5) * np.sin(np.pi * t / d) * 0.6
+
 KIND = dict(whoosh=whoosh, pop=pop, tick=tick, slam=slam, hiss=hiss, type=type_, bad=bad, good=good, fizz=fizz,
-            rise=rise, snip=snip, plop=plop, curdle=curdle, pour=pour, drop=drop, gurgle=gurgle)
+            rise=rise, snip=snip, plop=plop, curdle=curdle, pour=pour, drop=drop, gurgle=gurgle,
+            sparkle=sparkle, erase=erase, shatter=shatter, rec=rec, zap=zap, rumble=rumble, build=build, burn=burn)
 GAIN = dict(whoosh=0.55, pop=0.5, tick=0.45, slam=0.9, hiss=0.6, type=0.45, bad=0.55, good=0.6, fizz=0.5,
-            rise=0.5, snip=0.6, plop=0.7, curdle=0.6, pour=0.5, drop=0.5, gurgle=0.7)
+            rise=0.5, snip=0.6, plop=0.7, curdle=0.6, pour=0.5, drop=0.5, gurgle=0.7,
+            sparkle=0.6, erase=0.6, shatter=0.7, rec=0.6, zap=0.5, rumble=0.9, build=0.6, burn=0.5)
 
 src = open(sys.argv[1], encoding='utf-8').read()
 cues = re.findall(r"\[([\d.]+),\s*'(\w+)'\]", src[src.index('window.SFXEV'):])
