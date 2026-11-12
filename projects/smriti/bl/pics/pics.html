@@ -1,0 +1,14 @@
+<!DOCTYPE html><html><body><script>
+const P = {
+  steps(c) { c.fillStyle = '#ffd8b0'; for (let i = 0; i < 4; i++) { const x = 70 + i * 40, y = 200 - i * 45 + (i % 2) * 20; c.beginPath(); c.ellipse(x, y, 14, 24, 0.3, 0, 7); c.fill(); for (let k = 0; k < 4; k++) { c.beginPath(); c.arc(x - 9 + k * 6, y - 28, 4, 0, 7); c.fill(); } } },
+  ma(c) { c.fillStyle = '#ffffff'; c.beginPath(); c.ellipse(128, 115, 95, 70, 0, 0, 7); c.fill(); c.beginPath(); c.moveTo(80, 170); c.lineTo(60, 220); c.lineTo(120, 180); c.fill(); c.fillStyle = '#ff3d6e'; c.font = '800 90px Anek'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('মা', 128, 122); },
+  cake(c) { c.fillStyle = '#ff8fc8'; c.fillRect(60, 140, 136, 80); c.fillStyle = '#fff3d6'; c.fillRect(60, 130, 136, 20); c.fillStyle = '#53e0ff'; c.fillRect(124, 80, 8, 50); c.fillStyle = '#ffc93c'; c.beginPath(); c.ellipse(128, 70, 9, 16, 0, 0, 7); c.fill(); },
+  ball(c) { c.fillStyle = '#ff3d6e'; c.beginPath(); c.arc(128, 140, 70, 0, 7); c.fill(); c.strokeStyle = '#fff'; c.lineWidth = 10; c.beginPath(); c.arc(128, 140, 70, -0.6, 0.6); c.stroke(); c.beginPath(); c.arc(128, 140, 70, 2.5, 3.7); c.stroke(); },
+  mom(c) { c.fillStyle = '#3a2416'; c.beginPath(); c.arc(128, 120, 80, Math.PI, 0); c.fill(); c.fillRect(48, 120, 30, 100); c.fillRect(178, 120, 30, 100); c.fillStyle = '#f2c29b'; c.beginPath(); c.arc(128, 135, 58, 0, 7); c.fill(); c.fillStyle = '#1a1410'; c.beginPath(); c.arc(108, 130, 6, 0, 7); c.arc(148, 130, 6, 0, 7); c.fill(); c.strokeStyle = '#c0504d'; c.lineWidth = 5; c.beginPath(); c.arc(128, 150, 18, 0.2, 2.9); c.stroke(); },
+  home(c) { c.fillStyle = '#ffc93c'; c.beginPath(); c.moveTo(40, 130); c.lineTo(128, 50); c.lineTo(216, 130); c.fill(); c.fillStyle = '#f3efe6'; c.fillRect(60, 130, 136, 100); c.fillStyle = '#2b3157'; c.fillRect(110, 170, 36, 60); c.fillStyle = '#53e0ff'; c.fillRect(72, 150, 26, 26); c.fillRect(158, 150, 26, 26); },
+  moon(c) { c.fillStyle = '#fff3c8'; c.beginPath(); c.arc(128, 128, 64, 0, 7); c.fill(); c.fillStyle = '#2b3157'; c.beginPath(); c.arc(156, 110, 58, 0, 7); c.fill(); for (let i = 0; i < 9; i++) { c.fillStyle = '#ffffff'; c.fillRect((i * 67) % 230 + 10, (i * 41) % 200 + 20, 4, 4); } },
+};
+document.fonts.add(new FontFace('Anek','url(../../../neon-tech-short/kit/fonts/anek.woff2)'));
+window.still = async () => { await document.fonts.load('800 90px Anek'); return Object.keys(P).map(k => { const c = document.createElement('canvas'); c.width = c.height = 512; const g = c.getContext('2d'); g.fillStyle = '#2b3157'; g.fillRect(0,0,512,512); g.scale(2,2); P[k](g, 256); return ['pic_' + k + '.png', c.toDataURL('image/png')]; }); };
+window.ready = true;
+</script></body></html>
