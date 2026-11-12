@@ -21,3 +21,5 @@ What the reference does (studied from contact sheets):
 The user wants videos made from their own voiceover plus script, "exactly" like the 2 reference reels (train/rail one and food-delivery city one).
 
 **Brightness (2026-11-12):** the user said the smriti video looked too dark ("ondhokar ondhokar lage"). Keep the night style, but make it brighter: a lighter purple sky, a brighter grid, less fog and vignette. The preset is in the skill gotchas.
+
+**Natural background (2026-11-12):** the user said the background looks plain ("normal") and must be natural and mixed with nature to match the video. The grid void is replaced by `nature.js` (dusk meadow world). From now on every video gets a living, topic-fitting environment.

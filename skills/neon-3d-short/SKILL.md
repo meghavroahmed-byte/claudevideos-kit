@@ -62,6 +62,7 @@ Kit: `projects/neon-tech-short/kit/`
 8. **Mix and deliver.** Run `bash ../neon-tech-short/kit/tools/mix.sh parts/video.mp4 voice.wav sfx_<slug>.wav ../../renders/<slug>`, make a final contact sheet (`fps=1/3,tile`), then SendUserFile both files. Commit the code (media files are gitignored) and push.
 
 ## 4. Gotchas learned on the first video
+- **Background must be natural (user feedback 2026-11-12):** the plain grid void looked "normal". Use `nature.js` → `natureWorld({ z0, z1, corridor, patches })`, which gives a meadow, hills, trees, grass and flowers at the stations, fireflies, clouds and a dusk sky. Call `NAT.update(t)` in `update`. Give pedestal bases a stone colour. For other topics, make the world fit the topic (city, sea, desert, space, body) in the same spirit: a living environment, never an empty grid.
 - **Brightness (user feedback 2026-11-12, "ondhokar lage"):** use the brighter night preset from `projects/smriti/smriti.js` by default: `CFG.vignette = 0.28`, exposure 1.5, hemi 2.0, a lighter purple sky shader, a `#1a2050` grid floor, and fog `0x2a2f66` at 0.0062.
 - **Exposure:** bloom plus strong lights blow white props out. Keep a table SpotLight around 40, PointLights 5–10 and emissive intensities ≤ 0.2 on white things. Check the stills.
 - **Portrait framing:** the frame is narrow. A prop about 10 units wide needs the camera about 25 units away (fov 46). Close-ups of props about 2 units wide can sit 6–8 units away.

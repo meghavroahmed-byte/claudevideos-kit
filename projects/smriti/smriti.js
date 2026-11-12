@@ -3,6 +3,7 @@
 // hippocampus close-up) · D old wall -> new room (-6,85) · E toddler + mirror (6,118) · F empty shelf (-5,148)
 // · G grown-up brain takes the memories (4,180) · end: oldest memory + comment.
 import * as K from '../neon-tech-short/kit/core3d.js';
+import { natureWorld } from '../neon-tech-short/kit/nature.js';
 import { V, cl, sm, pedestal, brain, polaroid, fadeGroup, baby, burstPool, burst, updateBursts } from '../neon-tech-short/kit/objects3d.js';
 const { THREE } = K;
 const env = (t, a, b, fi = 0.4, fo = 0.4) => sm(a, a + fi, t) * (1 - sm(b - fo, b, t));
@@ -10,15 +11,8 @@ document.fonts.add(await new FontFace('Anek', 'url(../neon-tech-short/kit/fonts/
 
 CFG.duration = 71.04; CFG.captions = false;
 K.seed(1912);
-// brighter night (user found v1 too dark): lighter sky/floor, more exposure, thinner fog, softer vignette
-CFG.vignette = 0.28;
-K.renderer.toneMappingExposure = 1.5;
-K.hemi.intensity = 2.0; K.hemi.groundColor.set(0x2a3050);
-K.sky.material.fragmentShader = 'varying vec3 vp; void main(){ float k = clamp(vp.y*2.2,0.,1.); vec3 c = mix(vec3(0.30,0.26,0.55), vec3(0.08,0.10,0.26), pow(k,0.6)); gl_FragColor = vec4(c,1.); }';
-K.sky.material.needsUpdate = true;
-K.gridFloor(1400, 6, { bg: '#1a2050', line: 'rgba(110,140,255,0.6)', line2: 'rgba(110,140,255,0.22)' });
-K.scene.fog = new THREE.FogExp2(0x2a2f66, 0.0062);
-K.dust(900, -60, 60, -30, 220, 25);
+// natural dusk meadow world (user: background must be natural, mixed with nature)
+const NAT = natureWorld({ z0: -30, z1: 200, corridor: 12, patches: [[0, 0, 10], [0, 20, 8], [0, 45, 10], [-6, 85, 11], [6, 118, 9], [-5, 148, 8], [4, 180, 11]] });
 
 // ---- picture painters for the memory photos ----
 const P = {
@@ -95,7 +89,7 @@ K.setCamKeys([
   { t: 6.8, p: [3, 5.4, -9.5], l: [0, 3.6, 0] },
   { t: 9.4, p: [0, 5.6, -5.5], l: [0, 3.8, 6] },
   { t: 10.6, p: [0, 5.5, 6.5], l: [0, 4.2, 20] },
-  { t: 13.2, p: [0, 5.2, 9.5], l: [0, 4.0, 20] },
+  { t: 13.2, p: [0, 5.6, 5.5], l: [0, 4.0, 20] },
   { t: 15.2, p: [0, 8, 23], l: [0, 5.6, 45] },
   { t: 19.0, p: [3, 7.5, 26], l: [0, 5.4, 45] },
   { t: 24.5, p: [-3, 8, 27], l: [0, 5.6, 45] },
@@ -122,7 +116,10 @@ const VIS = [
 ];
 burst(shards, 0, V(-3.2, 4.6, 20), 12.85); burst(shards, 1, V(3.2, 4.6, 20), 13.0);
 
+// stone-coloured pedestal bases so they sit in the meadow
+for (const pd of [Ap, A2a, A2b, Bp, Ep, Gp]) pd.children[0].material = K.std({ color: 0x6a6878, roughness: 0.8 });
 function update(t) {
+  NAT.update(t);
   for (const [objs, a, b] of VIS) for (const o of objs) o.visible = t >= a && t <= b;
   const cam = K.camera.position;
   // A: photos orbit the baby; they go blank 7.3-8.6 (no memory left), then fade out
