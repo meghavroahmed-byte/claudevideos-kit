@@ -4,7 +4,8 @@
 // · G grown-up brain takes the memories (4,180) · end: oldest memory + comment.
 import * as K from '../neon-tech-short/kit/core3d.js';
 import { natureWorld } from '../neon-tech-short/kit/nature.js';
-import { V, cl, sm, pedestal, brain, polaroid, fadeGroup, baby, burstPool, burst, updateBursts } from '../neon-tech-short/kit/objects3d.js';
+import { V, cl, sm, pedestal, brain, polaroid, fadeGroup, baby, babyLive, burstPool, burst, updateBursts } from '../neon-tech-short/kit/objects3d.js';
+import { character } from '../neon-tech-short/kit/chars.js';
 const { THREE } = K;
 const env = (t, a, b, fi = 0.4, fo = 0.4) => sm(a, a + fi, t) * (1 - sm(b - fo, b, t));
 document.fonts.add(await new FontFace('Anek', 'url(../neon-tech-short/kit/fonts/anek.woff2)', { weight: '100 800' }).load());
@@ -30,6 +31,8 @@ const PICS = [P.steps, P.ma, P.cake, P.ball, P.mom, P.home, P.moon];
 const Ap = pedestal(0, 0, 0x53e0ff, 2.6);
 const Ababy = baby(Ap, 0, 1.2, 0, 1.15); Ababy.rotation.y = Math.PI;
 { const l = new THREE.PointLight(0xffe0c0, 9, 16, 1.4); l.position.set(0, 6, -5); K.scene.add(l); }
+// mother watching the baby (rigged human, idle clip retargeted from Xbot)
+const MOM = await character('Michelle', { clip: ['Xbot', 'idle'], scale: 2.3, pos: [2.2, 0, 2.6], rotY: Math.PI + 0.25 });
 const Aph = PICS.slice(0, 6).map((d, i) => polaroid(null, 0, 0, 0, 0.95, d));
 // A2: first walk / first word
 const A2a = pedestal(-3.2, 20, 0xffc93c, 1.8), A2b = pedestal(3.2, 20, 0xff8fc8, 1.8);
@@ -79,6 +82,8 @@ const Gp = pedestal(4, 180, 0xffc93c, 3.4, 1.2);
 const G = brain(null, 4, 5.6, 180, 3.3, 0xffb86b); G.rotation.y = -Math.PI / 2;
 const offer = PICS.map(d => polaroid(null, 0, 0, 0, 0.7, d));
 const flames = offer.map(() => K.glowSprite(0xff8a3d, 1.8, 0));
+// grown-up 'you' beside the brain (Ready Player Me avatar nodding)
+const YOU = await character('readyplayer.me', { clip: ['Xbot', 'agree'], scale: 2.3, pos: [0.6, 0, 172.5], rotY: Math.PI - 0.25 });
 const oldest = polaroid(null, 4, 6.0, 172.5, 1.6, P.mom);
 const oldGlow = K.glowSprite(0xffc93c, 5, 0); oldGlow.position.set(4, 6.0, 172.4);
 
@@ -111,8 +116,8 @@ const SHAKE_T = [[12.9, 0.12], [19.0, 0.16], [25.4, 0.12], [39.8, 0.2], [46.4, 0
 K.hooks.shake = t => { let a = 0; for (const [s, amp] of SHAKE_T) { const k = (t - s) / 0.45; if (k > 0 && k < 1) a += amp * (1 - k); } return [Math.sin(t * 93) * a, Math.cos(t * 71) * a]; };
 
 const VIS = [
-  [[Ap, ...Aph], 0, 13], [[A2a, A2b], 8, 16.5], [[Bp, B, ...inflow, neur], 13, 41.5], [[D], 36, 51.5],
-  [[Ep], 47, 59], [[F], 53, 62], [[Gp, G, ...offer, ...flames, oldest, oldGlow], 56, 71.2],
+  [[Ap, ...Aph, MOM.root], 0, 13], [[A2a, A2b], 8, 16.5], [[Bp, B, ...inflow, neur], 13, 41.5], [[D], 36, 51.5],
+  [[Ep], 47, 59], [[F], 53, 62], [[Gp, G, ...offer, ...flames, oldest, oldGlow, YOU.root], 56, 71.2],
 ];
 burst(shards, 0, V(-3.2, 4.6, 20), 12.85); burst(shards, 1, V(3.2, 4.6, 20), 13.0);
 
@@ -120,6 +125,7 @@ burst(shards, 0, V(-3.2, 4.6, 20), 12.85); burst(shards, 1, V(3.2, 4.6, 20), 13.
 for (const pd of [Ap, A2a, A2b, Bp, Ep, Gp]) pd.children[0].material = K.std({ color: 0x6a6878, roughness: 0.8 });
 function update(t) {
   NAT.update(t);
+  MOM.set(t); YOU.set(t); babyLive(Ababy, t); babyLive(Ebaby, t, 1.3);
   for (const [objs, a, b] of VIS) for (const o of objs) o.visible = t >= a && t <= b;
   const cam = K.camera.position;
   // A: photos orbit the baby; they go blank 7.3-8.6 (no memory left), then fade out

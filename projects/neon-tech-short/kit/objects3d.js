@@ -223,22 +223,55 @@ export function polaroid(parent, x, y, z, s = 1, draw) {
   return g;
 }
 export function fadeGroup(g, a) { for (const m of g.userData.mats) { m.opacity = a; } g.visible = a > 0.01; }
-// toddler: simple rounded figure (head, onesie body, limbs). userData parts for poses.
+// toddler: chibi proportions (big head), eyes with whites/iris/highlight, brows, cheeks, ears, nose, hair curl,
+// onesie with collar + buttons, chubby limbs with hands/feet. userData: head, body, limbs[4], lids[2] (blink via scale.y).
 export function baby(parent, x, y, z, s = 1, suit = 0x7fc8ff) {
   const g = K.group(x, y, z, parent); g.scale.setScalar(s);
-  const skin = K.std({ color: 0xf2c29b, roughness: 0.6 }), cloth = K.std({ color: suit, roughness: 0.55 }), dark = K.basic({ color: 0x1a1410 });
-  const body = K.mesh(new THREE.CapsuleGeometry(0.42, 0.45, 6, 16), cloth, 0, 1.0, 0, g);
+  const skin = new THREE.MeshPhysicalMaterial({ color: 0xf0bf98, roughness: 0.55, sheen: 0.6, sheenColor: new THREE.Color(0xffb39a), emissive: 0x3a1a10, emissiveIntensity: 0.25 });
+  const cloth = new THREE.MeshPhysicalMaterial({ color: suit, roughness: 0.75, sheen: 1, sheenColor: new THREE.Color(0xffffff) });
+  const white = K.std({ color: 0xffffff, roughness: 0.3 }), iris = K.std({ color: 0x3a2414, roughness: 0.2 }), black = K.basic({ color: 0x0a0806 });
+  const hair = K.std({ color: 0x2a1a10, roughness: 0.6 }), cheek = K.std({ color: 0xff9a9a, transparent: true, opacity: 0.55, roughness: 0.8 });
+  // body: pear-shaped onesie
+  const body = K.mesh(new THREE.SphereGeometry(0.5, 32, 24), cloth, 0, 0.95, 0, g); body.scale.set(1, 1.15, 0.9);
+  K.mesh(new THREE.TorusGeometry(0.2, 0.05, 8, 24), K.std({ color: 0xffffff }), 0, 1.45, 0.08, g).rotation.x = Math.PI / 2 - 0.3; // collar
+  for (let i = 0; i < 3; i++) K.mesh(new THREE.SphereGeometry(0.035, 8, 6), K.std({ color: 0xffffff }), 0, 1.25 - i * 0.17, 0.44 - i * 0.02, g);
+  // head
   const head = K.group(0, 1.95, 0, g);
-  K.mesh(new THREE.SphereGeometry(0.5, 32, 24), skin, 0, 0, 0, head);
-  for (const sx of [-1, 1]) { K.mesh(new THREE.SphereGeometry(0.06, 10, 8), dark, sx * 0.17, 0.02, 0.45, head); K.mesh(new THREE.SphereGeometry(0.1, 10, 8), skin, sx * 0.5, 0, 0, head); }
-  K.mesh(new THREE.TorusGeometry(0.08, 0.02, 6, 16, Math.PI), dark, 0, -0.17, 0.46, head).rotation.z = Math.PI;
-  K.mesh(new THREE.SphereGeometry(0.12, 10, 8), K.std({ color: 0x5a3a22 }), 0, 0.5, 0.05, head);
-  const limbs = [];
-  for (const [lx, ly, len] of [[-0.5, 1.2, 0.45], [0.5, 1.2, 0.45], [-0.2, 0.45, 0.4], [0.2, 0.45, 0.4]]) {
-    const piv = K.group(lx, ly, 0, g); K.mesh(new THREE.CapsuleGeometry(0.13, len, 4, 10), ly > 1 ? cloth : cloth, 0, -len / 2, 0, piv); limbs.push(piv);
+  K.mesh(new THREE.SphereGeometry(0.55, 40, 30), skin, 0, 0, 0, head).scale.set(1, 0.97, 0.95);
+  const lids = [];
+  for (const sx of [-1, 1]) {
+    const e = K.group(sx * 0.19, 0.02, 0.44, head);
+    K.mesh(new THREE.SphereGeometry(0.11, 20, 14), white, 0, 0, 0, e).scale.set(1, 1.15, 0.5);
+    K.mesh(new THREE.SphereGeometry(0.075, 16, 12), iris, 0.0, -0.01, 0.04, e).scale.set(1, 1.1, 0.5);
+    K.mesh(new THREE.SphereGeometry(0.04, 12, 8), black, 0, -0.01, 0.07, e).scale.set(1, 1, 0.5);
+    K.mesh(new THREE.SphereGeometry(0.018, 8, 6), K.basic({ color: 0xffffff }), 0.025, 0.03, 0.09, e);
+    const lid = K.mesh(new THREE.SphereGeometry(0.12, 20, 14, 0, Math.PI * 2, 0, Math.PI / 2), skin, 0, 0, 0.005, e); lid.scale.set(1, 0.05, 0.6); lids.push(lid);
+    const brow = K.mesh(new THREE.CapsuleGeometry(0.018, 0.1, 4, 8), hair, sx * 0.19, 0.17, 0.47, head); brow.rotation.z = Math.PI / 2 + sx * 0.15;
+    K.mesh(new THREE.SphereGeometry(0.09, 12, 10), cheek, sx * 0.3, -0.15, 0.4, head).scale.set(1, 0.7, 0.4);
+    K.mesh(new THREE.SphereGeometry(0.11, 14, 10), skin, sx * 0.55, 0, -0.02, head).scale.set(0.5, 1, 0.8); // ears
   }
-  g.userData = { head, body, limbs };
+  K.mesh(new THREE.SphereGeometry(0.05, 12, 8), skin, 0, -0.08, 0.53, head);                                    // nose
+  K.mesh(new THREE.TorusGeometry(0.07, 0.016, 6, 20, Math.PI), K.std({ color: 0xc0504d }), 0, -0.22, 0.49, head).rotation.z = Math.PI; // smile
+  K.mesh(new THREE.SphereGeometry(0.56, 32, 16, 0, Math.PI * 2, 0, 0.9), hair, 0, 0.03, -0.04, head).rotation.x = -0.35; // hair cap
+  const curl = K.mesh(new THREE.TorusGeometry(0.08, 0.025, 8, 20, 4.5), hair, 0.02, 0.6, 0.12, head); curl.rotation.y = 0.5;
+  // limbs (pivots at shoulder/hip) with hands and feet
+  const limbs = [];
+  for (const [lx, ly, len, arm] of [[-0.48, 1.32, 0.42, 1], [0.48, 1.32, 0.42, 1], [-0.2, 0.5, 0.36, 0], [0.2, 0.5, 0.36, 0]]) {
+    const piv = K.group(lx, ly, 0, g);
+    K.mesh(new THREE.CapsuleGeometry(0.15, len, 6, 14), cloth, 0, -len / 2, 0, piv);
+    if (arm) K.mesh(new THREE.SphereGeometry(0.12, 16, 12), skin, 0, -len - 0.12, 0.02, piv);
+    else K.mesh(new THREE.SphereGeometry(0.15, 16, 12), skin, 0, -len - 0.1, 0.08, piv).scale.set(1, 0.6, 1.4);
+    limbs.push(piv);
+  }
+  g.traverse(o => { if (o.isMesh) o.castShadow = true; });
+  g.userData = { head, body, limbs, lids };
   return g;
+}
+// blink + breathe helper for baby()
+export function babyLive(b, t, seed = 0) {
+  const u = b.userData, k = ((t + seed) % 3.3) < 0.14 ? 1 : 0;
+  u.lids.forEach(l => l.scale.y = 0.05 + k * 1.0);
+  u.body.scale.y = 1.15 + Math.sin(t * 2.2 + seed) * 0.02;
 }
 // one-shot shard bursts: pool of small glowing squares. burst(pool, i, center, t0) then updateBursts(pool, t)
 export function burstPool(n = 6, per = 40, color = 0xffc93c) {

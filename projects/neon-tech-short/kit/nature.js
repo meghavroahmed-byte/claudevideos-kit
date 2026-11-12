@@ -26,6 +26,8 @@ export function natureWorld({ z0 = -40, z1 = 220, corridor = 13, patches = [] } 
   K.hemi.color.set(0xa9b8ff); K.hemi.groundColor.set(0x3a4a2a); K.hemi.intensity = 1.6;
   K.moon.color.set(0xffc890); K.moon.intensity = 2.2; K.moon.position.set(30, 40, 160);
   CFG.vignette = 0.25;
+  // soft front fill from the camera side (the sun is behind the scene, at +z)
+  const fill = new THREE.DirectionalLight(0xdcd6ff, 0.9); fill.position.set(-10, 18, -60); K.scene.add(fill);
 
   // terrain: flat corridor, hills rising outside it
   const geo = new THREE.PlaneGeometry(520, L, 160, 220); geo.rotateX(-Math.PI / 2);
