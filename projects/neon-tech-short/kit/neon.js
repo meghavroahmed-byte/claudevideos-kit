@@ -378,6 +378,7 @@ function render(i) {
     if (k >= 0 && k < 1) { const a = s.amp * (1 - k); SHAKE.x += Math.sin(t * 91) * a; SHAKE.y += Math.cos(t * 77) * a; }
   }
   g.save(); g.clearRect(0, 0, W, H);
+  if (window.UI_ONLY) { SCENE.ui && SCENE.ui(g, t); drawHUD(g, t); g.restore(); return cv; } // overlay pass for external (Blender) shots
   if (window.BG3D) g.drawImage(window.BG3D(t), 0, 0, W, H);
   else { drawWorld(g, t); SCENE.world && SCENE.world(g, t); }
   if (CFG.captions) drawScrim(g);

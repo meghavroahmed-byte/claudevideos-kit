@@ -225,7 +225,7 @@ if SHOT == 'wall':
             o = prim('primitive_cube_add', brick, size=1, location=(x, WY, 0.25 + r * 0.5)); o.scale = (0.48, 0.24, 0.24)
             bpy.ops.object.transform_apply(scale=True)
             bpy.ops.rigidbody.object_add(type='ACTIVE'); o.rigid_body.mass = 1.0; o.rigid_body.friction = 0.6
-            o.rigid_body.use_deactivation = True; o.rigid_body.use_start_deactivated = True
+            o.rigid_body.use_deactivation = False
             # new glowing bricks rising behind
             n = prim('primitive_cube_add', newb, size=1, location=(x, WY + 1.2, -4)); n.scale = (0.48, 0.24, 0.24)
             f0 = fr(41.4 + random.uniform(0, 0.35) + r * 0.13)
@@ -243,7 +243,12 @@ if SHOT == 'wall':
         p.keyframe_insert('location', frame=fr(39.85)); p.keyframe_insert('rotation_euler', frame=fr(39.85))
         p.location = ((i - 1) * 4.2, WY - 3.5, 0.15); p.rotation_euler = (math.radians(85), 0, math.radians((i - 1) * 40))
         p.keyframe_insert('location', frame=fr(40.7)); p.keyframe_insert('rotation_euler', frame=fr(40.7))
-    co, tg = camera('cam', [(39.5, (-4, WY - 17, 6.5), (0, WY, 3)), (43.8, (2.5, WY - 14, 7.5), (0, WY, 2.8))], fstop=3.2, lens=36)
+    # explosion: radial force field behind the wall, switched on for a few frames at 39.8 s
+    bpy.ops.object.effector_add(type='FORCE', location=(0, WY + 1.5, 2.0)); fx = bpy.context.object
+    fx.field.falloff_type = 'SPHERE'; fx.field.use_max_distance = True; fx.field.distance_max = 9
+    for f, v in [(fr(39.75), 0), (fr(39.8), -2500), (fr(40.05), -2500), (fr(40.1), 0)]:
+        fx.field.strength = v; fx.field.keyframe_insert('strength', frame=f)
+    co, tg = camera('cam', [(39.5, (-3.5, WY - 11.5, 4.6), (0, WY, 2.6)), (43.8, (2.5, WY - 10, 5.4), (0, WY, 2.4))], fstop=2.8, lens=32)
     shake(co, 39.8, 0.25)
     bpy.ops.ptcache.bake_all(bake=True)
 
