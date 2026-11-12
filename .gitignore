@@ -7,3 +7,4 @@ temp/
 *.mov
 *.aac
 parts/
+render.log
