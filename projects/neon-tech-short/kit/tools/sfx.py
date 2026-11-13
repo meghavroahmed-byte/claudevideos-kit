@@ -1,5 +1,6 @@
 # sfx.py: synthesized SFX palette (no stock sounds). Usage: python3 sfx.py <story.js> <out.wav> <duration_s> [seed]
 # Kinds: whoosh pop tick slam hiss type bad good fizz rise snip plop curdle pour drop gurgle.
+# Optional 5th arg: pitch factor (e.g. 0.85 darker, 1.15 brighter) so a reused kind still sounds new.
 # Per video: pass a NEW seed and tweak the generator params/theme so no two videos sound the same.
 # First palette (anaros-dudh): kitchen/body theme: liquid plops,
 # fizz, gurgles, soft glassy pops, enzyme snips). Reads cue list from anaros.js and writes sfx_anaros.wav.
@@ -145,12 +146,14 @@ GAIN = dict(whoosh=0.55, pop=0.5, tick=0.45, slam=0.9, hiss=0.6, type=0.45, bad=
             rise=0.5, snip=0.6, plop=0.7, curdle=0.6, pour=0.5, drop=0.5, gurgle=0.7,
             sparkle=0.6, erase=0.6, shatter=0.7, rec=0.6, zap=0.5, rumble=0.9, build=0.6, burn=0.5)
 
+PITCH = float(sys.argv[5]) if len(sys.argv) > 5 else 1.0
 src = open(sys.argv[1], encoding='utf-8').read()
 cues = re.findall(r"\[([\d.]+),\s*'(\w+)'\]", src[src.index('window.SFXEV'):])
 L = np.zeros((int(DUR * SR) + SR, 2)); count = {}
 for ts, k in cues:
     v = count.get(k, 0); count[k] = v + 1
     x = KIND[k](v) * GAIN[k]
+    if PITCH != 1.0: x = np.interp(np.arange(0, len(x) - 1, PITCH), np.arange(len(x)), x)
     pan = [0.0, -0.25, 0.25, -0.12, 0.12][v % 5]
     s = int(float(ts) * SR); e = min(len(L), s + len(x))
     L[s:e, 0] += x[:e - s] * (1 - pan); L[s:e, 1] += x[:e - s] * (1 + pan)
