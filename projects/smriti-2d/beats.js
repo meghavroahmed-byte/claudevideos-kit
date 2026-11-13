@@ -182,18 +182,29 @@ beat(69.83, 'ice', { tr: 'zoom', d: (g, t, b) => { bgMG(g, t, 'ice'); drawIcon(g
   worldIn(g, c => { nursery(c, t); baby(c, 960, 990, 1.3, t, { pose: 'sit', wave: true, toy: true, col: '#8fd3ff' }); }, { fx: 960, fy: 620, z: 1 }, { x: 540, y: 560, r: 150, col: 'rgba(143,227,255,0.9)' }, t);
   commentCard(g, 540, 1080, 960, sm(t, 69.95, 0.4), t, 69.95); slam(g, 'কমেন্ট করে জানান!', 540, 1420, 110, pop(t, 70.1), CC.ember2); } });
 
-// SFX cues for sfx.py ([time, kind])
+// SFX cues for sfx_memory.py ([time, kind]). Whoosh-free: reverse swells only at 4 big section changes.
 window.SFXEV = [
-  [0.2, 'sparkle'], [0.3, 'slam'], [1.4, 'pop'], [4.11, 'whoosh'], [4.25, 'slam'], [4.5, 'tick'], [5.2, 'rise'], [5.6, 'pop'],
-  [6.8, 'whoosh'], [6.9, 'pop'], [7.0, 'pop'], [7.3, 'erase'], [7.9, 'erase'], [8.5, 'erase'], [8.9, 'slam'],
-  [10.0, 'whoosh'], [10.2, 'pop'], [11.0, 'pop'], [12.6, 'erase'], [13.0, 'bad'],
-  [15.05, 'whoosh'], [15.6, 'bad'], [15.8, 'pop'], [17.51, 'whoosh'], [17.6, 'rec'], [18.0, 'bad'],
-  [18.97, 'slam'], [19.1, 'zap'], [19.6, 'rise'], [19.9, 'slam'], [21.49, 'whoosh'], [21.6, 'rec'], [22.2, 'tick'], [23.0, 'tick'], [23.8, 'tick'],
-  [25.34, 'zap'], [25.9, 'shatter'], [26.6, 'slam'], [27.4, 'shatter'], [29.33, 'whoosh'], [29.4, 'bad'],
-  [30.11, 'whoosh'], [30.4, 'pop'], [30.85, 'pop'], [31.3, 'pop'], [32.6, 'whoosh'], [33.2, 'sparkle'], [34.4, 'zap'], [35.0, 'zap'], [35.6, 'zap'], [36.2, 'good'],
-  [38.68, 'whoosh'], [39.0, 'pop'], [39.75, 'rumble'], [39.8, 'shatter'], [41.2, 'build'], [42.0, 'whoosh'], [42.6, 'shatter'],
-  [43.84, 'slam'], [44.0, 'rumble'], [44.4, 'zap'], [45.0, 'erase'], [45.8, 'erase'], [46.6, 'whoosh'], [46.8, 'slam'],
-  [49.44, 'whoosh'], [49.6, 'pop'], [50.6, 'sparkle'], [52.6, 'whoosh'], [53.0, 'pop'], [53.4, 'bad'],
-  [55.71, 'whoosh'], [56.2, 'drop'], [56.8, 'drop'], [57.4, 'drop'], [59.35, 'whoosh'], [60.0, 'good'], [60.2, 'pop'],
-  [62.4, 'burn'], [62.6, 'slam'], [66.33, 'whoosh'], [66.6, 'sparkle'], [69.83, 'whoosh'], [70.0, 'type'], [70.1, 'pop'],
+  [0.1, 'heart'], [0.3, 'chord'], [2.0, 'box'],
+  [4.11, 'shutter'], [4.3, 'thud'], [4.5, 'clock'], [4.85, 'clock'], [5.2, 'clock'], [5.6, 'box'],
+  [6.8, 'shutter'], [6.9, 'box'], [7.02, 'box'], [7.14, 'box'], [7.26, 'box'], [7.38, 'box'], [7.3, 'tapestop'], [7.9, 'dissolve'], [8.5, 'dissolve'], [8.9, 'impact'],
+  [10.0, 'shutter'], [10.2, 'box'], [11.0, 'box'], [12.6, 'dissolve'], [13.0, 'glitch'],
+  [15.6, 'powerdown'], [15.8, 'box'], [17.51, 'glitch'], [17.6, 'beep'], [18.0, 'thud'],
+  [18.97, 'swell'], [19.1, 'synapse'], [19.5, 'rewind'], [19.9, 'impact'],
+  [21.49, 'shutter'], [21.6, 'beep'], [22.0, 'box'], [22.7, 'box'], [23.4, 'box'], [24.1, 'box'], [24.8, 'box'],
+  [25.34, 'glitch'], [25.9, 'dissolve'], [26.35, 'dissolve'], [26.6, 'thud'], [26.8, 'dissolve'], [27.4, 'impact'],
+  [29.33, 'swell'], [29.4, 'heart'],
+  [30.11, 'shutter'], [30.4, 'box'], [30.85, 'box'], [31.3, 'box'],
+  [32.07, 'heart'], [32.5, 'chord'], [33.3, 'synapse'],
+  [34.6, 'synapse'], [34.9, 'synapse'], [35.2, 'synapse'], [35.45, 'synapse'], [35.7, 'synapse'], [36.0, 'synapse'], [36.3, 'chord'],
+  [38.68, 'swell'], [39.0, 'box'], [39.75, 'impact'], [39.8, 'crumble'],
+  [41.58, 'crumble'], [42.4, 'thud'],
+  [43.84, 'impact'], [44.1, 'heart'], [44.3, 'synapse'], [44.6, 'synapse'], [44.9, 'synapse'], [45.0, 'dissolve'], [45.4, 'dissolve'], [45.8, 'dissolve'],
+  [48.16, 'tapestop'], [48.5, 'dissolve'], [48.9, 'dissolve'],
+  [49.44, 'shutter'], [49.6, 'box'], [51.0, 'chord'],
+  [54.15, 'glitch'], [54.95, 'thud'], [55.1, 'thud'], [55.25, 'thud'],
+  [55.71, 'shutter'], [56.2, 'box'], [56.8, 'box'], [57.4, 'box'], [57.9, 'thud'],
+  [59.35, 'swell'], [60.0, 'chord'],
+  [63.65, 'burn'], [64.9, 'impact'],
+  [66.33, 'shutter'], [66.6, 'box'], [67.1, 'box'], [67.6, 'box'], [68.1, 'box'],
+  [69.83, 'shutter'], [70.0, 'type'], [70.3, 'chord'],
 ];

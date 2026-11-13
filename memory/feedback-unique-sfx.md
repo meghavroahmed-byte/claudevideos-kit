@@ -23,3 +23,9 @@ Until then every edit used the same synthesized set (pink-noise whoosh, two-sine
 - Name the palette per project (e.g. `sfx_<project>_whoosh1.wav`).
 - Mention in the delivery message that the SFX are new for this video.
 - Related: [[megh-video-skill]].
+
+## 2026-11-13 (smriti-2d): "হুশ হুশ" rejected
+- The user called the reused palette "generic, normal, টক টক". About 18 whooshes in 71 s was far too many; they dislike whoosh spam.
+- Do now: design a palette from the video's THEME (smriti: music-box tines in one key, polaroid shutter, tape-stop for erasing, synapse sparks, heartbeat, quiet nostalgic pad).
+- Whoosh: almost none. Reverse-reverb swells only at 3-4 big section changes; most cuts get a themed sound or silence.
+- Example: projects/smriti-2d/sfx_memory.py. Normalise each sound per kind (reverb tails of tonal sounds blow up the level).
