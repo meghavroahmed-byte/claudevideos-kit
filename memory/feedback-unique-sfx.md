@@ -29,3 +29,12 @@ Until then every edit used the same synthesized set (pink-noise whoosh, two-sine
 - Do now: design a palette from the video's THEME (smriti: music-box tines in one key, polaroid shutter, tape-stop for erasing, synapse sparks, heartbeat, quiet nostalgic pad).
 - Whoosh: almost none. Reverse-reverb swells only at 3-4 big section changes; most cuts get a themed sound or silence.
 - Example: projects/smriti-2d/sfx_memory.py. Normalise each sound per kind (reverb tails of tonal sounds blow up the level).
+
+## 2026-11-13 (later): synthesized SFX rejected as "খ্যাত"
+- The user rejected numpy-synthesized SFX as cheap ("একদমই খ্যাত") and asked for the best real SFX. Now use real recorded library sounds, not synthesis.
+- Source: Mixkit (free, OK for commercial video). Full WAV is at `assets.mixkit.co/active_storage/sfx/<id>/<id>.wav`; if that returns 403, use `<id>-preview.mp3`.
+- Network: mixkit.co and assets.mixkit.co are allowed in the `claudevideos-kit` cloud environment.
+- Tools in `projects/smriti-2d`:
+  - `mixkit/catalog.py <categories>` lists ids and titles.
+  - `sfx_pro.py` holds the cue list and does the peak-aligned swells.
+- Keep each video unique: choose different ids per video and theme them; whoosh only at 3-4 section changes.

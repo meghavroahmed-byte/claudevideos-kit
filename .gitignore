@@ -12,3 +12,6 @@ projects/real3d-test/models/
 projects/neon-tech-short/kit/models/
 projects/smriti/bl/out/
 projects/smriti-2d/chk/
+projects/smriti-2d/mixkit/*.wav
+projects/smriti-2d/mixkit/*.mp3
+projects/smriti-2d/mixkit/n/
