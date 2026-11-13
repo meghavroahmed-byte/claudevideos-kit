@@ -23,3 +23,8 @@ The user wants videos made from their own voiceover plus script, "exactly" like 
 **Brightness (2026-11-12):** the user said the smriti video looked too dark ("ondhokar ondhokar lage"). Keep the night style, but make it brighter: a lighter purple sky, a brighter grid, less fog and vignette. The preset is in the skill gotchas.
 
 **Natural background (2026-11-12):** the user said the background looks plain ("normal") and must be natural and mixed with nature to match the video. The grid void is replaced by `nature.js` (dusk meadow world). From now on every video gets a living, topic-fitting environment.
+
+## Lesson (smriti final)
+- User disliked the Blender hybrid: hours of render, but the video looked almost the same as before. Don't repeat that.
+- No long renders that only change a few seconds. Show a short sample (5-10 s) first and get an ok before any long render.
+- An upgrade must be visible across the whole video, not a single shot.
