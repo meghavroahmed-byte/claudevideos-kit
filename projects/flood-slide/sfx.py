@@ -186,6 +186,29 @@ def drip(d=0.15):
     return norm(np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-tt * 40), 0.3)
 
 
+def stream(d, rate=45, fmin=380, fmax=1500, seed=3):  # babbling water: many tiny resonant bubbles
+    r = np.random.default_rng(seed)
+    out = np.zeros(int(d * SR))
+    n = int(d * rate)
+    for _ in range(n):
+        t0 = r.uniform(0, d); f0 = np.exp(r.uniform(np.log(fmin), np.log(fmax)))
+        dur = r.uniform(0.02, 0.06); tt = t_(dur)
+        b = np.sin(2 * np.pi * np.cumsum(f0 * (1 + 0.9 * tt / dur)) / SR) * np.exp(-tt / (dur * 0.3)) * r.uniform(0.3, 1)
+        s0 = int(t0 * SR); m = min(len(b), len(out) - s0); out[s0:s0 + m] += b[:m]
+    body = lp(noise(d), 300, 4) * 0.25                     # soft low wash underneath
+    return lp(out, 3500) + body
+
+
+def deep(d, seed=5):  # submerged: slow, low bubbles, no hiss
+    r = np.random.default_rng(seed)
+    out = lp(noise(d), 160, 4) * 0.35
+    for _ in range(int(d * 4)):
+        t0 = r.uniform(0, d); f0 = r.uniform(180, 420); dur = r.uniform(0.06, 0.12); tt = t_(dur)
+        b = np.sin(2 * np.pi * np.cumsum(f0 * (1 + 0.6 * tt / dur)) / SR) * np.exp(-tt / (dur * 0.35)) * r.uniform(0.4, 1)
+        s0 = int(t0 * SR); m = min(len(b), len(out) - s0); out[s0:s0 + m] += b[:m]
+    return norm(out * env(len(out), 0.3, 0.4), 0.5)
+
+
 # ---------------- timeline ----------------
 bed = np.zeros(int((DUR + 1) * SR))
 palette = {}
@@ -205,15 +228,15 @@ put(3.5, 'roll', whoosh(0.45, up=True), -14)                      # rolls onto h
 put(6.45, 'slip_run', slip_run(2.3), -11)                         # slips back down: soft descending marimba run
 put(8.95, 'roll2', whoosh(0.5, up=False), -14)                    # rolls back over
 put(9.1, 'pad', pad(2.6), -15)                                    # calm
-put(11.6, 'underwater', underwater(4.4), -19)
+put(11.6, 'underwater', deep(4.4, 5), -20)
 for k in range(9): put(11.9 + k * 0.45 + rng.uniform(0, 0.2), 'bubble', bubble(), -12)
 put(16.0, 'riser', riser(1.6), -11)                               # water keeps rising
 for k in range(3): put(17.6 + k * 1.25 + 0.05, 'stroke', stroke(0.55), -9)
-put(17.6, 'underwater2', underwater(3.0), -22)
+put(17.6, 'underwater2', deep(3.0, 6), -23)
 put(20.65, 'thud2', thud(0.5, 85), -10)                           # bumps into the bend
 put(22.2, 'creak', creak(0.8), -12)                               # brace
 put(23.4, 'fillroar', fillroar(1.8), -9)                          # slide fills
-put(25.3, 'underwater3', underwater(2.9), -19)
+put(25.3, 'underwater3', deep(2.9, 7), -20)
 for k in range(2): put(25.5 + k * 0.35, 'glide', glide(1.2 - k * 0.35), -12)
 put(26.65, 'pulse', pulse(1.4), -7)                               # pressure equalizes
 put(27.4, 'whoosh_push', whoosh(1.2, up=True), -9)                # pushes off, speeds down
@@ -228,9 +251,9 @@ def waterbed(d):
     slosh = bp(noise(d), 250, 1800) * (0.55 + 0.45 * np.sin(2 * np.pi * 0.9 * tt) * np.sin(2 * np.pi * 0.37 * tt + 1))
     trick = bp(noise(d), 2500, 7000) * 0.25 * np.abs(lp(noise(d), 6)) * 6
     return slosh + trick
-wb = waterbed(28.6)
+wb = stream(28.6)
 lv = np.interp(t_(28.6), [0, 1.5, 3.0, 11.6, 13.8, 16, 17.6, 23.4, 25.1, 27.6, 28.6], [0.9, 0.7, 0.3, 0.3, 0.45, 0.45, 0.55, 0.55, 0.9, 0.5, 0.0])
-put(0.0, 'waterbed', norm(wb, 0.5) * lv, -24)
+put(0.0, 'waterbed', norm(wb, 0.5) * lv, -20)
 
 # every remaining on-screen event gets its own sound
 # removed (sounded like hiss): for k in range(4): put(0.25 + k * 0.42, f'pant{k}', breath(0.32, inhale=k % 2 == 0, pitch=1.1 + 0.05 * k), -15)   # panic breathing in the hook
