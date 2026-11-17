@@ -12,7 +12,7 @@ def load(i):
     with wave.open(f'{LIB}/{i}.wav') as w: return np.frombuffer(w.readframes(w.getnframes()), '<i2').reshape(-1, 2) / 32768.0
 
 meta = {'cuts': set(), 'pops': set(), 'beats': []}
-for f in sorted(glob.glob('parts/p*.mp4.json')):
+for f in sorted(glob.glob('parts/[pq]*.mp4.json')):
     m = json.load(open(f)); meta['cuts'] |= set(m['cuts']); meta['pops'] |= set(m['pops']); meta['beats'] = m['beats'] or meta['beats']
 beats = {round(b[0], 2): b for b in meta['beats']}
 lines = json.load(open('lines.json'))
