@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { makeHuman } from './human.js';
 import { glowSprite } from './props.js';
 import { lerp, smooth, easeOut, easeIn, easeInOut, range, clamp, V, cam, place, shake } from './anim.js';
-import { slideMats, tubeSection, tubeWater, bubbles, spray, pressureRing, slideTower, makePool, rippleWater, orient } from './slide.js';
+import { slideMats, tubeSection, tubeWater, bubbles, spray, pressureRing, slideTower, makePool, rippleWater, orient, spiralInto } from './slide.js';
 
 export const DURATION = 30.92;
 
@@ -113,8 +113,8 @@ const CAM = [
   [0.0, [0.75, 0.32, -0.45], [0, -0.17, -0.78]],
   [1.4, [0.95, 0.4, -0.35], [0, -0.18, -0.72]],
   [1.95, [1.2, 0.5, -0.2], [0, -0.18, -0.65]],
-  [2.75, [4.5, 6.5, 15.5], [0, -0.6, 1.2]],
-  [3.3, [4.8, 6.9, 16.2], [0, -0.6, 0.9]],
+  [2.75, [7.5, 7.0, 21.0], [1.6, 1.6, -2.4]],
+  [3.3, [7.9, 7.3, 21.8], [1.6, 1.6, -2.6]],
   [4.1, [1.6, 0.55, -1.2], [0, -0.15, -0.75]],
   [4.8, [1.55, 0.5, -1.3], [0, -0.15, -0.75]],
   [6.3, [1.65, 0.45, -1.1], [0, -0.2, -0.7]],
@@ -163,8 +163,9 @@ function oneTake({ makeStage }) {
     const p = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, y, 12), M.support);
     p.position.set(0, y / 2, z * Math.cos(TILT)); p.castShadow = true; scene.add(p);
   }
-  const towerTop = H + (LEN / 2) * Math.sin(TILT);
-  const tw = new THREE.Mesh(new THREE.BoxGeometry(1.6, towerTop, 1.6), M.support); tw.position.set(0, towerTop / 2 - 0.4, -(LEN / 2) * Math.cos(TILT) - 0.8); tw.castShadow = true; scene.add(tw);
+  scene.updateMatrixWorld(true);
+  const topEnd = slide.localToWorld(V(0, 0, -LEN / 2));
+  scene.add(spiralInto(topEnd, V(0, -Math.sin(TILT), Math.cos(TILT))));
   // pool at the exit
   scene.updateMatrixWorld(true);
   const exitW = slide.localToWorld(V(0, Y0, EXIT));

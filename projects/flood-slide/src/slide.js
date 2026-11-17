@@ -226,3 +226,48 @@ export function makePool(W = 4.5, Lp = 6) {
   pool.userData.water = water;
   return pool;
 }
+
+// ---------- spiral tower whose tube runs into a given point with a given (downhill) direction ----------
+export function spiralInto(end, dir, { R = 2.4, turns = 1.75, top = 9.2, lead = 1.6 } = {}) {
+  const M = slideMats();
+  const g = new THREE.Group();
+  const d = dir.clone().normalize();
+  const flat = V3(d.x, 0, d.z).normalize();
+  const pEnd = end.clone().addScaledVector(d, -lead);            // where the helix hands over to the straight run
+  // helix around a centre so that at the last angle the tangent equals `flat`
+  const side = V3(flat.z, 0, -flat.x);                            // right-hand side of travel
+  const centre = pEnd.clone().addScaledVector(side, R); centre.y = 0;
+  const a1 = Math.atan2(pEnd.z - centre.z, pEnd.x - centre.x);
+  const pts = [];
+  const N = 90;
+  for (let i = 0; i <= N; i++) {
+    const k = i / N, a = a1 + (1 - k) * turns * Math.PI * 2;      // counter-clockwise going down
+    pts.push(V3(centre.x + Math.cos(a) * R, lerp(top, pEnd.y, k), centre.z + Math.sin(a) * R));
+  }
+  // check direction: tangent at the end should point along flat; flip winding if not
+  const tEnd = pts[N].clone().sub(pts[N - 1]).setY(0).normalize();
+  if (tEnd.dot(flat) < 0) for (let i = 0; i <= N; i++) { const k = i / N, a = a1 - (1 - k) * turns * Math.PI * 2; pts[i].set(centre.x + Math.cos(a) * R, lerp(top, pEnd.y, k), centre.z + Math.sin(a) * R); }
+  pts.push(end.clone().addScaledVector(d, -0.6), end.clone().addScaledVector(d, 0.05));
+  const curve = new THREE.CatmullRomCurve3(pts);
+  const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, 500, 0.43, 40, false), M.tube);
+  tube.castShadow = true; tube.receiveShadow = true; g.add(tube);
+  for (let i = 1; i < 34; i++) {
+    const u = i / 34, p = curve.getPointAt(u), t = curve.getTangentAt(u);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.455, 0.035, 10, 48), M.stripe);
+    ring.position.copy(p); ring.quaternion.setFromUnitVectors(V3(0, 0, 1), t); ring.castShadow = true; g.add(ring);
+  }
+  for (let i = 4; i < N; i += 7) {
+    const p = pts[i];
+    const c = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, p.y - 0.43, 16), M.support);
+    c.position.set(p.x, (p.y - 0.43) / 2, p.z); c.castShadow = true; g.add(c);
+  }
+  const tw = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.5, top + 0.6, 24), M.support); tw.position.set(centre.x, (top + 0.6) / 2, centre.z); tw.castShadow = true; g.add(tw);
+  const a0 = Math.atan2(pts[0].z - centre.z, pts[0].x - centre.x);
+  const pl = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, 0.18, 32), M.stripe);
+  pl.position.set(centre.x + Math.cos(a0) * R * 0.45, top + 0.1, centre.z + Math.sin(a0) * R * 0.45); pl.castShadow = true; g.add(pl);
+  const rail = new THREE.Mesh(new THREE.TorusGeometry(1.2, 0.03, 8, 48), M.support); rail.rotation.x = Math.PI / 2; rail.position.copy(pl.position).add(V3(0, 0.55, 0)); g.add(rail);
+  g.userData = { curve, centre };
+  return g;
+}
+function V3(x, y, z) { return new THREE.Vector3(x, y, z); }
+function lerp(a, b, t) { return a + (b - a) * t; }
