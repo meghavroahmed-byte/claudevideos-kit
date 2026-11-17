@@ -63,6 +63,12 @@ def squeak(d=0.22, f0=1500, f1=1150):  # wet skin on plastic
     x *= 0.6 + 0.4 * (np.abs(np.sin(2 * np.pi * 60 * tt)))
     return norm(x * env(len(tt), 0.02, 0.08), 0.5)
 
+def slide_rub(d=2.0):  # skin sliding on wet plastic: low, unpitched rub
+    tt = t_(d)
+    x = lp(bp(noise(d), 120, 900), 700, 4) * (0.7 + 0.3 * np.sin(2 * np.pi * 3.1 * tt) ** 2)
+    return norm(x * env(len(tt), 0.2, 0.5), 0.6)
+
+
 def longslide(d=2.0):  # body slipping back down the wall
     tt = t_(d); f = 900 * (0.55 ** (tt / d))
     ph = 2 * np.pi * np.cumsum(f * (1 + 0.06 * np.sin(2 * np.pi * 23 * tt))) / SR
@@ -176,9 +182,8 @@ put(0.0, 'thud', thud(0.5, 70), -12)                              # startle on f
 put(1.95, 'whip_out', whoosh(0.8, up=False), -14)                  # whip back to reveal the slide
 put(3.25, 'whip_in', whoosh(0.85, up=True), -14)                   # rush back in
 put(3.5, 'roll', whoosh(0.45, up=True), -14)                      # rolls onto his front
-for k in range(5):                                                # panic squeaks
-    put(3.95 + k * 0.45 + (k % 2) * 0.12, 'squeak', squeak(0.2, 1500 + 120 * (k % 3), 1100), -13)
-put(6.4, 'longslide', longslide(2.3), -10)                        # slips back down
+# (pitched squeaks removed: user said they sounded like a bird, 'eu eu eu')
+put(6.4, 'slide_rub', slide_rub(2.3), -12)                        # slips back down: dark rub, no pitched tone
 put(8.95, 'roll2', whoosh(0.5, up=False), -14)                    # rolls back over
 put(9.1, 'pad', pad(2.6), -15)                                    # calm
 put(11.6, 'underwater', underwater(4.4), -19)

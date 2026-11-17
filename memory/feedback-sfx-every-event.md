@@ -20,5 +20,6 @@ On 2026-11-17 (flood-slide short) the user said: "protteka bishoyer SFX sound by
   - v6: the user asked for more SFX. The SFX bed sits about 6 dB under the voice (voice -15.6 LUFS, ducked SFX about -21 LUFS). It uses light sidechain ducking (threshold 0.05, ratio 2) and a limiter on the final mix.
 - Continuous beds (water ambience, underwater rumble) stay LOW, about 10 dB under the event sounds, and swell only when the action calls for it (flood, filling). In v6 the user said "panir awaz pura video te onk zore".
 - Avoid hissy, white-noise-like sounds. In flood-slide v7 the user said the noisy SFX at the start sounded bad. The worst were breaths made from filtered noise and the bright top of the water gush. Make water sounds dark and low-passed, keep whooshes soft, and don't use fake noise breaths.
+- No pitched "squeak" or sweeping-tone sounds for body actions such as sliding, slipping or rubbing. In flood-slide v8 the user said they sounded like a bird going "eu eu eu" and were very bad. Use dark, unpitched rubs, thumps and slaps instead.
 - Small things count too: a continuous water bed that follows the water level, every slip, step, slap, breath and drip. In the user's words: "sukkho sukkho je kono bishoyer sound".
 - Still follows [[feedback-unique-sfx]]: synthesize a new palette for each video, never stock or reused files.
