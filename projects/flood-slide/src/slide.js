@@ -212,3 +212,17 @@ export function orient(root, up, front) {
   const X = new THREE.Vector3().crossVectors(Y, Z).normalize();
   root.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(X, Y, Z));
 }
+
+// ---------- standalone pool (rim, tiles, rippling water) ----------
+export function makePool(W = 4.5, Lp = 6) {
+  const M = slideMats();
+  const pool = new THREE.Group();
+  const rimMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 });
+  for (const [w, d, x, z] of [[W + 0.6, 0.3, 0, -Lp / 2 - 0.15], [W + 0.6, 0.3, 0, Lp / 2 + 0.15], [0.3, Lp, -W / 2 - 0.15, 0], [0.3, Lp, W / 2 + 0.15, 0]]) {
+    const b = new THREE.Mesh(new THREE.BoxGeometry(w, 0.12, d), rimMat); b.position.set(x, 0.06, z); b.receiveShadow = b.castShadow = true; pool.add(b);
+  }
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(W, Lp), M.tile); floor.rotation.x = -Math.PI / 2; floor.position.y = 0.004; pool.add(floor);
+  const water = new THREE.Mesh(new THREE.PlaneGeometry(W, Lp, 60, 80), M.pool); water.rotation.x = -Math.PI / 2; water.position.y = 0.09; water.renderOrder = 3; pool.add(water);
+  pool.userData.water = water;
+  return pool;
+}

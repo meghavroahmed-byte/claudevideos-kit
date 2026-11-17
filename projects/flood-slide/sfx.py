@@ -153,33 +153,30 @@ def put(at, name, x, gain_db=0.0):
     n = min(len(x), len(bed) - s)
     bed[s:s + n] += x[:n] * g
 
-CUTS = [1.8, 3.6, 6.25, 11.6, 16.0, 17.6, 20.6, 25.5, 28.2]
-for i, c in enumerate(CUTS):
-    put(c - 0.32, 'whoosh', whoosh(0.5, up=i % 2 == 0), -9)
-
-put(0.0, 'splashloop', splashloop(1.95), -14)                    # exit pouring, outside
-put(1.75, 'gush', gush(1.9), -8)                                  # flood rushes in
-put(1.95, 'thud', thud(0.5, 70), -12)
-for k in range(5):                                                # panic squeaks, one per stroke
-    put(3.75 + k * 0.9 * 0.5 + (k % 2) * 0.12, 'squeak', squeak(0.2, 1500 + 120 * (k % 3), 1100), -13)
-put(6.45, 'longslide', longslide(2.3), -10)                       # slips back down
-put(8.95, 'thud', thud(0.7, 48), -8)                              # "the secret" dip
+# one continuous take: no cut whooshes; sounds follow the action
+put(0.1, 'gush', gush(2.0), -8)                                   # flood rushes in behind him
+put(0.7, 'thud', thud(0.5, 70), -14)                              # startle
+put(3.5, 'roll', whoosh(0.45, up=True), -14)                      # rolls onto his front
+for k in range(5):                                                # panic squeaks
+    put(3.95 + k * 0.45 + (k % 2) * 0.12, 'squeak', squeak(0.2, 1500 + 120 * (k % 3), 1100), -13)
+put(6.4, 'longslide', longslide(2.3), -10)                        # slips back down
+put(8.95, 'roll2', whoosh(0.5, up=False), -14)                    # rolls back over
 put(9.1, 'pad', pad(2.6), -15)                                    # calm
 put(11.6, 'underwater', underwater(4.4), -14)
 for k in range(9): put(11.9 + k * 0.45 + rng.uniform(0, 0.2), 'bubble', bubble(), -12)
 put(16.0, 'riser', riser(1.6), -11)                               # water keeps rising
 for k in range(3): put(17.6 + k * 1.25 + 0.05, 'stroke', stroke(0.55), -9)
 put(17.6, 'underwater2', underwater(3.0), -17)
-put(20.75, 'thud2', thud(0.5, 85), -10)                           # jammed against the bend
+put(20.65, 'thud2', thud(0.5, 85), -10)                           # bumps into the bend
 put(22.2, 'creak', creak(0.8), -12)                               # brace
 put(23.4, 'fillroar', fillroar(1.8), -9)                          # slide fills
 put(25.3, 'underwater3', underwater(2.9), -14)
 for k in range(2): put(25.5 + k * 0.35, 'glide', glide(1.2 - k * 0.35), -12)
 put(26.65, 'pulse', pulse(1.4), -7)                               # pressure equalizes
-put(27.55, 'whoosh_push', whoosh(0.7, up=True), -9)               # push off
-put(28.2, 'splashloop2', splashloop(1.0), -16)
-put(29.1, 'bigsplash', bigsplash(1.6), -5)                        # out into the pool
-put(29.6, 'lapping', lapping(1.3), -16)
+put(27.4, 'whoosh_push', whoosh(1.2, up=True), -9)                # pushes off, speeds down
+put(28.3, 'jet', splashloop(1.2), -14)                            # water flushes out of the exit
+put(29.17, 'bigsplash', bigsplash(1.6), -5)                       # into the pool
+put(29.7, 'lapping', lapping(1.2), -16)
 put(30.0, 'sting', sting(0.9), -12)
 
 bed = bed[:int(DUR * SR)]
