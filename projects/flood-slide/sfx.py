@@ -144,6 +144,23 @@ def sting(d=1.4):  # bright resolve at "safety"
     return norm(x * np.exp(-tt * 2.2) * env(len(tt), 0.01, 0.2), 0.45)
 
 
+def breath(d=0.6, inhale=True, pitch=1.0):  # gasp / breath, filtered noise with a vowel-ish formant
+    tt = t_(d); x = noise(d)
+    f = (1100 if inhale else 800) * pitch
+    y = bp(x, f * 0.7, f * 1.6) + 0.4 * bp(x, 2500 * pitch, 4200 * pitch)
+    sh = (tt / d) ** 0.6 * np.exp(-tt * (2.5 if inhale else 4)) if inhale else np.exp(-tt * 4)
+    return norm(y * sh * env(len(tt), 0.04, 0.12), 0.5)
+
+def slap(d=0.18, f=240):  # palm / knee hitting the wet plastic wall
+    tt = t_(d)
+    x = bp(noise(d), 600, 3500) * np.exp(-tt * 60) + np.sin(2 * np.pi * f * tt) * np.exp(-tt * 30) * 0.6
+    return norm(x, 0.7)
+
+def drip(d=0.15):
+    tt = t_(d); f = rng.uniform(1400, 2400) * (1 + 1.5 * tt / d)
+    return norm(np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-tt * 40), 0.3)
+
+
 # ---------------- timeline ----------------
 bed = np.zeros(int((DUR + 1) * SR))
 palette = {}
@@ -180,6 +197,26 @@ put(28.3, 'jet', splashloop(1.2), -14)                            # water flushe
 put(29.17, 'bigsplash', bigsplash(1.6), -5)                       # into the pool
 put(29.7, 'lapping', lapping(1.2), -16)
 put(30.0, 'sting', sting(0.9), -12)
+
+# every remaining on-screen event gets its own sound
+for k in range(4): put(0.25 + k * 0.42, f'pant{k}', breath(0.32, inhale=k % 2 == 0, pitch=1.1 + 0.05 * k), -15)   # panic breathing in the hook
+for k in range(5): put(3.98 + k * 0.45 + (k % 2) * 0.12, f'slap{k}', slap(0.16, 200 + 30 * k), -14)            # palms slapping the wall while climbing
+for k in range(3): put(6.6 + k * 0.6, f'kick{k}', slap(0.2, 150 + 20 * k), -16)                                  # feet scrabbling as he slides
+put(9.5, 'calm_in', breath(1.0, inhale=True, pitch=0.8), -17)                     # slow calm breath in
+put(10.6, 'calm_out', breath(1.0, inhale=False, pitch=0.8), -17)                  # and out
+put(13.15, 'gasp', breath(0.6, inhale=True, pitch=1.0), -11)                      # head back, gulps air from the pocket
+put(14.4, 'breath2', breath(0.5, inhale=True, pitch=0.95), -15)
+put(16.75, 'cam_out', whoosh(0.55, up=False), -15)                                # camera pulls wide as water rises
+for k in range(3): put(17.7 + k * 1.25, f'push{k}', slap(0.14, 260 + 25 * k), -16)   # palms push off the tube walls
+put(21.3, 'cam_in', whoosh(0.5, up=True), -15)                                    # camera pushes in on the jam
+put(22.3, 'brace_l', slap(0.2, 180), -11); put(22.42, 'brace_r', slap(0.2, 210), -12)   # hands hit the walls
+put(22.6, 'knees', slap(0.22, 120), -12)                                          # knees jam against the tube
+put(23.0, 'strain', breath(0.9, inhale=False, pitch=0.9), -16)                    # straining breath
+put(25.15, 'full', thud(0.6, 60), -14)                                            # tube fills completely
+put(28.4, 'cam_out2', whoosh(0.7, up=False), -14)                                 # camera follows him out
+put(28.95, 'flyout', whoosh(0.45, up=True), -11)                                  # he shoots out of the exit
+for k in range(6): put(29.6 + k * 0.2 + rng.uniform(0, 0.1), f'drip{k}', drip(), -16)   # falling droplets after the splash
+put(30.2, 'relief', breath(0.9, inhale=False, pitch=0.85), -15)                   # relieved breath while floating
 
 bed = bed[:int(DUR * SR)]
 bed *= env(len(bed), 0.02, 0.25, 1)
