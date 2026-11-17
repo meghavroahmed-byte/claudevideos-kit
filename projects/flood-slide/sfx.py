@@ -63,6 +63,25 @@ def squeak(d=0.22, f0=1500, f1=1150):  # wet skin on plastic
     x *= 0.6 + 0.4 * (np.abs(np.sin(2 * np.pi * 60 * tt)))
     return norm(x * env(len(tt), 0.02, 0.08), 0.5)
 
+def marimba(f, d=0.6):  # soft wooden mallet note
+    tt = t_(d)
+    x = np.sin(2 * np.pi * f * tt) * np.exp(-tt * 6) + 0.25 * np.sin(2 * np.pi * f * 3.9 * tt) * np.exp(-tt * 22) + 0.1 * np.sin(2 * np.pi * f * 9.2 * tt) * np.exp(-tt * 45)
+    return x * env(len(tt), 0.003, 0.05)
+
+
+def slip_run(d=2.2):  # descending marimba run (E minor pentatonic, speeding up) + soft water swish
+    out = np.zeros(int(d * SR))
+    notes = [659.3, 587.3, 493.9, 440.0, 392.0, 329.6, 293.7, 246.9, 220.0, 164.8]
+    t = 0.0
+    for i, f in enumerate(notes):
+        n = marimba(f, 0.7)
+        s0 = int(t * SR); m = min(len(n), len(out) - s0)
+        if m > 0: out[s0:s0 + m] += n[:m] * (0.75 + 0.25 * i / len(notes))
+        t += 0.24 * (0.86 ** i)
+    sw = lp(bp(noise(d), 200, 1200), 900, 4) * env(len(out), 0.3, 0.8) * 0.25
+    return norm(out + sw, 0.7)
+
+
 def slide_rub(d=2.0):  # skin sliding on wet plastic: low, unpitched rub
     tt = t_(d)
     x = lp(bp(noise(d), 120, 900), 700, 4) * (0.7 + 0.3 * np.sin(2 * np.pi * 3.1 * tt) ** 2)
@@ -183,7 +202,7 @@ put(1.95, 'whip_out', whoosh(0.8, up=False), -14)                  # whip back t
 put(3.25, 'whip_in', whoosh(0.85, up=True), -14)                   # rush back in
 put(3.5, 'roll', whoosh(0.45, up=True), -14)                      # rolls onto his front
 # (pitched squeaks removed: user said they sounded like a bird, 'eu eu eu')
-put(6.4, 'slide_rub', slide_rub(2.3), -12)                        # slips back down: dark rub, no pitched tone
+put(6.45, 'slip_run', slip_run(2.3), -11)                         # slips back down: soft descending marimba run
 put(8.95, 'roll2', whoosh(0.5, up=False), -14)                    # rolls back over
 put(9.1, 'pad', pad(2.6), -15)                                    # calm
 put(11.6, 'underwater', underwater(4.4), -19)
@@ -216,7 +235,7 @@ put(0.0, 'waterbed', norm(wb, 0.5) * lv, -24)
 # every remaining on-screen event gets its own sound
 # removed (sounded like hiss): for k in range(4): put(0.25 + k * 0.42, f'pant{k}', breath(0.32, inhale=k % 2 == 0, pitch=1.1 + 0.05 * k), -15)   # panic breathing in the hook
 for k in range(5): put(3.98 + k * 0.45 + (k % 2) * 0.12, f'slap{k}', slap(0.16, 200 + 30 * k), -14)            # palms slapping the wall while climbing
-for k in range(3): put(6.6 + k * 0.6, f'kick{k}', slap(0.2, 150 + 20 * k), -16)                                  # feet scrabbling as he slides
+# (foot scrape thumps during the slip removed: user found them annoying)
 put(9.5, 'calm_in', breath(1.0, inhale=True, pitch=0.8), -17)                     # slow calm breath in
 put(10.6, 'calm_out', breath(1.0, inhale=False, pitch=0.8), -17)                  # and out
 put(13.15, 'gasp', breath(0.6, inhale=True, pitch=1.0), -11)                      # head back, gulps air from the pocket
