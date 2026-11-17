@@ -181,15 +181,15 @@ for k in range(5):                                                # panic squeak
 put(6.4, 'longslide', longslide(2.3), -10)                        # slips back down
 put(8.95, 'roll2', whoosh(0.5, up=False), -14)                    # rolls back over
 put(9.1, 'pad', pad(2.6), -15)                                    # calm
-put(11.6, 'underwater', underwater(4.4), -14)
+put(11.6, 'underwater', underwater(4.4), -19)
 for k in range(9): put(11.9 + k * 0.45 + rng.uniform(0, 0.2), 'bubble', bubble(), -12)
 put(16.0, 'riser', riser(1.6), -11)                               # water keeps rising
 for k in range(3): put(17.6 + k * 1.25 + 0.05, 'stroke', stroke(0.55), -9)
-put(17.6, 'underwater2', underwater(3.0), -17)
+put(17.6, 'underwater2', underwater(3.0), -22)
 put(20.65, 'thud2', thud(0.5, 85), -10)                           # bumps into the bend
 put(22.2, 'creak', creak(0.8), -12)                               # brace
 put(23.4, 'fillroar', fillroar(1.8), -9)                          # slide fills
-put(25.3, 'underwater3', underwater(2.9), -14)
+put(25.3, 'underwater3', underwater(2.9), -19)
 for k in range(2): put(25.5 + k * 0.35, 'glide', glide(1.2 - k * 0.35), -12)
 put(26.65, 'pulse', pulse(1.4), -7)                               # pressure equalizes
 put(27.4, 'whoosh_push', whoosh(1.2, up=True), -9)                # pushes off, speeds down
@@ -205,8 +205,8 @@ def waterbed(d):
     trick = bp(noise(d), 2500, 7000) * 0.25 * np.abs(lp(noise(d), 6)) * 6
     return slosh + trick
 wb = waterbed(28.6)
-lv = np.interp(t_(28.6), [0, 1.5, 11.6, 13.8, 16, 17.6, 23.4, 25.1, 27.6, 28.6], [0.9, 0.6, 0.6, 0.75, 0.75, 0.85, 0.85, 1.0, 1.0, 0.0])
-put(0.0, 'waterbed', norm(wb, 0.5) * lv, -13)
+lv = np.interp(t_(28.6), [0, 1.5, 3.0, 11.6, 13.8, 16, 17.6, 23.4, 25.1, 27.6, 28.6], [0.9, 0.7, 0.3, 0.3, 0.45, 0.45, 0.55, 0.55, 0.9, 0.5, 0.0])
+put(0.0, 'waterbed', norm(wb, 0.5) * lv, -24)
 
 # every remaining on-screen event gets its own sound
 for k in range(4): put(0.25 + k * 0.42, f'pant{k}', breath(0.32, inhale=k % 2 == 0, pitch=1.1 + 0.05 * k), -15)   # panic breathing in the hook

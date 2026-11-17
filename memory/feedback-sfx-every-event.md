@@ -18,5 +18,6 @@ On 2026-11-17 (flood-slide short) the user said: "protteka bishoyer SFX sound by
   - v1 (SFX bed about 11 dB under the voice, no ducking): user said the SFX were louder than the voice. Peaky hits (splash, whoosh, roar) cut through on a phone.
   - v5 (-8 dB plus heavy ducking, SFX about 20 dB under): too quiet.
   - v6: the user asked for more SFX. The SFX bed sits about 6 dB under the voice (voice -15.6 LUFS, ducked SFX about -21 LUFS). It uses light sidechain ducking (threshold 0.05, ratio 2) and a limiter on the final mix.
+- Continuous beds (water ambience, underwater rumble) stay LOW, about 10 dB under the event sounds, and swell only when the action calls for it (flood, filling). In v6 the user said "panir awaz pura video te onk zore".
 - Small things count too: a continuous water bed that follows the water level, every slip, step, slap, breath and drip. In the user's words: "sukkho sukkho je kono bishoyer sound".
 - Still follows [[feedback-unique-sfx]]: synthesize a new palette for each video, never stock or reused files.
