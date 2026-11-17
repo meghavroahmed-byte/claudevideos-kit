@@ -9,6 +9,7 @@ This holds the code, templates and data from Megh's video workflow (Bangla YouTu
 |---|---|
 | `skills/megh-video/SKILL.md` | House-style rules and workflow. **Read first.** |
 | `skills/neon-3d-short/SKILL.md` | The "Neon 3D" reference-style 3D short workflow (voice + script → video). Kit in `projects/neon-tech-short/kit`, example `projects/anaros-dudh`. Also linked at `.claude/skills/` so cloud sessions load it. |
+| `skills/zach-d-films/SKILL.md` | The `/zach-d-films` 3D cartoon "what if" explainer short (9:16, three.js): procedural cartoon people and props, slow-motion impacts, 1 to 3 word captions. Engine and worked example in `skills/zach-d-films/engine`. Linked at `.claude/skills/`. |
 | `memory/*.md` | Saved feedback and project notes. Start with `MEMORY.md`. |
 | `projects/short-1899/kit` | Approved v2 "Ice & Ember" motion-graphics Short kit: `short2.html`, `mg.js`, `wpro.js`, `wkit.js`, plus the user's character rig (`rigcore.js`, `common.js`, `sheet.jpg`). |
 | `projects/char-rig/kit` | **The user's character, FULL BODY. Use in every video.** `rig2.js` (front/side/back, finger hands, faces) + `anim2.js` (walk, run, sit, eat, emotions...). Guide: its `README.md`; example: `demo.html`. |
