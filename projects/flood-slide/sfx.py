@@ -202,7 +202,7 @@ def stream(d, rate=45, fmin=380, fmax=1500, seed=3):  # babbling water: many tin
 def deep(d, seed=5):  # submerged: slow, low bubbles, no hiss
     r = np.random.default_rng(seed)
     out = lp(noise(d), 160, 4) * 0.35
-    for _ in range(int(d * 4)):
+    for _ in range(int(d * 0.7)):
         t0 = r.uniform(0, d); f0 = r.uniform(180, 420); dur = r.uniform(0.06, 0.12); tt = t_(dur)
         b = np.sin(2 * np.pi * np.cumsum(f0 * (1 + 0.6 * tt / dur)) / SR) * np.exp(-tt / (dur * 0.35)) * r.uniform(0.4, 1)
         s0 = int(t0 * SR); m = min(len(b), len(out) - s0); out[s0:s0 + m] += b[:m]
@@ -229,7 +229,7 @@ put(6.45, 'slip_run', slip_run(2.3), -11)                         # slips back d
 # removed (hiss): put(8.95, 'roll2', whoosh(0.5, up=False), -14)                    # rolls back over
 put(9.1, 'pad', pad(2.6), -15)                                    # calm
 put(11.6, 'underwater', deep(4.4, 5), -20)
-for k in range(9): put(11.9 + k * 0.45 + rng.uniform(0, 0.2), 'bubble', bubble(), -12)
+for k in range(4): put(13.2 + k * 0.35 + rng.uniform(0, 0.1), 'bubble', bubble(), -14)   # a few bubbles as he lifts into the air pocket
 put(16.0, 'riser', riser(1.6), -11)                               # water keeps rising
 for k in range(3): put(17.6 + k * 1.25 + 0.05, 'stroke', stroke(0.55), -9)
 put(17.6, 'underwater2', deep(3.0, 6), -23)
@@ -252,7 +252,7 @@ def waterbed(d):
     trick = bp(noise(d), 2500, 7000) * 0.25 * np.abs(lp(noise(d), 6)) * 6
     return slosh + trick
 wb = stream(28.6)
-lv = np.interp(t_(28.6), [0, 1.5, 3.0, 11.6, 13.8, 16, 17.6, 23.4, 25.1, 27.6, 28.6], [0.9, 0.7, 0.3, 0.3, 0.45, 0.45, 0.55, 0.55, 0.9, 0.5, 0.0])
+lv = np.interp(t_(28.6), [0, 0.2, 1.4, 2.2, 15.8, 16.2, 17.3, 17.8, 23.2, 23.6, 25.0, 25.6, 28.6], [0.8, 0.8, 0.6, 0.0, 0.0, 0.55, 0.55, 0.0, 0.0, 0.85, 0.85, 0.0, 0.0])  # only where the water does something
 put(0.0, 'waterbed', norm(wb, 0.5) * lv, -20)
 
 # every remaining on-screen event gets its own sound
