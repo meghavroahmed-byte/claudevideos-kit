@@ -198,6 +198,16 @@ put(29.17, 'bigsplash', bigsplash(1.6), -5)                       # into the poo
 put(29.7, 'lapping', lapping(1.2), -16)
 put(30.0, 'sting', sting(0.9), -12)
 
+# continuous water in the tube: follows the water level (louder as it rises / fills)
+def waterbed(d):
+    tt = t_(d)
+    slosh = bp(noise(d), 250, 1800) * (0.55 + 0.45 * np.sin(2 * np.pi * 0.9 * tt) * np.sin(2 * np.pi * 0.37 * tt + 1))
+    trick = bp(noise(d), 2500, 7000) * 0.25 * np.abs(lp(noise(d), 6)) * 6
+    return slosh + trick
+wb = waterbed(28.6)
+lv = np.interp(t_(28.6), [0, 1.5, 11.6, 13.8, 16, 17.6, 23.4, 25.1, 27.6, 28.6], [0.9, 0.6, 0.6, 0.75, 0.75, 0.85, 0.85, 1.0, 1.0, 0.0])
+put(0.0, 'waterbed', norm(wb, 0.5) * lv, -13)
+
 # every remaining on-screen event gets its own sound
 for k in range(4): put(0.25 + k * 0.42, f'pant{k}', breath(0.32, inhale=k % 2 == 0, pitch=1.1 + 0.05 * k), -15)   # panic breathing in the hook
 for k in range(5): put(3.98 + k * 0.45 + (k % 2) * 0.12, f'slap{k}', slap(0.16, 200 + 30 * k), -14)            # palms slapping the wall while climbing

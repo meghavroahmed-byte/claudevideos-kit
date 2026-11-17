@@ -66,4 +66,4 @@ For a live preview, serve the project (`python3 -m http.server 8000`) and open `
 - Bright blue studio sky, soft daylight, metal that reads as metal. Cartoon people are simple shapes with big expressive faces; keep them in proportion with the props.
 - Slow motion on the impact, a short camera shake, sparks, bloom on hot things. The red ripple shows force spreading.
 - Quick cuts on caption beats; one dip to black on the "But" turn. Captions are white, bold, 1 to 3 words.
-- **SFX for every event** (user rule): every visible action, impact, water/state change, breath and big camera move gets its own newly synthesized sound. Mix the SFX bed about 8 dB down and duck it under the voice (sidechain); never filter the voice.
+- **SFX for every event** (user rule): every visible action, impact, water/state change, breath and big camera move gets its own newly synthesized sound. Mix the SFX bed about 6 dB under the voice with light sidechain ducking (ratio 2), and put a limiter on the final mix. Never filter the voice.
