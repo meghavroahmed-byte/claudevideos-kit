@@ -48,7 +48,7 @@ def whoosh(d=0.55, up=True):
 
 def gush(d=1.8):  # water rushing through the tube
     x = noise(d)
-    body = lp(x, 900) * 1.0 + bp(noise(d), 1500, 5000) * 0.35
+    body = lp(x, 650, 4) * 1.0 + bp(noise(d), 1200, 2600) * 0.06
     flut = 1 + 0.35 * np.sin(2 * np.pi * 7.3 * t_(d)) * np.sin(2 * np.pi * 1.1 * t_(d))
     return norm(body * flut * env(len(x), 0.25, 0.5, 1.5), 0.9)
 
@@ -171,10 +171,10 @@ def put(at, name, x, gain_db=0.0):
     bed[s:s + n] += x[:n] * g
 
 # one continuous take: no cut whooshes; sounds follow the action
-put(0.0, 'gush', gush(2.0), -8)                                   # flood rushes in behind him
+put(0.0, 'gush', gush(2.0), -12)                                   # flood rushes in behind him
 put(0.0, 'thud', thud(0.5, 70), -12)                              # startle on frame one (hook)
-put(1.95, 'whip_out', whoosh(0.8, up=False), -10)                  # whip back to reveal the slide
-put(3.25, 'whip_in', whoosh(0.85, up=True), -10)                   # rush back in
+put(1.95, 'whip_out', whoosh(0.8, up=False), -14)                  # whip back to reveal the slide
+put(3.25, 'whip_in', whoosh(0.85, up=True), -14)                   # rush back in
 put(3.5, 'roll', whoosh(0.45, up=True), -14)                      # rolls onto his front
 for k in range(5):                                                # panic squeaks
     put(3.95 + k * 0.45 + (k % 2) * 0.12, 'squeak', squeak(0.2, 1500 + 120 * (k % 3), 1100), -13)
@@ -209,7 +209,7 @@ lv = np.interp(t_(28.6), [0, 1.5, 3.0, 11.6, 13.8, 16, 17.6, 23.4, 25.1, 27.6, 2
 put(0.0, 'waterbed', norm(wb, 0.5) * lv, -24)
 
 # every remaining on-screen event gets its own sound
-for k in range(4): put(0.25 + k * 0.42, f'pant{k}', breath(0.32, inhale=k % 2 == 0, pitch=1.1 + 0.05 * k), -15)   # panic breathing in the hook
+# removed (sounded like hiss): for k in range(4): put(0.25 + k * 0.42, f'pant{k}', breath(0.32, inhale=k % 2 == 0, pitch=1.1 + 0.05 * k), -15)   # panic breathing in the hook
 for k in range(5): put(3.98 + k * 0.45 + (k % 2) * 0.12, f'slap{k}', slap(0.16, 200 + 30 * k), -14)            # palms slapping the wall while climbing
 for k in range(3): put(6.6 + k * 0.6, f'kick{k}', slap(0.2, 150 + 20 * k), -16)                                  # feet scrabbling as he slides
 put(9.5, 'calm_in', breath(1.0, inhale=True, pitch=0.8), -17)                     # slow calm breath in
