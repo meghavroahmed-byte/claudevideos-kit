@@ -43,7 +43,7 @@ def sweep_bp(x, f0, f1, q=0.6, steps=40):
 
 # ---------------- palette ----------------
 def whoosh(d=0.55, up=True):
-    x = sweep_bp(noise(d), 300 if up else 2400, 2400 if up else 300, q=0.9)
+    x = lp(sweep_bp(noise(d), 150 if up else 900, 900 if up else 150, q=0.9), 1100, 4)
     return norm(x * env(len(x), d * 0.55, d * 0.45, 1.6), 0.8)
 
 def gush(d=1.8):  # water rushing through the tube
@@ -133,7 +133,7 @@ def creak(d=0.7):  # strain / jammed
 
 def fillroar(d=1.8):
     tt = t_(d)
-    x = sweep_bp(noise(d), 200, 1600, q=1.6) + bp(noise(d), 2000, 6000) * 0.2 * (tt / d)
+    x = lp(sweep_bp(noise(d), 120, 700, q=1.6), 900, 4)
     return norm(x * (0.2 + (tt / d) ** 1.4) * env(len(tt), 0.05, 0.3), 0.8)
 
 def pulse(d=1.4):  # pressure fronts meeting: soft whomp + glassy shimmer
@@ -144,7 +144,7 @@ def pulse(d=1.4):  # pressure fronts meeting: soft whomp + glassy shimmer
 
 def glide(d=1.2):  # rings travelling in
     tt = t_(d); f = 260 + 300 * (tt / d) ** 2
-    x = np.sin(2 * np.pi * np.cumsum(f) / SR) * 0.4 + bp(noise(d), 500, 1500) * 0.15
+    x = np.sin(2 * np.pi * np.cumsum(f) / SR) * 0.4
     return norm(x * env(len(tt), 0.4, 0.1), 0.4)
 
 def bigsplash(d=1.6):
@@ -223,10 +223,10 @@ put(0.0, 'gush', gush(2.0), -12)                                   # flood rushe
 put(0.0, 'thud', thud(0.5, 70), -12)                              # startle on frame one (hook)
 put(1.95, 'whip_out', whoosh(0.8, up=False), -14)                  # whip back to reveal the slide
 put(3.25, 'whip_in', whoosh(0.85, up=True), -14)                   # rush back in
-put(3.5, 'roll', whoosh(0.45, up=True), -14)                      # rolls onto his front
+# removed (hiss): put(3.5, 'roll', whoosh(0.45, up=True), -14)                      # rolls onto his front
 # (pitched squeaks removed: user said they sounded like a bird, 'eu eu eu')
 put(6.45, 'slip_run', slip_run(2.3), -11)                         # slips back down: soft descending marimba run
-put(8.95, 'roll2', whoosh(0.5, up=False), -14)                    # rolls back over
+# removed (hiss): put(8.95, 'roll2', whoosh(0.5, up=False), -14)                    # rolls back over
 put(9.1, 'pad', pad(2.6), -15)                                    # calm
 put(11.6, 'underwater', deep(4.4, 5), -20)
 for k in range(9): put(11.9 + k * 0.45 + rng.uniform(0, 0.2), 'bubble', bubble(), -12)
@@ -259,22 +259,23 @@ put(0.0, 'waterbed', norm(wb, 0.5) * lv, -20)
 # removed (sounded like hiss): for k in range(4): put(0.25 + k * 0.42, f'pant{k}', breath(0.32, inhale=k % 2 == 0, pitch=1.1 + 0.05 * k), -15)   # panic breathing in the hook
 for k in range(5): put(3.98 + k * 0.45 + (k % 2) * 0.12, f'slap{k}', slap(0.16, 200 + 30 * k), -14)            # palms slapping the wall while climbing
 # (foot scrape thumps during the slip removed: user found them annoying)
-put(9.5, 'calm_in', breath(1.0, inhale=True, pitch=0.8), -17)                     # slow calm breath in
-put(10.6, 'calm_out', breath(1.0, inhale=False, pitch=0.8), -17)                  # and out
-put(13.15, 'gasp', breath(0.6, inhale=True, pitch=1.0), -11)                      # head back, gulps air from the pocket
-put(14.4, 'breath2', breath(0.5, inhale=True, pitch=0.95), -15)
-put(16.75, 'cam_out', whoosh(0.55, up=False), -15)                                # camera pulls wide as water rises
+# removed (hiss): put(9.5, 'calm_in', breath(1.0, inhale=True, pitch=0.8), -17)                     # slow calm breath in
+# removed (hiss): put(10.6, 'calm_out', breath(1.0, inhale=False, pitch=0.8), -17)                  # and out
+# removed (hiss): put(13.15, 'gasp', breath(0.6, inhale=True, pitch=1.0), -11)                      # head back, gulps air from the pocket
+# removed (hiss): put(14.4, 'breath2', breath(0.5, inhale=True, pitch=0.95), -15)
+# removed (hiss): put(16.75, 'cam_out', whoosh(0.55, up=False), -15)                                # camera pulls wide as water rises
 for k in range(3): put(17.7 + k * 1.25, f'push{k}', slap(0.14, 260 + 25 * k), -16)   # palms push off the tube walls
-put(21.3, 'cam_in', whoosh(0.5, up=True), -15)                                    # camera pushes in on the jam
+# removed (hiss): put(21.3, 'cam_in', whoosh(0.5, up=True), -15)                                    # camera pushes in on the jam
 put(22.3, 'brace_l', slap(0.2, 180), -11); put(22.42, 'brace_r', slap(0.2, 210), -12)   # hands hit the walls
 put(22.6, 'knees', slap(0.22, 120), -12)                                          # knees jam against the tube
-put(23.0, 'strain', breath(0.9, inhale=False, pitch=0.9), -16)                    # straining breath
+# removed (hiss): put(23.0, 'strain', breath(0.9, inhale=False, pitch=0.9), -16)                    # straining breath
 put(25.15, 'full', thud(0.6, 60), -14)                                            # tube fills completely
-put(28.4, 'cam_out2', whoosh(0.7, up=False), -14)                                 # camera follows him out
+# removed (hiss): put(28.4, 'cam_out2', whoosh(0.7, up=False), -14)                                 # camera follows him out
 put(28.95, 'flyout', whoosh(0.45, up=True), -11)                                  # he shoots out of the exit
 for k in range(6): put(29.6 + k * 0.2 + rng.uniform(0, 0.1), f'drip{k}', drip(), -16)   # falling droplets after the splash
-put(30.2, 'relief', breath(0.9, inhale=False, pitch=0.85), -15)                   # relieved breath while floating
+# removed (hiss): put(30.2, 'relief', breath(0.9, inhale=False, pitch=0.85), -15)                   # relieved breath while floating
 
+bed = lp(bed, 5000, 4)  # no hiss on top
 bed = bed[:int(DUR * SR)]
 bed *= env(len(bed), 0.02, 0.25, 1)
 os.makedirs(os.path.join(HERE, 'sfx'), exist_ok=True)
