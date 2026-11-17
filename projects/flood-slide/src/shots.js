@@ -43,7 +43,7 @@ function feetZ(t) {
 const PRONE = (t) => smooth(range(t, 3.6, 3.95)) * (1 - smooth(range(t, 9.0, 9.4)));
 function waterLevel(t) {
   let h = -R;
-  h = lerp(h, -0.28, easeOut(range(t, 0.15, 1.8)));
+  h = lerp(-0.34, -0.28, easeOut(range(t, 0, 1.8)));
   h = lerp(h, -0.13, smooth(range(t, 11.6, 13.8)));
   h = lerp(h, -0.02, easeInOut(range(t, 16.0, 17.6)));
   h = lerp(h, R + 0.03, easeIn(range(t, 23.4, 25.1)));
@@ -68,11 +68,11 @@ function poseAt(t) {
     };
     mouth = 0.55 + 0.25 * Math.abs(Math.sin(t * 5));
   } else if (t < 11.6) {                          // flood startle, later calm
-    const st = smooth(range(t, 0.7, 1.1)) * (1 - smooth(range(t, 8.0, 9.0)));
+    const st = (1 - smooth(range(t, 8.0, 9.0)));
     const br = Math.sin(t * 1.8) * (t > 9 ? 1 : 0);
     p = mixPose(LIE, { ...LIE, neck: [0.35, 0.4, 0], head: [0.2, 0.2, 0], lEl: [-0.9, 0, 0], rEl: [-0.9, 0, 0] }, st);
     p.chest = [-0.03 * br, 0, 0]; if (t > 9) p.neck = [0.12, 0, 0];
-    mouth = 0.55 * st;
+    mouth = (0.5 + 0.15 * Math.abs(Math.sin(t * 4))) * st;
   } else if (t < 17.6) {                          // tilt head back into the air pocket
     const k = smooth(range(t, 12.5, 13.4));
     p = mixPose(LIE, { ...LIE, ...HEADBACK }, k);
@@ -110,8 +110,9 @@ function poseAt(t) {
 
 // ---------------- camera path: [time, offset from body centre, look offset] (slide-local) ----------------
 const CAM = [
-  [0.0, [2.7, 1.05, 1.5], [0, -0.2, -0.3]],
-  [2.6, [1.9, 0.7, 0.8], [0, -0.22, -0.5]],
+  [0.0, [0.75, 0.32, -0.45], [0, -0.17, -0.78]],
+  [1.4, [0.95, 0.4, -0.35], [0, -0.18, -0.72]],
+  [3.0, [1.7, 0.6, 0.3], [0, -0.22, -0.6]],
   [4.4, [1.55, 0.5, -1.3], [0, -0.15, -0.75]],
   [6.3, [1.65, 0.45, -1.1], [0, -0.2, -0.7]],
   [8.5, [2.1, 0.4, -0.7], [0, -0.3, -0.6]],
@@ -200,9 +201,10 @@ function oneTake({ makeStage }) {
   return {
     scene, camera: c,
     update(t) {
+      const cl0z = feetZ(0) - 0.9;
       // water + flood
       const lvl = waterLevel(t); water.setLevel(lvl);
-      gush.position.set(0, lvl + 0.03, lerp(-6.5, -1.2, easeOut(range(t, 0.1, 1.2)))); gush.update(t < 3.2 ? t % 0.6 : -1);
+      gush.position.set(0, lvl + 0.03, cl0z - 0.4); gush.update(t < 3.2 ? t % 0.6 : -1);
       // man
       const { p, mouth } = poseAt(t); man.setPose(p); man.setMouth(mouth);
       const C = centre(t);

@@ -154,8 +154,8 @@ def put(at, name, x, gain_db=0.0):
     bed[s:s + n] += x[:n] * g
 
 # one continuous take: no cut whooshes; sounds follow the action
-put(0.1, 'gush', gush(2.0), -8)                                   # flood rushes in behind him
-put(0.7, 'thud', thud(0.5, 70), -14)                              # startle
+put(0.0, 'gush', gush(2.0), -8)                                   # flood rushes in behind him
+put(0.0, 'thud', thud(0.5, 70), -12)                              # startle on frame one (hook)
 put(3.5, 'roll', whoosh(0.45, up=True), -14)                      # rolls onto his front
 for k in range(5):                                                # panic squeaks
     put(3.95 + k * 0.45 + (k % 2) * 0.12, 'squeak', squeak(0.2, 1500 + 120 * (k % 3), 1100), -13)
