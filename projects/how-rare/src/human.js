@@ -321,8 +321,7 @@ export function makeHuman(outfit = 'plate', opts = {}) {
     const c = document.createElement('canvas'); c.width = 1024; c.height = 256; const g = c.getContext('2d');
     g.font = "400 136px Brand, 'Cap', sans-serif"; g.textAlign = 'center'; g.textBaseline = 'middle';
     if ('letterSpacing' in g) g.letterSpacing = '6px';
-    g.shadowColor = 'rgba(0,0,0,0.28)'; g.shadowBlur = 6; g.shadowOffsetY = 4;   // soft print shadow, no heavy outline
-    g.fillStyle = '#ffffff'; g.fillText(opts.chestText, 512, 134);
+    g.fillStyle = `rgba(255,255,255,${opts.chestAlpha ?? 0.38})`; g.fillText(opts.chestText, 512, 134);   // see-through watermark print
     const tx = new THREE.CanvasTexture(c); tx.colorSpace = THREE.SRGBColorSpace; tx.anisotropy = 4;
     const y = 0.36, a = torsoR(y) * TORSO_SX, b = torsoR(y) * TORSO_SZ, W = a * 1.85, Hh = W / 4;
     const pg = new THREE.PlaneGeometry(W, Hh, 32, 1), pp = pg.attributes.position;
