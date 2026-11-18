@@ -69,7 +69,7 @@ function oneTake({ makeStage }) {
   const floor = new THREE.Mesh(new THREE.CircleGeometry(40, 64), new THREE.MeshStandardMaterial({ color: 0xe8edf2, roughness: 0.9 }));
   floor.rotation.x = -Math.PI / 2; floor.position.y = -0.001; floor.receiveShadow = true; scene.add(floor);
   const C = crowd(); scene.add(C.group);
-  const hero = makeHuman('casual'); hero.root.position.copy(HERO); scene.add(hero.root);
+  const hero = makeHuman('casual', { chestText: 'MR. CLOUD' }); hero.root.position.copy(HERO); scene.add(hero.root);
   const M = materials();
   const IRIS0 = M.iris.color.clone(), HAIR0 = M.hair.color.clone(), BEARD0 = M.beard.color.clone();
   const eyeGlow = [glowSprite(0x7dffa0, 0.08), glowSprite(0x7dffa0, 0.08)]; eyeGlow.forEach(g => scene.add(g));

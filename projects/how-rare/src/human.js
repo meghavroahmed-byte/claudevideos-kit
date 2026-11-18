@@ -316,6 +316,20 @@ export function makeHuman(outfit = 'plate', opts = {}) {
     spine.add(rim(0.0, 0.03, 0.02, M.leather));
     for (const s of [1, -1]) { const k = s > 0 ? 'l' : 'r'; const b = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.047, 0.14, 24), M.leather); b.position.y = -0.17; j[k + 'El'].add(b); }
   }
+  // brand print on the chest (e.g. opts.chestText = 'MR. CLOUD')
+  if (opts.chestText) {
+    const c = document.createElement('canvas'); c.width = 1024; c.height = 256; const g = c.getContext('2d');
+    g.font = '900 150px Cap, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.lineJoin = 'round'; g.lineWidth = 22; g.strokeStyle = 'rgba(20,30,40,0.9)'; g.strokeText(opts.chestText, 512, 134);
+    g.fillStyle = '#ffffff'; g.fillText(opts.chestText, 512, 134);
+    const tx = new THREE.CanvasTexture(c); tx.colorSpace = THREE.SRGBColorSpace; tx.anisotropy = 4;
+    const y = 0.36, a = torsoR(y) * TORSO_SX, b = torsoR(y) * TORSO_SZ, W = a * 1.85, Hh = W / 4;
+    const pg = new THREE.PlaneGeometry(W, Hh, 32, 1), pp = pg.attributes.position;
+    for (let i = 0; i < pp.count; i++) { const x = pp.getX(i); pp.setZ(i, b * Math.sqrt(Math.max(0, 1 - (x / a) ** 2)) + 0.006); }
+    pg.computeVertexNormals();
+    const print = new THREE.Mesh(pg, new THREE.MeshStandardMaterial({ map: tx, transparent: true, roughness: 0.8, polygonOffset: true, polygonOffsetFactor: -2 }));
+    print.position.y = y - 0.2; chest.add(print);
+  }
   shadowAll(root);
 
   const human = {
