@@ -37,8 +37,8 @@ function oneTake({ makeStage }) {
   const C1 = W.chambers[0];
   // organ labels: [sprite, whale-local position, t-in, t-out]
   const labels = [
-    [label('THROAT'), (p) => p.clone().add(V(0, 0.32, 0)), 4.4, 6.7],
-    [label('ESOPHAGUS'), (p) => p.clone().add(V(0, 0.32, 0)), 6.9, 8.5],
+    [label('THROAT'), (p) => p.clone().add(V(0, 0.3, 1.35)), 4.4, 6.7],
+    [label('ESOPHAGUS'), (p) => p.clone().add(V(0, 0.3, 1.35)), 6.9, 8.5],
     [label('STOMACH'), (p) => p.clone().add(V(0, 0.75, -1.6)), 9.9, 13.4],
   ];
   labels.forEach(([sp]) => scene.add(sp));
@@ -50,12 +50,12 @@ function oneTake({ makeStage }) {
     const throatW = (u) => W.throat.getPointAt(u).clone().add(V(0, 0, wz));
     let p, up, front;
     if (t < 2.25) {
-      p = V(0, -0.9 + Math.sin(t * 2.2) * 0.04, 9.9); up = V(0, 1, 0); front = V(0, 0, 1);
+      p = V(0, -0.9 + Math.sin(t * 2.2) * 0.05, 9.6 + t * 0.25); up = V(0, 0.15, 1); front = V(0, -1, 0.15);
     } else if (t < 2.95) {
       const k = easeIn(range(t, 2.25, 2.95));
-      p = V(0, -0.9, 9.9).lerp(throatW(0.04), k);
+      p = V(0, -0.9, 9.6 + 2.25 * 0.25).lerp(throatW(0.04), k);
       const tg = W.throat.getTangentAt(0.04).negate();
-      up = V(0, 1, 0).lerp(tg, k).normalize(); front = V(0, 0, 1).lerp(V(0, 1, 0), k).normalize();
+      up = V(0, 0.15, 1).lerp(tg, k).normalize(); front = V(0.0001, -1, 0.15).lerp(V(0, 1, 0), smooth(k)).normalize();
     } else if (t < 8.6) {
       const u = throatU(t);
       p = throatW(u); up = W.throat.getTangentAt(u).negate(); front = V(0, 1, 0);
@@ -72,10 +72,10 @@ function oneTake({ makeStage }) {
 
   function poseAt(t) {
     const s = Math.sin(t * 5), s2 = Math.sin(t * 3.3);
-    if (t < 2.25) return [{
-      lSh: [-0.4 + 0.45 * s, 0, 0.9 + 0.25 * s2], rSh: [-0.4 - 0.45 * s, 0, -0.9 - 0.25 * s2], lEl: [-0.7, 0, 0], rEl: [-0.7, 0, 0],
-      lHip: [-0.45 + 0.35 * s2, 0, 0.1], rHip: [-0.45 - 0.35 * s2, 0, -0.1], lKn: [0.8, 0, 0], rKn: [0.8, 0, 0], neck: [0.05, 0.1 * s2, 0],
-    }, 0.55 + 0.15 * Math.abs(s)];
+    if (t < 2.25) { const a = t * 4.2; return [{
+      lSh: [-3.14 + 3.14 * (0.5 + 0.5 * Math.sin(a)), 0, 0.25], rSh: [-3.14 + 3.14 * (0.5 - 0.5 * Math.sin(a)), 0, -0.25], lEl: [-0.3, 0, 0], rEl: [-0.3, 0, 0],
+      lHip: [0.25 * Math.sin(t * 9), 0, 0.06], rHip: [-0.25 * Math.sin(t * 9), 0, -0.06], lKn: [0.25, 0, 0], rKn: [0.25, 0, 0], neck: [-0.55, 0.35 * Math.sin(a), 0],
+    }, 0.45]; }
     if (t < 2.95) return [{ lSh: [-1.45, 0, 0.3], rSh: [-1.45, 0, -0.3], lEl: [-0.2, 0, 0], rEl: [-0.2, 0, 0], lHip: [-0.6, 0, 0.1], rHip: [-0.6, 0, -0.1], lKn: [0.4, 0, 0], rKn: [0.4, 0, 0], neck: [0.25, 0, 0] }, 0.9];
     if (t < 8.6) return [{ lSh: [-3.0, 0, -0.15], rSh: [-3.0, 0, 0.15], lEl: [-0.15, 0, 0], rEl: [-0.15, 0, 0], neck: [0.1, 0.15 * s2, 0], lHip: [0, 0, 0.03], rHip: [0, 0, -0.03] }, 0.35 + 0.2 * Math.abs(s2)];
     if (t < 11.5) return [{ lSh: [-0.6 + 0.5 * s, 0, 1.3], rSh: [-0.6 - 0.5 * s, 0, -1.3], lEl: [-0.6, 0, 0], rEl: [-0.6, 0, 0], lHip: [-0.5 - 0.3 * s2, 0, 0.15], rHip: [-0.5 + 0.3 * s2, 0, -0.15], lKn: [0.9, 0, 0], rKn: [0.9, 0, 0], neck: [0.3, 0, 0] }, 0.7];
@@ -91,22 +91,22 @@ function oneTake({ makeStage }) {
 
   // camera keys: [t, pos, look, relative-to-body?]
   const K = [
-    [0.0, [0.5, 0.0, 11.0], [0, -0.1, 9.95], 0],
-    [1.3, [0.75, 0.05, 11.3], [0, -0.15, 9.9], 0],
-    [1.42, [0.76, 0.05, 11.31], [0, -0.15, 9.9], 0],
+    [0.0, [2.6, 0.9, 14.6], [-0.3, -0.8, 8.9], 0],
+    [1.3, [2.9, 1.1, 15.0], [-0.3, -0.8, 8.7], 0],
+    [1.42, [2.92, 1.11, 15.03], [-0.3, -0.8, 8.7], 0],
     [2.1, [4.5, 13.5, 25], [0, -1.2, -0.5], 0],
     [2.9, [4.2, 12.5, 23], [0, -1.2, 0.5], 0],
-    [3.9, [3.2, 1.0, 1.6], [0, 0, -0.4], 1],
-    [4.6, [1.5, 0.35, 0.6], [0, 0, 0], 1],
-    [6.7, [1.4, 0.3, 0.4], [0, 0, 0], 1],
-    [8.3, [1.9, 0.5, 0.4], [0, -0.1, -0.3], 1],
-    [9.7, [3.0, 1.1, 1.0], [0, -0.2, -0.8], 1],
+    [3.9, [2.4, 3.0, -2.2], [0, 0, 0], 1],
+    [4.6, [1.1, 2.5, -2.0], [0, 0, 0.1], 1],
+    [6.7, [1.0, 2.4, -2.1], [0, 0, 0.1], 1],
+    [8.3, [1.4, 2.7, -2.4], [0, -0.1, 0], 1],
+    [9.7, [2.2, 3.0, -2.4], [0, -0.3, -0.3], 1],
     [11.3, [4.2, 2.6, 4.2], [0, -0.35, -2.0], 1],
-    [13.0, [1.0, 1.3, -0.6], [0, 0.05, 0.55], 1],
-    [16.4, [0.45, 1.05, -0.35], [0, 0.08, 0.55], 1],
-    [19.5, [0.6, 1.15, -0.45], [0, 0.08, 0.5], 1],
-    [22.0, [0.35, 1.0, -0.15], [0, 0.12, 0.65], 1],
-    [25.3, [0.6, 1.3, -0.5], [0, 0.1, 0.45], 1],
+    [13.0, [1.0, 2.7, -1.9], [0, 0, 0.15], 1],
+    [16.4, [0.8, 2.5, -1.8], [0, 0, 0.2], 1],
+    [19.5, [0.9, 2.6, -1.9], [0, 0, 0.2], 1],
+    [22.0, [0.7, 2.4, -1.7], [0, 0.05, 0.25], 1],
+    [25.3, [0.9, 2.7, -2.0], [0, 0.05, 0.2], 1],
     [27.14, [16, 3.5, 13], [0, -0.5, 0], 0],
   ];
   function track(t, P) {
@@ -169,8 +169,11 @@ function oneTake({ makeStage }) {
       labels.forEach(([sp, lp, a, b]) => {
         const k = smooth(range(t, a, a + 0.3)) * (1 - smooth(range(t, b - 0.3, b)));
         sp.visible = k > 0.01; sp.material.opacity = k;
-        sp.position.copy(lp.isVector3 ? W.group.localToWorld(lp.clone()) : lp(B.p));
-        const d = sp.position.distanceTo(c.position); sp.scale.set(0.2 * d, 0.05 * d, 1);  // constant on-screen size
+        // pinned near the top of the screen, above the action
+        const fw = new THREE.Vector3(); c.getWorldDirection(fw);
+        const upv = new THREE.Vector3(0, 1, 0).applyQuaternion(c.quaternion);
+        sp.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.42);
+        sp.scale.set(0.36, 0.09, 1);
       });
       const fd = cp.distanceTo(lk);
       return { dof: { focus: fd, aperture: fd < 3 ? 0.0015 : 0.0004, maxblur: 0.006 }, bloom: 0.35 + 0.25 * ak * glow };

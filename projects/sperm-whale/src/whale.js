@@ -69,7 +69,7 @@ export function ocean(scene) {
   const tailG = new THREE.ConeGeometry(0.07, 0.1, 3); tailG.rotateX(-Math.PI / 2); tailG.translate(0, 0, -0.2);
   const fishM = new THREE.MeshStandardMaterial({ color: 0xb9d4e6, metalness: 0.6, roughness: 0.3 });
   const schools = [
-    { c: V(3.5, 1.2, 12.5), R: 2.2, n: 26, sp: 0.6, seed: 1 },
+    { c: V(-2.6, 0.6, 11.0), R: 1.6, n: 26, sp: 0.6, seed: 1 },
     { c: V(-6, 3, 4), R: 3.5, n: 40, sp: 0.45, seed: 2 },
     { c: V(7, -4, -6), R: 3, n: 34, sp: 0.5, seed: 3 },
   ].map(s => {

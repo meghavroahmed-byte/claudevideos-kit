@@ -1,4 +1,5 @@
 - [v2 MG style wins](feedback-v2-mg-style-wins.md) — Zack-D cartoon remake rejected; IMG_1899 v2 "Ice & Ember" motion-graphics look is the house style
+- [Full body framing](feedback-framing-full-body.md) — no over-zoom: whole character incl. head always in frame; hook = person + threat in a wide/medium shot, not a face close-up
 - [SFX for every event](feedback-sfx-every-event.md) — every on-screen action/impact/camera move gets its own sound, mixed under the voice with ducking
 - [Unique SFX per video](feedback-unique-sfx.md) — never reuse the same whoosh/pop/boom; design a fresh topic-themed palette every video
 - [megh-video skill](megh-video-skill.md) — the user's house-style skill file; use for every video, update with new feedback
