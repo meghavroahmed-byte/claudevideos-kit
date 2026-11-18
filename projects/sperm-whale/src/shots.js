@@ -166,6 +166,7 @@ function oneTake({ makeStage }) {
       const [cp, lk] = track(t, B.p);
       const sh = shake(t, 0.6 + 1.5 * smooth(range(t, 2.4, 2.8)) * (1 - smooth(range(t, 3.2, 3.8))) + 0.8 * smooth(range(t, 4.2, 4.6)) * (1 - smooth(range(t, 8.2, 8.6))), 3);
       place(c, [cp.x + sh[0], cp.y + sh[1], cp.z + sh[2]], [lk.x, lk.y, lk.z]);
+      if (window.CAM_OVERRIDE) place(c, window.CAM_OVERRIDE.pos, window.CAM_OVERRIDE.look);   // thumbnail framing
       labels.forEach(([sp, lp, a, b]) => {
         const k = smooth(range(t, a, a + 0.3)) * (1 - smooth(range(t, b - 0.3, b)));
         sp.visible = k > 0.01; sp.material.opacity = k;
