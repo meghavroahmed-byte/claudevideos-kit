@@ -181,7 +181,7 @@ function oneTake({ makeStage }) {
       bag.position.copy(cast[ABNEG].h.j.rWr.localToWorld(V(0, -0.12, 0.06))).add(V(0, 0.12, 0)); bag.scale.set(0.3 * bk, 0.375 * bk, 1); bag.material.opacity = bk; bag.visible = bk > 0.01;
       const pt = (t - 12.0) % 0.9, pk = t > 12.0 && t < 16.0 ? 1 : 0;
       pulse.position.copy(pos(ABNEG)).add(V(0, 0.03, 0)); pulse.scale.setScalar(1 + pt * 3); pulse.material.opacity = pk * (1 - pt / 0.9) * 0.8;
-      const ck = easeOut(range(t, 16.5, 16.9)) * (1 - smooth(range(t, 20.6, 21.0))), flip = range(t, 17.45, 17.75);
+      const ck = easeOut(range(t, 16.5, 16.9)) * (1 - smooth(range(t, 18.25, 18.6))), flip = range(t, 17.45, 17.75);
       const sq = Math.abs(Math.cos(flip * Math.PI));
       cal28.visible = flip < 0.5 && ck > 0.01; cal29.visible = flip >= 0.5 && ck > 0.01;
       [cal28, cal29].forEach(cg => { cg.scale.set(1.9 * ck, 2.2 * ck * Math.max(0.05, sq), 1); cg.material.opacity = ck; cg.position.y = 3.4 + Math.sin(t * 1.5) * 0.05; });
