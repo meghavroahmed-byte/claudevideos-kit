@@ -86,8 +86,9 @@ function oneTake({ makeStage }) {
   const K = [
     [0.0, [0.5, 0.0, 11.0], [0, -0.1, 9.95], 0],
     [1.3, [0.75, 0.05, 11.3], [0, -0.15, 9.9], 0],
-    [2.1, [4.5, 15, 25], [0, -0.8, -0.5], 0],
-    [2.9, [4.2, 13, 23], [0, -0.8, 0.5], 0],
+    [1.42, [0.76, 0.05, 11.31], [0, -0.15, 9.9], 0],
+    [2.1, [4.5, 13.5, 25], [0, -1.2, -0.5], 0],
+    [2.9, [4.2, 12.5, 23], [0, -1.2, 0.5], 0],
     [3.9, [3.2, 1.0, 1.6], [0, 0, -0.4], 1],
     [4.6, [1.5, 0.35, 0.6], [0, 0, 0], 1],
     [6.7, [1.4, 0.3, 0.4], [0, 0, 0], 1],
@@ -120,12 +121,12 @@ function oneTake({ makeStage }) {
   return {
     scene, camera: c,
     update(t) {
-      sea.update(t);
       W.group.position.z = whaleZ(t);
       W.tail.rotation.x = Math.sin(t * 1.4) * 0.22;
       W.setJaw(jawA(t));
       W.setXray(smooth(range(t, 3.1, 4.0)));
       const B = body(t);
+      sea.update(t, B.p, smooth(range(t, 3.1, 4.0)) * (1 - smooth(range(t, 25.4, 26.6))));
       W.squeeze(t < 8.6 ? throatU(t) : 2, t);
       const L = acidLevel(t), glow = 1 - 0.65 * smooth(range(t, 16.8, 18.5));
       W.setAcid([L, -0.9, -0.85], smooth(range(t, 8.4, 9.4)), glow);

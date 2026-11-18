@@ -5,37 +5,115 @@ const V = (x, y, z) => new THREE.Vector3(x, y, z);
 
 // ---------------- ocean ----------------
 export function ocean(scene) {
-  scene.userData.sky.visible = false;
-  scene.background = new THREE.Color(0x0a3557);
-  scene.fog = new THREE.FogExp2(0x0c3f66, 0.028);
+  // water colour: bright toward the surface, deep blue below
+  const sky = scene.userData.sky; sky.visible = true;
+  const u = sky.material.uniforms;
+  u.top.value.set(0x6fd2f2); u.mid.value.set(0x1f86bf); u.horizon.value.set(0x0f5a8e); u.floorC.value.set(0x04203a);
+  scene.background = null;
+  scene.fog = new THREE.FogExp2(0x115b8f, 0.03);
   scene.traverse(o => {
-    if (o.isHemisphereLight) { o.color.set(0x9fdcff); o.groundColor.set(0x08263f); o.intensity = 0.9; }
+    if (o.isHemisphereLight) { o.color.set(0xaee6ff); o.groundColor.set(0x0a2a44); o.intensity = 1.0; }
     if (o.isMesh && o.material && o.material.isShadowMaterial) o.visible = false;
   });
-  scene.userData.key.color.set(0xd8f0ff);
-  // marine snow
-  const r = rng(77), N = 900;
+  scene.userData.key.color.set(0xd8f4ff);
+  const r = rng(77);
+
+  // ---- caustics: animated light pattern projected from above ----
+  const TS = 256, tile = document.createElement('canvas'); tile.width = tile.height = TS;
+  {
+    const g = tile.getContext('2d'), img = g.createImageData(TS, TS), K = 2 * Math.PI / TS;
+    for (let y = 0; y < TS; y++) for (let x = 0; x < TS; x++) {
+      const w1 = Math.sin(x * K * 5 + 2.2 * Math.sin(y * K * 3));
+      const w2 = Math.sin(y * K * 6 + 2.0 * Math.sin(x * K * 4));
+      const w3 = Math.sin((x + y) * K * 4 + 1.6 * Math.sin((x - y) * K * 3));
+      const v = Math.pow(1 - Math.min(Math.abs(w1), Math.abs(w2), Math.abs(w3)), 7);
+      const i = (y * TS + x) * 4; img.data[i] = img.data[i + 1] = img.data[i + 2] = Math.min(255, 10 + v * 230); img.data[i + 3] = 255;
+    }
+    g.putImageData(img, 0, 0);
+  }
+  const cc = document.createElement('canvas'); cc.width = cc.height = TS; const cg = cc.getContext('2d');
+  const ctex = new THREE.CanvasTexture(cc); ctex.colorSpace = THREE.SRGBColorSpace;
+  const caust = new THREE.SpotLight(0xcff6ff, 60, 60, 0.55, 0.6, 1.2);
+  caust.map = ctex; caust.castShadow = true; caust.shadow.mapSize.set(1024, 1024); caust.shadow.bias = -0.0005;
+  scene.add(caust, caust.target);
+
+  // ---- surface overhead: rippling, bright ----
+  const sc = document.createElement('canvas'); sc.width = sc.height = 256;
+  { const g = sc.getContext('2d'); g.drawImage(tile, 0, 0); }
+  const stex = new THREE.CanvasTexture(sc); stex.wrapS = stex.wrapT = THREE.RepeatWrapping; stex.repeat.set(18, 18);
+  const surf = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.MeshBasicMaterial({ map: stex, color: 0xbff2ff, transparent: true, opacity: 0.5, side: THREE.DoubleSide, fog: true, depthWrite: false }));
+  surf.rotation.x = Math.PI / 2; surf.position.y = 17; scene.add(surf);
+  const sun = new THREE.Mesh(new THREE.CircleGeometry(4, 32), new THREE.MeshBasicMaterial({ map: glowTexture(), color: 0xffffff, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending, fog: false, depthWrite: false }));
+  sun.rotation.x = Math.PI / 2; sun.position.set(-6, 16.9, 4); scene.add(sun);
+
+  // ---- sea floor: sand, rocks, swaying weed ----
+  const floorY = -10;
+  const sand = new THREE.Mesh(new THREE.PlaneGeometry(160, 160, 80, 80), new THREE.MeshStandardMaterial({ color: 0xcdbb8a, roughness: 0.95 }));
+  { const p = sand.geometry.attributes.position; for (let i = 0; i < p.count; i++) p.setZ(i, Math.sin(p.getX(i) * 0.35) * 0.25 + Math.cos(p.getY(i) * 0.28) * 0.3 + (r() - 0.5) * 0.08); sand.geometry.computeVertexNormals(); }
+  sand.rotation.x = -Math.PI / 2; sand.position.y = floorY; sand.receiveShadow = true; scene.add(sand);
+  const rockM = new THREE.MeshStandardMaterial({ color: 0x6b7178, roughness: 0.9, flatShading: true });
+  for (let i = 0; i < 40; i++) {
+    const m = new THREE.Mesh(new THREE.DodecahedronGeometry(0.4 + r() * 1.4, 0), rockM);
+    m.position.set((r() - 0.5) * 50, floorY + 0.1, (r() - 0.5) * 50 - 2); m.scale.y = 0.5 + r() * 0.6; m.rotation.set(r() * 3, r() * 3, r() * 3);
+    m.castShadow = m.receiveShadow = true; scene.add(m);
+  }
+  const weedM = new THREE.MeshStandardMaterial({ color: 0x3d8a4a, roughness: 0.7 });
+  const weeds = [];
+  for (let i = 0; i < 70; i++) {
+    const h = 1.5 + r() * 3.5, gw = new THREE.CylinderGeometry(0.03, 0.08, h, 6, 8); gw.translate(0, h / 2, 0);
+    const m = new THREE.Mesh(gw, weedM); m.position.set((r() - 0.5) * 44, floorY, (r() - 0.5) * 44 - 2); m.castShadow = true; scene.add(m); weeds.push([m, r() * 6]);
+  }
+
+  // ---- fish schools ----
+  const fishG = new THREE.ConeGeometry(0.08, 0.32, 8); fishG.rotateX(Math.PI / 2);
+  const tailG = new THREE.ConeGeometry(0.07, 0.1, 3); tailG.rotateX(-Math.PI / 2); tailG.translate(0, 0, -0.2);
+  const fishM = new THREE.MeshStandardMaterial({ color: 0xb9d4e6, metalness: 0.6, roughness: 0.3 });
+  const schools = [
+    { c: V(3.5, 1.2, 12.5), R: 2.2, n: 26, sp: 0.6, seed: 1 },
+    { c: V(-6, 3, 4), R: 3.5, n: 40, sp: 0.45, seed: 2 },
+    { c: V(7, -4, -6), R: 3, n: 34, sp: 0.5, seed: 3 },
+  ].map(s => {
+    const body = new THREE.InstancedMesh(fishG, fishM, s.n), tail = new THREE.InstancedMesh(tailG, fishM, s.n);
+    body.frustumCulled = tail.frustumCulled = false; scene.add(body, tail);
+    const rr = rng(s.seed * 13); s.off = Array.from({ length: s.n }, () => [r() * 6.28, (rr() - 0.5) * 1.2, (rr() - 0.5) * 0.8, 0.8 + rr() * 0.4]);
+    return { ...s, body, tail };
+  });
+  const mt = new THREE.Matrix4(), qq = new THREE.Quaternion(), e = new THREE.Euler();
+
+  // ---- marine snow + light shafts ----
+  const N = 900;
   const pos = new Float32Array(N * 3), base = [];
   for (let i = 0; i < N; i++) base.push([(r() - 0.5) * 50, (r() - 0.5) * 24, (r() - 0.5) * 50, r()]);
   const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  const snow = new THREE.Points(geo, new THREE.PointsMaterial({ size: 0.05, map: glowTexture(), color: 0xcfeeff, transparent: true, opacity: 0.6, depthWrite: false }));
+  const snow = new THREE.Points(geo, new THREE.PointsMaterial({ size: 0.05, map: glowTexture(), color: 0xdff4ff, transparent: true, opacity: 0.7, depthWrite: false }));
   snow.frustumCulled = false; scene.add(snow);
-  // light shafts from the surface
   const shaftTex = (() => {
     const c = document.createElement('canvas'); c.width = 64; c.height = 256; const g = c.getContext('2d');
-    const gr = g.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, 'rgba(255,255,255,0.9)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+    const gr = g.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
     g.fillStyle = gr; g.fillRect(0, 0, 64, 256);
     const gx = g.createLinearGradient(0, 0, 64, 0); gx.addColorStop(0, 'rgba(0,0,0,1)'); gx.addColorStop(0.5, 'rgba(0,0,0,0)'); gx.addColorStop(1, 'rgba(0,0,0,1)');
     g.globalCompositeOperation = 'destination-out'; g.fillStyle = gx; g.fillRect(0, 0, 64, 256);
     return new THREE.CanvasTexture(c);
   })();
   const shafts = [];
-  for (let i = 0; i < 7; i++) {
-    const m = new THREE.Mesh(new THREE.PlaneGeometry(2.5 + r() * 2, 30), new THREE.MeshBasicMaterial({ map: shaftTex, color: 0x9fe0ff, transparent: true, opacity: 0.12, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, fog: false }));
-    m.position.set((r() - 0.5) * 30, 8, (r() - 0.5) * 30); m.rotation.set(0, r() * Math.PI, 0.25); scene.add(m); shafts.push([m, r() * 6]);
+  for (let i = 0; i < 14; i++) {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(1.5 + r() * 3, 34), new THREE.MeshBasicMaterial({ map: shaftTex, color: 0xbff0ff, transparent: true, opacity: 0.2, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, fog: false }));
+    m.position.set((r() - 0.5) * 36, 0, (r() - 0.5) * 36 + 2); m.rotation.set(0, r() * Math.PI, 0.22); scene.add(m); shafts.push([m, r() * 6]);
   }
   return {
-    update(t) {
+    // focus: where the action is (caustic spot follows it); inside: 0..1 when we are inside the whale
+    update(t, focus, inside = 0) {
+      // caustic pattern: two drifting copies of the tile
+      cg.globalCompositeOperation = 'source-over'; cg.fillStyle = '#000'; cg.fillRect(0, 0, TS, TS);
+      cg.globalCompositeOperation = 'lighter'; cg.globalAlpha = 0.6;
+      for (const [dx, dy] of [[t * 22, t * 9], [-t * 15, t * 19]]) {
+        const ox = ((dx % TS) + TS) % TS, oy = ((dy % TS) + TS) % TS;
+        for (const a of [0, -TS]) for (const b of [0, -TS]) cg.drawImage(tile, ox + a, oy + b);
+      }
+      cg.globalAlpha = 1; ctex.needsUpdate = true;
+      caust.position.copy(focus).add(V(-3, 16, 2)); caust.target.position.copy(focus);
+      caust.intensity = 14 * (1 - 0.8 * inside);
+      stex.offset.set(t * 0.01, t * 0.006);
       for (let i = 0; i < N; i++) {
         const b = base[i];
         pos[i * 3] = b[0] + Math.sin(t * 0.3 + b[3] * 9) * 0.3;
@@ -43,7 +121,16 @@ export function ocean(scene) {
         pos[i * 3 + 2] = b[2];
       }
       geo.attributes.position.needsUpdate = true;
-      for (const [m, p] of shafts) m.material.opacity = 0.08 + 0.05 * Math.sin(t * 0.7 + p);
+      for (const [m, p] of shafts) m.material.opacity = 0.16 + 0.08 * Math.sin(t * 0.7 + p);
+      for (const [m, p] of weeds) { m.rotation.z = Math.sin(t * 0.9 + p) * 0.18; m.rotation.x = Math.cos(t * 0.7 + p) * 0.12; }
+      for (const s of schools) s.off.forEach((o, i) => {
+        const a = o[0] + t * s.sp * o[3];
+        const p = V(s.c.x + Math.cos(a) * s.R * (1 + o[2] * 0.3), s.c.y + o[1] + Math.sin(a * 2) * 0.15, s.c.z + Math.sin(a) * s.R);
+        e.set(0, -a, 0); qq.setFromEuler(e);
+        mt.compose(p, qq, V(1, 1, 1)); s.body.setMatrixAt(i, mt);
+        e.set(0, -a + Math.sin(t * 14 + i) * 0.4, 0); qq.setFromEuler(e); mt.compose(p, qq, V(1, 1, 1)); s.tail.setMatrixAt(i, mt);
+      }) || null;
+      for (const s of schools) { s.body.instanceMatrix.needsUpdate = true; s.tail.instanceMatrix.needsUpdate = true; }
     },
   };
 }
