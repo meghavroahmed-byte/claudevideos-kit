@@ -16,6 +16,8 @@
   }
   #fade { position: absolute; inset: 0; background: #000; opacity: 0; pointer-events: none; }
   #hud { position: fixed; left: 730px; top: 10px; color: #aaa; font: 13px monospace; }
+  @font-face { font-family: 'Brand'; src: url('node_modules/@fontsource/righteous/files/righteous-latin-400-normal.woff2') format('woff2'); font-weight: 400; }
+  #fontload { position: absolute; left: -9999px; font-family: 'Brand'; }
 </style>
 <script type="importmap">
 { "imports": {
@@ -27,6 +29,7 @@
 <body>
 <div id="stage"><div id="fade"></div><div id="cap"></div></div>
 <div id="hud"></div>
+<div id="fontload">MR. CLOUD</div>
 <script type="module" src="./src/main.js"></script>
 </body>
 </html>
