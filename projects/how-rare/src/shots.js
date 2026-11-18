@@ -36,9 +36,10 @@ const K = [
   [4.45, [1.0, 3.7, 9.0], [0, 0.9, -0.6]],                          // two green beams in the crowd
   [6.0, [-4.8, 2.3, 5.0], [0.2, 1.4, -0.4]],                        // ten left hands go up
   [7.7, [-4.0, 2.9, 6.4], [0.4, 1.2, -0.5]],
-  [8.85, [pos(5).x + 1.0, 1.95, 2.75], [pos(5).x, 1.45, 0.6]],     // her hair turns red
-  [10.1, [pos(18).x + 1.3, 2.7, 1.5], [pos(18).x, 1.5, -1.3]],      // and his
-  [10.9, [0.6, 3.8, 9.0], [0, 0.9, -0.6]],
+  [8.75, [pos(5).x + 1.0, 1.95, 2.75], [pos(5).x, 1.45, 0.6]],     // her hair turns red
+  [9.45, [pos(5).x + 1.05, 1.96, 2.8], [pos(5).x, 1.45, 0.6]],
+  [10.25, [pos(18).x + 1.3, 2.7, 1.5], [pos(18).x, 1.5, -1.3]],     // and his
+  [11.05, [0.6, 3.8, 9.0], [0, 0.9, -0.6]],
   [12.1, [pos(ABNEG).x - 0.7, 2.25, 1.75], [pos(ABNEG).x, 1.35, -0.35]],   // AB-
   [14.3, [-1.0, 3.6, 8.6], [-0.6, 1.0, -0.6]],
   [16.5, [0, 2.5, 7.6], [0, 3.3, -3.2]],                            // giant calendar flips to the 29th
@@ -69,8 +70,8 @@ function track(t) {
 const BEATS = [
   { a: 3.95, b: 5.6, who: GREEN, col: 0x3fe07a, card: ['GREEN EYES', '2%', '#5be37d', 2, 'of the world'] },
   { a: 7.0, b: 8.5, who: LEFT, col: 0xffc233, card: ['LEFT-HANDED', '1 in 10', '#ffd166', 10, 'people'] },
-  { a: 9.75, b: 11.6, who: RED, col: 0xff5a1f, card: ['RED HAIR', '1–2%', '#ff7a45', 2, 'of humans'] },
-  { a: 13.75, b: 16.0, who: [ABNEG], col: 0xff2d55, card: ['AB NEGATIVE', '< 1%', '#ff4d6d', 1, 'fewer than 1 in 100'] },
+  { a: 9.75, b: 11.6, who: RED, col: 0xff1a1a, card: ['RED HAIR', '1–2%', '#ff3b3b', 2, 'of humans'] },
+  { a: 13.75, b: 16.0, who: [ABNEG], col: 0xff3d7f, card: ['AB NEGATIVE', '< 1%', '#ff6b9a', 1, 'fewer than 1 in 100'] },
   { a: 18.55, b: 21.1, who: [], col: 0x66b8ff, card: ['BORN FEB 29', '1 in 1,461', '#8ecbff', 0, 'nobody in this crowd'] },
   { a: 26.0, b: 28.0, who: [], col: 0xffd60a, card: ['GREEN EYES + LEFTY', '1 in 500', '#ffe14d', null, 'just him'] },
 ];
@@ -112,7 +113,7 @@ function oneTake({ makeStage }) {
   const bag = bloodBag(); scene.add(bag);
   const pulse = new THREE.Mesh(new THREE.RingGeometry(0.3, 0.36, 48).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xff2d55, transparent: true, toneMapped: false, depthWrite: false })); scene.add(pulse);
   const cal28 = calendar('28'), cal29 = calendar('29'); [cal28, cal29].forEach(cg => { cg.position.set(0, 3.4, -3.4); scene.add(cg); });
-  const fx = { red1: burst(0xff7a30, 70, 5), red2: burst(0xff7a30, 70, 6), green1: burst(0x7dffa0, 50, 7), cal: burst(0x8ecbff, 90, 8), gold: burst(0xffe14d, 110, 9), hero: burst(0x7dffa0, 50, 10) };
+  const fx = { red1: burst(0xff2020, 70, 5), red2: burst(0xff2020, 70, 6), green1: burst(0x7dffa0, 50, 7), cal: burst(0x8ecbff, 90, 8), gold: burst(0xffe14d, 110, 9), hero: burst(0x7dffa0, 50, 10) };
   Object.values(fx).forEach(f => scene.add(f));
   fx.red1.position.copy(t2(5)).add(V(0, 0.2, 0)); fx.red2.position.copy(t2(18)).add(V(0, 0.2, 0)); fx.green1.position.copy(t2(2));
   fx.cal.position.set(0, 3.4, -3.4); fx.gold.position.copy(HERO).add(V(0, 1.2, 0)); fx.hero.position.copy(HERO).add(V(0, 1.62, 0));
@@ -132,8 +133,8 @@ function oneTake({ makeStage }) {
         // traits switch on and stay
         const g = k === 2 ? smooth(range(t, 2.8, 3.1)) : k === 13 ? smooth(range(t, 3.95, 4.25)) : 0;
         p.h.M.iris.color.copy(p.iris0).lerp(new THREE.Color(0x2fbf55), g);
-        const rd = k === 5 ? smooth(range(t, 8.8, 9.15)) : k === 18 ? smooth(range(t, 9.85, 10.2)) : 0;
-        p.h.M.hair.color.copy(p.hair0).lerp(new THREE.Color(0xd2471a), rd); p.h.M.hair.emissive = p.h.M.hair.emissive || new THREE.Color(); p.h.M.hair.emissive.setRGB(0.25 * rd * Math.exp(-Math.max(0, t - (k === 5 ? 8.8 : 9.85)) * 1.5), 0.05 * rd, 0);
+        const rd = k === 5 ? smooth(range(t, 8.8, 8.92)) : k === 18 ? smooth(range(t, 9.85, 9.97)) : 0;
+        p.h.M.hair.color.copy(p.hair0).lerp(new THREE.Color(0xb3101c), rd); p.h.M.hair.emissive = p.h.M.hair.emissive || new THREE.Color(); p.h.M.hair.emissive.setRGB(0.12 * rd + 0.25 * rd * Math.exp(-Math.max(0, t - (k === 5 ? 8.8 : 9.85)) * 1.5), 0, 0.01 * rd);
         // dim the others during a beat
         const d = isLit ? 0 : dim;
         p.h.shirt.color.copy(p.shirt0).lerp(GRAY, d * 0.85); p.h.M.skin.color.copy(p.skin0).lerp(GRAY, d * 0.45);
