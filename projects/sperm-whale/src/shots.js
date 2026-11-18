@@ -3,7 +3,7 @@ import { makeHuman } from './human.js';
 import { materials } from './materials.js';
 import { lerp, smooth, easeOut, easeIn, easeInOut, range, clamp, V, cam, place, shake } from './anim.js';
 import { bubbles, orient } from './slide.js';
-import { ocean, makeWhale, o2Token } from './whale.js';
+import { ocean, makeWhale, o2Token, label } from './whale.js';
 
 export const DURATION = 27.14;
 export const CAPTIONS = [
@@ -35,6 +35,13 @@ function oneTake({ makeStage }) {
   const o2 = [0, 1, 2, 3, 4, 5].map(() => { const s = o2Token(); scene.add(s); return s; });
   const c = cam(38);
   const C1 = W.chambers[0];
+  // organ labels: [sprite, whale-local position, t-in, t-out]
+  const labels = [
+    [label('THROAT'), (p) => p.clone().add(V(0, 0.32, 0)), 4.4, 6.7],
+    [label('ESOPHAGUS'), (p) => p.clone().add(V(0, 0.32, 0)), 6.9, 8.5],
+    [label('STOMACH'), (p) => p.clone().add(V(0, 0.75, -1.6)), 9.9, 13.4],
+  ];
+  labels.forEach(([sp]) => scene.add(sp));
   const q = new THREE.Quaternion();
 
   // body centre (world) + orientation at time t
@@ -94,8 +101,8 @@ function oneTake({ makeStage }) {
     [6.7, [1.4, 0.3, 0.4], [0, 0, 0], 1],
     [8.3, [1.9, 0.5, 0.4], [0, -0.1, -0.3], 1],
     [9.7, [3.0, 1.1, 1.0], [0, -0.2, -0.8], 1],
-    [11.3, [4.0, 1.3, -0.6], [0, -0.2, -1.6], 1],
-    [13.0, [1.0, 1.3, -0.6], [0, 0, 0.2], 1],
+    [11.3, [4.2, 2.6, 4.2], [0, -0.35, -2.0], 1],
+    [13.0, [1.0, 1.3, -0.6], [0, 0.05, 0.55], 1],
     [16.4, [0.45, 1.05, -0.35], [0, 0.08, 0.55], 1],
     [19.5, [0.6, 1.15, -0.45], [0, 0.08, 0.5], 1],
     [22.0, [0.35, 1.0, -0.15], [0, 0.12, 0.65], 1],
@@ -159,6 +166,12 @@ function oneTake({ makeStage }) {
       const [cp, lk] = track(t, B.p);
       const sh = shake(t, 0.6 + 1.5 * smooth(range(t, 2.4, 2.8)) * (1 - smooth(range(t, 3.2, 3.8))) + 0.8 * smooth(range(t, 4.2, 4.6)) * (1 - smooth(range(t, 8.2, 8.6))), 3);
       place(c, [cp.x + sh[0], cp.y + sh[1], cp.z + sh[2]], [lk.x, lk.y, lk.z]);
+      labels.forEach(([sp, lp, a, b]) => {
+        const k = smooth(range(t, a, a + 0.3)) * (1 - smooth(range(t, b - 0.3, b)));
+        sp.visible = k > 0.01; sp.material.opacity = k;
+        sp.position.copy(lp.isVector3 ? W.group.localToWorld(lp.clone()) : lp(B.p));
+        const d = sp.position.distanceTo(c.position); sp.scale.set(0.2 * d, 0.05 * d, 1);  // constant on-screen size
+      });
       const fd = cp.distanceTo(lk);
       return { dof: { focus: fd, aperture: fd < 3 ? 0.0015 : 0.0004, maxblur: 0.006 }, bloom: 0.35 + 0.25 * ak * glow };
     },

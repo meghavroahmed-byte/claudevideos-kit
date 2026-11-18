@@ -135,6 +135,67 @@ export function ocean(scene) {
   };
 }
 
+
+// ---------------- organ look: veined flesh texture + fold bump ----------------
+let _organ = null;
+function organTex() {
+  if (_organ) return _organ;
+  const r = rng(404), S = 512;
+  const c = document.createElement('canvas'); c.width = c.height = S; const g = c.getContext('2d');
+  g.fillStyle = '#c4505e'; g.fillRect(0, 0, S, S);
+  for (let i = 0; i < 260; i++) { g.fillStyle = `rgba(${150 + r() * 70 | 0},${40 + r() * 40 | 0},${55 + r() * 40 | 0},0.25)`; g.beginPath(); g.arc(r() * S, r() * S, 6 + r() * 30, 0, 7); g.fill(); }
+  const vein = (x, y, a, w, n) => { // branching veins
+    g.strokeStyle = 'rgba(110,20,45,0.75)'; g.lineWidth = w; g.beginPath(); g.moveTo(x, y);
+    for (let k = 0; k < n; k++) { a += (r() - 0.5) * 0.7; x += Math.cos(a) * 9; y += Math.sin(a) * 9; g.lineTo(x, y); if (r() < 0.12 && w > 0.8) vein(x, y, a + (r() - 0.5) * 1.6, w * 0.6, n - k); }
+    g.stroke();
+  };
+  for (let i = 0; i < 14; i++) vein(r() * S, r() * S, r() * 6.28, 3, 40);
+  const b = document.createElement('canvas'); b.width = b.height = S; const h = b.getContext('2d');
+  h.fillStyle = '#808080'; h.fillRect(0, 0, S, S);
+  for (let i = 0; i < 26; i++) { // wavy folds (rugae)
+    h.strokeStyle = `rgba(255,255,255,${0.35 + r() * 0.3})`; h.lineWidth = 6 + r() * 8; h.beginPath();
+    const y0 = (i / 26) * S; for (let x = 0; x <= S; x += 8) h.lineTo(x, y0 + Math.sin(x * 0.03 + i) * 10 + Math.sin(x * 0.011 + i * 2) * 14); h.stroke();
+  }
+  const map = new THREE.CanvasTexture(c); map.colorSpace = THREE.SRGBColorSpace; map.wrapS = map.wrapT = THREE.RepeatWrapping;
+  const bump = new THREE.CanvasTexture(b); bump.wrapS = bump.wrapT = THREE.RepeatWrapping;
+  _organ = { map, bump }; return _organ;
+}
+function lumpy(geo, amp = 0.08, seed = 1) {
+  const p = geo.attributes.position, v = new THREE.Vector3();
+  for (let i = 0; i < p.count; i++) {
+    v.fromBufferAttribute(p, i);
+    const n = Math.sin(v.x * 3.1 + seed) * Math.sin(v.y * 2.7 + seed * 2) * Math.sin(v.z * 2.3 + seed * 3);
+    v.multiplyScalar(1 + amp * n); p.setXYZ(i, v.x, v.y, v.z);
+  }
+  geo.computeVertexNormals(); return geo;
+}
+// half-digested squid (what sperm whales actually eat)
+function squid(scale = 1) {
+  const g = new THREE.Group();
+  const m = new THREE.MeshStandardMaterial({ color: 0xe9b9a4, roughness: 0.5, transparent: true });
+  const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.11, 0.42, 6, 14), m); body.rotation.z = Math.PI / 2; g.add(body);
+  const fin = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.14, 3), m); fin.rotation.z = Math.PI / 2; fin.position.x = 0.32; fin.scale.z = 0.25; g.add(fin);
+  const beak = new THREE.Mesh(new THREE.ConeGeometry(0.035, 0.07, 6), new THREE.MeshStandardMaterial({ color: 0x2a1a12, roughness: 0.3, transparent: true }));
+  beak.rotation.z = Math.PI / 2; beak.position.x = -0.3; g.add(beak);
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2, pts = [];
+    for (let k = 0; k <= 6; k++) pts.push(V(-0.28 - k * 0.09, Math.sin(a) * 0.05 + Math.sin(k * 0.9 + i) * 0.03, Math.cos(a) * 0.05 + Math.cos(k * 0.7 + i) * 0.03));
+    g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 16, 0.012, 6, false), m));
+  }
+  g.scale.setScalar(scale); g.userData.mats = [m, beak.material];
+  return g;
+}
+// floating label (organ names in the x-ray view)
+export function label(text) {
+  const c = document.createElement('canvas'); c.width = 512; c.height = 128; const g = c.getContext('2d');
+  g.fillStyle = 'rgba(10,20,30,0.72)'; g.beginPath(); g.roundRect(8, 24, 496, 80, 40); g.fill();
+  g.strokeStyle = 'rgba(255,255,255,0.85)'; g.lineWidth = 4; g.stroke();
+  g.fillStyle = '#fff'; g.font = 'bold 54px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(text, 256, 66);
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthTest: false, depthWrite: false, fog: false }));
+  sp.scale.set(1.6, 0.4, 1); sp.renderOrder = 20; sp.visible = false;
+  return sp;
+}
+
 // ---------------- whale (head toward +z, ~19 m nose to fluke) ----------------
 function boxy(geo, e = 0.7) {
   const p = geo.attributes.position;
@@ -180,7 +241,9 @@ export function makeWhale() {
   const tail = new THREE.Group(); tail.position.set(0, 0.1, -8.4); g.add(tail);
   for (const s of [1, -1]) add(new THREE.SphereGeometry(1, 32, 12), skin, [s * 1.15, 0, -0.75], [0, s * 0.45, 0], [1.45, 0.1, 0.62], tail);
   // the inside: throat, esophagus, stomach chambers (x-ray)
-  const flesh = new THREE.MeshPhysicalMaterial({ color: 0xe0707e, roughness: 0.3, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide, emissive: 0x5a1020, emissiveIntensity: 0.35 });
+  const OT = organTex();
+  const flesh = new THREE.MeshPhysicalMaterial({ color: 0xffffff, map: OT.map, bumpMap: OT.bump, bumpScale: 3, roughness: 0.35, clearcoat: 0.6, clearcoatRoughness: 0.3, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide, emissive: 0x4a0a18, emissiveIntensity: 0.3 });
+  const stomachM = flesh.clone(); stomachM.color.set(0xe08a8a); stomachM.bumpScale = 5;
   const throat = new THREE.CatmullRomCurve3([V(0, -1.05, 8.9), V(0, -1.0, 7.2), V(0, -0.85, 5.5), V(0, -0.62, 3.9), V(0, -0.45, 2.3), V(0, -0.38, 1.1), V(0, -0.4, 0.35)]);
   const tube = add(new THREE.TubeGeometry(throat, 160, 0.44, 32, false), flesh); tube.castShadow = false;
   const rings = [];
@@ -193,7 +256,11 @@ export function makeWhale() {
     { c: V(0.3, -0.65, -3.15), r: 0.95, sz: 1.15 },
     { c: V(-0.15, -0.6, -4.95), r: 0.8, sz: 1.1 },
   ];
-  const chambers = C.map(k => { const m = add(new THREE.SphereGeometry(k.r, 48, 32), flesh, k.c.toArray(), [0, 0, 0], [1, 1, k.sz]); m.castShadow = false; return m; });
+  const chambers = C.map((k, i) => { const m = add(lumpy(new THREE.SphereGeometry(k.r, 64, 40), 0.07, i + 1), stomachM, k.c.toArray(), [0, 0, 0], [1, 1, k.sz]); m.castShadow = false; return m; });
+  // stomach contents: half-digested squid floating in the acid
+  const squids = [[0, 0.78, -0.55, -0.3, 0.9, 0.8], [0, -0.75, -0.6, -1.75, -0.6, 0.75], [1, 0.1, -0.7, -3.0, 2.2, 0.9], [2, -0.2, -0.65, -4.9, 0.4, 0.8]].map(([ci, x, y, z, ry, sc]) => {
+    const q = squid(sc); q.position.set(x, y, z); q.rotation.set(0.2, ry, 0.15); g.add(q); q.userData.ci = ci; return q;
+  });
   for (let i = 0; i < 2; i++) {
     const a = C[i].c.clone().add(V(0, 0, -C[i].r * C[i].sz * 0.85)), b = C[i + 1].c.clone().add(V(0, 0, C[i + 1].r * C[i + 1].sz * 0.85));
     const tg = new THREE.TubeGeometry(new THREE.LineCurve3(a, b), 8, 0.3, 20, false);
@@ -206,12 +273,12 @@ export function makeWhale() {
   const surf = C.map((k, i) => { const m = add(new THREE.CircleGeometry(1, 48), surfM[i], k.c.toArray(), [-Math.PI / 2, 0, 0], [1, k.sz, 1]); m.castShadow = false; m.renderOrder = 5; return m; });
   const shell = [skin, belly, pink, toothM, eyeM];
   return {
-    group: g, jaw, tail, throat, rings, chambers: C, flesh,
+    group: g, jaw, tail, throat, rings, chambers: C, flesh, squids,
     setJaw(a) { jaw.rotation.x = a; },
     // 0 = solid whale, 1 = x-ray (skin ghosted, organs visible)
     setXray(k) {
       for (const m of shell) { m.opacity = 1 - 0.84 * k; m.depthWrite = k < 0.05; }
-      flesh.opacity = 0.42 * k;
+      flesh.opacity = 0.5 * k; stomachM.opacity = 0.55 * k;
       rings.forEach(r => r.material.opacity = 0.6 * k);
     },
     // acid levels (whale-local y) per chamber, and visibility
@@ -226,6 +293,7 @@ export function makeWhale() {
         surf[i].position.y = L; surf[i].scale.set(rr, rr * c.sz, 1);
         surfM[i].opacity = 0.35 * k * glow;
       });
+      squids.forEach(q => q.userData.mats.forEach(m => { m.opacity = k; }));
     },
     // peristalsis: rings squeeze where `u` is on the throat
     squeeze(u, t) {
