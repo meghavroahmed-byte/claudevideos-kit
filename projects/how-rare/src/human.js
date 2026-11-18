@@ -72,7 +72,7 @@ function sph(r, mat, pos = [0, 0, 0], scl = [1, 1, 1], seg = 32) {
 function shadowAll(o) { o.traverse(c => { if (c.isMesh) { c.castShadow = true; c.receiveShadow = true; } }); }
 
 // ---------- head ----------
-function buildHead(M, { helmet = false, hood = false } = {}) {
+function buildHead(M, { helmet = false, hood = false, beard = true, long = false } = {}) {
   const head = new THREE.Group();
   const jaw = new THREE.Group(); jaw.position.set(0, 0.06, 0.0); head.add(jaw);
   const parts = {};
@@ -120,14 +120,21 @@ function buildHead(M, { helmet = false, hood = false } = {}) {
   const quiff = sph(0.07, M.hair, [0.01, 0.19, 0.035], [1.1, 0.55, 0.9]); quiff.rotation.z = -0.2; head.add(quiff);
   for (const s of [-1, 1]) head.add(sph(0.02, M.hair, [s * 0.083, 0.118, -0.002], [0.32, 1.3, 0.9]));
   // goatee + moustache
-  jaw.add(sph(0.02, M.beard, [0, -0.055, 0.088], [1.0, 1.1, 0.45]));
   const mst = new THREE.Mesh(new THREE.CapsuleGeometry(0.0055, 0.042, 4, 8), M.beard);
-  mst.scale.z = 0.6; mst.rotation.z = Math.PI / 2; mst.position.set(0, 0.043, 0.104); head.add(mst);
+  mst.scale.z = 0.6; mst.rotation.z = Math.PI / 2; mst.position.set(0, 0.043, 0.104);
   parts.mst = mst;
-  // stubble shell on jaw
-  const stub = sph(0.071, M.beard, [0, -0.02, 0.022], [1.09, 0.76, 1.01], 32);
-  stub.material = M.beard.clone(); stub.material.transparent = true; stub.material.opacity = 0.2;
-  jaw.add(stub);
+  if (beard) {
+    jaw.add(sph(0.02, M.beard, [0, -0.055, 0.088], [1.0, 1.1, 0.45]));
+    head.add(mst);
+    // stubble shell on jaw
+    const stub = sph(0.071, M.beard, [0, -0.02, 0.022], [1.09, 0.76, 1.01], 32);
+    stub.material = M.beard.clone(); stub.material.transparent = true; stub.material.opacity = 0.2;
+    jaw.add(stub);
+  }
+  if (long) { // long hair falling to the shoulders + side locks
+    head.add(sph(0.105, M.hair, [0, 0.03, -0.045], [1.0, 1.45, 0.75]));
+    for (const s of [-1, 1]) head.add(sph(0.045, M.hair, [s * 0.088, 0.02, 0.0], [0.6, 2.0, 1.1]));
+  }
   // mouth
   const mouth = sph(0.02, M.mouth, [0, 0.026, 0.097], [1.1, 0.1, 0.45]); head.add(mouth);
   const lipU = sph(0.02, M.lip, [0, 0.031, 0.099], [1.1, 0.16, 0.42]); head.add(lipU);
@@ -166,7 +173,11 @@ function fist(M, mat, side) {
 // ---------- full character ----------
 // outfit: 'vest' | 'chainmail' | 'plate' | 'knight' | 'archer'
 export function makeHuman(outfit = 'plate', opts = {}) {
-  const M = materials();
+  const M0 = materials();
+  const M = Object.assign({}, M0);   // per-character copies where colours differ
+  if (opts.skin != null) { M.skin = M0.skin.clone(); M.skin.color.set(opts.skin); }
+  if (opts.hair != null) { M.hair = M0.hair.clone(); M.hair.color.set(opts.hair); M.beard = M0.beard.clone(); M.beard.color.set(opts.hair).multiplyScalar(0.85); }
+  if (opts.iris != null) { M.iris = M0.iris.clone(); M.iris.color.set(opts.iris); }
   const knight = outfit === 'knight';
   const swim = outfit === 'swim';
   const casual = outfit === 'casual';
@@ -200,7 +211,7 @@ export function makeHuman(outfit = 'plate', opts = {}) {
   const neck = new THREE.Group(); neck.position.y = 0.36; chest.add(neck);
   const neckM = new THREE.Mesh(new THREE.CylinderGeometry(0.048, 0.055, 0.12, 24), knight ? M.steelDark : M.skin);
   neckM.position.y = 0.04; neck.add(neckM);
-  const H = buildHead(M, { helmet: knight, hood: outfit === 'archer' });
+  const H = buildHead(M, { helmet: knight, hood: outfit === 'archer', beard: opts.beard !== false, long: !!opts.long });
   H.head.position.y = 0.085; neck.add(H.head);
   j.neck = neck; j.head = H.head;
 
@@ -333,7 +344,7 @@ export function makeHuman(outfit = 'plate', opts = {}) {
   shadowAll(root);
 
   const human = {
-    root, j, armor, setMouth: H.setMouth,
+    root, j, armor, setMouth: H.setMouth, M, shirt,
     // pose: { joint: [x,y,z] }, all others reset to rest
     setPose(p = {}) {
       for (const k of ['pelvis', 'spine', 'chest', 'neck', 'head', 'lSh', 'lEl', 'lWr', 'rSh', 'rEl', 'rWr', 'lHip', 'lKn', 'lAn', 'rHip', 'rKn', 'rAn']) {

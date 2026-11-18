@@ -328,29 +328,41 @@ def put(at, name, x, gain_db=0.0):
     n = min(len(x), len(bed) - s)
     bed[s:s + n] += x[:n] * g
 
-put(0.12, 'q_pop', popup(400, 0.25), -12)                          # "?" appears
-put(2.05, 'push_in', whoosh(0.7, up=True), -15)                     # camera moves in on his face
-put(2.45, 'green', sparkle(0.9, 1174.7), -12)                       # eyes turn green
-put(3.7, 'pull_out', whoosh(0.8, up=False), -15)                    # camera pulls back over the crowd
-BEATS = [(4.0, 2, 'b1'), (7.1, 10, 'b2'), (9.8, 2, 'b3'), (13.8, 1, 'b4'), (18.6, 0, 'b5')]
+put(0.15, 'card_in', popup(400, 0.25), -12)                        # glass card slides in
+put(1.85, 'glide_in', whoosh(0.8, up=True), -16)                    # camera glides into the crowd
+put(2.95, 'green1', sparkle(0.9, 1174.7), -11)                      # her eyes turn green
+put(3.5, 'pull_out', whoosh(0.9, up=False), -16)
+put(4.0, 'green2', sparkle(0.8, 1318.5), -13)                       # second pair of green eyes
+BEATS = [(3.95, 2, 'b1'), (7.0, 10, 'b2'), (9.75, 2, 'b3'), (13.75, 1, 'b4'), (18.55, 0, 'b5')]
 for at, n, tag in BEATS:
-    put(at - 0.08, f'down_{tag}', powerdown(0.7), -12)                  # the rest of the crowd greys out
-    put(at, f'tick_{tag}', tick(0.12, 1700), -11)                       # counter changes
-    for k in range(n): put(at + 0.12 + k * 0.05, f'pop_{tag}{k}', popup(520 + 60 * (k % 5)), -14)   # each person who has it pops up
-put(18.75, 'bonk', bonk(0.5), -13)                                  # ...and nobody here has that one
-put(5.75, 'hand_up', whoosh(0.4, up=True), -14)                     # left hand goes up
-for k in range(3): put(6.0 + k * 0.35, f'wave{k}', tick(0.08, 900 + 80 * k), -20)   # little waves
-put(8.6, 'red', sparkle(0.9, 880), -12)                             # hair turns red
-put(11.9, 'bag_pop', popup(330, 0.22), -11); put(12.0, 'slosh', slosh(0.6), -13)   # blood bag appears
-put(16.85, 'flip', flip(0.18), -11); put(16.9, 'cal_pop', popup(440, 0.2), -13)    # calendar flips to Feb 29
-put(21.4, 'rise_cam', whoosh(1.2, up=True), -14)                    # camera lifts into the sky
-put(22.3, 'rumble', rumble(1.9), -12)                               # 400 more people rise up
-for k in range(14): put(22.4 + k * 0.12, f'rise{k}', popup(260 + 15 * k, 0.12), -19)
-put(25.9, 'down_all', powerdown(0.9), -11)                          # everyone but him greys out
+    put(at - 0.08, f'down_{tag}', powerdown(0.7), -13)                  # everyone else dims
+    put(at + 0.02, f'tick_{tag}', tick(0.12, 1700), -11)                # card number lands
+    for k in range(min(n, 3)): put(at + 0.15 + k * 0.08, f'ring_{tag}{k}', popup(520 + 80 * k), -15)   # rings under the ones who have it
+put(4.6, 'swing', whoosh(1.2, up=False), -17)                       # camera swings to the side
+for k in range(10): put(5.85 + k * 0.06, f'hand{k}', lp(whoosh(0.25, up=True), 900), -19)     # ten left hands go up in a wave
+for k in range(4): put(6.4 + k * 0.4, f'wave{k}', tick(0.07, 800 + 90 * k), -21)
+put(8.0, 'to_red', whoosh(0.9, up=True), -17)
+put(8.8, 'red1', sparkle(0.9, 880), -11); put(8.82, 'fire1', lp(gush(0.6), 700), -14)        # her hair catches red
+put(9.85, 'red2', sparkle(0.8, 987.8), -12); put(9.87, 'fire2', lp(gush(0.5), 700), -15)     # and his
+put(11.2, 'to_ab', whoosh(0.9, up=False), -17)
+put(11.95, 'bag_pop', popup(330, 0.22), -11); put(12.05, 'slosh', slosh(0.6), -13)          # blood bag in his hand
+for k in range(5): put(12.0 + k * 0.9, f'hb{k}', heartbeat(0.6, 50), -14)                    # red pulse rings
+put(15.4, 'to_cal', whoosh(1.2, up=True), -17)
+put(16.5, 'cal_in', popup(440, 0.22), -12)                          # giant calendar appears
+put(17.45, 'flip', flip(0.18), -10); put(17.6, 'cal_spark', sparkle(0.9, 1046.5), -12)       # flips from 28 to 29
+put(18.75, 'bonk', bonk(0.5), -13)                                  # nobody in this crowd
+put(21.3, 'rise_cam', whoosh(1.4, up=True), -15)                    # camera lifts into the sky
+put(22.0, 'rumble', rumble(1.9), -12)                               # 400 more people rise up
+for k in range(14): put(22.1 + k * 0.12, f'rise{k}', popup(260 + 15 * k, 0.12), -19)
+put(23.6, 'dive', whoosh(1.1, up=False), -15)                       # dive down to him
+put(24.55, 'hero_green', sparkle(0.9, 1174.7), -11)                 # his eyes turn green
+put(24.95, 'hero_hand', lp(whoosh(0.3, up=True), 900), -14)         # and his left hand goes up
+put(25.85, 'down_all', powerdown(0.9), -11)                         # everyone else greys out
 put(26.0, 'tick_500', tick(0.12, 1700), -11)
-put(26.05, 'spot', sparkle(1.2, 1046.5), -10); put(26.1, 'hum', hum(1.9), -17)   # spotlight on the one in 500
-put(27.3, 'descend', whoosh(1.0, up=False), -14)                    # camera comes back down
-put(28.2, 'you', popup(600, 0.3), -11); put(28.25, 'sting', sting(1.0), -12)      # "YOU?"
+put(26.05, 'spot', sparkle(1.2, 1046.5), -10); put(26.1, 'hum', hum(1.8), -17)   # spotlight + gold burst
+put(25.9, 'up_again', whoosh(1.0, up=True), -16)
+put(27.0, 'descend', whoosh(1.0, up=False), -15)                    # back down to him
+put(28.15, 'you', popup(600, 0.3), -11); put(28.2, 'sting', sting(1.0), -12)   # "now you count"
 
 bed = lp(bed, 5000, 4)  # no hiss on top
 bed = bed[:int(DUR * SR)]
