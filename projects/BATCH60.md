@@ -25,7 +25,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 12 | no-water | How long can you survive without water? | b |
 | 13 | pyramid-worker | A day in the life of a pyramid worker | b |
 | 14 | knight-toilet | How did knights go to the toilet in armor? | b |
-| 15 | ancient-teeth | How did people brush their teeth 5,000 years ago? | |
+| 15 | ancient-teeth | How did people brush their teeth 5,000 years ago? | b |
 | 16 | gladiator | Life of a Roman gladiator | |
 | 17 | hippo | Why you should never pet a hippo | |
 | 18 | giant-mosquito | What if a mosquito was human-sized? | |
