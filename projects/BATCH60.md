@@ -12,8 +12,8 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | # | Project | Topic | Status |
 |---|---------|-------|--------|
 | 1 | toilet-paper | What did people use before toilet paper? | x |
-| 2 | anaconda | What if you got swallowed by an anaconda? | r |
-| 3 | no-sleep | What happens if you stop sleeping? | b |
+| 2 | anaconda | What if you got swallowed by an anaconda? | x |
+| 3 | no-sleep | What happens if you stop sleeping? | r |
 | 4 | space-suit | Space without a spacesuit | r |
 | 5 | volcano | What if you fell into a volcano? | b |
 | 6 | lightning | What happens when you get struck by lightning? | b |
@@ -45,7 +45,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 32 | moon-jump | How high could you jump on the Moon? | b |
 | 33 | shark | What to do if a shark attacks | b |
 | 34 | bear | What to do if you meet a bear | b |
-| 35 | avalanche | How to survive an avalanche | |
+| 35 | avalanche | How to survive an avalanche | b |
 | 36 | desert-lost | What if you got lost in the desert? | |
 | 37 | plane-door | What if you opened a plane door mid-flight? | |
 | 38 | ice-lake | What if you fell through a frozen lake? | |
