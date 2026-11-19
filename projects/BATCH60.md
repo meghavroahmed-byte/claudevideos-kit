@@ -33,7 +33,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 20 | doppelganger | How many people look exactly like you? | b |
 | 21 | elevator-fall | What if your elevator cable snapped? | b |
 | 22 | coldest-place | What if you stood in -90°C Antarctica? | b |
-| 23 | bee-sting | What happens when a bee stings you? | |
+| 23 | bee-sting | What happens when a bee stings you? | b |
 | 24 | hiccups | Why do we get hiccups? | |
 | 25 | sneeze | What happens when you sneeze? | |
 | 26 | goosebumps | Why do we get goosebumps? | |
