@@ -31,7 +31,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 18 | giant-mosquito | What if a mosquito was human-sized? | b |
 | 19 | chameleon | How a chameleon really changes color | b |
 | 20 | doppelganger | How many people look exactly like you? | b |
-| 21 | elevator-fall | What if your elevator cable snapped? | |
+| 21 | elevator-fall | What if your elevator cable snapped? | b |
 | 22 | coldest-place | What if you stood in -90°C Antarctica? | |
 | 23 | bee-sting | What happens when a bee stings you? | |
 | 24 | hiccups | Why do we get hiccups? | |
