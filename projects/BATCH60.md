@@ -29,7 +29,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 16 | gladiator | Life of a Roman gladiator | b |
 | 17 | hippo | Why you should never pet a hippo | b |
 | 18 | giant-mosquito | What if a mosquito was human-sized? | b |
-| 19 | chameleon | How a chameleon really changes color | |
+| 19 | chameleon | How a chameleon really changes color | b |
 | 20 | doppelganger | How many people look exactly like you? | |
 | 21 | elevator-fall | What if your elevator cable snapped? | |
 | 22 | coldest-place | What if you stood in -90°C Antarctica? | |
