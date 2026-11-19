@@ -8,3 +8,6 @@ On 2026-11-19 the user circled the translucent top info card (infoCard() from ra
 **Why:** they dislike that card; they had to repeat themselves, so this is a hard rule.
 
 **How to apply:** do not create or show infoCard / any big top-of-frame glass text card in new videos. Videos already delivered stay as they are. Other small graphics (stamps, icons, HUD counters) were not objected to, but keep text overlays minimal.
+
+Also (2026-11-19): no dark translucent rounded HUD panels behind counters/timers/labels either (same "glass" look).
+Counters/timers = plain text or icons with a dark outline/shadow, placed mid-frame at the side, never at the top.
