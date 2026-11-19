@@ -47,7 +47,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 34 | bear | What to do if you meet a bear | b |
 | 35 | avalanche | How to survive an avalanche | b |
 | 36 | desert-lost | What if you got lost in the desert? | b |
-| 37 | plane-door | What if you opened a plane door mid-flight? | |
+| 37 | plane-door | What if you opened a plane door mid-flight? | b |
 | 38 | ice-lake | What if you fell through a frozen lake? | |
 | 39 | caffeine | What does coffee do to your brain? | |
 | 40 | sugar | What happens when you eat too much sugar? | |
