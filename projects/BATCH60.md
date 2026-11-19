@@ -46,7 +46,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 33 | shark | What to do if a shark attacks | b |
 | 34 | bear | What to do if you meet a bear | b |
 | 35 | avalanche | How to survive an avalanche | b |
-| 36 | desert-lost | What if you got lost in the desert? | |
+| 36 | desert-lost | What if you got lost in the desert? | b |
 | 37 | plane-door | What if you opened a plane door mid-flight? | |
 | 38 | ice-lake | What if you fell through a frozen lake? | |
 | 39 | caffeine | What does coffee do to your brain? | |
