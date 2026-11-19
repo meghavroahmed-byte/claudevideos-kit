@@ -11,8 +11,8 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 
 | # | Project | Topic | Status |
 |---|---------|-------|--------|
-| 1 | toilet-paper | What did people use before toilet paper? | r |
-| 2 | anaconda | What if you got swallowed by an anaconda? | b |
+| 1 | toilet-paper | What did people use before toilet paper? | x |
+| 2 | anaconda | What if you got swallowed by an anaconda? | r |
 | 3 | no-sleep | What happens if you stop sleeping? | b |
 | 4 | space-suit | Space without a spacesuit | r |
 | 5 | volcano | What if you fell into a volcano? | b |
@@ -38,7 +38,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 25 | sneeze | What happens when you sneeze? | b |
 | 26 | goosebumps | Why do we get goosebumps? | b |
 | 27 | yawn | Why are yawns contagious? | b |
-| 28 | brain-freeze | What is brain freeze? | |
+| 28 | brain-freeze | What is brain freeze? | b |
 | 29 | knuckle-crack | What happens when you crack your knuckles? | |
 | 30 | deep-ocean | What if you dove to the bottom of the ocean? | |
 | 31 | black-hole | What if you fell into a black hole? | |
