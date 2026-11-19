@@ -13,7 +13,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 |---|---------|-------|--------|
 | 1 | toilet-paper | What did people use before toilet paper? | x |
 | 2 | anaconda | What if you got swallowed by an anaconda? | x |
-| 3 | no-sleep | What happens if you stop sleeping? | r |
+| 3 | no-sleep | What happens if you stop sleeping? | x |
 | 4 | space-suit | Space without a spacesuit | r |
 | 5 | volcano | What if you fell into a volcano? | b |
 | 6 | lightning | What happens when you get struck by lightning? | b |
@@ -49,7 +49,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 36 | desert-lost | What if you got lost in the desert? | b |
 | 37 | plane-door | What if you opened a plane door mid-flight? | b |
 | 38 | ice-lake | What if you fell through a frozen lake? | b |
-| 39 | caffeine | What does coffee do to your brain? | |
+| 39 | caffeine | What does coffee do to your brain? | b |
 | 40 | sugar | What happens when you eat too much sugar? | |
 | 41 | phone-sleep | Why phones at night ruin your sleep | |
 | 42 | hair-growth | Why does hair grow? | |
