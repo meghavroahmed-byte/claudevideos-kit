@@ -59,7 +59,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 44 | ears-pop | Why do your ears pop on a plane? | b |
 | 45 | eye-blink | How many times do you blink in a day? | b |
 | 46 | heart-beats | How many times does your heart beat in a lifetime? | b |
-| 47 | castle-siege | How did people attack a castle? | |
+| 47 | castle-siege | How did people attack a castle? | b |
 | 48 | viking-ship | Life on a Viking ship | |
 | 49 | samurai-armor | Could samurai armor stop a sword? | |
 | 50 | mummy | How were mummies made? | |
