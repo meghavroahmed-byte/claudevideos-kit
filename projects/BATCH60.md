@@ -21,7 +21,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 8 | tsunami | Could you outrun a tsunami? | b |
 | 9 | lost-at-sea | What if you were lost at sea for 3 days? | b |
 | 10 | swallow-gum | What happens if you swallow gum? | b |
-| 11 | tickle | Why can't you tickle yourself? | |
+| 11 | tickle | Why can't you tickle yourself? | b |
 | 12 | no-water | How long can you survive without water? | |
 | 13 | pyramid-worker | A day in the life of a pyramid worker | |
 | 14 | knight-toilet | How did knights go to the toilet in armor? | |
