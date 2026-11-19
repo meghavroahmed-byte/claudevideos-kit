@@ -35,7 +35,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 22 | coldest-place | What if you stood in -90°C Antarctica? | b |
 | 23 | bee-sting | What happens when a bee stings you? | b |
 | 24 | hiccups | Why do we get hiccups? | b |
-| 25 | sneeze | What happens when you sneeze? | |
+| 25 | sneeze | What happens when you sneeze? | b |
 | 26 | goosebumps | Why do we get goosebumps? | |
 | 27 | yawn | Why are yawns contagious? | |
 | 28 | brain-freeze | What is brain freeze? | |
