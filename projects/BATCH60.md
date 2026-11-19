@@ -23,7 +23,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 10 | swallow-gum | What happens if you swallow gum? | b |
 | 11 | tickle | Why can't you tickle yourself? | b |
 | 12 | no-water | How long can you survive without water? | b |
-| 13 | pyramid-worker | A day in the life of a pyramid worker | |
+| 13 | pyramid-worker | A day in the life of a pyramid worker | b |
 | 14 | knight-toilet | How did knights go to the toilet in armor? | |
 | 15 | ancient-teeth | How did people brush their teeth 5,000 years ago? | |
 | 16 | gladiator | Life of a Roman gladiator | |
