@@ -43,7 +43,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 30 | deep-ocean | What if you dove to the bottom of the ocean? | b |
 | 31 | black-hole | What if you fell into a black hole? | b |
 | 32 | moon-jump | How high could you jump on the Moon? | b |
-| 33 | shark | What to do if a shark attacks | |
+| 33 | shark | What to do if a shark attacks | b |
 | 34 | bear | What to do if you meet a bear | |
 | 35 | avalanche | How to survive an avalanche | |
 | 36 | desert-lost | What if you got lost in the desert? | |
