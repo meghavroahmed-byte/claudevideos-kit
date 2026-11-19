@@ -1,0 +1,70 @@
+# 60-short batch (~30 s each, Zack-D-style one take, MR. CLOUD hero, ElevenLabs voice)
+
+Rules: one continuous take; hook = the situation in a wide/medium shot; full body always in frame; visuals match the words literally;
+fresh synthesized SFX for every event (no hiss, no bird squeaks, marimba run for slips, no all-video beds); voice untouched;
+MR. CLOUD chest print (Righteous, ~38% white). Voice: ElevenLabs "Megh Yt english" eleven_v4, stability 0.5, similarity 0.75.
+
+Status: [x] delivered · [r] rendering · [b] built · [ ] to do
+
+| # | Project | Topic | Status |
+|---|---------|-------|--------|
+| 1 | toilet-paper | What did people use before toilet paper? | r |
+| 2 | anaconda | What if you got swallowed by an anaconda? | b |
+| 3 | no-sleep | What happens if you stop sleeping? | b |
+| 4 | space-suit | Space without a spacesuit | b |
+| 5 | volcano | What if you fell into a volcano? | b |
+| 6 | lightning | What happens when you get struck by lightning? | |
+| 7 | quicksand | What if you got stuck in quicksand? | |
+| 8 | tsunami | Could you outrun a tsunami? | |
+| 9 | lost-at-sea | What if you were lost at sea for 3 days? | |
+| 10 | swallow-gum | What happens if you swallow gum? | |
+| 11 | tickle | Why can't you tickle yourself? | |
+| 12 | no-water | How long can you survive without water? | |
+| 13 | pyramid-worker | A day in the life of a pyramid worker | |
+| 14 | knight-toilet | How did knights go to the toilet in armor? | |
+| 15 | ancient-teeth | How did people brush their teeth 5,000 years ago? | |
+| 16 | gladiator | Life of a Roman gladiator | |
+| 17 | hippo | Why you should never pet a hippo | |
+| 18 | giant-mosquito | What if a mosquito was human-sized? | |
+| 19 | chameleon | How a chameleon really changes color | |
+| 20 | doppelganger | How many people look exactly like you? | |
+| 21 | elevator-fall | What if your elevator cable snapped? | |
+| 22 | coldest-place | What if you stood in -90°C Antarctica? | |
+| 23 | bee-sting | What happens when a bee stings you? | |
+| 24 | hiccups | Why do we get hiccups? | |
+| 25 | sneeze | What happens when you sneeze? | |
+| 26 | goosebumps | Why do we get goosebumps? | |
+| 27 | yawn | Why are yawns contagious? | |
+| 28 | brain-freeze | What is brain freeze? | |
+| 29 | knuckle-crack | What happens when you crack your knuckles? | |
+| 30 | deep-ocean | What if you dove to the bottom of the ocean? | |
+| 31 | black-hole | What if you fell into a black hole? | |
+| 32 | moon-jump | How high could you jump on the Moon? | |
+| 33 | shark | What to do if a shark attacks | |
+| 34 | bear | What to do if you meet a bear | |
+| 35 | avalanche | How to survive an avalanche | |
+| 36 | desert-lost | What if you got lost in the desert? | |
+| 37 | plane-door | What if you opened a plane door mid-flight? | |
+| 38 | ice-lake | What if you fell through a frozen lake? | |
+| 39 | caffeine | What does coffee do to your brain? | |
+| 40 | sugar | What happens when you eat too much sugar? | |
+| 41 | phone-sleep | Why phones at night ruin your sleep | |
+| 42 | hair-growth | Why does hair grow? | |
+| 43 | fingernails | Why do fingernails grow faster than toenails? | |
+| 44 | ears-pop | Why do your ears pop on a plane? | |
+| 45 | eye-blink | How many times do you blink in a day? | |
+| 46 | heart-beats | How many times does your heart beat in a lifetime? | |
+| 47 | castle-siege | How did people attack a castle? | |
+| 48 | viking-ship | Life on a Viking ship | |
+| 49 | samurai-armor | Could samurai armor stop a sword? | |
+| 50 | mummy | How were mummies made? | |
+| 51 | caveman-fire | How did cavemen make fire? | |
+| 52 | medieval-doctor | Visiting a doctor in the Middle Ages | |
+| 53 | ant-strength | What if you were as strong as an ant? | |
+| 54 | octopus | Why octopuses are so smart | |
+| 55 | elephant-memory | Do elephants really never forget? | |
+| 56 | cheetah | Could you outrun a cheetah? | |
+| 57 | everest | What happens to your body on Everest? | |
+| 58 | earthquake | What to do in an earthquake | |
+| 59 | tornado | What if you got caught in a tornado? | |
+| 60 | sun-stare | What if you stared at the Sun? | |
