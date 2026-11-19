@@ -36,7 +36,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 23 | bee-sting | What happens when a bee stings you? | b |
 | 24 | hiccups | Why do we get hiccups? | b |
 | 25 | sneeze | What happens when you sneeze? | b |
-| 26 | goosebumps | Why do we get goosebumps? | |
+| 26 | goosebumps | Why do we get goosebumps? | b |
 | 27 | yawn | Why are yawns contagious? | |
 | 28 | brain-freeze | What is brain freeze? | |
 | 29 | knuckle-crack | What happens when you crack your knuckles? | |
