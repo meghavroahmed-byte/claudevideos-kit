@@ -54,7 +54,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 41 | phone-sleep | Why phones at night ruin your sleep | b |
 | 42 | hair-growth | Why does hair grow? | b |
 | 43 | fingernails | Why do fingernails grow faster than toenails? | b |
-| 44 | ears-pop | Why do your ears pop on a plane? | |
+| 44 | ears-pop | Why do your ears pop on a plane? | b |
 | 45 | eye-blink | How many times do you blink in a day? | |
 | 46 | heart-beats | How many times does your heart beat in a lifetime? | |
 | 47 | castle-siege | How did people attack a castle? | |
