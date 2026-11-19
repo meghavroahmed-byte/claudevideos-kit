@@ -14,7 +14,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 4 | space-suit | Space without a spacesuit | b |
 | 5 | volcano | What if you fell into a volcano? | b |
 | 6 | lightning | What happens when you get struck by lightning? | b |
-| 7 | quicksand | What if you got stuck in quicksand? | |
+| 7 | quicksand | What if you got stuck in quicksand? | b |
 | 8 | tsunami | Could you outrun a tsunami? | |
 | 9 | lost-at-sea | What if you were lost at sea for 3 days? | |
 | 10 | swallow-gum | What happens if you swallow gum? | |
