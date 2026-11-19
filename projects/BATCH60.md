@@ -4,6 +4,9 @@ Rules: one continuous take; hook = the situation in a wide/medium shot; full bod
 fresh synthesized SFX for every event (no hiss, no bird squeaks, marimba run for slips, no all-video beds); voice untouched;
 MR. CLOUD chest print (Righteous, ~38% white). Voice: ElevenLabs "Megh Yt english" eleven_v4, stability 0.5, similarity 0.75.
 
+Pipeline (for future check-ins): scripts in scratchpad (tts.sh <proj> = ElevenLabs+align; st.sh = still grids with P=<proj>; render.sh <proj> <dur>).
+Render daemon: scratchpad/queue.sh reads scratchpad/queue.txt ("project duration") and renders any project whose <proj>.mp4 is missing; if not running, restart with `setsid nohup .../queue.sh &`. Deliver finished mp4s (SendUserFile), then mark x.
+
 Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 
 | # | Project | Topic | Status |
@@ -15,7 +18,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 5 | volcano | What if you fell into a volcano? | b |
 | 6 | lightning | What happens when you get struck by lightning? | b |
 | 7 | quicksand | What if you got stuck in quicksand? | b |
-| 8 | tsunami | Could you outrun a tsunami? | |
+| 8 | tsunami | Could you outrun a tsunami? | b |
 | 9 | lost-at-sea | What if you were lost at sea for 3 days? | |
 | 10 | swallow-gum | What happens if you swallow gum? | |
 | 11 | tickle | Why can't you tickle yourself? | |
