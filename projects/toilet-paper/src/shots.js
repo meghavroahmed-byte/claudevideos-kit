@@ -242,7 +242,7 @@ function oneTake({ makeStage }) {
       ];
       const cur = CARDS.find(([a, b]) => t >= a && t < b); let ck2 = 0;
       if (cur) { card.set(cur[2], cur[3], cur[4], null, cur[5]); const grp = CARDS.filter(x => x[2] === cur[2]); const ga = grp[0][0], gb = grp[grp.length - 1][1]; ck2 = smooth(range(t, ga, ga + 0.25)) * (1 - smooth(range(t, gb - 0.25, gb))); const pk = 1 + 0.09 * Math.exp(-(t - cur[0]) * 9); card.scale.set(0.72 * pk, 0.281 * pk, 1); }
-      card.material.opacity = ck2; card.visible = ck2 > 0.01;
+      card.material.opacity = ck2; card.visible = false;
       const fd = cp.distanceTo(lk);
       return { dof: { focus: fd, aperture: fd < 6 ? 0.0012 : 0.0004, maxblur: 0.005 }, bloom: 0.4, exposure: 1.0 };
     },

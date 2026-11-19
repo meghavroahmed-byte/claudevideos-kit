@@ -193,7 +193,7 @@ function oneTake({ makeStage }) {
       ];
       const cur = CARDS.find(([a, b]) => t >= a && t < b); let ck = 0;
       if (cur) { card.set(cur[2], cur[3], cur[4], null, cur[5]); const grp = CARDS.filter(x => x[2] === cur[2]); const ga = grp[0][0], gb = grp[grp.length - 1][1]; ck = smooth(range(t, ga, ga + 0.25)) * (1 - smooth(range(t, gb - 0.25, gb))); const pk = 1 + 0.09 * Math.exp(-(t - cur[0]) * 9); card.scale.set(0.72 * pk, 0.281 * pk, 1); }
-      card.material.opacity = ck; card.visible = ck > 0.01;
+      card.material.opacity = ck; card.visible = false;
       const fd = cp.distanceTo(lk);
       const blackout = off * 0.45;
       return { dof: { focus: fd, aperture: 0.0012, maxblur: 0.005 }, bloom: 0.5, exposure: (1.1 - blackout) * (1 - dark * 0.25) };
