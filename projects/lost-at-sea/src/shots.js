@@ -25,7 +25,7 @@ const DAYS = [[0, 1], [13.9, 2], [19.6, 3]];
 function dayHud() {
   const c = document.createElement('canvas'); c.width = 512; c.height = 220; const g = c.getContext('2d'); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
   const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, depthTest: false, depthWrite: false, toneMapped: false, fog: false })); s.renderOrder = 31; let last = -1;
-  s.set = (d) => { if (d === last) return; last = d; g.clearRect(0, 0, 512, 220); g.fillStyle = 'rgba(6,20,36,0.7)'; g.beginPath(); g.roundRect(6, 6, 500, 208, 36); g.fill(); g.strokeStyle = 'rgba(255,255,255,0.35)'; g.lineWidth = 4; g.stroke();
+  s.set = (d) => { if (d === last) return; last = d; g.clearRect(0, 0, 512, 220); g.shadowColor = 'rgba(0,0,0,0.9)'; g.shadowBlur = 16;
     g.fillStyle = '#ffd23f'; g.beginPath(); g.arc(90, 110, 44, 0, 7); g.fill(); for (let i = 0; i < 8; i++) { const a = i / 8 * 6.28; g.fillRect(90 + Math.cos(a) * 62 - 6, 110 + Math.sin(a) * 62 - 6, 12, 12); }
     g.font = "400 108px Brand, sans-serif"; g.fillStyle = '#fff'; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillText(`DAY ${d}`, 180, 116); t.needsUpdate = true; };
   s.set(1); return s;
@@ -155,7 +155,7 @@ function oneTake({ makeStage }) {
       key.target.position.set(0, 0, 0); key.position.set(-4, 9, 3);
       const fw = V(0, 0, 0); c.getWorldDirection(fw); const upv = V(0, 1, 0).applyQuaternion(c.quaternion), rt = V(1, 0, 0).applyQuaternion(c.quaternion);
       const hk = smooth(range(t, 4.1, 4.4));
-      dh.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.26).addScaledVector(rt, 0.2); dh.scale.set(0.28 * hk, 0.12 * hk, 1); dh.material.opacity = hk; dh.visible = hk > 0.01;
+      dh.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.14).addScaledVector(rt, 0.2); dh.scale.set(0.28 * hk, 0.12 * hk, 1); dh.material.opacity = hk; dh.visible = hk > 0.01;
       const pop = (a) => 1 + 0.15 * Math.exp(-Math.max(0, t - a) * 8) * (t > a ? 1 : 0); dh.scale.multiplyScalar(pop(13.99) * pop(19.64));
       never.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.05); never.set(t > 9.05 ? easeOut(range(t, 9.05, 9.2)) * (1 - smooth(range(t, 10.4, 10.7))) : 0);
       saved.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.05); saved.set(t > 30.6 ? easeOut(range(t, 30.6, 30.76)) : 0);

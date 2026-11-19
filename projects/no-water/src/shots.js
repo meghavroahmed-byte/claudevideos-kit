@@ -38,7 +38,7 @@ function tankHud() {   // body silhouette filled with water
 function dayHud() {
   const c = document.createElement('canvas'); c.width = 512; c.height = 220; const g = c.getContext('2d'); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
   const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, depthTest: false, depthWrite: false, toneMapped: false, fog: false })); s.renderOrder = 31; let last = -1;
-  s.set = (d) => { if (d === last) return; last = d; g.clearRect(0, 0, 512, 220); g.fillStyle = 'rgba(40,20,6,0.7)'; g.beginPath(); g.roundRect(6, 6, 500, 208, 36); g.fill(); g.strokeStyle = 'rgba(255,255,255,0.35)'; g.lineWidth = 4; g.stroke();
+  s.set = (d) => { if (d === last) return; last = d; g.clearRect(0, 0, 512, 220); g.shadowColor = 'rgba(0,0,0,0.9)'; g.shadowBlur = 16;
     g.fillStyle = '#ffd23f'; g.beginPath(); g.arc(90, 110, 44, 0, 7); g.fill(); g.font = "400 108px Brand, sans-serif"; g.fillStyle = '#fff'; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillText(`DAY ${d}`, 180, 116); t.needsUpdate = true; };
   s.set(1); return s;
 }
@@ -139,7 +139,7 @@ function oneTake({ makeStage }) {
       tank.set(t > 29.9 ? lerp(lvl, 0.6, smooth(range(t, 29.9, 31))) : lvl, lvl < 0.53 ? '#ff9a5a' : '#4ab8ff');
       tank.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.12).addScaledVector(rt, -0.26); tank.scale.set(0.13 * tk, 0.225 * tk, 1); tank.material.opacity = tk; tank.visible = tk > 0.01;
       const dk = smooth(range(t, 9.2, 9.5));
-      dh.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.26).addScaledVector(rt, 0.2); dh.scale.set(0.26 * dk, 0.112 * dk, 1); dh.material.opacity = dk; dh.visible = dk > 0.01;
+      dh.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.14).addScaledVector(rt, 0.2); dh.scale.set(0.26 * dk, 0.112 * dk, 1); dh.material.opacity = dk; dh.visible = dk > 0.01;
       drink.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.1); drink.set(t > 29.6 ? easeOut(range(t, 29.6, 29.76)) : 0);
       fx.ok.position.copy(c.position).addScaledVector(fw, 2.4); fx.ok.update(t - 29.7);
       card.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.5);

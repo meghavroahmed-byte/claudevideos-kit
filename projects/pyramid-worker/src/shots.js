@@ -75,9 +75,9 @@ function oneTake({ makeStage }) {
   for (let i = 0; i < 5; i++) { const j = amphora(0.42, 0xa0522d); j.position.copy(TABLE).add(V(0.15 + i * 0.22, 0.79, (i % 2) * 0.2 - 0.1)); scene.add(j); beers.push(j); }
   const heroJug = amphora(0.38, 0xa0522d); scene.add(heroJug);
   const noChain = iconBubble(canvasTex(512, 512, (g) => { g.strokeStyle = '#8a8f96'; g.lineWidth = 28; for (let i = 0; i < 4; i++) { g.beginPath(); g.ellipse(120 + i * 90, 256, 55, 32, 0, 0, 7); g.stroke(); } })); scene.add(noChain);
-  const ton = new THREE.Sprite(new THREE.SpriteMaterial({ map: canvasTex(512, 220, (g) => { g.fillStyle = 'rgba(40,24,8,0.75)'; g.beginPath(); g.roundRect(6, 6, 500, 208, 36); g.fill(); g.font = "400 120px Brand, sans-serif"; g.fillStyle = '#ffd23f'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('2+ TONS', 256, 116); }), transparent: true, depthWrite: false })); scene.add(ton);
+  const ton = new THREE.Sprite(new THREE.SpriteMaterial({ map: canvasTex(512, 220, (g) => { g.shadowColor = 'rgba(0,0,0,0.9)'; g.shadowBlur = 16; g.font = "400 120px Brand, sans-serif"; g.fillStyle = '#ffd23f'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('2+ TONS', 256, 116); }), transparent: true, depthWrite: false })); scene.add(ton);
   const counter = new THREE.Sprite(new THREE.SpriteMaterial({ transparent: true, depthTest: false, depthWrite: false, toneMapped: false })); counter.renderOrder = 31; scene.add(counter);
-  const cTex = {}; const cnt = (n) => cTex[n] || (cTex[n] = canvasTex(512, 200, (g) => { g.fillStyle = 'rgba(40,24,8,0.72)'; g.beginPath(); g.roundRect(6, 6, 500, 188, 36); g.fill(); g.font = "400 110px Brand, sans-serif"; g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(`TEAM × ${n}`, 256, 104); }));
+  const cTex = {}; const cnt = (n) => cTex[n] || (cTex[n] = canvasTex(512, 200, (g) => { g.shadowColor = 'rgba(0,0,0,0.9)'; g.shadowBlur = 16; g.font = "400 110px Brand, sans-serif"; g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(`TEAM × ${n}`, 256, 104); }));
   const sunS = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTexture('rgba(255,250,220,1)', 'rgba(255,170,60,0)'), color: 0xffd090, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, toneMapped: false, fog: false })); scene.add(sunS);
   const fx = { chip: [burst(0xe2cf9e, 30, 1), burst(0xe2cf9e, 30, 2), burst(0xe2cf9e, 30, 3)], crack: burst(0xffffff, 60, 4), pay: burst(0xffd23f, 110, 5) };
   for (const v of Object.values(fx)) (Array.isArray(v) ? v : [v]).forEach(f => scene.add(f));
@@ -148,7 +148,7 @@ function oneTake({ makeStage }) {
       noChain.renderOrder = 30;
       const ck2 = smooth(range(t, 11.0, 11.3)) * (1 - smooth(range(t, 12.9, 13.2)));
       const n = Math.max(1, Math.round(lerp(1, 20, easeOut(range(t, 11.2, 12.3))))); if (counter.material.map !== cnt(n)) { counter.material.map = cnt(n); counter.material.needsUpdate = true; }
-      counter.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.2); counter.scale.set(0.3 * ck2, 0.117 * ck2, 1); counter.material.opacity = ck2; counter.visible = ck2 > 0.01;
+      counter.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.14); counter.scale.set(0.3 * ck2, 0.117 * ck2, 1); counter.material.opacity = ck2; counter.visible = ck2 > 0.01;
       payday.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.12); payday.set(t > 27.0 ? easeOut(range(t, 27.0, 27.16)) : 0);
       card.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.5);
       const CARDS = [

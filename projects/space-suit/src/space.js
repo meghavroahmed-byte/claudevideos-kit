@@ -84,12 +84,12 @@ export function stopwatch() {
   s.set = (sec, o2, col = '#ffffff') => {
     const k = `${sec}|${Math.round(o2 * 40)}|${col}`; if (k === last) return; last = k;
     g.clearRect(0, 0, 512, 300);
-    g.fillStyle = 'rgba(10,14,28,0.65)'; g.beginPath(); g.roundRect(6, 6, 500, 288, 40); g.fill(); g.strokeStyle = 'rgba(255,255,255,0.35)'; g.lineWidth = 4; g.stroke();
+    g.lineJoin = 'round';
     g.strokeStyle = col; g.lineWidth = 12; g.beginPath(); g.arc(110, 120, 70, 0, 7); g.stroke(); g.fillStyle = col; g.fillRect(98, 30, 24, 22);
     g.save(); g.translate(110, 120); g.rotate((sec % 60) / 60 * Math.PI * 2); g.fillRect(-4, -58, 8, 60); g.restore();
-    g.fillStyle = col; g.font = "400 112px Brand, sans-serif"; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillText(`${sec}s`, 210, 122);
+    g.font = "400 112px Brand, sans-serif"; g.textAlign = 'left'; g.textBaseline = 'middle'; g.lineWidth = 14; g.strokeStyle = 'rgba(0,0,0,0.6)'; g.strokeText(`${sec}s`, 210, 122); g.fillStyle = col; g.fillText(`${sec}s`, 210, 122);
     g.fillStyle = 'rgba(255,255,255,0.7)'; g.font = "400 40px Brand, sans-serif"; g.fillText('O₂', 34, 250);
-    g.fillStyle = 'rgba(255,255,255,0.18)'; g.beginPath(); g.roundRect(100, 232, 370, 36, 18); g.fill();
+    g.strokeStyle = 'rgba(0,0,0,0.6)'; g.lineWidth = 6; g.beginPath(); g.roundRect(100, 232, 370, 36, 18); g.stroke();
     g.fillStyle = o2 > 0.5 ? '#5be37d' : o2 > 0.2 ? '#ffd166' : '#ff4a4a'; g.beginPath(); g.roundRect(100, 232, Math.max(18, 370 * o2), 36, 18); g.fill();
     t.needsUpdate = true;
   };

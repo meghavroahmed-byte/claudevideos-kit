@@ -57,7 +57,7 @@ function oneTake({ makeStage }) {
   for (const [x, z] of [[-0.55, 0.38], [0.55, 0.38], [-0.55, -0.38], [0.55, -0.38]]) { const w = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.17, 0.1, 18), hm); w.rotation.x = Math.PI / 2; w.position.set(x, -0.18, z); car.add(w); }
   scene.add(car);
   const arrow = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.3, 16), new THREE.MeshBasicMaterial({ color: 0xffd23f, toneMapped: false, transparent: true })); scene.add(arrow);
-  const chart = hudSprite(512, 420, (g) => { g.fillStyle = 'rgba(30,20,10,0.72)'; g.beginPath(); g.roundRect(6, 6, 500, 408, 40); g.fill(); g.strokeStyle = 'rgba(255,255,255,0.35)'; g.lineWidth = 4; g.stroke(); g.fillStyle = '#ff6b6b'; g.beginPath(); g.roundRect(90, 300 - 110, 120, 110, 14); g.fill(); g.fillStyle = '#c9a26b'; g.beginPath(); g.roundRect(300, 300 - 220, 120, 220, 14); g.fill(); g.font = "400 46px Brand, sans-serif"; g.textAlign = 'center'; g.fillStyle = '#fff'; g.fillText('BODY', 150, 360); g.fillText('QUICKSAND', 360, 360); g.font = "400 52px Brand, sans-serif"; g.fillText('1x', 150, 170); g.fillText('2x', 360, 62); });
+  const chart = hudSprite(512, 420, (g) => { g.shadowColor = 'rgba(0,0,0,0.9)'; g.shadowBlur = 16; g.fillStyle = '#ff6b6b'; g.beginPath(); g.roundRect(90, 300 - 110, 120, 110, 14); g.fill(); g.fillStyle = '#c9a26b'; g.beginPath(); g.roundRect(300, 300 - 220, 120, 220, 14); g.fill(); g.font = "400 46px Brand, sans-serif"; g.textAlign = 'center'; g.fillStyle = '#fff'; g.fillText('BODY', 150, 360); g.fillText('QUICKSAND', 360, 360); g.font = "400 52px Brand, sans-serif"; g.fillText('1x', 150, 170); g.fillText('2x', 360, 62); });
   const water = []; for (let i = 0; i < 30; i++) { const s = glowSprite(0x5ab8ff, 0.3); s.userData.ph = i / 30; scene.add(s); water.push(s); }
   const fx = { step: burst(0x8a7350, 50, 1), car: burst(0x8fd3ff, 60, 2), free: burst(0x5be37d, 100, 3), pull: burst(0x8a7350, 40, 4) };
   Object.values(fx).forEach(f => scene.add(f));
@@ -124,7 +124,7 @@ function oneTake({ makeStage }) {
       key.target.position.copy(lk); key.position.copy(lk).add(V(-4, 9, 5));
       const fw = V(0, 0, 0); c.getWorldDirection(fw); const upv = V(0, 1, 0).applyQuaternion(c.quaternion), rt = V(1, 0, 0).applyQuaternion(c.quaternion);
       const chk = smooth(range(t, 8.6, 8.9)) * (1 - smooth(range(t, 10.9, 11.2)));
-      chart.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.18).addScaledVector(rt, 0.18); chart.scale.set(0.3 * chk, 0.246 * chk, 1); chart.material.opacity = chk; chart.visible = chk > 0.01;
+      chart.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.14).addScaledVector(rt, 0.18); chart.scale.set(0.3 * chk, 0.246 * chk, 1); chart.material.opacity = chk; chart.visible = chk > 0.01;
       imp.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.05); imp.set(t > 7.4 ? easeOut(range(t, 7.4, 7.56)) * (1 - smooth(range(t, 8.3, 8.6))) : 0);
       panic.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.1); panic.set(t > 20.1 ? easeOut(range(t, 20.1, 20.26)) * (1 - smooth(range(t, 21.1, 21.4))) : 0);
       free.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.1); free.set(t > 28.4 ? easeOut(range(t, 28.4, 28.56)) : 0);

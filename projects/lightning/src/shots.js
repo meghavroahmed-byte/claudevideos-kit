@@ -47,14 +47,14 @@ function voltHud() {
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
   const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, depthTest: false, depthWrite: false, toneMapped: false, fog: false })); s.renderOrder = 31;
   let last = '';
-  s.set = (v) => { const txt = Math.round(v).toLocaleString('en-US') + ' V'; if (txt === last) return; last = txt; g.clearRect(0, 0, 768, 220); g.fillStyle = 'rgba(8,12,30,0.7)'; g.beginPath(); g.roundRect(6, 6, 756, 208, 36); g.fill(); g.strokeStyle = 'rgba(140,180,255,0.6)'; g.lineWidth = 4; g.stroke();
+  s.set = (v) => { const txt = Math.round(v).toLocaleString('en-US') + ' V'; if (txt === last) return; last = txt; g.clearRect(0, 0, 768, 220); g.shadowColor = 'rgba(0,0,0,0.9)'; g.shadowBlur = 16;
     g.fillStyle = '#ffe14d'; g.beginPath(); g.moveTo(70, 30); g.lineTo(40, 115); g.lineTo(72, 115); g.lineTo(50, 190); g.lineTo(115, 90); g.lineTo(82, 90); g.lineTo(105, 30); g.fill();
     g.font = "400 92px Brand, sans-serif"; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillStyle = '#ffffff'; g.fillText(txt, 140, 115); t.needsUpdate = true; };
   s.set(0); return s;
 }
 function sunCompare() {
   const c = document.createElement('canvas'); c.width = 768; c.height = 420; const g = c.getContext('2d');
-  g.fillStyle = 'rgba(8,12,30,0.72)'; g.beginPath(); g.roundRect(6, 6, 756, 408, 40); g.fill(); g.strokeStyle = 'rgba(255,255,255,0.35)'; g.lineWidth = 4; g.stroke();
+  g.shadowColor = 'rgba(0,0,0,0.9)'; g.shadowBlur = 16;
   const gr = g.createRadialGradient(170, 190, 10, 170, 190, 110); gr.addColorStop(0, '#fff3a0'); gr.addColorStop(0.6, '#ffb020'); gr.addColorStop(1, 'rgba(255,120,0,0)'); g.fillStyle = gr; g.beginPath(); g.arc(170, 190, 110, 0, 7); g.fill();
   g.fillStyle = '#ffe14d'; g.beginPath(); g.moveTo(560, 40); g.lineTo(500, 200); g.lineTo(560, 200); g.lineTo(520, 360); g.lineTo(650, 160); g.lineTo(585, 160); g.lineTo(630, 40); g.fill();
   g.font = "400 56px Brand, sans-serif"; g.textAlign = 'center'; g.fillStyle = '#fff'; g.fillText('SUN', 170, 345); g.fillText('BOLT', 575, 395 - 0);
@@ -181,9 +181,9 @@ function oneTake({ makeStage }) {
       const fw = V(0, 0, 0); c.getWorldDirection(fw); const upv = V(0, 1, 0).applyQuaternion(c.quaternion), rt = V(1, 0, 0).applyQuaternion(c.quaternion);
       whiteFlash.position.copy(c.position).addScaledVector(fw, 0.5); whiteFlash.scale.set(2, 2, 1); whiteFlash.material.opacity = Math.min(1, wf); whiteFlash.visible = wf > 0.01;
       const vk = smooth(range(t, 4.9, 5.2)) * (1 - smooth(range(t, 7.3, 7.6)));
-      volt.set(lerp(0, 300000000, easeInOut(range(t, 5.15, 6.76)))); volt.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.22); volt.scale.set(0.62 * vk, 0.178 * vk, 1); volt.material.opacity = vk; volt.visible = vk > 0.01;
+      volt.set(lerp(0, 300000000, easeInOut(range(t, 5.15, 6.76)))); volt.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.14); volt.scale.set(0.62 * vk, 0.178 * vk, 1); volt.material.opacity = vk; volt.visible = vk > 0.01;
       const sk = smooth(range(t, 7.6, 7.9)) * (1 - smooth(range(t, 10.4, 10.7)));
-      sunc.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.2); sunc.scale.set(0.62 * sk, 0.34 * sk, 1); sunc.material.opacity = sk; sunc.visible = sk > 0.01;
+      sunc.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.14); sunc.scale.set(0.62 * sk, 0.34 * sk, 1); sunc.material.opacity = sk; sunc.visible = sk > 0.01;
       surv.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, -0.02); surv.set(t > 27.0 ? easeOut(range(t, 27.0, 27.16)) : 0);
       fx.win.position.copy(c.position).addScaledVector(fw, 2.4); fx.win.update(t - 27.0);
       card.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.5);

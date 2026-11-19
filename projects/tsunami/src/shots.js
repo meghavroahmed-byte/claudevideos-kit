@@ -66,13 +66,13 @@ function jet() {
 function speedHud() {
   const c = document.createElement('canvas'); c.width = 768; c.height = 220; const g = c.getContext('2d'); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
   const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, depthTest: false, depthWrite: false, toneMapped: false, fog: false })); s.renderOrder = 31; let last = '';
-  s.set = (v, label, col = '#ffffff') => { const k = Math.round(v) + label; if (k === last) return; last = k; g.clearRect(0, 0, 768, 220); g.fillStyle = 'rgba(6,20,36,0.72)'; g.beginPath(); g.roundRect(6, 6, 756, 208, 36); g.fill(); g.strokeStyle = 'rgba(255,255,255,0.35)'; g.lineWidth = 4; g.stroke();
+  s.set = (v, label, col = '#ffffff') => { const k = Math.round(v) + label; if (k === last) return; last = k; g.clearRect(0, 0, 768, 220); g.shadowColor = 'rgba(0,0,0,0.9)'; g.shadowBlur = 16;
     g.font = "400 40px Brand, sans-serif"; g.fillStyle = 'rgba(255,255,255,0.75)'; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillText(label, 40, 52); g.font = "400 110px Brand, sans-serif"; g.fillStyle = col; g.fillText(`${Math.round(v)} km/h`, 40, 140); t.needsUpdate = true; };
   s.set(0, ''); return s;
 }
 function raceHud() {
   const c = document.createElement('canvas'); c.width = 768; c.height = 380; const g = c.getContext('2d');
-  g.fillStyle = 'rgba(6,20,36,0.72)'; g.beginPath(); g.roundRect(6, 6, 756, 368, 36); g.fill(); g.strokeStyle = 'rgba(255,255,255,0.35)'; g.lineWidth = 4; g.stroke();
+  g.shadowColor = 'rgba(0,0,0,0.9)'; g.shadowBlur = 16;
   const rows = [['WAVE', 40, '#4ab8ff'], ['SPRINTER', 44, '#ffd23f'], ['YOU', 15, '#ff6b6b']];
   rows.forEach(([n, v, col], i) => { const y = 80 + i * 105; g.font = "400 44px Brand, sans-serif"; g.fillStyle = '#fff'; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillText(n, 36, y); g.fillStyle = col; g.beginPath(); g.roundRect(270, y - 26, v * 9, 52, 20); g.fill(); g.fillStyle = '#fff'; g.font = "400 38px Brand, sans-serif"; g.fillText(`${v}`, 285 + v * 9, y); });
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
@@ -177,9 +177,9 @@ function oneTake({ makeStage }) {
       const sk = smooth(range(t, 6.2, 6.5)) * (1 - smooth(range(t, 13.7, 14.0)));
       const sv = t < 9.2 ? lerp(0, 800, easeOut(range(t, 6.3, 8.0))) : lerp(800, 40, easeInOut(range(t, 10.2, 12.5)));
       spd.set(sv, t < 9.2 ? 'DEEP OCEAN' : 'NEAR THE SHORE', t < 9.2 ? '#4ab8ff' : '#ffd23f');
-      spd.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.22); spd.scale.set(0.6 * sk, 0.172 * sk, 1); spd.material.opacity = sk; spd.visible = sk > 0.01;
+      spd.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.14); spd.scale.set(0.6 * sk, 0.172 * sk, 1); spd.material.opacity = sk; spd.visible = sk > 0.01;
       const rk2 = smooth(range(t, 14.0, 14.3)) * (1 - smooth(range(t, 18.6, 18.9)));
-      race.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.18); race.scale.set(0.6 * rk2, 0.297 * rk2, 1); race.material.opacity = rk2; race.visible = rk2 > 0.01;
+      race.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.14); race.scale.set(0.6 * rk2, 0.297 * rk2, 1); race.material.opacity = rk2; race.visible = rk2 > 0.01;
       const ik1 = easeOut(range(t, 30.3, 30.55)), ik2 = easeOut(range(t, 31.5, 31.75));
       shakeI.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(rt, -0.17).addScaledVector(upv, -0.12); shakeI.set(0.2 * ik1, 0);
       seaI.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(rt, 0.17).addScaledVector(upv, -0.12); seaI.set(0.2 * ik2, 0);

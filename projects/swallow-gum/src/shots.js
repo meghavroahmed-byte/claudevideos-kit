@@ -69,7 +69,7 @@ function oneTake({ makeStage }) {
   };
   Object.values(icons).forEach(i => scene.add(i));
   const days = new THREE.Sprite(new THREE.SpriteMaterial({ transparent: true, depthTest: false, depthWrite: false, toneMapped: false })); days.renderOrder = 31; scene.add(days);
-  const dayTex = [1, 2, 3].map(d => canvasTex(512, 200, (g) => { g.fillStyle = 'rgba(30,10,30,0.72)'; g.beginPath(); g.roundRect(6, 6, 500, 188, 36); g.fill(); g.font = "400 110px Brand, sans-serif"; g.fillStyle = '#ff8fc0'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(`DAY ${d}`, 256, 104); }));
+  const dayTex = [1, 2, 3].map(d => canvasTex(512, 200, (g) => { g.shadowColor = 'rgba(0,0,0,0.9)'; g.shadowBlur = 16; g.font = "400 110px Brand, sans-serif"; g.fillStyle = '#ff8fc0'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(`DAY ${d}`, 256, 104); }));
   const fx = { pop: burst(0xff8fc0, 50, 1), gulp: burst(0xffffff, 30, 2), bin: burst(0x5be37d, 80, 3), exit: burst(0xff8fc0, 50, 4) };
   Object.values(fx).forEach(f => scene.add(f));
   const myth = stamp('MYTH!', '#ff2a2a', 0.45); scene.add(myth);

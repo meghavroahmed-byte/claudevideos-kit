@@ -23,7 +23,7 @@ const over = (a, b) => Object.assign({}, a, b);
 function meterHud() {
   const c = document.createElement('canvas'); c.width = 512; c.height = 180; const g = c.getContext('2d'); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
   const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, depthTest: false, depthWrite: false, toneMapped: false })); s.renderOrder = 31; let last = -1;
-  s.set = (v) => { const q = Math.round(v * 40); if (q === last) return; last = q; g.clearRect(0, 0, 512, 180); g.fillStyle = 'rgba(30,10,40,0.7)'; g.beginPath(); g.roundRect(6, 6, 500, 168, 36); g.fill();
+  s.set = (v) => { const q = Math.round(v * 40); if (q === last) return; last = q; g.clearRect(0, 0, 512, 180); g.shadowColor = 'rgba(0,0,0,0.9)'; g.shadowBlur = 16;
     g.font = "400 46px Brand, sans-serif"; g.fillStyle = '#fff'; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillText('TICKLE', 32, 56);
     g.fillStyle = 'rgba(255,255,255,0.2)'; g.beginPath(); g.roundRect(32, 100, 448, 44, 22); g.fill(); g.fillStyle = v > 0.5 ? '#ff5fa2' : v > 0.15 ? '#ffd23f' : '#8a8a9a'; g.beginPath(); g.roundRect(32, 100, Math.max(22, 448 * v), 44, 22); g.fill();
     g.font = "400 46px Brand, sans-serif"; g.fillStyle = '#fff'; g.textAlign = 'right'; g.fillText(`${Math.round(v * 100)}%`, 480, 56); t.needsUpdate = true; };
@@ -116,7 +116,7 @@ function oneTake({ makeStage }) {
       const fw = V(0, 0, 0); c.getWorldDirection(fw); const upv = V(0, 1, 0).applyQuaternion(c.quaternion), rt = V(1, 0, 0).applyQuaternion(c.quaternion);
       const mk = smooth(range(t, 2.0, 2.3)) * (1 - smooth(range(t, 21.9, 22.2)));
       const mv = t < 9.6 ? 0.92 + 0.08 * Math.sin(t * 9) : t < 19.8 ? lerp(0.92, 0.35, smooth(range(t, 10.4, 12.0))) : lerp(0.35, 0.0, smooth(range(t, 20.0, 21.4)));
-      meter.set(mv); meter.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.25).addScaledVector(rt, -0.17); meter.scale.set(0.3 * mk, 0.105 * mk, 1); meter.material.opacity = mk; meter.visible = mk > 0.01;
+      meter.set(mv); meter.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.14).addScaledVector(rt, -0.17); meter.scale.set(0.3 * mk, 0.105 * mk, 1); meter.material.opacity = mk; meter.visible = mk > 0.01;
       cancel.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.0); cancel.set(t > 21.0 ? easeOut(range(t, 21.0, 21.16)) * (1 - smooth(range(t, 22.0, 22.3))) : 0);
       card.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.5);
       const CARDS = [
