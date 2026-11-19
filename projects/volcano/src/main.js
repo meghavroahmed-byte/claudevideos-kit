@@ -80,7 +80,7 @@ export function makeStage({ shadowSize = 3, sunDir = [-3, 6, 4], sun = 2.3 } = {
 }
 
 // ---------- post ----------
-const rt = new THREE.WebGLRenderTarget(W, H, { samples: 4, type: THREE.HalfFloatType });
+const rt = new THREE.WebGLRenderTarget(W, H, { samples: 2, type: THREE.HalfFloatType });
 const composer = new EffectComposer(renderer, rt);
 const dummyScene = new THREE.Scene(), dummyCam = new THREE.PerspectiveCamera();
 const renderPass = new RenderPass(dummyScene, dummyCam);
@@ -127,7 +127,7 @@ window.renderAt = (t) => {
   renderPass.scene = bokeh.scene = shot.scene;
   renderPass.camera = bokeh.camera = cam;
   const dof = r.dof || { focus: 3, aperture: 0, maxblur: 0 };
-  bokeh.enabled = dof.aperture > 0;
+  bokeh.enabled = false;
   bokeh.uniforms.focus.value = dof.focus;
   bokeh.uniforms.aperture.value = dof.aperture;
   bokeh.uniforms.maxblur.value = dof.maxblur ?? 0.012;
