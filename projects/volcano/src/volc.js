@@ -56,7 +56,7 @@ export function thermo() {
   s.set = (deg) => {
     const v = Math.round(deg / 10) * 10; if (v === last) return; last = v;
     g.clearRect(0, 0, 512, 300);
-    g.fillStyle = 'rgba(20,8,6,0.65)'; g.beginPath(); g.roundRect(6, 6, 500, 288, 40); g.fill(); g.strokeStyle = 'rgba(255,200,150,0.4)'; g.lineWidth = 4; g.stroke();
+    g.shadowColor = 'rgba(0,0,0,0.9)'; g.shadowBlur = 16;
     const k = Math.min(1, deg / 1100);
     g.fillStyle = 'rgba(255,255,255,0.2)'; g.beginPath(); g.roundRect(54, 40, 40, 170, 20); g.fill(); g.beginPath(); g.arc(74, 230, 38, 0, 7); g.fill();
     const col = k < 0.4 ? '#ffd166' : k < 0.8 ? '#ff8a3d' : '#ff3b1f';
@@ -69,7 +69,7 @@ export function thermo() {
 // density bars: water 1 vs lava 3
 export function densityChart() {
   const t = canvasTex(512, 420, (g) => {
-    g.fillStyle = 'rgba(20,10,8,0.7)'; g.beginPath(); g.roundRect(6, 6, 500, 408, 40); g.fill(); g.strokeStyle = 'rgba(255,255,255,0.35)'; g.lineWidth = 4; g.stroke();
+    g.shadowColor = 'rgba(0,0,0,0.9)'; g.shadowBlur = 16;
     g.font = "400 46px Brand, sans-serif"; g.textAlign = 'center'; g.fillStyle = '#ffffff';
     g.fillStyle = '#4aa8ff'; g.beginPath(); g.roundRect(90, 300 - 80, 120, 80, 14); g.fill();
     g.fillStyle = '#ff6a1a'; g.beginPath(); g.roundRect(300, 300 - 240, 120, 240, 14); g.fill();

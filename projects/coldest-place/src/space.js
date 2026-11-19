@@ -84,7 +84,7 @@ export function stopwatch() {
   s.set = (sec, o2, col = '#ffffff') => {
     const k = `${sec}|${Math.round(o2 * 40)}|${col}`; if (k === last) return; last = k;
     g.clearRect(0, 0, 512, 300);
-    g.fillStyle = 'rgba(10,14,28,0.65)'; g.beginPath(); g.roundRect(6, 6, 500, 288, 40); g.fill(); g.strokeStyle = 'rgba(255,255,255,0.35)'; g.lineWidth = 4; g.stroke();
+    g.shadowColor = 'rgba(0,0,0,0.9)'; g.shadowBlur = 16;
     g.strokeStyle = col; g.lineWidth = 12; g.beginPath(); g.arc(110, 120, 70, 0, 7); g.stroke(); g.fillStyle = col; g.fillRect(98, 30, 24, 22);
     g.save(); g.translate(110, 120); g.rotate((sec % 60) / 60 * Math.PI * 2); g.fillRect(-4, -58, 8, 60); g.restore();
     g.fillStyle = col; g.font = "400 112px Brand, sans-serif"; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillText(`${sec}s`, 210, 122);

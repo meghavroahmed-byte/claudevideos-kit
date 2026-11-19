@@ -7,6 +7,8 @@ MR. CLOUD chest print (Righteous, ~38% white). Voice: ElevenLabs "Megh Yt englis
 Pipeline (for future check-ins): scripts in scratchpad (tts.sh <proj> = ElevenLabs+align; st.sh = still grids with P=<proj>; render.sh <proj> <dur>).
 Render: run scratchpad/queue2.sh as a run_in_background task (time-sliced ~100 min; detached daemons die when the idle container is reclaimed). It renders any project in scratchpad/queue.txt whose <proj>.mp4 is missing. Deliver finished mp4s (SendUserFile), then mark x.
 
+Note: #1-3 were delivered with the old dark-backed stamps; re-render them at the end of the queue (rename mp4) and re-deliver.
+
 Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 
 | # | Project | Topic | Status |
