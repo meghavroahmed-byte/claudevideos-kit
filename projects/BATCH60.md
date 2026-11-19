@@ -19,7 +19,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 6 | lightning | What happens when you get struck by lightning? | b |
 | 7 | quicksand | What if you got stuck in quicksand? | b |
 | 8 | tsunami | Could you outrun a tsunami? | b |
-| 9 | lost-at-sea | What if you were lost at sea for 3 days? | |
+| 9 | lost-at-sea | What if you were lost at sea for 3 days? | b |
 | 10 | swallow-gum | What happens if you swallow gum? | |
 | 11 | tickle | Why can't you tickle yourself? | |
 | 12 | no-water | How long can you survive without water? | |
