@@ -50,7 +50,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 37 | plane-door | What if you opened a plane door mid-flight? | b |
 | 38 | ice-lake | What if you fell through a frozen lake? | b |
 | 39 | caffeine | What does coffee do to your brain? | b |
-| 40 | sugar | What happens when you eat too much sugar? | |
+| 40 | sugar | What happens when you eat too much sugar? | b |
 | 41 | phone-sleep | Why phones at night ruin your sleep | |
 | 42 | hair-growth | Why does hair grow? | |
 | 43 | fingernails | Why do fingernails grow faster than toenails? | |
