@@ -44,7 +44,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 31 | black-hole | What if you fell into a black hole? | b |
 | 32 | moon-jump | How high could you jump on the Moon? | b |
 | 33 | shark | What to do if a shark attacks | b |
-| 34 | bear | What to do if you meet a bear | |
+| 34 | bear | What to do if you meet a bear | b |
 | 35 | avalanche | How to survive an avalanche | |
 | 36 | desert-lost | What if you got lost in the desert? | |
 | 37 | plane-door | What if you opened a plane door mid-flight? | |
