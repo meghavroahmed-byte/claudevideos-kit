@@ -58,7 +58,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 43 | fingernails | Why do fingernails grow faster than toenails? | b |
 | 44 | ears-pop | Why do your ears pop on a plane? | b |
 | 45 | eye-blink | How many times do you blink in a day? | b |
-| 46 | heart-beats | How many times does your heart beat in a lifetime? | |
+| 46 | heart-beats | How many times does your heart beat in a lifetime? | b |
 | 47 | castle-siege | How did people attack a castle? | |
 | 48 | viking-ship | Life on a Viking ship | |
 | 49 | samurai-armor | Could samurai armor stop a sword? | |
