@@ -12,8 +12,8 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | # | Project | Topic | Status |
 |---|---------|-------|--------|
 | 1 | toilet-paper | What did people use before toilet paper? | x |
-| 2 | anaconda | What if you got swallowed by an anaconda? | r |
-| 3 | no-sleep | What happens if you stop sleeping? | b |
+| 2 | anaconda | What if you got swallowed by an anaconda? | x |
+| 3 | no-sleep | What happens if you stop sleeping? | r |
 | 4 | space-suit | Space without a spacesuit | b |
 | 5 | volcano | What if you fell into a volcano? | b |
 | 6 | lightning | What happens when you get struck by lightning? | b |
