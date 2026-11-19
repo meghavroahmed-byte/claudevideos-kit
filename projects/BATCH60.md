@@ -28,7 +28,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 15 | ancient-teeth | How did people brush their teeth 5,000 years ago? | b |
 | 16 | gladiator | Life of a Roman gladiator | b |
 | 17 | hippo | Why you should never pet a hippo | b |
-| 18 | giant-mosquito | What if a mosquito was human-sized? | |
+| 18 | giant-mosquito | What if a mosquito was human-sized? | b |
 | 19 | chameleon | How a chameleon really changes color | |
 | 20 | doppelganger | How many people look exactly like you? | |
 | 21 | elevator-fall | What if your elevator cable snapped? | |
