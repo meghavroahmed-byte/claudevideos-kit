@@ -29,3 +29,4 @@
 - [Neon Tech style](neon-tech-style.md) — dark 3D-grid tech shorts copied from a reference creator (2026-11-09); kit projects/neon-tech-short/kit; subtitles OFF (user said no)
 - [neon-3d-short skill](../skills/neon-3d-short/SKILL.md) — user asked (2026-11-09) to turn the anaros-dudh 3D short workflow into a reusable skill; use it for every voice+script Neon 3D video
 - [ElevenLabs voice](reference-elevenlabs.md) — api.elevenlabs.io key via proxy, voice_id DDBVyamqcjlSuvNUZLUH
+- [No glass top card](feedback-no-glass-card.md) — never use the top glass info card (label/value/note) in any video

@@ -196,7 +196,7 @@ function oneTake({ makeStage }) {
       ];
       const cu = CARDS.find(([a, b]) => t >= a && t < b); let ck = 0;
       if (cu) { const lit = typeof cu[5] === 'number' ? cu[5] : null; card.set(cu[2], cu[3], cu[4], lit, lit != null ? cu[6] : cu[5]); const grp = CARDS.filter(x => x[2] === cu[2]); const ga = grp[0][0], gb = grp[grp.length - 1][1]; ck = smooth(range(t, ga, ga + 0.25)) * (1 - smooth(range(t, gb - 0.25, gb))); const pk = 1 + 0.09 * Math.exp(-(t - cu[0]) * 9); card.scale.set(0.72 * pk, 0.281 * pk, 1); }
-      card.material.opacity = ck; card.visible = ck > 0.01;
+      card.material.opacity = ck; card.visible = false;
       const fd = cp.distanceTo(lkp);
       return { dof: { focus: fd, aperture: 0.0008, maxblur: 0.004 }, bloom: 0.8, exposure: 0.95 + (frozen ? 0.1 : 0) };
     },
