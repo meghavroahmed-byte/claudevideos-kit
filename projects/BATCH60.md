@@ -5,7 +5,7 @@ fresh synthesized SFX for every event (no hiss, no bird squeaks, marimba run for
 MR. CLOUD chest print (Righteous, ~38% white). Voice: ElevenLabs "Megh Yt english" eleven_v4, stability 0.5, similarity 0.75.
 
 Pipeline (for future check-ins): scripts in scratchpad (tts.sh <proj> = ElevenLabs+align; st.sh = still grids with P=<proj>; render.sh <proj> <dur>).
-Render daemon: scratchpad/queue.sh reads scratchpad/queue.txt ("project duration") and renders any project whose <proj>.mp4 is missing; if not running, restart with `setsid nohup .../queue.sh &`. Deliver finished mp4s (SendUserFile), then mark x.
+Render: run scratchpad/queue2.sh as a run_in_background task (time-sliced ~100 min; detached daemons die when the idle container is reclaimed). It renders any project in scratchpad/queue.txt whose <proj>.mp4 is missing. Deliver finished mp4s (SendUserFile), then mark x.
 
 Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 
