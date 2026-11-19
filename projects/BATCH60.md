@@ -40,7 +40,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 27 | yawn | Why are yawns contagious? | b |
 | 28 | brain-freeze | What is brain freeze? | b |
 | 29 | knuckle-crack | What happens when you crack your knuckles? | b |
-| 30 | deep-ocean | What if you dove to the bottom of the ocean? | |
+| 30 | deep-ocean | What if you dove to the bottom of the ocean? | b |
 | 31 | black-hole | What if you fell into a black hole? | |
 | 32 | moon-jump | How high could you jump on the Moon? | |
 | 33 | shark | What to do if a shark attacks | |
