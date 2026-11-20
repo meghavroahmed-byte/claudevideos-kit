@@ -24,7 +24,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 9 | lost-at-sea | What if you were lost at sea for 3 days? | x |
 | 10 | swallow-gum | What happens if you swallow gum? | x |
 | 11 | tickle | Why can't you tickle yourself? | x |
-| 12 | no-water | How long can you survive without water? | b |
+| 12 | no-water | How long can you survive without water? | x |
 | 13 | pyramid-worker | A day in the life of a pyramid worker | b |
 | 14 | knight-toilet | How did knights go to the toilet in armor? | b |
 | 15 | ancient-teeth | How did people brush their teeth 5,000 years ago? | b |
@@ -71,5 +71,5 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 56 | cheetah | Could you outrun a cheetah? | b |
 | 57 | everest | What happens to your body on Everest? | b |
 | 58 | earthquake | What to do in an earthquake | b |
-| 59 | tornado | What if you got caught in a tornado? | |
+| 59 | tornado | What if you got caught in a tornado? | b |
 | 60 | sun-stare | What if you stared at the Sun? | |
