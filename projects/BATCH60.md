@@ -64,7 +64,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 49 | samurai-armor | Could samurai armor stop a sword? | b |
 | 50 | mummy | How were mummies made? | b |
 | 51 | caveman-fire | How did cavemen make fire? | b |
-| 52 | medieval-doctor | Visiting a doctor in the Middle Ages | |
+| 52 | medieval-doctor | Visiting a doctor in the Middle Ages | b |
 | 53 | ant-strength | What if you were as strong as an ant? | |
 | 54 | octopus | Why octopuses are so smart | |
 | 55 | elephant-memory | Do elephants really never forget? | |
