@@ -67,7 +67,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 52 | medieval-doctor | Visiting a doctor in the Middle Ages | b |
 | 53 | ant-strength | What if you were as strong as an ant? | b |
 | 54 | octopus | Why octopuses are so smart | b |
-| 55 | elephant-memory | Do elephants really never forget? | |
+| 55 | elephant-memory | Do elephants really never forget? | b |
 | 56 | cheetah | Could you outrun a cheetah? | |
 | 57 | everest | What happens to your body on Everest? | |
 | 58 | earthquake | What to do in an earthquake | |
