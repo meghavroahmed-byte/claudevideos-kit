@@ -69,7 +69,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 54 | octopus | Why octopuses are so smart | b |
 | 55 | elephant-memory | Do elephants really never forget? | b |
 | 56 | cheetah | Could you outrun a cheetah? | b |
-| 57 | everest | What happens to your body on Everest? | |
+| 57 | everest | What happens to your body on Everest? | b |
 | 58 | earthquake | What to do in an earthquake | |
 | 59 | tornado | What if you got caught in a tornado? | |
 | 60 | sun-stare | What if you stared at the Sun? | |
