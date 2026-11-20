@@ -61,7 +61,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 46 | heart-beats | How many times does your heart beat in a lifetime? | b |
 | 47 | castle-siege | How did people attack a castle? | b |
 | 48 | viking-ship | Life on a Viking ship | b |
-| 49 | samurai-armor | Could samurai armor stop a sword? | |
+| 49 | samurai-armor | Could samurai armor stop a sword? | b |
 | 50 | mummy | How were mummies made? | |
 | 51 | caveman-fire | How did cavemen make fire? | |
 | 52 | medieval-doctor | Visiting a doctor in the Middle Ages | |
