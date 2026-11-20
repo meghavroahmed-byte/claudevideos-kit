@@ -63,7 +63,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 48 | viking-ship | Life on a Viking ship | b |
 | 49 | samurai-armor | Could samurai armor stop a sword? | b |
 | 50 | mummy | How were mummies made? | b |
-| 51 | caveman-fire | How did cavemen make fire? | |
+| 51 | caveman-fire | How did cavemen make fire? | b |
 | 52 | medieval-doctor | Visiting a doctor in the Middle Ages | |
 | 53 | ant-strength | What if you were as strong as an ant? | |
 | 54 | octopus | Why octopuses are so smart | |
