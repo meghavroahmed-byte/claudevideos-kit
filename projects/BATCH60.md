@@ -23,7 +23,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 8 | tsunami | Could you outrun a tsunami? | x |
 | 9 | lost-at-sea | What if you were lost at sea for 3 days? | x |
 | 10 | swallow-gum | What happens if you swallow gum? | x |
-| 11 | tickle | Why can't you tickle yourself? | r |
+| 11 | tickle | Why can't you tickle yourself? | x |
 | 12 | no-water | How long can you survive without water? | b |
 | 13 | pyramid-worker | A day in the life of a pyramid worker | b |
 | 14 | knight-toilet | How did knights go to the toilet in armor? | b |
@@ -65,7 +65,7 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 50 | mummy | How were mummies made? | b |
 | 51 | caveman-fire | How did cavemen make fire? | b |
 | 52 | medieval-doctor | Visiting a doctor in the Middle Ages | b |
-| 53 | ant-strength | What if you were as strong as an ant? | |
+| 53 | ant-strength | What if you were as strong as an ant? | b |
 | 54 | octopus | Why octopuses are so smart | |
 | 55 | elephant-memory | Do elephants really never forget? | |
 | 56 | cheetah | Could you outrun a cheetah? | |
