@@ -11,14 +11,13 @@ const Q = () => new THREE.Quaternion();
 export const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
 
 // models: Poly Haven names; hdris: names; people: always loaded (rpm avatar + Xbot clips [+ michelle, soldier])
-export async function loadKit(renderer, { models = [], hdris = [], tex = [], people = ['readyplayer.me', 'Michelle', 'Soldier'] } = {}) {
+export async function loadKit(renderer, { models = [], hdris = [], tex = [], people = ['hero'] } = {}) {
   const gl = new GLTFLoader();
   const pm = new THREE.PMREMGenerator(renderer);
   await Promise.all([
     ...models.map(n => gl.loadAsync(`${A}${n}/${n}.gltf`).then(g => { ASSETS.models[n] = g.scene; })),
     ...hdris.map(n => new RGBELoader().loadAsync(`${A}hdri/${n}.hdr`).then(h => { h.mapping = THREE.EquirectangularReflectionMapping; ASSETS.hdr[n] = h; ASSETS.env[n] = pm.fromEquirectangular(h).texture; })),
-    ...people.map(n => gl.loadAsync(`${A}people/${n}.glb`).then(g => { ASSETS.models['@' + n] = g; })),
-    gl.loadAsync(`${A}people/Xbot.glb`).then(g => { ASSETS.xbot = g; }),
+    loadPeople(people),
   ]);
   const tl = new THREE.TextureLoader();
   await Promise.all(tex.map(async n => {
@@ -61,45 +60,96 @@ export function canvasTex(w, h, draw) { const c = document.createElement('canvas
 // kind: 'hero' (Ready Player Me man, MR. CLOUD print), 'michelle', 'soldier'. Animated by Xbot Mixamo clips via model-space retarget.
 // person.update(t, { idle:1, walk:0, run:0, agree:0, headShake:0, sad_pose:0, sneak_pose:0 }, speedScale) then person.pose(fn) for bone tweaks.
 const SRC = {}; // shared source rig per clip set
+// manual clip sampling with weighted slerp blending (quaternion tracks only; hips translation ignored)
+function sampleClips(src, weights, time) {
+  let acc = {}; const tot = Object.values(weights).reduce((a, b) => a + (b || 0), 0) || 1;
+  if (!Object.values(weights).some(w => w > 1e-3)) weights = { idle: 1 };
+  for (const [name, w] of Object.entries(weights)) {
+    if (!(w > 1e-3)) continue; const c = src.clips[name]; if (!c) continue;
+    if (!c._interp) c._interp = c.tracks.filter(tr => tr.name.endsWith('.quaternion')).map(tr => [tr.name.slice(0, -11).replace(/^mixamorig:?/, ''), tr.createInterpolant()]);
+    const tt = ((time % c.duration) + c.duration) % c.duration;
+    for (const [bn, ip] of c._interp) {
+      const b = src.sb[bn]; if (!b) continue; const v = ip.evaluate(tt); const q = new THREE.Quaternion(v[0], v[1], v[2], v[3]);
+      if (!acc[bn]) { acc[bn] = { q, w }; } else { const a = acc[bn]; a.w += w; a.q.slerp(q, w / a.w); }
+    }
+  }
+  for (const bn in acc) src.sb[bn].quaternion.copy(acc[bn].q);
+}
 function srcRig() {
   if (SRC.rig) return SRC.rig;
   const g = ASSETS.xbot; const root = SkeletonUtils.clone(g.scene); const sb = {};
   root.traverse(o => { if (o.isBone) sb[o.name.replace(/^mixamorig:?/, '')] = o; });
   root.updateMatrixWorld(true);
-  return (SRC.rig = { root, sb, clips: Object.fromEntries(g.animations.map(c => [c.name, c])) });
+  const rest = {}; for (const n in sb) rest[n] = [sb[n].position.clone(), sb[n].quaternion.clone()];
+  return (SRC.rig = { root, sb, rest, clips: Object.fromEntries(g.animations.map(c => [c.name, c])) });
 }
 const mq = (o, root) => { const q = Q(), r = Q(); o.getWorldQuaternion(q); root.getWorldQuaternion(r); return r.invert().multiply(q); };
-export function person(kind = 'hero', { print = kind === 'hero', shirt = null } = {}) {
-  const key = { hero: '@readyplayer.me', michelle: '@Michelle', soldier: '@Soldier' }[kind];
+// RenderPeople bone names -> Mixamo names
+const RPMAP = { hip: 'Hips', spine_01: 'Spine', spine_02: 'Spine1', spine_03: 'Spine2', neck: 'Neck', head: 'Head', jaw: 'Jaw' };
+for (const [s, S] of [['l', 'Left'], ['r', 'Right']]) {
+  Object.assign(RPMAP, { [`shoulder_${s}`]: `${S}Shoulder`, [`upperarm_${s}`]: `${S}Arm`, [`lowerarm_${s}`]: `${S}ForeArm`, [`hand_${s}`]: `${S}Hand`,
+    [`upperleg_${s}`]: `${S}UpLeg`, [`lowerleg_${s}`]: `${S}Leg`, [`foot_${s}`]: `${S}Foot`, [`ball_${s}`]: `${S}ToeBase` });
+  for (const [f, F] of [['thumb', 'Thumb'], ['index', 'Index'], ['middle', 'Middle'], ['ring', 'Ring'], ['pinky', 'Pinky']]) for (const k of [1, 2, 3]) RPMAP[`${f}_0${k}_${s}`] = `${S}Hand${F}${k}`;
+}
+const rpName = (n) => { const m = n.match(/(hip|spine_0\d|neck|head|jaw|shoulder_[lr]|upperarm_[lr]|lowerarm_[lr]|hand_[lr]|upperleg_[lr]|lowerleg_[lr]|foot_[lr]|ball_[lr]|(?:thumb|index|middle|ring|pinky)_0\d_[lr])_\d+$/); return m ? RPMAP[m[1]] : null; };
+const CHILD = { Hips: 'Spine', Spine: 'Spine1', Spine1: 'Spine2', Spine2: 'Neck', Neck: 'Head', LeftShoulder: 'LeftArm', LeftArm: 'LeftForeArm', LeftForeArm: 'LeftHand', LeftUpLeg: 'LeftLeg', LeftLeg: 'LeftFoot', LeftFoot: 'LeftToeBase',
+  RightShoulder: 'RightArm', RightArm: 'RightForeArm', RightForeArm: 'RightHand', RightUpLeg: 'RightLeg', RightLeg: 'RightFoot', RightFoot: 'RightToeBase', LeftHand: 'LeftHandMiddle1', RightHand: 'RightHandMiddle1' };
+// kinds: 'hero' (RenderPeople Nathan, T-shirt + MR. CLOUD), 'eric','carla','claudia','sophia','manuel' (RenderPeople), 'rpm','michelle','soldier'
+const KIND = { hero: 'sf/rp_nathan', nathan: 'sf/rp_nathan', eric: 'sf/rp_eric', carla: 'sf/rp_carla', claudia: 'sf/rp_claudia', sophia: 'sf/rp_sophia', manuel: 'sf/rp_manuel', rpm: 'people/readyplayer.me', michelle: 'people/Michelle', soldier: 'people/Soldier' };
+export async function loadPeople(kinds = ['hero']) {
+  const gl = new GLTFLoader();
+  await Promise.all([...new Set(kinds.map(k => KIND[k]))].map(p => ASSETS.models['@' + p] ? null : gl.loadAsync(`${A}${p}.glb`).then(g => { ASSETS.models['@' + p] = g; })));
+  if (!ASSETS.xbot) ASSETS.xbot = await gl.loadAsync(`${A}people/Xbot.glb`);
+}
+export function person(kind = 'hero', { print = kind === 'hero', shirt = null, height = 1.78 } = {}) {
+  const key = '@' + KIND[kind];
   const root = SkeletonUtils.clone(ASSETS.models[key].scene);
   const g = new THREE.Group(); g.add(root);
-  if (kind !== 'hero') root.scale.setScalar(1); // Michelle/Soldier are already ~1.7 m in their glb root transform
-  root.traverse(m => { if (m.isMesh) { m.castShadow = true; m.receiveShadow = true; m.frustumCulled = false; } });
-  const bone = {}; root.traverse(o => { if (o.isBone) bone[o.name.replace(/^mixamorig:?/, '')] = o; });
+  root.traverse(m => { if (m.isMesh) { m.castShadow = true; m.receiveShadow = true; m.frustumCulled = false; if (m.material) { m.material.envMapIntensity = 0.8; } } });
+  const bone = {}; root.traverse(o => { if (o.isBone) { const n = rpName(o.name) || o.name.replace(/^mixamorig:?/, ''); if (!bone[n]) bone[n] = o; } });
+  // normalise height to `height` metres, feet on y=0
+  root.updateMatrixWorld(true); { const b = new THREE.Box3().setFromObject(root, true); const h = b.max.y - b.min.y; if (h > 0.01) { root.scale.multiplyScalar(height / h); root.updateMatrixWorld(true); const b2 = new THREE.Box3().setFromObject(root, true); root.position.y -= b2.min.y; } }
   if (shirt != null) root.traverse(m => { if (m.isMesh && /Outfit_Top/.test(m.name)) { m.material = m.material.clone(); m.material.color.set(shirt); } });
   const faces = []; root.traverse(m => { if (m.isMesh && m.morphTargetDictionary && 'mouthOpen' in m.morphTargetDictionary) faces.push(m); });
-  if (print && bone.Spine2) {
-    const p = new THREE.Mesh(new THREE.PlaneGeometry(0.2, 0.05), new THREE.MeshStandardMaterial({ map: canvasTex(512, 128, (c) => { c.font = "400 92px Brand, sans-serif"; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = 'rgba(255,255,255,0.92)'; c.fillText('MR. CLOUD', 256, 68); }), transparent: true, roughness: 0.9, polygonOffset: true, polygonOffsetFactor: -4 }));
-    bone.Spine2.add(p); p.position.set(0, 0.1, 0.135); g.userData.print = p;
-  }
   // retarget setup
-  const src = srcRig(); const mixer = new THREE.AnimationMixer(src.root); const act = {};
-  for (const [n, c] of Object.entries(src.clips)) { act[n] = mixer.clipAction(c); act[n].play(); act[n].weight = 0; }
+  const src = srcRig();
   const restPose = {}; Object.keys(src.sb).forEach(n => { restPose[n] = src.sb[n].quaternion.clone(); });
   // rest model-space quats (both in bind pose)
-  root.updateMatrixWorld(true); mixer.setTime(0); mixer.stopAllAction(); Object.keys(src.sb).forEach(n => src.sb[n].quaternion.copy(restPose[n])); src.root.updateMatrixWorld(true);
-  const names = []; (bone.Hips || root).traverse(o => { const n = o.name.replace(/^mixamorig:?/, ''); if (o.isBone && src.sb[n]) names.push(n); });
+  root.updateMatrixWorld(true); Object.keys(src.sb).forEach(n => src.sb[n].quaternion.copy(restPose[n])); src.root.updateMatrixWorld(true);
+  const names = []; (bone.Hips || root).traverse(o => { if (!o.isBone) return; const n = rpName(o.name) || o.name.replace(/^mixamorig:?/, ''); if (src.sb[n] && bone[n] === o && !names.includes(n)) names.push(n); });
+  // calibrate target into the source's rest pose (A-pose -> T-pose): align each bone->child direction in model space
+  g.updateMatrixWorld(true);
+  const wp = (o) => { const v = V(); o.getWorldPosition(v); return v; };
+  const toModel = (v, r) => { const q = Q(); r.getWorldQuaternion(q); return v.applyQuaternion(q.invert()); };
+  for (const n of names) {
+    const c = CHILD[n]; if (!c || !bone[c] || !src.sb[c]) continue;
+    const sd = toModel(wp(src.sb[c]).sub(wp(src.sb[n])), src.root).normalize();
+    const td = toModel(wp(bone[c]).sub(wp(bone[n])), root).normalize();
+    if (sd.lengthSq() < 0.5 || td.lengthSq() < 0.5) continue;
+    const dq = new THREE.Quaternion().setFromUnitVectors(td, sd); // model-space rotation
+    const rq = Q(); root.getWorldQuaternion(rq); const pq = Q(); bone[n].parent.getWorldQuaternion(pq);
+    const local = pq.clone().invert().multiply(rq).multiply(dq).multiply(rq.clone().invert()).multiply(pq); // conjugate into parent frame
+    bone[n].quaternion.premultiply(local); bone[n].updateMatrixWorld(true);
+  }
   const srest = {}, trest = {}; names.forEach(n => { srest[n] = mq(src.sb[n], src.root).invert(); trest[n] = mq(bone[n], root); });
-  for (const n in act) act[n].play();
-  const hipsY0 = bone.Hips ? bone.Hips.position.y : 0;
+  // MR. CLOUD chest print: placed in world space at rest (T-pose), then attached to the chest bone
+  if (print && bone.Spine2) {
+    const p = new THREE.Mesh(new THREE.PlaneGeometry(0.2, 0.05), new THREE.MeshStandardMaterial({ map: canvasTex(512, 128, (c) => { c.font = "400 92px Brand, sans-serif"; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = 'rgba(255,255,255,0.92)'; c.fillText('MR. CLOUD', 256, 68); }), transparent: true, roughness: 0.9, polygonOffset: true, polygonOffsetFactor: -4 }));
+    const hs = height / 1.78; const sp = V(); bone.Spine2.getWorldPosition(sp); const ne = V(); (bone.Neck || bone.Spine2).getWorldPosition(ne);
+    const gq = Q(); g.getWorldQuaternion(gq); const fwd = V(0, 0, 1).applyQuaternion(gq);
+    p.position.copy(sp.lerp(ne, 0.15)).addScaledVector(fwd, 0.125 * hs).add(V(0, -0.03 * hs, 0)); p.quaternion.copy(gq); p.scale.setScalar(hs);
+    g.add(p); g.updateMatrixWorld(true); bone.Spine2.attach(p); g.userData.print = p;
+  }
+  const hipsY0 = bone.Hips ? bone.Hips.position.y : 0; const hipsS = bone.Hips ? 1 / bone.Hips.parent.getWorldScale(V()).y : 1;
   const P = {
     root: g, bone, faces,
     // weights: clip name -> weight. t: time in seconds (clip time = t*speed)
-    update(t, weights = { idle: 1 }, speed = 1) {
-      for (const n in act) act[n].weight = weights[n] || 0;
-      const tot = Object.values(weights).reduce((a, b) => a + b, 0);
-      if (tot < 1e-3) act.idle.weight = 1;
-      mixer.setTime(t * speed);
+    // pose: object of canned pose weights {flinch, point, pointL, handsHead, handsChest, handsBelly, handsThroat, armsUp, shrug, crouch, lean, lookUp, lookDown, nod, headTilt}
+    update(t, weights = { idle: 1 }, speed = 1, pose = null) {
+      for (const n in src.sb) { src.sb[n].position.copy(src.rest[n][0]); src.sb[n].quaternion.copy(src.rest[n][1]); }
+      sampleClips(src, weights, t * speed);
+      src.root.updateMatrixWorld(true);
+      if (pose) applyPose(src, pose);
       src.root.updateMatrixWorld(true); g.updateMatrixWorld(true);
       const rootQ = Q(); root.getWorldQuaternion(rootQ); const rinv = rootQ.invert();
       for (const n of names) {
@@ -119,7 +169,7 @@ export function person(kind = 'hero', { print = kind === 'hero', shirt = null } 
       b.quaternion.premultiply(new THREE.Quaternion().setFromAxisAngle(localAxis, ang)); b.updateMatrixWorld(true);
       return P;
     },
-    mouth(k) { faces.forEach(m => { m.morphTargetInfluences[m.morphTargetDictionary.mouthOpen] = k; }); return P; },
+    mouth(k) { faces.forEach(m => { m.morphTargetInfluences[m.morphTargetDictionary.mouthOpen] = k; }); if (bone.Jaw && !faces.length) { P.turn('Jaw', [1, 0, 0], 0.25 * k); } return P; },
     smile(k) { faces.forEach(m => { const i = m.morphTargetDictionary.mouthSmile; if (i != null) m.morphTargetInfluences[i] = k; }); return P; },
     // canned bone poses on top of the clip (k = 0..1)
     flinch(k) { if (k < 0.01) return P; return P.turn('Spine', [1, 0, 0], -0.25 * k).turn('LeftArm', [1, 0, 0], -1.3 * k).turn('RightArm', [1, 0, 0], -1.3 * k).turn('LeftForeArm', [0, 1, 0], 1.4 * k).turn('RightForeArm', [0, 1, 0], -1.4 * k); },
@@ -128,12 +178,47 @@ export function person(kind = 'hero', { print = kind === 'hero', shirt = null } 
       if (k < 0.01) return P; const a = { head: 2.3, throat: 1.9, chest: 1.5, belly: 1.1 }[part] || 1.5;
       return P.turn('LeftArm', [1, 0, 0], -a * 0.55 * k).turn('RightArm', [1, 0, 0], -a * 0.55 * k).turn('LeftForeArm', [0, 1, 0], 1.6 * k).turn('RightForeArm', [0, 1, 0], -1.6 * k);
     },
-    hipsDrop(dy) { if (bone.Hips) bone.Hips.position.y = hipsY0 - dy / Math.max(1e-6, bone.Hips.parent.getWorldScale(V()).y); return P; },
+    hipsDrop(dy) { if (bone.Hips) bone.Hips.position.y = hipsY0 - dy * hipsS; return P; },
     headPos() { const v = V(); bone.Head.getWorldPosition(v); return v; },
     world(name) { const v = V(); bone[name].getWorldPosition(v); return v; },
   };
   P.update(0);
   return P;
+}
+
+// canned poses applied to the Mixamo source rig (model-space axes: x = character's left->right?, y up, z forward)
+function sturn(src, name, axis, ang) {
+  const b = src.sb[name]; if (!b || !ang) return;
+  const rq = Q(); src.root.getWorldQuaternion(rq); const pq = Q(); b.parent.getWorldQuaternion(pq);
+  const ax = V(...axis).applyQuaternion(rq).applyQuaternion(pq.invert()).normalize();
+  b.quaternion.premultiply(new THREE.Quaternion().setFromAxisAngle(ax, ang)); b.updateMatrixWorld(true);
+}
+export const POSES = {
+  // each: list of [bone, axis, angle] at weight 1
+  flinch: [['Spine', [1, 0, 0], -0.2], ['LeftArm', [1, 0, 0], -1.25], ['RightArm', [1, 0, 0], -1.25], ['LeftArm', [0, 1, 0], -0.5], ['RightArm', [0, 1, 0], 0.5], ['LeftForeArm', [1, 0, 0], -1.6], ['RightForeArm', [1, 0, 0], -1.6]],
+  point: [['RightArm', [1, 0, 0], -1.4], ['RightArm', [0, 1, 0], 0.15]],
+  pointL: [['LeftArm', [1, 0, 0], -1.4], ['LeftArm', [0, 1, 0], -0.15]],
+  handsHead: [['LeftArm', [0, 0, 1], -0.6], ['RightArm', [0, 0, 1], 0.6], ['LeftArm', [1, 0, 0], -1.9], ['RightArm', [1, 0, 0], -1.9], ['LeftForeArm', [1, 0, 0], -1.7], ['RightForeArm', [1, 0, 0], -1.7]],
+  handsChest: [['LeftArm', [1, 0, 0], -0.7], ['RightArm', [1, 0, 0], -0.7], ['LeftForeArm', [0, 1, 0], -1.5], ['RightForeArm', [0, 1, 0], 1.5]],
+  handsBelly: [['LeftArm', [1, 0, 0], -0.35], ['RightArm', [1, 0, 0], -0.35], ['LeftForeArm', [0, 1, 0], -1.3], ['RightForeArm', [0, 1, 0], 1.3], ['Spine', [1, 0, 0], 0.25]],
+  handsThroat: [['LeftArm', [1, 0, 0], -0.9], ['RightArm', [1, 0, 0], -0.9], ['LeftForeArm', [0, 1, 0], -1.9], ['RightForeArm', [0, 1, 0], 1.9]],
+  armsUp: [['LeftArm', [0, 0, 1], -2.6], ['RightArm', [0, 0, 1], 2.6]],
+  shrug: [['LeftArm', [0, 0, 1], -0.4], ['RightArm', [0, 0, 1], 0.4], ['LeftForeArm', [0, 1, 0], -1.2], ['RightForeArm', [0, 1, 0], 1.2], ['Neck', [0, 0, 1], 0.15]],
+  crouch: [['Spine', [1, 0, 0], 0.5], ['LeftUpLeg', [1, 0, 0], -1.1], ['RightUpLeg', [1, 0, 0], -1.1], ['LeftLeg', [1, 0, 0], 1.6], ['RightLeg', [1, 0, 0], 1.6]],
+  lean: [['Spine', [1, 0, 0], 0.35]],
+  leanBack: [['Spine', [1, 0, 0], -0.3]],
+  lookUp: [['Neck', [1, 0, 0], -0.5], ['Head', [1, 0, 0], -0.3]],
+  lookDown: [['Neck', [1, 0, 0], 0.45], ['Head', [1, 0, 0], 0.3]],
+  headTilt: [['Neck', [0, 0, 1], 0.35]],
+  nod: [['Head', [1, 0, 0], 0.5]],
+  slump: [['Spine', [1, 0, 0], 0.4], ['Spine1', [1, 0, 0], 0.25], ['Neck', [1, 0, 0], 0.4], ['LeftArm', [0, 0, 1], 0.15], ['RightArm', [0, 0, 1], -0.15]],
+};
+function applyPose(src, pose) {
+  for (const [k, w] of Object.entries(pose)) {
+    if (!w) continue;
+    if (typeof POSES[k] === 'function') POSES[k](src, w);
+    else for (const [b, ax, a] of POSES[k] || []) sturn(src, b, ax, a * w);
+  }
 }
 
 // plain label: white bold text, thick black outline, no panel
