@@ -74,4 +74,4 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 57 | everest | What happens to your body on Everest? | b |
 | 58 | earthquake | What to do in an earthquake | b |
 | 59 | tornado | What if you got caught in a tornado? | b |
-| 60 | sun-stare | What if you stared at the Sun? | |
+| 60 | sun-stare | What if you stared at the Sun? | b |
