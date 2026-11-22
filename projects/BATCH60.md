@@ -9,6 +9,7 @@ Render: run scratchpad/queue2.sh as a run_in_background task (time-sliced ~100 m
 
 Note: #1-3 were delivered with the old dark-backed stamps; re-render them at the end of the queue (rename mp4) and re-deliver.
 
+SOUND (user, 2026-11-22): #3-60 louder master + soft unique BGM per video (bgm.py); #1-2 untouched.
 DELIVERY (user, 2026-11-22): do NOT send piecemeal. When ALL 60 are rendered, send them serially #1..#60, one file per message, each captioned with its number + title (file named "NN - Title.mp4").
 
 Status: [x] delivered · [r] rendering · [b] built · [ ] to do

@@ -15,3 +15,5 @@ Counters/timers = plain text or icons with a dark outline/shadow, placed mid-fra
 Delivery preference (2026-11-22): user wants the finished batch sent only after all videos are done, serially in order, one per message, each with its title (so they can download calmly).
 
 No end/face stamps (2026-11-22): user said never put the big stamped text (stamp(): "SAFE!", "DON'T LOOK!", "GOOD LUCK!"...) over the face, esp. at the end. Keep #1-2 as delivered; all others have stamp() disabled. Don't use stamp() in new videos.
+
+Sound (2026-11-22): #3-#60 get a louder master (+7.5 dB into a limiter, ~-12 LUFS) and a very soft, unique, mood-matched BGM (scratchpad/bgm.py, ducked under the voice, ~17 dB below it). #1-#2 keep their original mix (no BGM, original level). This supersedes the old "no bed running the whole video" rule for BGM only.

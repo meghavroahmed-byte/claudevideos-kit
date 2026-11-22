@@ -395,11 +395,11 @@ export function iconBubble(tex) {
 // big red stamp word (canvas sprite)
 export function stamp(text, col = '#ff2a2a', w = 1.6) {
   const c = document.createElement('canvas'); c.width = 1024; c.height = 300; const g = c.getContext('2d');
-  g.shadowColor = 'rgba(0,0,0,0.75)'; g.shadowBlur = 18;
+  g.fillStyle = 'rgba(20,14,8,0.45)'; rr(g, 30, 30, 964, 240, 30); g.fill();
   g.strokeStyle = col; g.lineWidth = 22; rr(g, 30, 30, 964, 240, 30); g.stroke();
   g.textAlign = 'center'; g.textBaseline = 'middle'; if ('letterSpacing' in g) g.letterSpacing = '8px';
   let fs = 170; g.font = `400 ${fs}px Brand, sans-serif`; const mw = g.measureText(text).width; if (mw > 880) { fs = Math.floor(fs * 880 / mw); g.font = `400 ${fs}px Brand, sans-serif`; }
-  g.lineWidth = 12; g.strokeStyle = 'rgba(0,0,0,0.55)'; g.strokeText(text, 512, 160); g.fillStyle = col; g.fillText(text, 512, 160);
+  g.fillStyle = col; g.fillText(text, 512, 160);
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
   const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, depthTest: false, depthWrite: false, toneMapped: false, fog: false }));
   s.renderOrder = 40; s.userData.w = w; s.material.rotation = -0.18;
