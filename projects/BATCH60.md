@@ -1,6 +1,6 @@
 # 60-short batch (~30 s each, Zack-D-style one take, MR. CLOUD hero, ElevenLabs voice)
 
-Rules: NO top glass info card and NO dark translucent HUD panels (user forbade 2026-11-19); one continuous take; hook = the situation in a wide/medium shot; full body always in frame; visuals match the words literally;
+Rules: NO top glass info card, NO dark translucent HUD panels, NO stamp() text over the face (except #1-2 as delivered) (user forbade 2026-11-19); one continuous take; hook = the situation in a wide/medium shot; full body always in frame; visuals match the words literally;
 fresh synthesized SFX for every event (no hiss, no bird squeaks, marimba run for slips, no all-video beds); voice untouched;
 MR. CLOUD chest print (Righteous, ~38% white). Voice: ElevenLabs "Megh Yt english" eleven_v4, stability 0.5, similarity 0.75.
 

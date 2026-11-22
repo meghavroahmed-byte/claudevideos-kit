@@ -403,7 +403,7 @@ export function stamp(text, col = '#ff2a2a', w = 1.6) {
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
   const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, depthTest: false, depthWrite: false, toneMapped: false, fog: false }));
   s.renderOrder = 40; s.userData.w = w; s.material.rotation = -0.18;
-  s.set = (k) => { s.visible = k > 0.01; const pop = 1 + 2.2 * (1 - Math.min(1, k * 1.0)); s.scale.set(w * pop, w * 0.293 * pop, 1); s.material.opacity = Math.min(1, k * 1.5); };
+  s.set = () => { s.visible = false; };
   s.set(0); return s;
 }
 // sun disc for the time-lapse

@@ -13,3 +13,5 @@ Also (2026-11-19): no dark translucent rounded HUD panels behind counters/timers
 Counters/timers = plain text or icons with a dark outline/shadow, placed mid-frame at the side, never at the top.
 
 Delivery preference (2026-11-22): user wants the finished batch sent only after all videos are done, serially in order, one per message, each with its title (so they can download calmly).
+
+No end/face stamps (2026-11-22): user said never put the big stamped text (stamp(): "SAFE!", "DON'T LOOK!", "GOOD LUCK!"...) over the face, esp. at the end. Keep #1-2 as delivered; all others have stamp() disabled. Don't use stamp() in new videos.
