@@ -17,12 +17,15 @@ export async function PRELOAD(renderer) {
   const gl = new GLTFLoader();
   const names = ['street_rat', 'metal_trash_can', 'fire_hydrant', 'concrete_road_barrier', 'cardboard_box_01', 'Barrel_01', 'covered_car', 'hamburger_buns', 'bananas', 'food_apple_01'];
   await Promise.all(names.map(n => gl.loadAsync(`${A}${n}/${n}.gltf`).then(g => { ASSETS[n] = g.scene; })));
+  const av = await gl.loadAsync(`${A}people/readyplayer.me.glb`); ASSETS.avatar = av.scene;
+  const xb = await gl.loadAsync(`${A}people/Xbot.glb`);
+  ASSETS.xbot = xb.scene; ASSETS.clips = {}; for (const c of xb.animations) ASSETS.clips[c.name] = c;
   const hdr = await new RGBELoader().loadAsync(`${A}hdri/urban_alley_01.hdr`);
   hdr.mapping = THREE.EquirectangularReflectionMapping; ASSETS.hdr = hdr;
   const pm = new THREE.PMREMGenerator(renderer); ASSETS.env = pm.fromEquirectangular(hdr).texture;
 }
 
-const STAND = (t, ph = 0) => ({ lSh: [0.05, 0, 0.16], rSh: [0.05, 0, -0.16], lEl: [-0.25, 0, 0], rEl: [-0.25, 0, 0], lHip: [0, 0, 0.07], rHip: [0, 0, -0.07], lAn: [0, 0, -0.07], rAn: [0, 0, 0.07], chest: [Math.sin(t * 1.6 + ph) * 0.015, 0, 0], neck: [0.03, Math.sin(t * 0.5 + ph) * 0.12, 0] });
+const _STAND = (t, ph = 0) => ({ lSh: [0.05, 0, 0.16], rSh: [0.05, 0, -0.16], lEl: [-0.25, 0, 0], rEl: [-0.25, 0, 0], lHip: [0, 0, 0.07], rHip: [0, 0, -0.07], lAn: [0, 0, -0.07], rAn: [0, 0, 0.07], chest: [Math.sin(t * 1.6 + ph) * 0.015, 0, 0], neck: [0.03, Math.sin(t * 0.5 + ph) * 0.12, 0] });
 const over = (a, b) => Object.assign({}, a, b);
 function canvasTex(w, h, draw) { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; }
 const clone = (n, s = 1) => { const o = ASSETS[n].clone(true); o.scale.setScalar(s); o.traverse(m => { if (m.isMesh) { m.castShadow = true; m.receiveShadow = true; } }); return o; };
@@ -55,7 +58,32 @@ function oneTake({ makeStage }) {
   const rat = clone('street_rat', RS); const ratG = new THREE.Group(); ratG.add(rat); scene.add(ratG);
   const ghost = clone('street_rat', 1); ghost.traverse(m => { if (m.isMesh) { m.castShadow = false; m.material = new THREE.MeshBasicMaterial({ color: 0xdff4ff, transparent: true, opacity: 0.5, depthWrite: false }); } }); scene.add(ghost);
   const small = clone('street_rat', 5); scene.add(small);
-  const hero = makeHuman('casual', { shirt: 0x2a9d8f, jeans: 0x34507a, chestText: 'MR. CLOUD' }); scene.add(hero.root);
+  // realistic hero (Ready Player Me avatar + Mixamo clips)
+  const hero = { root: ASSETS.avatar }; scene.add(hero.root);
+  hero.root.traverse(m => { if (m.isMesh) { m.castShadow = true; m.receiveShadow = true; m.frustumCulled = false; } });
+  const bone = {}; hero.root.traverse(o => { if (o.isBone) bone[o.name] = o; });
+  // retarget: drive the avatar from an invisible Xbot (same Mixamo bone names) via model-space rotation deltas
+  const src = ASSETS.xbot; const sb = {}; src.traverse(o => { if (o.isBone) sb[o.name.replace(/^mixamorig:?/, '')] = o; });
+  src.updateMatrixWorld(true); hero.root.updateMatrixWorld(true);
+  const Q = () => new THREE.Quaternion();
+  const mq = (o, root) => { const q = Q(), r = Q(); o.getWorldQuaternion(q); root.getWorldQuaternion(r); return r.invert().multiply(q); };
+  const names = []; bone.Hips.traverse(o => { if (o.isBone && sb[o.name]) names.push(o.name); });
+  const srest = {}, trest = {}; names.forEach(n => { srest[n] = mq(sb[n], src).invert(); trest[n] = mq(bone[n], hero.root); });
+  const mixer = new THREE.AnimationMixer(src);
+  const act = {}; for (const n of ['idle', 'sad_pose', 'headShake']) { act[n] = mixer.clipAction(ASSETS.clips[n]); act[n].play(); act[n].weight = 0; }
+  const retarget = () => {
+    src.updateMatrixWorld(true); hero.root.updateMatrixWorld(true);
+    const rootQ = Q(); hero.root.getWorldQuaternion(rootQ);
+    for (const n of names) {
+      const b = bone[n]; const want = mq(sb[n], src).multiply(srest[n]).multiply(trest[n]); // model-space target
+      const pq = Q(); b.parent.getWorldQuaternion(pq); const pm = rootQ.clone().invert().multiply(pq); // parent model-space
+      b.quaternion.copy(pm.invert().multiply(want)); b.updateMatrixWorld(true);
+    }
+  };
+  const faces = []; hero.root.traverse(m => { if (m.isMesh && m.morphTargetDictionary && 'mouthOpen' in m.morphTargetDictionary) faces.push(m); });
+  // MR. CLOUD print on the chest
+  const print = new THREE.Mesh(new THREE.PlaneGeometry(0.2, 0.05), new THREE.MeshStandardMaterial({ map: canvasTex(512, 128, (g) => { g.font = "900 84px Cap, sans-serif"; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = '#f4f4f4'; g.fillText('MR. CLOUD', 256, 68); }), transparent: true, roughness: 0.9, polygonOffset: true, polygonOffsetFactor: -4 }));
+  bone.Spine2.add(print); print.position.set(0, 0.1, 0.13);
   // x-ray circle (sits on the rat)
   const xc = document.createElement('canvas'); xc.width = xc.height = 512; const xg = xc.getContext('2d'); const xt = new THREE.CanvasTexture(xc); xt.colorSpace = THREE.SRGBColorSpace;
   const xray = new THREE.Sprite(new THREE.SpriteMaterial({ map: xt, transparent: true, depthTest: false, depthWrite: false, toneMapped: false })); xray.renderOrder = 35; scene.add(xray);
@@ -110,11 +138,17 @@ function oneTake({ makeStage }) {
       fx.land.position.set(-2.0, top, -3.3); fx.land.update(t - 18.4);
       food.visible = t > 24.0; food.scale.setScalar(Math.max(0.001, 1 - smooth(range(t, 25.0, 26.6))));
       // ---------- hero ----------
-      hero.root.position.set(1.75, 0, -0.35); hero.root.rotation.y = -H + 0.25;
+      hero.root.position.set(1.45, 0, -0.15); hero.root.rotation.y = -H - 0.25 + Math.PI * 0 ; hero.root.rotation.y += Math.PI;
       const scared = smooth(range(t, 0.3, 0.8)) * (1 - smooth(range(t, 3.0, 4.0)));
-      let pose = STAND(t);
-      if (scared > 0.01) pose = over(pose, { spine: [-0.15 * scared, 0, 0], lSh: [-1.6 * scared, 0, 0.5], rSh: [-1.6 * scared, 0, -0.5], lEl: [-1.4 * scared, 0, 0], rEl: [-1.4 * scared, 0, 0], neck: [-0.15 * scared, 0, 0] });
-      hero.setPose(pose); hero.setMouth(scared > 0.3 ? 0.7 : 0.06);
+      const shakeW = smooth(range(t, 24.8, 25.2)) * (1 - smooth(range(t, 27.0, 27.4)));
+      act.idle.weight = 1 - shakeW; act.headShake.weight = shakeW; act.sad_pose.weight = 0;
+      mixer.setTime(t); retarget();
+      if (scared > 0.01) { // flinch: arms up in front of the face, lean back
+        bone.Spine.rotation.x -= 0.25 * scared;
+        bone.LeftArm.rotation.x += 0.0 * scared; bone.LeftArm.rotation.z += 0; bone.LeftArm.rotateX(-1.2 * scared); bone.RightArm.rotateX(-1.2 * scared);
+        bone.LeftForeArm.rotateZ(1.6 * scared); bone.RightForeArm.rotateZ(-1.6 * scared);
+      }
+      faces.forEach(m => { m.morphTargetInfluences[m.morphTargetDictionary.mouthOpen] = scared * 0.7; });
       scene.updateMatrixWorld(true);
       const head = rat.localToWorld(V(0, 0.022, 0.026)), leg = rat.localToWorld(V(0.012, 0.007, 0.004));
       fx.wood.position.copy(head); fx.wood.update(t - 9.6); fx.plastic.position.copy(head); fx.plastic.update(t - 10.15); fx.concrete.position.copy(head); fx.concrete.update(t - 11.0);
@@ -122,7 +156,7 @@ function oneTake({ makeStage }) {
       fx.sag.position.copy(ratG.position).add(V(0, 0.2, 0)); fx.sag.update(t - 22.6);
       hole.visible = t > 15.7 && t < 20; hole.position.set(2.8, 0.55, -5.58); hole.rotation.y = 0;
       // ---------- camera ----------
-      const KEYS = [[0, [4.0, 1.8, 7.5], [0.4, 0.7, -0.6]], [2.4, [1.7, 0.9, 1.7], [0.1, 0.5, -0.7]], [7.8, [1.7, 0.9, 1.7], [0.1, 0.5, -0.7]], [8.8, [4.8, 1.9, 0.6], [-0.4, 0.6, -3.0]], [12.4, [4.8, 1.9, 0.6], [0.6, 0.6, -3.0]], [14.4, [5.6, 1.6, -2.2], [2.4, 0.6, -5.4]], [16.6, [5.6, 1.6, -2.2], [2.4, 0.6, -5.4]], [17.2, [-0.6, 1.6, -0.4], [-1.9, 1.9, -3.2]], [18.4, [-0.6, 1.4, -0.6], [-1.9, 0.6, -3.2]], [19.6, [-0.6, 1.4, -0.6], [-1.5, 0.5, -3.0]], [20.6, [4.0, 1.8, 7.5], [0.4, 0.7, -0.6]], [22.2, [2.0, 1.2, 4.0], [-0.4, 0.5, -0.6]], [24.4, [2.0, 1.2, 4.0], [-0.4, 0.5, -0.6]], [28.2, [3.6, 1.6, 6.8], [0.4, 0.6, -0.4]]];
+      const KEYS = [[0, [4.3, 1.8, 7.0], [0.9, 0.8, -0.4]], [2.4, [1.7, 0.9, 1.7], [0.1, 0.5, -0.7]], [7.8, [1.7, 0.9, 1.7], [0.1, 0.5, -0.7]], [8.8, [4.8, 1.9, 0.6], [-0.4, 0.6, -3.0]], [12.4, [4.8, 1.9, 0.6], [0.6, 0.6, -3.0]], [14.4, [5.6, 1.6, -2.2], [2.4, 0.6, -5.4]], [16.6, [5.6, 1.6, -2.2], [2.4, 0.6, -5.4]], [17.2, [-0.6, 1.6, -0.4], [-1.9, 1.9, -3.2]], [18.4, [-0.6, 1.4, -0.6], [-1.9, 0.6, -3.2]], [19.6, [-0.6, 1.4, -0.6], [-1.5, 0.5, -3.0]], [20.6, [4.3, 1.8, 7.0], [0.9, 0.8, -0.4]], [22.2, [2.4, 1.3, 4.2], [0.1, 0.6, -0.6]], [24.4, [2.4, 1.3, 4.2], [0.3, 0.6, -0.5]], [28.2, [3.9, 1.6, 6.4], [0.9, 0.7, -0.3]]];
       let j = 0; while (j < KEYS.length - 2 && KEYS[j + 1][0] < t) j++;
       const kk = smooth(range(t, KEYS[j][0], KEYS[j + 1][0]));
       const cp = V(...KEYS[j][1]).lerp(V(...KEYS[j + 1][1]), kk), lk = V(...KEYS[j][2]).lerp(V(...KEYS[j + 1][2]), kk);
