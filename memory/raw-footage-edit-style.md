@@ -48,6 +48,8 @@ The first raw video (announced 2026-11-07) is a **9:16 Short**. The user spoke s
 - Use the user's character LIGHTLY in every raw-footage edit (pointing at the map/globe, worried bust, on the phone for the CTA). Pre-render it as PNG sprites from the rig with lip-sync.
 - The bar is "best of best". Apply every past lesson at once: karaoke captions, varied transitions, shake, depth layers, cloud fly-through maps, a distinct colour per section, no navy backgrounds.
 
+**Face timing rule (2026-11-22, Short):** the user said: show the face for exactly 3 short windows, about 2 s each: the first 2 s, 2 s in the middle, and the last 2 s. Everything else is graphics, edited in whatever way works best. Face shots still only where they look straight into the camera. Later rules override older notes above: no captions (not karaoke), and the voice stays raw (gain only, no audio cleanup).
+
 **Why:** they see themselves as the voice and the explainer graphics as the show. The [[feedback-pro-visual-bar]] applies too.
 
 **How to apply:**
