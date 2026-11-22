@@ -17,6 +17,7 @@ Poly Haven HDRI world (GroundedSkybox + env light) and real Poly Haven models/te
 retargeted from Xbot Mixamo clips, see giant-rat/src/shots.js) with MR. CLOUD print; ONE-WORD big bold captions (caps.js from vo.words.json);
 small plain outlined labels on objects (no box); X-ray circle on the body where it fits; ghost/hologram version of the creature where it fits.
 HUMANS MUST NOT LOOK TINY next to animals - keep the person large and readable in frame. Reuse each project's existing voice/script.
+ASSETS: projects/_assets (shared; each v2 project's assets -> ../_assets symlink). Poly Haven via _kit/getph.py; Sketchfab via _kit/getsf.py (token saved on env; CC0/CC-BY only, credits in _assets/sf/CREDITS.json -> give the user credit lines per video). Kit: _kit/real.js, _kit/v2init.sh <proj>, _kit/mkcaps.py, _kit/dims.py.
 Old-style renders of #3-60 are obsolete. New per-project status: [v] v2 built · [R] v2 rendered.
 
 Status: [x] delivered · [r] rendering · [b] built · [ ] to do
