@@ -12,6 +12,13 @@ Note: #1-3 were delivered with the old dark-backed stamps; re-render them at the
 SOUND (user, 2026-11-22): #3-60 louder master + soft unique BGM per video (bgm.py); #1-2 untouched.
 DELIVERY (user, 2026-11-22): do NOT send piecemeal. When ALL 60 are rendered, send them serially #1..#60, one file per message, each captioned with its number + title (file named "NN - Title.mp4").
 
+STYLE v2 (user, 2026-11-22, after the giant-rat sample): REBUILD #3-60 in the REALISTIC style of projects/giant-rat:
+Poly Haven HDRI world (GroundedSkybox + env light) and real Poly Haven models/textures; realistic rigged 3D human (Ready Player Me avatar
+retargeted from Xbot Mixamo clips, see giant-rat/src/shots.js) with MR. CLOUD print; ONE-WORD big bold captions (caps.js from vo.words.json);
+small plain outlined labels on objects (no box); X-ray circle on the body where it fits; ghost/hologram version of the creature where it fits.
+HUMANS MUST NOT LOOK TINY next to animals - keep the person large and readable in frame. Reuse each project's existing voice/script.
+Old-style renders of #3-60 are obsolete. New per-project status: [v] v2 built · [R] v2 rendered.
+
 Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 
 | # | Project | Topic | Status |
