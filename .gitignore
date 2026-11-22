@@ -7,3 +7,4 @@ temp/
 *.mov
 *.aac
 parts/
+r[0-9].log
