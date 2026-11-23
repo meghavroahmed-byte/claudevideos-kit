@@ -6,6 +6,10 @@ const { THREE } = K;
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 const PH = '../../assets/polyhaven/';
+import { loadPeople, person, label, showLabel, V as PV } from './people3d.js';
+import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
+{ const FB = '../neon-tech-short/kit/fonts/'; await Promise.all([new FontFace('Anek', `url(${FB}anek.woff2)`, { weight: '100 800' }), new FontFace('PJS', `url(${FB}plus-jakarta-sans-latin-800-normal.woff2)`, { weight: '800' }), new FontFace('Brand', 'url(../../node_modules/@fontsource/righteous/files/righteous-latin-400-normal.woff2)')].map(f => f.load().then(x => document.fonts.add(x)))); }
+await loadPeople('./people/');
 const hdr = await new RGBELoader().loadAsync(PH + 'kloofendal_48d_partly_cloudy_puresky.hdr'); hdr.mapping = THREE.EquirectangularReflectionMapping;
 const GL = new GLTFLoader(); const MODELS = {};
 await Promise.all(['gamepad', 'gaming_console', 'treasure_chest', 'alarm_clock_01', 'Camera_01', 'circuit_board', 'metal_office_desk', 'classic_laptop', 'CashRegister_01', 'street_lamp_01', 'grass_medium_01', 'shrub_01', 'Television_01'].map(n => GL.loadAsync(PH + n + '/' + n + '.gltf').then(g => { MODELS[n] = g.scene; })));
@@ -214,29 +218,92 @@ ST.H.children.forEach(c => { if (c.children.length && c.position.x === 5) c.chil
 model('treasure_chest', ST.H, 5, 0, 0, 2.6, -0.3); model('alarm_clock_01', ST.H, -1.5, 0, 3, 0.9, 0.4);
 [-1, 1].forEach(sd => { model('street_lamp_01', ST.I, sd * 5.5, 0, -1, 7, sd > 0 ? Math.PI : 0); });
 // grass clumps + shrubs around every station (culled with the station)
-for (const k in ST) { const g = ST[k]; for (let i = 0; i < 7; i++) { const sd = i % 2 ? 1 : -1; model('grass_medium_01', g, sd * K.rnd(5, 12), 0, K.rnd(-4, 12), K.rnd(0.6, 1.1), K.rnd(0, 6)); } model('shrub_01', g, -11, 0, K.rnd(-6, 2), 2.2, K.rnd(0, 6)); model('shrub_01', g, 11.5, 0, K.rnd(-6, 2), 1.8, K.rnd(0, 6)); }
+for (const k in ST) { const g = ST[k]; for (let i = 0; i < 7; i++) { const sd = i % 2 ? 1 : -1; model('grass_medium_01', g, sd * K.rnd(7, 12), 0, K.rnd(-6, 3), K.rnd(0.6, 1.1), K.rnd(0, 6)); } model('shrub_01', g, -11, 0, K.rnd(-6, 2), 2.2, K.rnd(0, 6)); model('shrub_01', g, 11.5, 0, K.rnd(-6, 2), 1.8, K.rnd(0, 6)); }
 Object.values(ST).forEach(g => g.traverse(m => { if (m.isMesh && m.castShadow === false && !m.material.transparent) m.receiveShadow = true; }));
 
+// ---------------- realistic people (3D only, no 2D) ----------------
+ST.F.userData.man.visible = false;
+const PPL = [];   // {p, st, x, z, ry, s, fn(t)->{w, speed, ...}}
+function addP(kind, st, x, z, ry, s = 1.25, fn, opt = {}) { const p = person(kind, opt); p.root.position.set(x, 0, z); p.root.rotation.y = ry; p.root.scale.setScalar(s); ST[st].add(p.root); const o = { p, st, fn }; PPL.push(o); return o; }
+const VO = t => { const E_ = window.ENV || [], i = Math.round(t * 30); if (i < 1 || i >= E_.length - 1) return 0; const db = (E_[i - 1] + 2 * E_[i] + E_[i + 1]) / 4; return cl((db + 42) / 20) * (0.6 + 0.4 * Math.abs(Math.sin(t * 17))); };
+// hero (the user's avatar) per station; mouth follows the voice
+const HA = addP('hero', 'A', -2.3, 11, 0.25, 1.5, t => ({ w: { idle: 1 }, point: sm(2.2, 2.7, t), mouth: VO(t) }));
+const HB = addP('hero', 'B', -7, 24, 0.5, 1.5, t => { const k = sm(TL.st.B[0], TL.st.B[0] + 4, t); return { w: { idle: 1 - env(t, E('shunchen'), E('shunchen') + 1.8), headShake: env(t, E('shunchen'), E('shunchen') + 1.8, 0.3, 0.4) }, point: sm(E('burj') - 0.2, E('burj') + 0.3, t) * (1 - sm(E('shunchen'), E('shunchen') + 0.3, t)), lookUp: sm(E('burj'), E('burj') + 0.6, t), mouth: VO(t) }; });
+const HC = addP('hero', 'C', -6, 20, 0.6, 1.5, t => { const k = sm(TL.st.C[0], E('b3'), t); return { w: { idle: 1 - env(t, E('dami'), TL.st.C[1], 0.3, 0.3), agree: env(t, E('dami'), TL.st.C[1], 0.3, 0.3) }, point: env(t, E('cmp'), E('dami'), 0.3, 0.3), mouth: VO(t) }; });
+const HD = addP('hero', 'D', -3.5, 21, 0.3, 1.5, t => ({ w: { idle: 1 - env(t, E('q'), E('devs'), 0.3, 0.3), headShake: env(t, E('q'), E('devs'), 0.3, 0.3) }, hands: env(t, E('etotaka'), E('devs'), 0.3, 0.3), mouth: VO(t) }));
+const devs = [['michelle', -4.5, 5.6], ['soldier', 0, 5.6], ['hero', 4.5, 5.6]].map(([k, x, z], i) => addP(k, 'D', x, z, Math.PI, 1.05, t => ({ w: { idle: 1 }, type: 1 }), k === 'hero' ? { print: false, shirt: 0x2a6fd6 } : {}));
+// devs inside the building (seen through the x-ray): two rows at monitors on floor 1
+const inner = []; for (let i = 0; i < 6; i++) inner.push(addP(['michelle', 'soldier', 'hero'][i % 3], 'D', -6 + i * 2, -3 + 2.3, Math.PI, 0.62, t => ({ w: { idle: 1 }, type: 1 }), i % 3 === 2 ? { print: false, shirt: [0xd63a6a, 0x2a9d5a][i % 2] } : {}));
+const HE = addP('hero', 'E', 6, 15, -0.4, 1.5, t => ({ w: { idle: 1 - env(t, E('open'), E('chars'), 0.2, 0.2) * 0.0, agree: env(t, E('open') + 0.3, E('chars'), 0.2, 0.2) }, point: env(t, E('open'), E('chars'), 0.2, 0.2), mouth: VO(t) }));
+// mocap performer = Xbot-like suit (Soldier mesh tinted dark) with glowing markers + hologram twin
+const perf = addP('soldier', 'F', -2, 0, 0.3, 1.3, t => ({ w: { run: 1 }, speed: 1 }));
+perf.p.root.traverse(m => { if (m.isMesh) { m.material = m.material.clone(); m.material.color.set(0x1a1c24); m.material.map = null; m.material.roughness = 0.7; } });
+const MKR = new THREE.MeshBasicMaterial({ color: 0xeaff6a }); ['Head', 'LeftArm', 'RightArm', 'LeftForeArm', 'RightForeArm', 'LeftHand', 'RightHand', 'Spine2', 'Hips', 'LeftUpLeg', 'RightUpLeg', 'LeftLeg', 'RightLeg', 'LeftFoot', 'RightFoot'].forEach(n => { const b = perf.p.bone[n]; if (b) { const m = new THREE.Mesh(new THREE.SphereGeometry(4, 10, 8), MKR); b.add(m); m.position.set(0, 4, 6); } });
+const twin = addP('soldier', 'F', -2, -5.5, 0.3, 1.3, t => ({ w: { run: 1 }, speed: 1 }));
+twin.p.root.traverse(m => { if (m.isMesh) { m.material = new THREE.MeshBasicMaterial({ color: 0x3de8ff, wireframe: true, transparent: true, opacity: 0.55 }); m.castShadow = false; } });
+const HF = addP('hero', 'F', 5.6, 1.4, -0.5, 1.5, t => ({ w: { idle: 1 }, mouth: VO(t) * (1 + env(t, E('voice'), E('tech'), 0.2, 0.2)) }));
+const HG = addP('hero', 'G', 0, 13, 0, 1.5, t => { const a = -0.9 + 0.9 * sm(TL.st.G[0], E('virtual'), t); return { w: { idle: 1 - env(t, E('virtual'), TL.st.G[1], 0.3, 0.3), agree: env(t, E('virtual'), TL.st.G[1], 0.3, 0.3) }, mouth: VO(t) }; });
+const HH = addP('hero', 'H', 1.2, 15, -0.15, 1.5, t => ({ w: { idle: 1 - env(t, E('kolpona'), E('labh') + 1.5, 0.3, 0.4), headShake: env(t, E('kolpona'), E('labh') + 1.5, 0.3, 0.4) }, flinch: env(t, E('inc'), E('inc') + 0.8, 0.1, 0.4) * 0.7, mouth: VO(t) }));
+const HI = addP('hero', 'I', 2.2, 9.5, -0.3, 1.5, t => ({ w: { idle: 1 - env(t, E('phone') - 0.3, E('comment'), 0.3, 0.3), sad_pose: env(t, E('phone') - 0.3, E('comment'), 0.3, 0.3) * 0.8 }, phone: 0, mouth: VO(t) }));
+{ const ph = new THREE.Group(); const b = new THREE.Mesh(new THREE.BoxGeometry(7.5, 15, 0.9), new THREE.MeshStandardMaterial({ color: 0x15161c, roughness: 0.3, metalness: 0.5 })); const sc = new THREE.Mesh(new THREE.PlaneGeometry(6.8, 14), new THREE.MeshStandardMaterial({ color: 0x223355, emissive: 0x3a6cff, emissiveIntensity: 0.6 })); sc.position.z = 0.46; ph.add(b, sc); const hb = HI.p.bone.RightHand; if (false) { hb.add(ph); ph.position.set(0, 9, 4); ph.rotation.set(-1.2, 0, 0); } }
+const lerp_ = (a, b, k) => a + (b - a) * k;
+// ---------------- 3D labels (plain white text + black outline, no box) ----------------
+const LBL = []; const L = (txt, st, pos, a0, a1, h = 1.1) => { const s = label(txt, h); ST[st].add(s); LBL.push([s, PV(...pos), a0, a1]); return s; };
+L('GTA 6', 'A', [0, 8.2, 0.5], 2.0, TL.st.A[1] + 0.1, 1.3);
+L('খরচের টাকা', 'B', [-1.5, 7.2, 0], TL.st.B[0] + 0.2, E('burj') - 0.1, 2.2);
+L('বুর্জ খলিফা', 'B', [2.5, 21, -2], E('burj'), TL.st.B[1], 3.0);
+L('$১ বিলিয়ন', 'C', [-4.8, 6.4, 0], E('b1') + 0.3, TL.st.C[1], 1.6); L('$১.৫ বিলিয়ন', 'C', [0, 8.6, 0], E('b2') + 0.3, TL.st.C[1], 1.6); L('$২ বিলিয়ন', 'C', [6, 11, 0], E('b3') + 0.4, TL.st.C[1], 1.9);
+L('= GTA 6', 'C', [6, 13.0, 0], E('cmp'), TL.st.C[1], 1.5); L('= বুর্জ খলিফা', 'C', [0, 10.6, 0], E('cmp') + 0.4, TL.st.C[1], 1.5);
+L('এত টাকা কেন?', 'D', [-2.5, 4.4, 12], E('q') + 0.2, E('devs') - 0.1, 0.9);
+L('হাজার হাজার ডেভেলপার', 'D', [0, 18.5, -3], E('devs'), E('open'), 2.4); L('বছরের পর বছর', 'D', [9.5, 7.2, 3], E('years'), E('open'), 1.5);
+L('বিশাল ওপেন ওয়ার্ল্ড', 'E', [0, 9, 0], E('open'), E('chars') + 0.1, 2.0);
+L('বাস্তবসম্মত চরিত্র', 'F', [0, 6.6, 0], E('chars'), E('mocap'), 1.1); L('মোশন ক্যাপচার', 'F', [0, 6.6, 0], E('mocap'), E('voice'), 1.1);
+L('ভয়েস অ্যাক্টিং', 'F', [3.5, 7.0, -0.5], E('voice'), E('tech'), 1.1); L('আধুনিক প্রযুক্তি', 'F', [-2, 5.4, -9], E('tech'), TL.st.F[1] + 0.1, 1.2);
+L('শুধু গেম না…', 'G', [0, 8.2, 0], TL.st.G[0] + 0.4, E('virtual'), 1.6); L('ভার্চুয়াল দুনিয়া', 'G', [0, 8.2, 0], E('virtual'), TL.st.G[1] + 0.1, 2.0);
+L('রিলিজের ২৪ ঘণ্টায়', 'H', [0, 9.4, -1], TL.st.H[0] + 0.2, E('kolpona'), 1.7);  L('এক দিনেই লাভ', 'H', [0, 9.4, 0], E('labh'), TL.st.H[1], 1.6);
+L('আপনি কোনটা?', 'I', [0, 10.2, 0], TL.st.I[0] + 0.2, E('comment'), 1.3); L('কমেন্টে জানান', 'I', [0, 10.2, 0], E('comment'), TL.dur, 1.4);
+// ---------------- 3D x-ray circles (render-to-texture: the inside is real 3D, no 2D drawing) ----------------
+const xrRT = new THREE.WebGLRenderTarget(640, 640, { samples: 2 }); xrRT.texture.colorSpace = THREE.SRGBColorSpace;
+const xrCam = new THREE.PerspectiveCamera(50, 1, 0.05, 400);
+const circA = K.canvasTex(256, 256, (g) => { g.fillStyle = '#000'; g.fillRect(0, 0, 256, 256); g.fillStyle = '#fff'; g.beginPath(); g.arc(128, 128, 120, 0, 7); g.fill(); });
+const ringT = K.canvasTex(256, 256, (g) => { g.strokeStyle = '#ff3b30'; g.lineWidth = 14; g.beginPath(); g.arc(128, 128, 118, 0, 7); g.stroke(); g.strokeStyle = 'rgba(255,255,255,0.7)'; g.lineWidth = 3; g.beginPath(); g.arc(128, 128, 106, 0, 7); g.stroke(); });
+const xrS = new THREE.Sprite(new THREE.SpriteMaterial({ map: xrRT.texture, alphaMap: circA, transparent: true, depthTest: false, depthWrite: false, toneMapped: false, fog: false })); xrS.renderOrder = 30; K.scene.add(xrS);
+const xrR = new THREE.Sprite(new THREE.SpriteMaterial({ map: ringT, transparent: true, depthTest: false, depthWrite: false, toneMapped: false, fog: false })); xrR.renderOrder = 31; K.scene.add(xrR);
+// what's inside the game case: a hidden vault of cash + gold (only seen through the x-ray)
+{ const g = new THREE.Group(); g.position.set(0, 3.6, 0); ST.A.userData.case.add(g); const lt = new THREE.PointLight(0xffd27a, 30, 8, 1.5); lt.position.set(0, 1.4, 0.2); g.add(lt); const cash = K.instanced(new THREE.BoxGeometry(0.6, 0.18, 0.3), M.cash, 60, g); const gold = K.instanced(new THREE.BoxGeometry(0.4, 0.14, 0.2), M.gold, 30, g); for (let i = 0; i < 60; i++) K.setInst(cash, i, [K.rnd(-2.2, 2.2), -2.9 + Math.floor(i / 12) * 0.2 + K.rnd(0, 0.05), K.rnd(-0.2, 0.2)], 1, 0, K.rnd(-0.3, 0.3), 0); for (let i = 0; i < 30; i++) K.setInst(gold, i, [K.rnd(-2, 2), -1.8 + K.rnd(0, 0.5), K.rnd(-0.15, 0.15)], 1, 0, K.rnd(0, 3), 0); cash.instanceMatrix.needsUpdate = true; gold.instanceMatrix.needsUpdate = true; ST.A.userData.vault = g; }
+// x-ray plan: [t0, t1, station, sprite world pos, sprite size, inside-camera pos, look]
+const XR = [
+  [2.1, TL.st.A[1] + 0.05, 'A', [0, 3.7, 0.9], 3.6, [0, 3.0, 2.2], [0, 2.4, 0]],
+  [E('devs') + 0.1, E('open') - 0.05, 'D', [0, 7.5, 3], 6.5, [0, 2.6, 3.6], [0, 1.6, -1.5]],
+  [E('inc') + 0.1, E('kolpona') - 0.05, 'H', [5, 4.6, 2], 3.4, [5, 4.2, 1.6], [5, 1.6, 0]],
+];
 // ---------------- camera ----------------
 // keys at each station: start a bit wide, end close; side swings for parallax
 const st = k => TL.st[k];
 const camKeys = [];
 const addCam = (t, p, l, fov = 42) => camKeys.push({ t, p, l, fov });
-{
-  const A = st('A'); addCam(A[0], [0, 4.2, 25], [0, 3.6, 0], 42); addCam((A[0] + A[1]) / 2, [-5, 4.6, 20], [0, 3.6, 0], 42); addCam(A[1], [2, 4.2, 16], [0, 3.8, 0], 42);
-  const B = st('B'), bm = (B[0] + B[1]) / 2; addCam(B[0], [-12, 5, Z.B + 34], [-1, 6, Z.B], 46); addCam(E('burj'), [-16, 14, Z.B + 50], [2, 18, Z.B], 48); addCam(B[1], [-9, 26, Z.B + 62], [4, 24, Z.B], 48);
-  const C = st('C'); addCam(C[0], [0, 7, Z.C + 36], [0, 4, Z.C], 44); addCam(E('b3'), [9, 8, Z.C + 30], [0, 5, Z.C], 44); addCam(C[1], [-4, 9, Z.C + 26], [1, 5.5, Z.C], 44);
-  const D = st('D'); addCam(D[0], [-8, 5, Z.D + 32], [0, 6, Z.D], 44); addCam(E('devs'), [7, 9, Z.D + 34], [0, 8, Z.D - 3], 44); addCam(D[1], [11, 6, Z.D + 24], [4, 5, Z.D + 2], 44);
-  const E_ = st('E'); addCam(E_[0], [0, 21, Z.E + 28], [0, 1, Z.E], 46); addCam(E_[1], [11, 13, Z.E + 20], [0, 1.5, Z.E], 44);
-  const F = st('F'); addCam(F[0], [-3, 4.5, Z.F + 15], [-2, 3.2, Z.F], 44); addCam(E('voice'), [5, 5, Z.F + 17], [3, 3.8, Z.F - 1], 44); addCam(F[1], [-2, 7, Z.F + 6], [-2, 2.6, Z.F - 9], 46);
-  const G = st('G'); addCam(G[0], [0, 10, Z.G + 25], [0, 3, Z.G], 46); addCam((G[0] + G[1]) / 2, [-13, 8, Z.G + 19], [0, 3, Z.G], 44); addCam(G[1], [0, 15, Z.G + 20], [0, 2, Z.G], 46);
-  const H_ = st('H'); addCam(H_[0], [0, 7, Z.H + 32], [0, 5, Z.H], 44); addCam(E('inc'), [-5, 7, Z.H + 25], [-1, 5, Z.H], 44); addCam(H_[1], [6, 6, Z.H + 22], [3, 3.5, Z.H], 44);
-  const I_ = st('I'); addCam(I_[0], [0, 6, Z.I + 24], [0, 5, Z.I], 44); addCam(I_[1], [0, 5.6, Z.I + 17], [0, 5, Z.I], 42);
-}
+// over-the-shoulder rigs: hero in the foreground (large, whole body), subject behind; slow push-in + orbit
+const RIGS = { // S: subject focus (local), h: hero (x,z local), cd: cam distance behind hero, ch: cam height, so: side offset (+ = hero on left of frame)
+  A: { S: [0, 3.4, 0], h: [-1.6, 9.5], cd: 7.5, ch: 2.9, so: -1.1 },
+  B: { S: [1, 9, -2], h: [-3.5, 13], cd: 8.5, ch: 2.2, so: -1.1, up: 8 },
+  C: { S: [0, 4, 0], h: [-2.5, 13], cd: 8.5, ch: 3.0, so: -1.1 },
+  D: { S: [0, 6.5, -3], h: [-2.5, 16], cd: 8.5, ch: 3.0, so: -1.1 },
+  E: { S: [0, 1.5, 0], h: [-1.5, 13.5], cd: 7.5, ch: 5.5, so: -1.0 },
+  G: { S: [0, 3, 0], h: [-1.8, 11.5], cd: 7.5, ch: 3.0, so: -1.1 },
+  H: { S: [0, 4.5, 0], h: [-1.2, 12.5], cd: 7.5, ch: 3.0, so: 1.1 },
+  I: { S: [0, 5, 0], h: [-2.4, 8.5], cd: 6.8, ch: 2.9, so: 1.0 },
+};
+const HP = {};
+for (const k in RIGS) { const r = RIGS[k], [a, b] = st(k), z0 = Z[k]; const S = V(r.S[0], r.S[1], r.S[2] + z0), Hh = V(r.h[0], 0, r.h[1] + z0); HP[k] = Hh;
+  const dir = Hh.clone().sub(V(S.x, 0, S.z)).normalize(), side = V(dir.z, 0, -dir.x);
+  const at = (u, f) => { const ang = (u - 0.5) * 0.22; const d2 = dir.clone().applyAxisAngle(V(0, 1, 0), ang), s2 = V(d2.z, 0, -d2.x); const cd = r.cd * f; const p = Hh.clone().addScaledVector(d2, cd).addScaledVector(s2, r.so * f); p.y = r.ch + (r.up || 0) * Math.max(0, u - 0.6) / 0.4; const look = S.clone().lerp(V(Hh.x, 1.6, Hh.z), 0.18); look.y += (r.up || 0) * Math.max(0, u - 0.6) / 0.4 * 1.4; return [p.toArray(), look.toArray()]; };
+  const [p0, l0] = at(0, 1.22), [p1, l1] = at(0.5, 1.0), [p2, l2] = at(1, 0.86); addCam(a + 0.05, p0, l0, 44); addCam((a + b) / 2, p1, l1, 44); addCam(b - 0.05, p2, l2, 44); }
+{ const F = st('F'); addCam(F[0] + 0.05, [-3, 4.5, Z.F + 15], [-2, 3.2, Z.F], 44); addCam(E('voice'), [5, 5, Z.F + 17], [3, 3.8, Z.F - 1], 44); addCam(F[1] - 0.05, [-2, 7, Z.F + 6], [-2, 2.6, Z.F - 9], 46); }
 camKeys.sort((a, b) => a.t - b.t);
 K.setCamKeys(camKeys);
-window.STZ = Z;
-
+// put each station's hero in the foreground of that station's middle camera key (never tiny, never out of frame)
+const HEROES = { A: HA, B: HB, C: HC, D: HD, E: HE, G: HG, H: HH, I: HI };
+for (const k in HEROES) { const Hh = HP[k], o = HEROES[k].p.root; const c = camKeys.find(q => q.t >= TL.st[k][0]); o.position.set(Hh.x, 0, Hh.z - Z[k]); o.rotation.y = Math.atan2(c.p[0] - Hh.x, c.p[2] - Hh.z) + (RIGS[k].so < 0 ? 0.35 : -0.35); }
 // ---------------- animation ----------------
 const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _p = new THREE.Vector3(), _s = new THREE.Vector3();
 function curStation(t) { let best = 'A'; for (const k in TL.st) if (t >= TL.st[k][0] - 0.8) best = k; return best; }
@@ -272,6 +339,24 @@ function update(t) {
   H.userData.lid.rotation.x = -1.6 * mk;
   H.userData.billP.forEach(([x, vy, zz, d, r], i) => { const age = ((t - E('money')) * 0.9 + d) % 1.6; const on = t > E('money'); const tt = age; _p.set(5 + x * 4 * tt, on ? 2 + vy * tt - 6 * tt * tt : -20, zz * 3 * tt); _q.setFromEuler(_e.set(r + t * 3, r, t * 2 + r)); _s.setScalar(on ? 1 : 0.001); _m.compose(_p, _q, _s); H.userData.bills.setMatrixAt(i, _m); }); H.userData.bills.instanceMatrix.needsUpdate = true;
   // I phone gently floats
+  // people
+  for (const o of PPL) { if (!ST[o.st].visible) continue; const r = o.fn(t); const P_ = o.p; if (r.pos) { P_.root.position.x = r.pos[0]; P_.root.position.z = r.pos[1]; } if (r.ry != null) P_.root.rotation.y = r.ry; P_.update(t, r.w, r.speed || 1);
+    if (r.point) P_.point(r.point, 'Right'); if (r.flinch) P_.flinch(r.flinch); if (r.hands) P_.handsOn('head', r.hands); if (r.lookUp) P_.turn('Neck', [1, 0, 0], -0.5 * r.lookUp).turn('Head', [1, 0, 0], -0.3 * r.lookUp);
+    if (r.type) { P_.turn('LeftArm', [1, 0, 0], -0.9).turn('RightArm', [1, 0, 0], -0.9).turn('LeftForeArm', [0, 1, 0], 0.9 + 0.08 * Math.sin(t * 23 + o.p.root.position.x)).turn('RightForeArm', [0, 1, 0], -0.9 - 0.08 * Math.sin(t * 19 + o.p.root.position.x)); }
+    if (r.phone) { P_.turn('RightArm', [1, 0, 0], -0.7).turn('RightForeArm', [0, 1, 0], -1.5); }
+    P_.mouth(Math.min(1, r.mouth || 0)); P_.smile(0.15); }
+  // labels
+  for (const [s_, pos, a0, a1] of LBL) { if (!s_.parent.visible) continue; showLabel(s_, pos, t, a0, a1); }
+  // x-ray: render the inside from a close camera into the circle
+  xrS.visible = xrR.visible = false;
+  for (const [a0, a1, st_, sp, size, cp, lk] of XR) { if (t < a0 || t > a1) continue; const k = Math.max(0.001, (1 - Math.pow(1 - cl((t - a0) / 0.35), 3)) * cl((a1 - t) / 0.25)); const z0 = Z[st_];
+    xrCam.position.set(cp[0], cp[1], cp[2] + z0); xrCam.lookAt(lk[0], lk[1], lk[2] + z0); xrCam.updateMatrixWorld();
+    const hideCase = st_ === 'A'; const front = ST.A.userData.case.children[1]; if (hideCase) ST.A.userData.case.children.forEach(c => { if (c !== ST.A.userData.vault && c.isMesh) c.visible = false; });
+    const bg = K.scene.background; K.scene.background = new THREE.Color(st_ === 'A' ? 0x120c04 : 0x0b1220); LBL.forEach(l => l[0].userData.v = l[0].visible); LBL.forEach(l => l[0].visible = false);
+    if (st_ === 'D') ST.D.children[0].children.forEach(c => { if (c.material === M.glass) c.visible = false; });
+    R.setRenderTarget(xrRT); R.render(K.scene, xrCam); R.setRenderTarget(null);
+    K.scene.background = bg; LBL.forEach(l => l[0].visible = l[0].userData.v); if (hideCase) ST.A.userData.case.children.forEach(c => c.visible = true); if (st_ === 'D') ST.D.children[0].children.forEach(c => c.visible = true);
+    xrS.visible = xrR.visible = true; xrS.position.set(sp[0], sp[1], sp[2] + z0); xrR.position.copy(xrS.position); xrS.scale.setScalar(size * k); xrR.scale.setScalar(size * 1.04 * k); }
   ST.I.userData.phone.position.y = 0.2 * Math.sin(t * 1.4); ST.I.userData.phone.rotation.y = Math.sin(t * 0.6) * 0.25;
   // camera shake hooks
 }
