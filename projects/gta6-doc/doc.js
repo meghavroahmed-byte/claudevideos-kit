@@ -92,13 +92,13 @@ const coverTex = K.canvasTex(512, 640, (g, w, h) => {
 const NIGHT = !location.search.includes('day');
 if (NIGHT) {
   ground.visible = false; path_.visible = false; K.scene.children.filter(o => o.isMesh && o.material === fenceM).forEach(o => o.visible = false);
-  K.scene.background = new THREE.Color(0x07040a); K.scene.backgroundIntensity = 1; K.scene.environmentIntensity = 0.35; K.scene.fog = new THREE.FogExp2(0x120806, 0.0105);
-  { const skyN = new THREE.Mesh(new THREE.SphereGeometry(600, 32, 16), new THREE.ShaderMaterial({ side: THREE.BackSide, depthWrite: false, fog: false, vertexShader: 'varying vec3 vp; void main(){ vp = normalize(position); gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }', fragmentShader: 'varying vec3 vp; void main(){ float h = clamp(vp.y,0.,1.); vec3 c = mix(vec3(0.20,0.07,0.03), vec3(0.015,0.01,0.02), pow(h,0.55)); gl_FragColor = vec4(c,1.); }' })); K.scene.add(skyN); window.__skyN = skyN; }
-  K.gridFloor(1400, 6, { bg: '#0a0605', line: 'rgba(255,140,60,0.55)', line2: 'rgba(255,140,60,0.16)' }).position.z = 200;
-  K.dust(1400, -40, 40, -20, 360, 22).material.color.set(0xffb070);
-  R.toneMappingExposure = 0.9; K.bloom.strength = 0.7; K.bloom.threshold = 0.86; K.bloom.radius = 0.5; M.steel.color.set(0x8fa3b8); M.steel.roughness = 0.35; M.white.color.set(0xb9b2ad); M.glass.opacity = 0.35;
-  K.hemi.color.set(0xffb27a); K.hemi.groundColor.set(0x1a0a06); K.hemi.intensity = 0.55; K.moon.color.set(0xffd2a0); K.moon.intensity = 2.2;
-  window.__rim = new THREE.DirectionalLight(0x6fd6ff, 1.6); window.__rim.position.set(30, 25, 60); K.scene.add(window.__rim);
+  K.scene.background = new THREE.Color(0x05070a); K.scene.backgroundIntensity = 1; K.scene.environmentIntensity = 0.45; K.scene.fog = new THREE.FogExp2(0x0e131a, 0.011);
+  { const skyN = new THREE.Mesh(new THREE.SphereGeometry(600, 32, 16), new THREE.ShaderMaterial({ side: THREE.BackSide, depthWrite: false, fog: false, vertexShader: 'varying vec3 vp; void main(){ vp = normalize(position); gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }', fragmentShader: 'varying vec3 vp; void main(){ float h = clamp(vp.y,0.,1.); vec3 c = mix(vec3(0.10,0.13,0.17), vec3(0.018,0.022,0.03), pow(h,0.55)); c += vec3(0.10,0.07,0.03)*smoothstep(0.0,0.06,h)*(1.0-smoothstep(0.06,0.25,h)); gl_FragColor = vec4(c,1.); }' })); K.scene.add(skyN); window.__skyN = skyN; }
+  K.gridFloor(1400, 6, { bg: '#07090c', line: 'rgba(120,170,190,0.22)', line2: 'rgba(120,170,190,0.07)' }).position.z = 200;
+  K.dust(1400, -40, 40, -20, 360, 22).material.color.set(0xd8c8a8);
+  R.toneMappingExposure = 0.9; K.bloom.strength = 0.5; K.bloom.threshold = 0.88; K.bloom.radius = 0.5; M.steel.color.set(0x8fa3b8); M.steel.roughness = 0.35; M.white.color.set(0xb9b2ad); M.glass.opacity = 0.35;
+  K.hemi.color.set(0xbfd4e6); K.hemi.groundColor.set(0x0b0d10); K.hemi.intensity = 0.6; K.moon.color.set(0xffe2b8); K.moon.intensity = 2.4;
+  window.__rim = new THREE.DirectionalLight(0x6fc8d8, 1.6); window.__rim.position.set(30, 25, 60); K.scene.add(window.__rim);
 }
 // glowing neon outline around any object (edges as emissive lines -> bloom)
 function neonOutline(obj, color = 0xffb347, thresh = 30) { obj.updateMatrixWorld(true); const grp = new THREE.Group(); obj.traverse(m => { if (!m.isMesh || m.isInstancedMesh || m.isSkinnedMesh) return; const e = new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry, thresh), new THREE.LineBasicMaterial({ color, toneMapped: false, transparent: true, opacity: 0.95 })); e.position.copy(m.position); e.rotation.copy(m.rotation); e.scale.copy(m.scale).multiplyScalar(1.01); m.parent.add(e); grp.add(e); }); return grp; }
@@ -168,7 +168,7 @@ const cars = [];
   for (let i = 0; i < 22; i++) { const a = K.rnd(0, 6.28), r = K.rnd(0.8, 4.6); const h = K.rnd(0.8, 4.5) * (r < 2.5 ? 1.6 : 1); const b = K.box(K.rnd(0.7, 1.4), h, K.rnd(0.7, 1.4), bM[i % 4], Math.cos(a) * r, 1.2 + h / 2, Math.sin(a) * r + (Math.abs(Math.sin(a) * r) < 0.7 ? 1.2 : 0), g); b.castShadow = true; }
   const trunkM = K.std({ color: 0x7a5530, roughness: 1 }), leafM = K.std({ color: 0x2f8a3a, roughness: 0.8, flatShading: true });
   for (let i = 0; i < 16; i++) { const a = i / 16 * 6.28 + 0.2, r = 7.6; const p = K.group(Math.cos(a) * r, 1.2, Math.sin(a) * r, g); K.mesh(new THREE.CylinderGeometry(0.08, 0.14, 2.2, 6), trunkM, 0, 1.1, 0, p); for (let l = 0; l < 6; l++) { const lf = K.mesh(new THREE.ConeGeometry(0.22, 1.4, 4), leafM, 0, 2.2, 0, p); lf.rotation.z = 1.2; lf.rotation.y = l; lf.position.x = Math.cos(l) * 0.4; lf.position.z = -Math.sin(l) * 0.4; } shadowy(p); }
-  const carCols = [0xff3d9a, 0xffd23f, 0x3de8ff, 0xffffff, 0xff6b2a];
+  const carCols = [0xf2b84b, 0xffd23f, 0x4fc7d6, 0xffffff, 0xff6b2a];
   for (let i = 0; i < 5; i++) { const c = K.group(0, 1.35, 0, g); K.box(0.7, 0.25, 0.36, K.std({ color: carCols[i], roughness: 0.3, metalness: 0.4 }), 0, 0, 0, c); K.box(0.36, 0.2, 0.32, K.std({ color: 0x223344, roughness: 0.2 }), -0.05, 0.2, 0, c); shadowy(c); cars.push([c, i / 5 * 6.28, 0.5 + i * 0.07]); }
 }
 // F: motion capture: mannequin with markers, tripod cameras, big mic and a glowing chip
@@ -190,7 +190,7 @@ const mannequin = (parent, x, z, col = 0x22242c) => {
   const mic = K.group(7, 0, -1, g); g.userData.mic = mic; K.mesh(new THREE.CylinderGeometry(0.06, 0.06, 4.4, 8), M.dark, 0, 2.2, 0, mic); K.mesh(new THREE.CylinderGeometry(0.9, 0.9, 0.12, 24), M.dark, 0, 0.06, 0, mic);
   const head = K.mesh(new THREE.CapsuleGeometry(0.55, 0.9, 8, 16), M.steel, 0, 5.1, 0, mic); K.mesh(new THREE.TorusGeometry(0.75, 0.07, 8, 32), M.dark, 0, 4.8, 0, mic).rotation.x = Math.PI / 2; shadowy(mic);
   // chip
-  const chip = K.group(-2, 0, -9, g); g.userData.chip = chip; K.box(3.4, 0.4, 3.4, K.std({ color: 0x1a1f2a, metalness: 0.6, roughness: 0.3 }), 0, 2.6, 0, chip); K.box(2.0, 0.42, 2.0, K.std({ color: 0x2a3140, emissive: 0x3de8ff, emissiveIntensity: 0.25, metalness: 0.7, roughness: 0.25 }), 0, 2.62, 0, chip); for (let i = 0; i < 8; i++) for (const s of [-1, 1]) { K.box(0.12, 0.08, 0.6, M.gold, -1.4 + i * 0.4, 2.5, s * 2.0, chip); K.box(0.6, 0.08, 0.12, M.gold, s * 2.0, 2.5, -1.4 + i * 0.4, chip); } shadowy(chip);
+  const chip = K.group(-2, 0, -9, g); g.userData.chip = chip; K.box(3.4, 0.4, 3.4, K.std({ color: 0x1a1f2a, metalness: 0.6, roughness: 0.3 }), 0, 2.6, 0, chip); K.box(2.0, 0.42, 2.0, K.std({ color: 0x2a3140, emissive: 0x4fc7d6, emissiveIntensity: 0.25, metalness: 0.7, roughness: 0.25 }), 0, 2.62, 0, chip); for (let i = 0; i < 8; i++) for (const s of [-1, 1]) { K.box(0.12, 0.08, 0.6, M.gold, -1.4 + i * 0.4, 2.5, s * 2.0, chip); K.box(0.6, 0.08, 0.12, M.gold, s * 2.0, 2.5, -1.4 + i * 0.4, chip); } shadowy(chip);
 }
 // G: virtual world: glass dome over a mini city on a pedestal
 {
@@ -199,7 +199,7 @@ const mannequin = (parent, x, z, col = 0x22242c) => {
   const cityG = K.group(0, 1.4, 0, g); const bM = [K.std({ color: 0xff7ab8, roughness: 0.5 }), K.std({ color: 0x6fd6ff, roughness: 0.5 }), K.std({ color: 0xffe07a, roughness: 0.5 })];
   for (let i = 0; i < 40; i++) { const a = K.rnd(0, 6.28), r = Math.sqrt(K.rnd(0, 1)) * 5.2; const h = K.rnd(0.4, 3.6) * (1.3 - r / 6); const b = K.box(0.6, h, 0.6, bM[i % 3], Math.cos(a) * r, h / 2, Math.sin(a) * r, cityG); b.castShadow = true; }
   const dome = K.mesh(new THREE.SphereGeometry(6.2, 48, 24, 0, 6.29, 0, Math.PI / 2), K.std({ color: 0xbfe8ff, transparent: true, opacity: 0.22, roughness: 0.05, metalness: 0.3 }), 0, 1.4, 0, g); g.userData.dome = dome;
-  const grid = K.mesh(new THREE.SphereGeometry(6.25, 24, 12, 0, 6.29, 0, Math.PI / 2), K.basic({ color: 0x3de8ff, wireframe: true, transparent: true, opacity: 0.35 }), 0, 1.4, 0, g); g.userData.grid = grid;
+  const grid = K.mesh(new THREE.SphereGeometry(6.25, 24, 12, 0, 6.29, 0, Math.PI / 2), K.basic({ color: 0x4fc7d6, wireframe: true, transparent: true, opacity: 0.35 }), 0, 1.4, 0, g); g.userData.grid = grid;
 }
 // H: release day: giant clock + money fountain
 {
@@ -238,11 +238,11 @@ Object.values(ST).forEach(g => g.traverse(m => { if (m.isMesh && m.castShadow ==
 
 // neon outlines per station (section colours like the approved v2 short)
 if (NIGHT) {
-  neonOutline(ST.A.userData.case, 0xffc04a); neonOutline(ST.B.userData.tower, 0xffd27a, 20); ST.C.userData.stacks.forEach(s_ => neonOutline(s_.st, 0x5cff9d));
-  neonOutline(ST.D.children[0], 0x3de8ff); neonOutline(ST.E, 0xff3d9a, 40); neonOutline(ST.F.userData.chip, 0x3de8ff); neonOutline(ST.F.userData.mic, 0xffc04a);
-  neonOutline(ST.G, 0x8fe3ff, 40); neonOutline(ST.H.userData.clk, 0xff4d5a); neonOutline(ST.I.userData.phone, 0xff3d9a);
+  neonOutline(ST.A.userData.case, 0xf2b84b); neonOutline(ST.B.userData.tower, 0xe8d2a6, 20); ST.C.userData.stacks.forEach(s_ => neonOutline(s_.st, 0x4fc7d6));
+  neonOutline(ST.D.children[0], 0x4fc7d6); neonOutline(ST.E, 0xf2b84b, 40); neonOutline(ST.F.userData.chip, 0x4fc7d6); neonOutline(ST.F.userData.mic, 0xf2b84b);
+  neonOutline(ST.G, 0x8fb8d0, 40); neonOutline(ST.H.userData.clk, 0xe5533d); neonOutline(ST.I.userData.phone, 0xf2b84b);
   // a glowing ring pad under every station's hero object
-  const SEC = { A: 0xffc04a, B: 0xffd27a, C: 0x5cff9d, D: 0x3de8ff, E: 0xff3d9a, F: 0x3de8ff, G: 0x8fe3ff, H: 0xff4d5a, I: 0xff3d9a };
+  const SEC = { A: 0xf2b84b, B: 0xe8d2a6, C: 0x4fc7d6, D: 0x4fc7d6, E: 0xf2b84b, F: 0x4fc7d6, G: 0x8fb8d0, H: 0xe5533d, I: 0xf2b84b };
   for (const k in ST) { const ring = new THREE.Mesh(new THREE.RingGeometry(9, 9.25, 96), new THREE.MeshBasicMaterial({ color: SEC[k], toneMapped: false, side: THREE.DoubleSide, transparent: true, opacity: 0.9 })); ring.rotation.x = -Math.PI / 2; ring.position.y = 0.05; ST[k].add(ring); const gl = K.glowSprite(SEC[k], 30, 0.25, ST[k]); gl.position.y = 0.3; }
 }
 // ---------------- realistic people (3D only, no 2D) ----------------
@@ -264,7 +264,7 @@ const perf = addP('soldier', 'F', -2, 0, 0.3, 1.3, t => ({ w: { run: 1 }, speed:
 perf.p.root.traverse(m => { if (m.isMesh) { m.material = m.material.clone(); m.material.color.set(0x1a1c24); m.material.map = null; m.material.roughness = 0.7; } });
 const MKR = new THREE.MeshBasicMaterial({ color: 0xeaff6a }); ['Head', 'LeftArm', 'RightArm', 'LeftForeArm', 'RightForeArm', 'LeftHand', 'RightHand', 'Spine2', 'Hips', 'LeftUpLeg', 'RightUpLeg', 'LeftLeg', 'RightLeg', 'LeftFoot', 'RightFoot'].forEach(n => { const b = perf.p.bone[n]; if (b) { const m = new THREE.Mesh(new THREE.SphereGeometry(4, 10, 8), MKR); b.add(m); m.position.set(0, 4, 6); } });
 const twin = addP('soldier', 'F', -2, -5.5, 0.3, 1.3, t => ({ w: { run: 1 }, speed: 1 }));
-twin.p.root.traverse(m => { if (m.isMesh) { m.material = new THREE.MeshBasicMaterial({ color: 0x3de8ff, wireframe: true, transparent: true, opacity: 0.55 }); m.castShadow = false; } });
+twin.p.root.traverse(m => { if (m.isMesh) { m.material = new THREE.MeshBasicMaterial({ color: 0x4fc7d6, wireframe: true, transparent: true, opacity: 0.55 }); m.castShadow = false; } });
 const HF = addP('hero', 'F', 5.6, 1.4, -0.5, 1.5, t => ({ w: { idle: 1 }, mouth: VO(t) * (1 + env(t, E('voice'), E('tech'), 0.2, 0.2)) }));
 const HG = addP('hero', 'G', 0, 13, 0, 1.5, t => { const a = -0.9 + 0.9 * sm(TL.st.G[0], E('virtual'), t); return { w: { idle: 1 - env(t, E('virtual'), TL.st.G[1], 0.3, 0.3), agree: env(t, E('virtual'), TL.st.G[1], 0.3, 0.3) }, mouth: VO(t) }; });
 const HH = addP('hero', 'H', 1.2, 15, -0.15, 1.5, t => ({ w: { idle: 1 - env(t, E('kolpona'), E('labh') + 1.5, 0.3, 0.4), headShake: env(t, E('kolpona'), E('labh') + 1.5, 0.3, 0.4) }, flinch: env(t, E('inc'), E('inc') + 0.8, 0.1, 0.4) * 0.7, mouth: VO(t) }));
@@ -294,7 +294,7 @@ const ringT = K.canvasTex(256, 256, (g) => { g.strokeStyle = '#ff3b30'; g.lineWi
 const xrS = new THREE.Sprite(new THREE.SpriteMaterial({ map: xrRT.texture, alphaMap: circA, transparent: true, depthTest: false, depthWrite: false, toneMapped: false, fog: false })); xrS.renderOrder = 30; K.scene.add(xrS);
 const xrR = new THREE.Sprite(new THREE.SpriteMaterial({ map: ringT, transparent: true, depthTest: false, depthWrite: false, toneMapped: false, fog: false })); xrR.renderOrder = 31; K.scene.add(xrR);
 // what's inside the game case: a hidden vault of cash + gold (only seen through the x-ray)
-{ const g = new THREE.Group(); g.position.set(0, 3.6, 0); ST.A.userData.case.add(g); const lt = new THREE.PointLight(0xffd27a, 30, 8, 1.5); lt.position.set(0, 1.4, 0.2); g.add(lt); const cash = K.instanced(new THREE.BoxGeometry(0.6, 0.18, 0.3), M.cash, 60, g); const gold = K.instanced(new THREE.BoxGeometry(0.4, 0.14, 0.2), M.gold, 30, g); for (let i = 0; i < 60; i++) K.setInst(cash, i, [K.rnd(-2.2, 2.2), -2.9 + Math.floor(i / 12) * 0.2 + K.rnd(0, 0.05), K.rnd(-0.2, 0.2)], 1, 0, K.rnd(-0.3, 0.3), 0); for (let i = 0; i < 30; i++) K.setInst(gold, i, [K.rnd(-2, 2), -1.8 + K.rnd(0, 0.5), K.rnd(-0.15, 0.15)], 1, 0, K.rnd(0, 3), 0); cash.instanceMatrix.needsUpdate = true; gold.instanceMatrix.needsUpdate = true; ST.A.userData.vault = g; }
+{ const g = new THREE.Group(); g.position.set(0, 3.6, 0); ST.A.userData.case.add(g); const lt = new THREE.PointLight(0xe8d2a6, 30, 8, 1.5); lt.position.set(0, 1.4, 0.2); g.add(lt); const cash = K.instanced(new THREE.BoxGeometry(0.6, 0.18, 0.3), M.cash, 60, g); const gold = K.instanced(new THREE.BoxGeometry(0.4, 0.14, 0.2), M.gold, 30, g); for (let i = 0; i < 60; i++) K.setInst(cash, i, [K.rnd(-2.2, 2.2), -2.9 + Math.floor(i / 12) * 0.2 + K.rnd(0, 0.05), K.rnd(-0.2, 0.2)], 1, 0, K.rnd(-0.3, 0.3), 0); for (let i = 0; i < 30; i++) K.setInst(gold, i, [K.rnd(-2, 2), -1.8 + K.rnd(0, 0.5), K.rnd(-0.15, 0.15)], 1, 0, K.rnd(0, 3), 0); cash.instanceMatrix.needsUpdate = true; gold.instanceMatrix.needsUpdate = true; ST.A.userData.vault = g; }
 // x-ray plan: [t0, t1, station, sprite world pos, sprite size, inside-camera pos, look]
 const XR = [
   [2.1, TL.st.A[1] + 0.05, 'A', [0, 3.7, 0.9], 3.6, [0, 3.0, 2.2], [0, 2.4, 0]],
@@ -333,32 +333,33 @@ for (const k in HEROES) { const Hh = HP[k], o = HEROES[k].p.root; const c = camK
 // ---------------- 3D motion graphics (v2 vocabulary in 3D) ----------------
 const G_ = (st, x, y, z) => { const g = new THREE.Group(); g.position.set(x, y, z); ST[st].add(g); return g; };
 const MG = {
-  aRing: dashRing(4.3, 0xffcf5a, G_('A', 0, 3.6, -0.7)), aBadge: badge('dollar', 1.1, 0xffcf5a, G_('A', -4.3, 7.0, 1.6)),
-  bDollar: neonIcon('dollar', 5, 0x5cff9d, G_('B', -4, 10.5, 1)), bRing: ringGauge(3.3, 0x5cff9d, G_('B', -4, 10.5, 1)), bTop: dashRing(3.2, 0xffd27a, G_('B', 4.5, 46, -2)),
-  cB: [-6, 0, 6].map((x, i) => badge('dollar', 0.9, 0x5cff9d, G_('C', x, [6.4, 8.6, 11][i] - 0.6, 1.5))),
-  cTower: badge('tower', 1.4, 0x8fe3ff, G_('C', -2.4, 4.2, 12)), cPad: badge('pad', 1.4, 0xff3d9a, G_('C', 2.4, 4.2, 12)), cR1: ringGauge(1.75, 0x8fe3ff, G_('C', -2.4, 4.2, 12)), cR2: ringGauge(1.75, 0xff3d9a, G_('C', 2.4, 4.2, 12)),
-  dQ: neonIcon('q', 3.2, 0xffcf5a, G_('D', -0.2, 6.6, 15)),
-  dHub: badge('dollar', 1.2, 0xffcf5a, G_('D', 0, 6, 10)), dSp: [['team', -3.2, 2.6], ['globe', 3.2, 2.6], ['cam', -3.2, -2.2], ['mic', 3.2, -2.2]].map(([n, x, y]) => ({ b: badge(n, 0.9, 0x8fe3ff, G_('D', x, 6 + y, 10)), l: beam(new THREE.Vector3(0, 0, 0), new THREE.Vector3(x * 0.72, y * 0.72, 0), 0xffcf5a, G_('D', 0, 6, 9.95), 0.05) })),
-  dCal: neonIcon('cal', 3, 0xff4d5a, G_('D', 9.5, 8.6, 3.3)), dCalR: ringGauge(2.2, 0xff4d5a, G_('D', 9.5, 8.6, 3.3)),
-  eGlobe: neonIcon('globe', 4, 0xff3d9a, G_('E', 0, 9.5, 0)), eRing: dashRing(3.4, 0xff3d9a, G_('E', 0, 9.5, 0)),
-  fCam: neonIcon('cam', 2.6, 0x8fe3ff, G_('F', -6.5, 5.4, 0.5)), fMic: neonIcon('mic', 2.4, 0xffcf5a, G_('F', 7, 8.4, -0.6)), fChip: neonIcon('chip', 3, 0x8fe3ff, G_('F', -2, 6.2, -9)), fChipR: ringGauge(2.2, 0x8fe3ff, G_('F', -2, 6.2, -9)),
-  gGlobe: neonIcon('globe', 4.6, 0x8fe3ff, G_('G', 0, 10.8, 0)), gRing: dashRing(7.2, 0x8fe3ff, G_('G', 0, 2.2, 0)),
-  hClock: ringGauge(3.35, 0xff4d5a, G_('H', -5, 6, -0.55), 0.12), hBadge: badge('dollar', 1.2, 0x5cff9d, G_('H', 5, 5.6, 1.8)), hChart: neonIcon('chart', 4.2, 0xffcf5a, G_('H', 0, 9.4, 2)),
-  iPad: badge('pad', 1.3, 0x5cff9d, G_('I', -3.6, 9.2, 1)), iEye: badge('eye', 1.3, 0xff3d9a, G_('I', 3.6, 9.2, 1)),
+  aRing: dashRing(4.3, 0xf2b84b, G_('A', 0, 3.6, -0.7)), aBadge: badge('dollar', 1.1, 0xf2b84b, G_('A', -4.3, 7.0, 1.6)),
+  bDollar: neonIcon('dollar', 5, 0x4fc7d6, G_('B', -4, 10.5, 1)), bRing: ringGauge(3.3, 0x4fc7d6, G_('B', -4, 10.5, 1)), bTop: dashRing(3.2, 0xe8d2a6, G_('B', 4.5, 46, -2)),
+  cB: [-6, 0, 6].map((x, i) => badge('dollar', 0.9, 0x4fc7d6, G_('C', x, [6.4, 8.6, 11][i] - 0.6, 1.5))),
+  cTower: badge('tower', 1.4, 0x8fb8d0, G_('C', -2.4, 4.2, 12)), cPad: badge('pad', 1.4, 0xf2b84b, G_('C', 2.4, 4.2, 12)), cR1: ringGauge(1.75, 0x8fb8d0, G_('C', -2.4, 4.2, 12)), cR2: ringGauge(1.75, 0xf2b84b, G_('C', 2.4, 4.2, 12)),
+  dQ: neonIcon('q', 3.2, 0xf2b84b, G_('D', -0.2, 6.6, 15)),
+  dHub: badge('dollar', 1.2, 0xf2b84b, G_('D', 0, 6, 10)), dSp: [['team', -3.2, 2.6], ['globe', 3.2, 2.6], ['cam', -3.2, -2.2], ['mic', 3.2, -2.2]].map(([n, x, y]) => ({ b: badge(n, 0.9, 0x8fb8d0, G_('D', x, 6 + y, 10)), l: beam(new THREE.Vector3(0, 0, 0), new THREE.Vector3(x * 0.72, y * 0.72, 0), 0xf2b84b, G_('D', 0, 6, 9.95), 0.05) })),
+  dCal: neonIcon('cal', 3, 0xe5533d, G_('D', 9.5, 8.6, 3.3)), dCalR: ringGauge(2.2, 0xe5533d, G_('D', 9.5, 8.6, 3.3)),
+  eGlobe: neonIcon('globe', 4, 0xf2b84b, G_('E', 0, 9.5, 0)), eRing: dashRing(3.4, 0xf2b84b, G_('E', 0, 9.5, 0)),
+  fCam: neonIcon('cam', 2.6, 0x8fb8d0, G_('F', -6.5, 5.4, 0.5)), fMic: neonIcon('mic', 2.4, 0xf2b84b, G_('F', 7, 8.4, -0.6)), fChip: neonIcon('chip', 3, 0x8fb8d0, G_('F', -2, 6.2, -9)), fChipR: ringGauge(2.2, 0x8fb8d0, G_('F', -2, 6.2, -9)),
+  gGlobe: neonIcon('globe', 4.6, 0x8fb8d0, G_('G', 0, 10.8, 0)), gRing: dashRing(7.2, 0x8fb8d0, G_('G', 0, 2.2, 0)),
+  hClock: ringGauge(3.35, 0xe5533d, G_('H', -5, 6, -0.55), 0.12), hBadge: badge('dollar', 1.2, 0x4fc7d6, G_('H', 5, 5.6, 1.8)), hChart: neonIcon('chart', 4.2, 0xf2b84b, G_('H', 0, 9.4, 2)),
+  iPad: badge('pad', 1.3, 0x4fc7d6, G_('I', -3.6, 9.2, 1)), iEye: badge('eye', 1.3, 0xf2b84b, G_('I', 3.6, 9.2, 1)),
 };
 MG.gRing.rotation.x = -Math.PI / 2; MG.bTop.rotation.x = -Math.PI / 2;
 // ---------------- shot list (hard cuts every ~2-3 s, push-in/orbit inside each) ----------------
 const SH = []; const sh = (t, st_, p, l, o = {}) => SH.push(Object.assign({ t, p: [p[0], p[1], p[2] + Z[st_]], l: [l[0], l[1], l[2] + Z[st_]] }, o));
-sh(0, 'A', [0, 4, 15], [0, 4, 0]); sh(2.0, 'A', [3.5, 4.2, 15], [-0.5, 4.2, 0], { orbit: 0.35 });
-sh(4.2, 'B', [-10, 4, 18], [-4, 5, 1], { orbit: 0.3 }); sh(E('taka') - 0.3, 'B', [3, 7, 17], [-4, 8.5, 1], { push: 0.2 }); sh(E('dubai'), 'B', [-12, 3, 34], [3, 18, -2], { rise: 14, push: 0.05 }); sh(E('shunchen'), 'B', [-8, 12, 30], [4.5, 32, -2], { push: 0.15, orbit: 0.3 });
-sh(17.15, 'C', [0, 8, 34], [0, 5, 0], { push: 0.15 }); sh(E('b1') - 0.2, 'C', [-6, 5, 13], [-6, 4, 0]); sh(E('b2') - 0.2, 'C', [0, 6, 14], [0, 5.5, 0]); sh(E('b3') - 0.2, 'C', [7, 4, 15], [6, 8, 0], { rise: 4 });
-sh(E('cmp') - 0.2, 'C', [0, 4.3, 21], [0, 4.2, 12], { push: 0.2 }); sh(E('dami') - 0.3, 'C', [0, 6, 26], [0, 5, 6], { push: 0.2 });
-sh(32.95, 'D', [-0.2, 6.6, 23], [-0.2, 6.6, 15], { push: 0.25 }); sh(E('etotaka') - 0.2, 'D', [0, 6, 20], [0, 6, 10], { push: 0.1 }); sh(E('devs') - 0.1, 'D', [-6, 9, 30], [0, 8, -3], { orbit: 0.4 }); sh(E('years') - 0.1, 'D', [14, 7, 12], [9.5, 6.5, 3.3], { push: 0.2 });
-sh(E('open') - 0.2, 'E', [0, 16, 24], [0, 4, 0], { orbit: 0.5 });
+sh(0, 'A', [0, 4, 15], [0, 4, 0]); sh(2.6, 'A', [4, 4.4, 14], [-0.5, 4.2, 0], { orbit: 0.4, push: 0.2 });
+sh(4.0, 'B', [-10, 4, 18], [-4, 5, 1], { orbit: 0.35 }); sh(E('taka') - 0.2, 'B', [3, 7, 17], [-4, 8.5, 1], { push: 0.2 }); sh(E('dubai'), 'B', [-12, 3, 34], [3, 18, -2], { rise: 14, push: 0.05 }); sh(12.9, 'B', [-8, 12, 30], [4.5, 32, -2], { push: 0.15, orbit: 0.3 });
+sh(14.0, 'C', [0, 8, 34], [0, 5, 0], { push: 0.15, orbit: 0.3 }); sh(E('b1') - 0.1, 'C', [-6, 5, 14], [-6, 4, 0], { push: 0.1 }); sh(E('b2') - 0.1, 'C', [0, 6, 15], [0, 5.5, 0], { push: 0.1 }); sh(E('b3') - 0.2, 'C', [7, 4, 16], [6, 8, 0], { rise: 4 });
+sh(E('cmp') - 0.05, 'C', [0, 4.3, 22], [0, 4.2, 12], { push: 0.2 }); sh(26.0, 'C', [-9, 7, 24], [0, 6, 0], { orbit: 0.4 }); sh(E('dami') - 0.2, 'C', [0, 6, 26], [0, 5, 6], { push: 0.25 });
+sh(29.6, 'D', [-0.2, 6.6, 23], [-0.2, 6.6, 15], { push: 0.25 }); sh(E('etotaka') - 0.2, 'D', [0, 6, 20], [0, 6, 10], { push: 0.12 });
+sh(35.9, 'D', [-6, 9, 30], [0, 8, -3], { orbit: 0.4 }); sh(E('devs') - 0.1, 'D', [6, 8, 26], [0, 7, -3], { orbit: 0.3, push: 0.1 }); sh(E('years') - 0.1, 'D', [14, 7, 12], [9.5, 6.5, 3.3], { push: 0.2 });
+sh(E('open') - 0.2, 'E', [0, 16, 24], [0, 4, 0], { orbit: 0.6 });
 sh(E('chars') - 0.15, 'F', [-3, 3.5, 11], [-2, 3, 0], { orbit: 0.4 }); sh(E('mocap') - 0.1, 'F', [-10, 5, 9], [-4, 4, -2], { push: 0.15 }); sh(E('voice') - 0.1, 'F', [9, 6, 8], [6.5, 5.5, -0.5], { push: 0.2 }); sh(E('tech') - 0.1, 'F', [-2, 7, -1], [-2, 4.5, -9], { push: 0.25 });
-sh(51.2, 'G', [0, 8, 24], [0, 4, 0], { orbit: 0.5 }); sh(54.15, 'G', [-12, 6, 15], [0, 5, 0], { orbit: 0.4 }); sh(E('virtual') - 0.2, 'G', [0, 12, 20], [0, 7, 0], { push: 0.2 });
-sh(59.0, 'H', [-5, 6, 13], [-5, 6, -1], { push: 0.2 }); sh(62.4, 'H', [0, 6, 26], [0, 5, 0], { orbit: 0.3 }); sh(E('inc') - 0.1, 'H', [7, 4, 13], [5, 3.5, 0], { push: 0.2 }); sh(E('kolpona') - 0.1, 'H', [2, 6, 15], [5, 3, 0], { push: 0.2, orbit: 0.3 }); sh(E('labh') - 0.1, 'H', [0, 8, 24], [0, 7, 0], { rise: 3 });
-sh(73.6, 'I', [0, 6, 22], [0, 5.5, 0], { push: 0.2 }); sh(E('phone') - 0.2, 'I', [-1, 6.5, 16], [0, 7.5, 0], { orbit: 0.3 });
+sh(49.8, 'G', [0, 8, 24], [0, 4, 0], { orbit: 0.5 }); sh(52.4, 'G', [-12, 6, 15], [0, 5, 0], { orbit: 0.4 }); sh(E('virtual') - 0.2, 'G', [0, 12, 20], [0, 7, 0], { push: 0.2 });
+sh(56.6, 'H', [0, 6, 26], [0, 5, 0], { orbit: 0.3 }); sh(E('rel') - 0.1, 'H', [-5, 6, 13], [-5, 6, -1], { push: 0.2 }); sh(E('h24') - 0.1, 'H', [-1, 6, 18], [-3, 5.5, 0], { push: 0.15 }); sh(E('inc') - 0.1, 'H', [7, 4, 13], [5, 3.5, 0], { push: 0.2 }); sh(64.3, 'H', [0, 8, 24], [0, 7, 0], { rise: 3 });
+sh(65.6, 'I', [0, 6, 22], [0, 5.5, 0], { push: 0.2 }); sh(67.8, 'I', [-1, 6.5, 18], [0, 7.5, 0], { orbit: 0.3 }); sh(E('yt') - 0.1, 'I', [1.5, 5.5, 13], [0, 5.5, 0], { push: 0.2 });
 shotCam(SH);
 // ---------------- animation ----------------
 const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _p = new THREE.Vector3(), _s = new THREE.Vector3();
@@ -401,14 +402,14 @@ function update(t) {
   MG.bDollar.draw(w_(4.4, 5.6)); MG.bRing.set(w_(E('taka') - 0.1, E('burj')), 1); MG.bDollar.parent.rotation.y = Math.sin(t) * 0.3; MG.bTop.parent.rotation.y = t; MG.bTop.visible = t > E('burj') + 1.5;
   MG.cB.forEach((b, i) => b.set(w_([E('b1'), E('b2'), E('b3')][i] + 0.2, [E('b1'), E('b2'), E('b3')][i] + 1.0)));
   MG.cTower.set(w_(E('cmp'), E('cmp') + 0.6)); MG.cPad.set(w_(E('cmp') + 0.3, E('cmp') + 0.9)); MG.cR1.set(0.75 * eo(w_(E('cmp') + 0.5, E('cmp') + 1.5)), 1); MG.cR2.set(eo(w_(E('cmp') + 0.8, E('cmp') + 1.8)), 1);
-  MG.dQ.draw(w_(33.1, 34.2)); MG.dQ.parent.rotation.y = Math.sin(t * 2) * 0.3; MG.dQ.visible = t < E('etotaka');
+  MG.dQ.draw(w_(29.8, 30.9)); MG.dQ.parent.rotation.y = Math.sin(t * 2) * 0.3; MG.dQ.visible = t < E('etotaka');
   MG.dHub.set(w_(E('etotaka'), E('etotaka') + 0.6)); MG.dSp.forEach((o, i) => { o.l.draw(w_(E('etotaka') + 0.5 + i * 0.35, E('etotaka') + 0.9 + i * 0.35)); o.b.set(w_(E('etotaka') + 0.8 + i * 0.35, E('etotaka') + 1.5 + i * 0.35)); });
   MG.dCal.draw(w_(E('years'), E('years') + 0.8)); MG.dCalR.set((t - E('years')) * 0.6 % 1, t > E('years') ? 1 : 0);
   MG.eGlobe.draw(w_(E('open') - 0.1, E('open') + 0.9)); MG.eGlobe.parent.rotation.y = t * 0.8; MG.eRing.parent.rotation.z = t;
   MG.fCam.draw(w_(E('mocap'), E('mocap') + 0.7)); MG.fMic.draw(w_(E('voice'), E('voice') + 0.7)); MG.fChip.draw(w_(E('tech'), E('tech') + 0.8)); MG.fChipR.set(w_(E('tech') + 0.3, E('tech') + 1.8), t > E('tech') ? 1 : 0);
-  MG.gGlobe.draw(w_(E('virtual') - 0.1, E('virtual') + 1.0)); MG.gGlobe.parent.rotation.y = t * 0.6; MG.gRing.parent.rotation.y = t * 0.3; MG.gRing.visible = t > 51.2;
-  MG.hClock.set(w_(59.2, E('inc')), 1); MG.hBadge.set(w_(E('inc') + 0.2, E('inc') + 0.9)); MG.hChart.draw(w_(E('labh'), E('labh') + 1.2));
-  MG.iPad.set(w_(73.9, 74.6)); MG.iEye.set(w_(E('phone'), E('phone') + 0.7));
+  MG.gGlobe.draw(w_(E('virtual') - 0.1, E('virtual') + 1.0)); MG.gGlobe.parent.rotation.y = t * 0.6; MG.gRing.parent.rotation.y = t * 0.3; MG.gRing.visible = t > 49.8;
+  MG.hClock.set(w_(E('rel'), E('inc')), 1); MG.hBadge.set(w_(E('inc') + 0.2, E('inc') + 0.9)); MG.hChart.draw(w_(E('inc') + 0.3, E('inc') + 1.5));
+  MG.iPad.set(w_(E('play'), E('play') + 0.7)); MG.iEye.set(w_(E('yt'), E('yt') + 0.7));
   if (PLATE) Object.values(MG).flat().forEach(m => { const o = m.b || m; if (o.visible !== undefined) o.visible = false; });
   // people
   for (const o of PPL) { if (!ST[o.st].visible || !o.p.root.visible) continue; const r = o.fn(t); const P_ = o.p; if (r.pos) { P_.root.position.x = r.pos[0]; P_.root.position.z = r.pos[1]; } if (r.ry != null) P_.root.rotation.y = r.ry; P_.update(t, r.w, r.speed || 1);
