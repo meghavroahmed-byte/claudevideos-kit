@@ -22,3 +22,9 @@ On 2026-11-23 the user said this after rejecting the GTA edits. They will now cu
 - Still never filter the voice. SFX sit about 6 dB under the voice ([[feedback-sfx-every-event]] in the other branch).
 
 Related: [[feedback-3d-ember-style-face]]
+
+**Face rules (2026-11-23):**
+- The hook MUST open on the user's face shot.
+- The ending MUST close on their face too.
+- In between, the face is ~15% of the runtime.
+- Edit like a top-class documentary, mixing max motion graphics: 3D plus some 2D.
