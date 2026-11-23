@@ -1,112 +1,56 @@
 import * as THREE from 'three';
-import { makeHuman } from './human.js';
-import { glowSprite } from './props.js';
-import { lerp, smooth, easeOut, easeIn, easeInOut, range, clamp, V, cam, place, shake } from './anim.js';
-import { burst } from './rare.js';
-import { stamp } from './ancient.js';
-import { textSprite } from './room.js';
-import { rng } from './textures.js';
+import { labelCam, loadKit, world, prop, fit, texMat, person, label, showLabel, xray, ghost, keyCam, stream, V } from './real.js';
+import { CAPTIONS as CAPS, CAP_END } from './caps.js';
 
 export const DURATION = 23.2;
-export const CAPTIONS = [
-  [0.0, 'Could you outrun a cheetah?'],
-  [1.86, 'Not a chance!'], [3.36, 'A cheetah hits over 100 km/h'], [6.18, 'in just three seconds'], [8.01, 'The fastest human ever'], [9.53, 'ran about 44'],
-  [11.18, "But here's your hope"], [12.61, 'A cheetah can only sprint'], [14.02, 'for about twenty seconds'], [15.39, 'before it overheats and has to stop'],
-  [17.79, 'So if you had a huge head start'], [19.92, 'you might just make it'], [21.24, 'Good luck with that!', 23.0],
-];
+export const CAPTIONS = CAPS.map(([s, w], i) => [s, w, i === CAPS.length - 1 ? CAP_END : undefined]);
 export const FADES = [];
-
-const STAND = (t, ph = 0) => ({ lSh: [0.05, 0, 0.16], rSh: [0.05, 0, -0.16], lEl: [-0.25, 0, 0], rEl: [-0.25, 0, 0], lHip: [0, 0, 0.07], rHip: [0, 0, -0.07], lAn: [0, 0, -0.07], rAn: [0, 0, 0.07], chest: [0, 0, 0], neck: [0.03, 0, 0] });
-const over = (a, b) => Object.assign({}, a, b);
-function canvasTex(w, h, draw) { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; }
-const run = (t, sp = 11, a = 0.9) => ({ lHip: [-a * Math.sin(t * sp), 0, 0.07], rHip: [a * Math.sin(t * sp), 0, -0.07], lKn: [1.3 * Math.max(0, Math.sin(t * sp + 1.2)), 0, 0], rKn: [1.3 * Math.max(0, -Math.sin(t * sp + 1.2)), 0, 0], lSh: [1.0 * Math.sin(t * sp), 0, 0.15], rSh: [-1.0 * Math.sin(t * sp), 0, -0.15], lEl: [-1.5, 0, 0], rEl: [-1.5, 0, 0], spine: [0.3, 0, 0], neck: [-0.15, 0, 0] });
-const HV = 7.0;
-// cheetah offset from hero (x), by time
-const dOf = (t) => { if (t < 3.0) return lerp(-7, -1.6, easeIn(range(t, 0, 3.0))); if (t < 13.4) return lerp(-1.6, 1.4, smooth(range(t, 3.0, 7.0))); return lerp(1.4, -30, easeIn(range(t, 13.4, 17.2))); };
-const cheetahSpeedFactor = (t) => t < 13.4 ? 1 : 1 - smooth(range(t, 13.4, 17.0));
-
-function makeCheetah() {
-  const g = new THREE.Group(), body = new THREE.Group(); g.add(body);
-  const spotT = canvasTex(256, 256, (gg) => { gg.fillStyle = '#e8b858'; gg.fillRect(0, 0, 256, 256); const r = rng(5); gg.fillStyle = '#2a1a10'; for (let i = 0; i < 90; i++) { gg.beginPath(); gg.arc(r() * 256, r() * 256, 4 + r() * 5, 0, 7); gg.fill(); } });
-  const m = new THREE.MeshStandardMaterial({ map: spotT, roughness: 0.8 }), belly = new THREE.MeshStandardMaterial({ color: 0xf4e4c0 });
-  body.position.y = 0.72;
-  const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.2, 0.75, 8, 16), m); torso.rotation.z = Math.PI / 2; body.add(torso);
-  const chest = new THREE.Mesh(new THREE.SphereGeometry(0.22, 14, 10), m); chest.position.x = 0.4; body.add(chest);
-  const head = new THREE.Group(); head.position.set(0.68, 0.12, 0); body.add(head);
-  const hm = new THREE.Mesh(new THREE.SphereGeometry(0.14, 16, 12), m); hm.scale.set(1.1, 0.9, 1); head.add(hm);
-  const snout = new THREE.Mesh(new THREE.SphereGeometry(0.07, 10, 8), belly); snout.position.set(0.12, -0.04, 0); head.add(snout);
-  for (const s of [-1, 1]) { const e = new THREE.Mesh(new THREE.SphereGeometry(0.025, 8, 6), new THREE.MeshBasicMaterial({ color: 0x111111 })); e.position.set(0.1, 0.04, s * 0.07); head.add(e); const ear = new THREE.Mesh(new THREE.ConeGeometry(0.04, 0.07, 6), m); ear.position.set(-0.02, 0.12, s * 0.07); head.add(ear); const tear = new THREE.Mesh(new THREE.BoxGeometry(0.008, 0.08, 0.008), new THREE.MeshBasicMaterial({ color: 0x111111 })); tear.position.set(0.12, -0.01, s * 0.06); tear.rotation.z = 0.4; head.add(tear); }
-  const tongue = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.01, 0.04), new THREE.MeshStandardMaterial({ color: 0xff6a8a })); tongue.position.set(0.18, -0.1, 0); head.add(tongue);
-  const legs = []; for (const [x, z] of [[0.38, 0.1], [0.38, -0.1], [-0.38, 0.1], [-0.38, -0.1]]) { const lg = new THREE.Group(); lg.position.set(x, -0.08, z); body.add(lg); const l = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.03, 0.62, 8), m); l.position.y = -0.31; lg.add(l); legs.push(lg); }
-  const tail = new THREE.Group(); tail.position.set(-0.55, 0.05, 0); body.add(tail); const tm = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.02, 0.7, 6), m); tm.position.x = -0.35; tm.rotation.z = Math.PI / 2; tail.add(tm);
-  g.userData = { body, head, legs, tail, tongue, m };
-  g.gallop = (ph, amp) => { const s = Math.sin(ph); legs[0].rotation.z = -s * amp; legs[1].rotation.z = -Math.sin(ph + 0.3) * amp; legs[2].rotation.z = s * amp; legs[3].rotation.z = Math.sin(ph + 0.3) * amp; body.position.y = 0.72 + Math.abs(Math.sin(ph)) * 0.08 * amp; body.rotation.z = Math.sin(ph) * 0.12 * amp; tail.rotation.z = 0.2 + Math.sin(ph * 0.5) * 0.3; };
-  return g;
+export const PRELOAD = (r) => loadKit(r, { models: ['sf/cheetah', 'dead_tree_trunk'], hdris: ['rosendal_plains_2'], tex: ['sandy_gravel'], people: ['hero'] });
+const sm = (a, b, t) => { const u = Math.min(1, Math.max(0, (t - a) / (b - a))); return u * u * (3 - 2 * u); };
+const lerp = (a, b, k) => a + (b - a) * k;
+function drawTemp(g, k, t) {
+  g.fillStyle = 'rgba(210,230,255,0.95)'; g.beginPath(); g.roundRect(226, 60, 60, 330, 30); g.fill(); g.beginPath(); g.arc(256, 410, 55, 0, 6.283); g.fill();
+  g.fillStyle = k > 0.8 ? '#ff2020' : '#ff7a30'; const h = 300 * k; g.beginPath(); g.roundRect(240, 380 - h, 32, h + 20, 16); g.fill(); g.beginPath(); g.arc(256, 410, 42, 0, 6.283); g.fill();
+  g.fillStyle = '#ffd24a'; g.font = '900 48px Cap, sans-serif'; g.textAlign = 'left'; g.fillText(`${Math.round(20 * k)} s`, 310, 260);
 }
-
-function oneTake({ makeStage }) {
-  const scene = makeStage({ shadowSize: 10, sunDir: [-4, 8, 6], sun: 2.8 });
-  const U = scene.userData.sky.material.uniforms; U.top.value.set(0x3a8ae0); U.mid.value.set(0x9ac8f0); U.horizon.value.set(0xffe0a8); U.floorC.value.set(0xd8b878);
-  scene.fog = new THREE.Fog(0xf4dcb0, 30, 160);
-  const hemi = scene.children.find(o => o.isHemisphereLight); hemi.intensity = 0.9;
-  const key = scene.userData.key;
-  const grassT = canvasTex(512, 512, (g) => { g.fillStyle = '#d8b46a'; g.fillRect(0, 0, 512, 512); const r = rng(4); for (let i = 0; i < 3000; i++) { g.strokeStyle = r() > 0.5 ? 'rgba(170,130,60,0.5)' : 'rgba(240,210,140,0.5)'; g.lineWidth = 2; const x = r() * 512, y = r() * 512; g.beginPath(); g.moveTo(x, y); g.lineTo(x + (r() - 0.5) * 4, y - 8 - r() * 8); g.stroke(); } });
-  grassT.wrapS = grassT.wrapT = THREE.RepeatWrapping; grassT.repeat.set(60, 60);
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.MeshStandardMaterial({ map: grassT, roughness: 1 })); ground.rotation.x = -Math.PI / 2; ground.position.x = 100; ground.receiveShadow = true; scene.add(ground);
-  scene.children.filter(o => o.isMesh && o !== ground && o.geometry && o.geometry.type === 'PlaneGeometry' && !o.material.isShadowMaterial).forEach(o => o.visible = false);
-  const acacia = (x, z, s) => { const g = new THREE.Group(); g.position.set(x, 0, z); g.scale.setScalar(s); scene.add(g); const tr = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.2, 3, 8), new THREE.MeshStandardMaterial({ color: 0x5a3a22 })); tr.position.y = 1.5; g.add(tr); const top = new THREE.Mesh(new THREE.CylinderGeometry(2.2, 1.6, 0.5, 12), new THREE.MeshStandardMaterial({ color: 0x6a8a3a, flatShading: true })); top.position.y = 3.2; g.add(top); };
-  const tr = rng(6); for (let i = 0; i < 26; i++) acacia(-20 + i * 8 + tr() * 4, -8 - tr() * 14, 0.9 + tr() * 0.5);
-  const grassTufts = []; for (let i = 0; i < 120; i++) { const t2 = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.35, 5), new THREE.MeshStandardMaterial({ color: 0xc8a050 })); t2.position.set(-20 + tr() * 200, 0.17, (tr() - 0.5) * 6 + (tr() > 0.5 ? 2.5 : -2.5)); scene.add(t2); }
-  const hero = makeHuman('casual', { shirt: 0x39a0ff, jeans: 0x1d3557, chestText: 'MR. CLOUD' }); scene.add(hero.root);
-  const cheetah = makeCheetah(); scene.add(cheetah);
-  const heat = glowSprite(0xff3b1a, 1.4); scene.add(heat);
-  const steam = []; for (let i = 0; i < 8; i++) { const s = glowSprite(0xffffff, 0.3); s.userData.ph = i / 8; scene.add(s); steam.push(s); }
-  const dust = []; for (let i = 0; i < 20; i++) { const s = glowSprite(0xd8c098, 0.35); s.material.blending = THREE.NormalBlending; s.userData.ph = i / 20; scene.add(s); dust.push(s); }
-  const mk = (txt, col) => { const cc = document.createElement('canvas'); cc.width = 768; cc.height = 220; const g = cc.getContext('2d'); const t = new THREE.CanvasTexture(cc); t.colorSpace = THREE.SRGBColorSpace; const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, depthTest: false, depthWrite: false, toneMapped: false })); s.renderOrder = 31; scene.add(s); let last = ''; s.draw = (str) => { if (str === last) return; last = str; g.clearRect(0, 0, 768, 220); g.font = "400 120px Brand, sans-serif"; g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineWidth = 14; g.strokeStyle = 'rgba(0,0,0,0.6)'; g.strokeText(str, 384, 110); g.fillStyle = col; g.fillText(str, 384, 110); t.needsUpdate = true; }; return s; };
-  const cSpd = mk('', '#ffd23f'), hSpd = mk('', '#39a0ff'), timer = mk('', '#ff5a3a');
-  const luck = stamp('GOOD LUCK!', '#5be37d', 0.6); scene.add(luck);
-  const fx = { stop: burst(0xd8c098, 60, 1) }; scene.add(fx.stop);
-  const c = cam(38);
-
+function build({ makeStage }) {
+  const scene = world(makeStage({ shadowSize: 10, sunDir: [-5, 8, 4] }), 'rosendal_plains_2', { height: 3, radius: 90, sun: 2.3, sunColor: 0xfff0d0, env: 0.95 });
+  const groundM = texMat('sandy_gravel', 10, 10, { color: 0xd8c8a0 }); const ground = new THREE.Mesh(new THREE.CircleGeometry(28, 48), groundM); ground.rotation.x = -Math.PI / 2; ground.position.y = 0.01; ground.receiveShadow = true; scene.add(ground);
+  const cat = fit(prop('sf/cheetah'), 1.3, 'max'); cat.traverse(m => { if (m.isMesh) { m.material = m.material.clone(); m.material.color.set(0xd8a862); m.material.roughness = 0.85; } }); const catG = new THREE.Group(); catG.add(cat); scene.add(catG);
+  const hero = person('hero'); scene.add(hero.root);
+  const bolt = person('hero', { print: false }); ghost(bolt.root, 0xbfe6ff, { inPlace: true }); bolt.root.traverse(m => { if (m.isMesh) m.material.blending = THREE.NormalBlending; }); scene.add(bolt.root);
+  const dust = stream(400, 0xc8b490, 0.12); dust.material.opacity = 0.45; scene.add(dust);
+  const heat = stream(200, 0xff6030, 0.06); heat.material.blending = THREE.AdditiveBlending; scene.add(heat);
+  const xr = xray(1.2); scene.add(xr);
+  const L = { no: label('NOT A CHANCE!', 2.4), kmh: label('100+ KM/H', 2.6), s3: label('IN 3 SECONDS', 2.0), human: label('FASTEST HUMAN: 44 KM/H', 1.8), hope: label('YOUR HOPE', 1.4), s20: label('ONLY ~20 SECONDS', 2.4), hot: label('OVERHEATS & STOPS', 2.4), head: label('HUGE HEAD START', 4.0), luck: label('GOOD LUCK!', 3.2) };
+  Object.values(L).forEach(l => scene.add(l));
+  const cam = new THREE.PerspectiveCamera(44, 720 / 1280, 0.05, 900);
   return {
-    scene, camera: c,
+    scene, camera: cam,
     update(t) {
-      const hx = HV * t;
-      hero.root.position.set(hx, Math.abs(Math.sin(t * 11)) * 0.06, 0.4); hero.root.rotation.y = Math.PI / 2;
-      hero.setPose(over(STAND(t), run(t, 11, 0.9))); hero.setMouth(0.5);
-      const d = dOf(t), sf = cheetahSpeedFactor(t);
-      const cx = t < 17.2 ? hx + d : HV * 17.2 + dOf(17.2);
-      cheetah.position.set(cx, 0, -0.35);
-      const lying = smooth(range(t, 16.8, 17.6));
-      cheetah.gallop(t * 16 * Math.max(0.15, sf), 0.8 * sf);
-      cheetah.userData.body.position.y = lerp(cheetah.userData.body.position.y, 0.32, lying);
-      cheetah.userData.legs.forEach(l => l.rotation.z = lerp(l.rotation.z, (l.position.x > 0 ? -1.4 : 1.4), lying));
-      cheetah.userData.tongue.visible = t > 14.0;
-      cheetah.userData.head.rotation.z = -0.25 * lying;
-      const hot = smooth(range(t, 14.8, 15.8));
-      cheetah.userData.m.emissive = cheetah.userData.m.emissive || new THREE.Color(); cheetah.userData.m.emissive.setRGB(0.5 * hot * (0.6 + 0.4 * Math.sin(t * 8)), 0.05 * hot, 0);
-      heat.position.set(cx, 0.8, -0.35); heat.material.opacity = 0.4 * hot; heat.visible = hot > 0.01;
-      steam.forEach((s, i) => { const u2 = (t * 0.8 + s.userData.ph) % 1; s.position.set(cx + Math.sin(i * 2) * 0.3, 1.0 + u2 * 1.2, -0.35); s.material.opacity = hot * 0.5 * (1 - u2); s.visible = hot > 0.01; });
-      dust.forEach((s, i) => { const who = i % 2; const u2 = (t * 2 + s.userData.ph) % 1; const bx = who ? hx : cx; s.position.set(bx - 0.5 - u2 * 1.5, 0.1 + u2 * 0.4, who ? 0.4 : -0.35); s.material.opacity = 0.4 * (1 - u2) * (who ? 1 : sf); });
-      fx.stop.position.set(cx, 0.3, -0.35); fx.stop.update(t - 17.0);
-      // ---------- camera (tracking) ----------
-      let camP, camL;
-      if (t < 17.4) { const midx = hx + Math.min(0, d) * 0.5; camP = V(midx + 0.5, 2.0, 7.8 + Math.max(0, -d - 1.5) * 2.2); camL = V(midx, 0.8, 0); if (t > 12.6) { const k = smooth(range(t, 12.6, 14.0)); camP.lerp(V(hx + d * 0.5, 2.2, 9.0 + Math.min(10, -d * 0.2)), 0); } }
-      // focus on cheetah stopping 13.4..17.4: camera slows, stays with cheetah
-      const follow = smooth(range(t, 13.6, 15.0));
-      if (t < 17.4) { const p2 = V(cx + 0.3, 1.6, 5.4), l2 = V(cx, 0.6, 0); camP.lerp(p2, follow); camL.lerp(l2, follow); }
-      else { const ftx = HV * 17.2 + dOf(17.2); const p3 = V(ftx - 3.6, 1.05, -0.35), l3 = V(ftx + 10, 0.45, -0.3); const p2 = V(cx + 0.3, 1.6, 5.4), l2 = V(cx, 0.6, 0); const k = smooth(range(t, 17.4, 18.6)); camP = p2.lerp(p3, k); camL = l2.lerp(l3, k); }
-      const shk = shake(t, 0.8 * (1 - follow * 0.6), 2);
-      place(c, [camP.x + shk[0], camP.y + shk[1], camP.z + shk[2]], [camL.x, camL.y, camL.z]);
-      c.updateMatrixWorld(true);
-      const fw = V(); c.getWorldDirection(fw); const upv = V(0, 1, 0).applyQuaternion(c.quaternion), rt = V(1, 0, 0).applyQuaternion(c.quaternion);
-      const ck = t > 3.4 && t < 11.0 ? 1 : 0, hk = t > 8.0 && t < 11.0 ? 1 : 0, tk = t > 12.8 && t < 17.6 ? 1 : 0;
-      cSpd.draw(`🐆 ${Math.round(lerp(0, 104, easeOut(range(t, 4.0, 7.0))))} km/h`.replace('🐆 ', '')); cSpd.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.17).addScaledVector(rt, 0.0); cSpd.scale.set(0.32 * ck, 0.092 * ck, 1); cSpd.visible = !!ck;
-      hSpd.draw(`YOU ${Math.round(lerp(0, 44, easeOut(range(t, 9.4, 10.4))))} km/h`); hSpd.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.1).addScaledVector(rt, 0.0); hSpd.scale.set(0.32 * hk, 0.092 * hk, 1); hSpd.visible = !!hk;
-      timer.draw(`${Math.min(20, Math.max(0, Math.round(lerp(0, 20, range(t, 13.0, 16.8)))))} s`); timer.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.15); timer.scale.set(0.32 * tk, 0.092 * tk, 1); timer.visible = !!tk;
-      luck.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, -0.24); luck.set(t > 21.3 ? easeOut(range(t, 21.3, 21.5)) : 0);
-      return { dof: { focus: 6, aperture: 0, maxblur: 0 }, bloom: 0.3, exposure: 1.05 };
+      // everyone stays near the origin; the ground scrolls (hero runs at 6 m/s)
+      groundM.map.offset.y = -t * 6 / 4; if (groundM.normalMap) groundM.normalMap.offset.y = groundM.map.offset.y;
+      // cheetah position relative to hero (negative = ahead)
+      let gap;
+      if (t < 3.4) gap = 9; else if (t < 7.9) gap = lerp(9, 0.6, sm(3.4, 7.9, t)); else if (t < 11.0) gap = 0.4; else if (t < 16.0) gap = lerp(0.4, -6, sm(11.0, 16.0, t)); else gap = lerp(-6, 14, sm(16.0, 18.2, t));
+      if (t > 18.2) gap = 14 + 8 * sm(18.2, 20, t);
+      const showCat = !(t > 17.6);
+      const heroZ = 0, catZ = heroZ + gap;
+      hero.update(t, { run: 1 }, 1.25, {}); hero.root.position.set(0.8, 0, heroZ); hero.root.rotation.y = Math.PI;
+      const tired = sm(16.4, 17.6, t); const gait = Math.sin(t * 16) * (1 - tired);
+      catG.position.set(-0.6, Math.abs(gait) * 0.12, catZ); catG.rotation.set(0.08 * gait, Math.PI, 0); catG.scale.y = 1 - 0.25 * sm(16.8, 17.4, t); catG.visible = showCat;
+      const bk = sm(8.0, 8.4, t) * (1 - sm(10.8, 11.2, t)); bolt.update(t, { run: 1 }, 1.25, {}); bolt.root.fade(0.75 * bk); bolt.root.position.set(2.0, 0, heroZ - 0.8); bolt.root.rotation.y = Math.PI;
+      const lead = Math.min(0, gap); cam.position.set(2.2, 1.6, lead - 5.0); cam.lookAt(V(0, 0.8, lead + Math.max(0, Math.min(9, Math.abs(gap))) * 0.35)); labelCam(cam);
+      scene.updateMatrixWorld(true);
+      dust.update(catG.position.clone().add(V(0, 0.1, 0.6)), V(0, 0.5, 1), 3.4, 17.0, t, 2.5, 1.2);
+      heat.update(catG.position.clone().add(V(0, 0.8, 0)), V(0, 1, 0), 14.0, 17.4, t, 0.6, 0.6);
+      const xk = sm(12.8, 13.1, t) * (1 - sm(16.9, 17.2, t));
+      if (xk > 0.01) xr.show(catG.position.clone().add(V(-1.0, 1.5, 0)), xk, drawTemp, sm(13.0, 16.4, t), t); else xr.visible = false;
+      const cp = catG.position.clone().add(V(0, 1.4, 0)), hp = hero.headPos().add(V(0, 0.45, 0));
+      showLabel(L.no, hp, t, 1.9, 3.3); showLabel(L.kmh, cp, t, 3.6, 6.1); showLabel(L.s3, cp, t, 6.2, 7.9); showLabel(L.human, hp.clone().add(V(0.4, 0, 0)), t, 8.0, 11.0);
+      showLabel(L.hope, hp, t, 11.4, 12.5); showLabel(L.s20, cp, t, 12.6, 15.3); showLabel(L.hot, cp, t, 15.4, 17.4); showLabel(L.head, hp, t, 17.8, 21.0); showLabel(L.luck, hp, t, 21.2, 23.2);
+      return { bloom: 0.2, exposure: 1.0 };
     },
   };
 }
-export const SHOTS = [{ start: 0, end: DURATION + 1, build: oneTake }];
+export const SHOTS = [{ start: 0, end: 99, build }];
