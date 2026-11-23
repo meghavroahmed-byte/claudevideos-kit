@@ -222,6 +222,7 @@ export const POSES = {
   handsBelly: [['LeftArm', [1, 0, 0], -0.35], ['RightArm', [1, 0, 0], -0.35], ['LeftForeArm', [0, 1, 0], -1.3], ['RightForeArm', [0, 1, 0], 1.3], ['Spine', [1, 0, 0], 0.25]],
   handsThroat: [['LeftArm', [1, 0, 0], -0.9], ['RightArm', [1, 0, 0], -0.9], ['LeftForeArm', [0, 1, 0], -1.9], ['RightForeArm', [0, 1, 0], 1.9]],
   armsUp: [['LeftArm', [0, 0, 1], -2.6], ['RightArm', [0, 0, 1], 2.6]],
+  spread: [['LeftArm', [0, 0, 1], -1.3], ['RightArm', [0, 0, 1], 1.3]],
   shrug: [['LeftArm', [0, 0, 1], -0.4], ['RightArm', [0, 0, 1], 0.4], ['LeftForeArm', [0, 1, 0], -1.2], ['RightForeArm', [0, 1, 0], 1.2], ['Neck', [0, 0, 1], 0.15]],
   crouch: [['Spine', [1, 0, 0], 0.5], ['LeftUpLeg', [1, 0, 0], -1.1], ['RightUpLeg', [1, 0, 0], -1.1], ['LeftLeg', [1, 0, 0], 1.6], ['RightLeg', [1, 0, 0], 1.6]],
   lean: [['Spine', [1, 0, 0], 0.35]],
@@ -278,6 +279,9 @@ export function xray(size = 0.8) {
     draw(g, kk, tt); g.restore();
     g.strokeStyle = '#ff3b30'; g.lineWidth = 16; g.beginPath(); g.arc(256, 256, 238, 0, 7); g.stroke(); t.needsUpdate = true;
     s.position.copy(pos); s.scale.setScalar(size * (1 - Math.pow(1 - k, 3)));
+    const c = ASSETS.cam; if (c) { const ndc = pos.clone().project(c); const dist = c.position.distanceTo(pos); const hh = dist * Math.tan(THREE.MathUtils.degToRad(c.fov / 2)), hw = hh * c.aspect;
+      const rx = (size / 2) / hw, ry = (size / 2) / hh; const cx = Math.max(-0.97 + rx, Math.min(0.97 - rx, ndc.x)), cy = Math.max(-0.95 + ry, Math.min(0.95 - ry, ndc.y));
+      if (cx !== ndc.x || cy !== ndc.y) { ndc.x = cx; ndc.y = cy; s.position.copy(ndc.unproject(c)); } }
   };
   return s;
 }
