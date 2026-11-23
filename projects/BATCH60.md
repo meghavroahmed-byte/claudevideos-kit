@@ -22,6 +22,8 @@ Old-style renders of #3-60 are obsolete. New per-project status: [v] v2 built ·
 
 LIBRARY CLEANUP (todo): sfbulk auto-picks are often WRONG (e.g. swordfish=Cowboy Bebop ship, piranha=FNAF toy, dolphin=shark, crab=platformer pack, car_sedan=city, moon=attic). Review every _assets/sf model thumbnail (Sketchfab API thumbnails) and delete/replace mismatches; prefer realistic picks. Sketchfab rate-limits downloads (429) for long stretches: fetch only what a video needs, slowly.
 
+V2 STATUS (2026-11-23): all 58 v2 scenes built; rendering via _tools/v2run.sh + v2queue.txt (projects/<proj>/.v2done marks rendered).
+
 FINAL STEP (user, 2026-11-22): after all 60 are delivered, write a RECOVERY SKILL (e.g. .claude/skills/realistic-shorts/SKILL.md, committed) so that a fresh Claude on a new computer can restore everything from this repo alone: where the asset library lives (projects/_assets: Poly Haven + Sketchfab + people, credits), the v2 pipeline (kit, tools, render/mix, captions, sfx, bgm), the user's rules (no face stamps, no glass card, voice untouched, loud master + soft BGM, delivery format), and how to regenerate voice (ElevenLabs settings) and fetch more assets.
 
 Status: [x] delivered · [r] rendering · [b] built · [ ] to do
