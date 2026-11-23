@@ -5,7 +5,7 @@ import { CAPTIONS as CAPS, CAP_END } from './caps.js';
 export const DURATION = 31.9;
 export const CAPTIONS = CAPS.map(([s, w], i) => [s, w, i === CAPS.length - 1 ? CAP_END : undefined]);
 export const FADES = [];
-export const PRELOAD = (r) => loadKit(r, { models: ['sf/lifeboat', 'sf/tuna', 'dutch_ship_medium', 'plastic_bottle_gallon'], hdris: ['kloofendal_48d_partly_cloudy_puresky'], people: ['hero'] });
+export const PRELOAD = (r) => loadKit(r, { models: ['sf/lifeboat', 'dutch_ship_medium', 'plastic_bottle_gallon'], hdris: ['kloofendal_48d_partly_cloudy_puresky'], people: ['hero'] });
 const sm = (a, b, t) => { const u = Math.min(1, Math.max(0, (t - a) / (b - a))); return u * u * (3 - 2 * u); };
 const lerp = (a, b, k) => a + (b - a) * k;
 function drawCells(g, k) { // salt pulls water out: cells shrink, salt crystals appear
@@ -20,10 +20,14 @@ function drawBattery(g, k) {
 }
 function build({ makeStage }) {
   const scene = world(makeStage({ shadowSize: 4, sunDir: [4, 7, 2] }), 'kloofendal_48d_partly_cloudy_puresky', { sky: false, sun: 2.4, env: 0.9 });
-  const sea = new THREE.Mesh(new THREE.PlaneGeometry(2000, 2000), waterMat(2.0)); sea.rotation.x = -Math.PI / 2; sea.position.y = 0; scene.add(sea);
+  const sea = new THREE.Mesh(new THREE.PlaneGeometry(2000, 2000), waterMat(2.0)); sea.rotation.x = -Math.PI / 2; sea.position.y = 0; scene.add(sea); scene.children.filter(o => o.material && o.material.isShadowMaterial).forEach(o => o.visible = false);
   const raft = fit(prop('sf/lifeboat'), 2.4, 'max'); scene.add(raft);
-  const tuna = fit(prop('sf/tuna'), 0.9, 'max', { ground: false }); scene.add(tuna);
-  const tMix = new THREE.AnimationMixer(tuna); const tc = ASSETS.anims['sf/tuna']; if (tc && tc.length) tMix.clipAction(tc[0]).play();
+  // procedural silver sea fish (mackerel-like)
+  const tuna = new THREE.Group(); { const body = new THREE.Mesh(new THREE.SphereGeometry(0.1, 24, 16), new THREE.MeshStandardMaterial({ color: 0x8fa8bd, metalness: 0.75, roughness: 0.25 })); body.scale.set(1, 0.85, 4.2); tuna.add(body);
+    const back = new THREE.Mesh(new THREE.SphereGeometry(0.1, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2.3), new THREE.MeshStandardMaterial({ color: 0x1f4f6a, metalness: 0.5, roughness: 0.35 })); back.scale.set(1.02, 0.9, 4.25); tuna.add(back);
+    const tail = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.16, 3), new THREE.MeshStandardMaterial({ color: 0x5a7a90, metalness: 0.6, roughness: 0.3 })); tail.rotation.x = -Math.PI / 2; tail.scale.set(1, 1, 0.2); tail.position.z = -0.46; tuna.add(tail); tuna.userData.tail = tail;
+    for (const sx of [-1, 1]) { const eye = new THREE.Mesh(new THREE.SphereGeometry(0.014, 8, 8), new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.2 })); eye.position.set(sx * 0.07, 0.02, 0.32); tuna.add(eye); } }
+  tuna.traverse(m => { if (m.isMesh) m.castShadow = true; }); tuna.scale.setScalar(0.7); scene.add(tuna); const tMix = { setTime() {} };
   const ship = prop('dutch_ship_medium', 1); scene.add(ship);
   const bottle = prop('plastic_bottle_gallon', 1.4); scene.add(bottle);
   const mirror = new THREE.Mesh(new THREE.CircleGeometry(0.07, 24), new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 1, roughness: 0.05 })); scene.add(mirror);
@@ -37,7 +41,7 @@ function build({ makeStage }) {
   const cam = new THREE.PerspectiveCamera(40, 720 / 1280, 0.05, 3000);
   const KEYS = [[0, [3.6, 2.6, 7.0], [0, 0.6, 0]], [3.4, [2.0, 1.6, 4.6], [0, 0.7, 0]], [8.6, [2.0, 1.6, 4.6], [0, 0.7, 0]], [9.4, [1.2, 1.3, 2.9], [0, 0.85, 0]], [13.6, [1.2, 1.3, 2.9], [0, 0.85, 0]],
     [14.4, [2.4, 1.8, 4.8], [0, 0.7, 0]], [19.4, [2.4, 1.8, 4.8], [0, 0.7, 0]], [20.2, [1.3, 1.4, 3.0], [0, 0.85, 0]], [22.6, [1.3, 1.4, 3.0], [0, 0.85, 0]], [23.2, [2.6, 1.4, 4.2], [0.6, 0.6, 0.4]], [24.6, [2.6, 1.4, 4.2], [0.6, 0.6, 0.4]],
-    [26.0, [2.4, 2.0, 5.4], [0, 0.8, 0]], [28.0, [2.4, 2.0, 5.4], [0, 0.8, 0]], [29.0, [-2.0, 1.6, 3.0], [8, 4, -40]], [31.9, [-2.0, 1.6, 3.0], [12, 4, -40]]];
+    [26.0, [2.4, 2.0, 5.4], [0, 0.8, 0]], [28.0, [2.4, 2.0, 5.4], [0, 0.8, 0]], [29.0, [1.6, 1.6, 3.6], [-14, 2, -60]], [31.9, [1.6, 1.6, 3.6], [-10, 2, -60]]];
   return {
     scene, camera: cam,
     update(t) {
@@ -49,15 +53,15 @@ function build({ makeStage }) {
       const scoop = sm(9.2, 9.6, t) * (1 - sm(10.6, 11.0, t));
       const catchR = sm(17.0, 17.4, t) * (1 - sm(19.2, 19.6, t));
       const signal = sm(28.0, 28.4, t);
-      hero.update(t, { idle: 1 }, 0.7, { crouch: 0.55, slump: 0.4 * weak + 0.25 * sm(5.6, 6.0, t) * (1 - sm(8.6, 9.0, t)), lean: 0.5 * scoop, headTilt: 0.6 * weak * Math.sin(t * 2.2), armsUp: 0.55 * catchR, point: signal, handsThroat: 0.6 * sm(7.6, 7.9, t) * (1 - sm(8.8, 9.1, t)) });
-      hero.root.position.set(0, 0.1 + bob, 0); hero.root.rotation.set(roll, -0.4, 0);
+      hero.update(t, { idle: 1 }, 0.7, { crouch: 0.95, slump: 0.4 * weak + 0.25 * sm(5.6, 6.0, t) * (1 - sm(8.6, 9.0, t)), lean: 0.5 * scoop, headTilt: 0.6 * weak * Math.sin(t * 2.2), armsUp: 0.55 * catchR, point: signal, handsThroat: 0.6 * sm(7.6, 7.9, t) * (1 - sm(8.8, 9.1, t)) });
+      hero.root.position.set(0, -0.32 + bob, 0); hero.root.rotation.set(roll, -0.4, 0);
       // sunburn: skin reddens on day 1
       const red = sm(5.6, 7.0, t); skinMats.forEach(m => m.color.setRGB(1, 1 - 0.25 * red, 1 - 0.3 * red));
       // rain (day 2)
       rain.update(V(0, 6, 0), V(0, -1, 0), 16.9, 19.4, t, 6, 6);
       // fish jumps next to the raft (day 3)
       const fk = Math.min(1, Math.max(0, (t - 23.0) / 1.2)); tuna.visible = t > 22.9 && t < 24.3; tMix.setTime(t);
-      tuna.position.set(lerp(1.6, 0.6, fk), -0.3 + Math.sin(fk * Math.PI) * 1.1, 0.9); tuna.rotation.set(0, Math.PI / 2, (0.5 - fk) * 1.6);
+      tuna.position.set(lerp(1.7, 0.5, fk), -0.3 + Math.sin(fk * Math.PI) * 1.1, 0.9); tuna.rotation.set((fk - 0.5) * 1.8, -Math.PI / 2, 0); tuna.userData.tail.rotation.y = Math.sin(t * 25) * 0.5;
       bottle.visible = t > 16.8 && t < 19.8; bottle.position.copy(hero.world('RightHand')).add(V(0, 0.05, 0));
       // ship far away + mirror flash
       ship.position.set(lerp(-60, -20, sm(25, 31.9, t)), -2.5, -120); ship.rotation.y = 0.2; ship.visible = t > 25;

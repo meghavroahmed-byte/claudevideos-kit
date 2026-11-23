@@ -1,169 +1,91 @@
 import * as THREE from 'three';
-import { makeHuman } from './human.js';
-import { glowSprite } from './props.js';
-import { lerp, smooth, easeOut, easeInOut, range, clamp, V, cam, place, shake } from './anim.js';
-import { infoCard, burst } from './rare.js';
-import { rng, glowTexture } from './textures.js';
-import { world, grass, rock, stamp, iconBubble } from './ancient.js';
-import { amphora } from './tp.js';
+import { labelCam, loadKit, world, prop, texMat, person, label, showLabel, ghost, keyCam, stream, V } from './real.js';
+import { CAPTIONS as CAPS, CAP_END } from './caps.js';
 
 export const DURATION = 28.9;
-export const CAPTIONS = [
-  [0.0, 'What was a day like'], [1.13, 'for the workers'], [1.96, 'who built the pyramids?'],
-  [3.55, "They weren't slaves"], [4.95, 'Most were paid workers'], [6.28, 'who lived in a village'], [7.33, 'right next to the pyramid'],
-  [9.24, 'They woke up at sunrise'], [10.57, 'and worked in teams'], [11.62, 'of about twenty people'],
-  [13.5, 'Using copper tools'], [14.66, 'they cut huge limestone blocks'], [16.9, 'some weighing'], [17.57, 'more than two tons'],
-  [19.4, 'Then they dragged them'], [20.34, 'on wooden sleds'], [21.52, 'pouring water on the sand'], [22.91, 'to make them slide easier'],
-  [24.77, 'And their pay?'], [25.81, 'Bread and beer'], [27.04, 'Lots of beer!', 28.7],
-];
+export const CAPTIONS = CAPS.map(([s, w], i) => [s, w, i === CAPS.length - 1 ? CAP_END : undefined]);
 export const FADES = [];
+export const PRELOAD = (r) => loadKit(r, { models: ['antique_ceramic_vase_01', 'jug_01', 'wooden_bucket_01', 'cross_pein_hammer', 'hamburger_buns'], hdris: ['kloofendal_48d_partly_cloudy_puresky'], tex: ['sand_01', 'sandstone_cracks', 'rough_wood', 'beige_wall_001'], people: ['hero', 'manuel', 'eric'] });
+const sm = (a, b, t) => { const u = Math.min(1, Math.max(0, (t - a) / (b - a))); return u * u * (3 - 2 * u); };
+const lerp = (a, b, k) => a + (b - a) * k;
 
-const STAND = (t, ph = 0) => ({ lSh: [0.05, 0, 0.16], rSh: [0.05, 0, -0.16], lEl: [-0.25, 0, 0], rEl: [-0.25, 0, 0], lHip: [0, 0, 0.07], rHip: [0, 0, -0.07], lAn: [0, 0, -0.07], rAn: [0, 0, 0.07], chest: [Math.sin(t * 1.6 + ph) * 0.015, 0, 0], neck: [0.03, Math.sin(t * 0.5 + ph) * 0.12, 0] });
-const PULL = (p) => { const s = Math.sin(p); return { lHip: [-0.6 - 0.3 * s, 0, 0.05], rHip: [0.25 + 0.3 * s, 0, -0.05], lKn: [0.5, 0, 0], rKn: [0.2, 0, 0], spine: [0.45, 0, 0], neck: [-0.35, 0, 0], lSh: [-1.35, 0, 0.1], rSh: [-1.45, 0, -0.1], lEl: [-0.2, 0, 0], rEl: [-0.3, 0, 0], drop: -0.1 }; };
-const over = (a, b) => Object.assign({}, a, b);
-function canvasTex(w, h, draw) { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; }
-const sledX = (t) => -1.2 + t * 0.16;
-const SLED_Z = 0, QUARRY = V(-4.2, 0, 9.4), TABLE = V(-9.5, 0, 3.2);
-
-function oneTake({ makeStage }) {
-  const scene = makeStage({ shadowSize: 8, sunDir: [-4, 9, 4], sun: 2.6 });
-  const u = scene.userData.sky.material.uniforms;
-  scene.fog = new THREE.Fog(0xf0dcb8, 35, 160);
+function build({ makeStage }) {
+  const scene = world(makeStage({ shadowSize: 12, sunDir: [-6, 8, 5] }), 'kloofendal_48d_partly_cloudy_puresky', { sky: false, sun: 2.6, sunColor: 0xfff0d0, env: 0.8 });
   const key = scene.userData.key;
-  const hemi = scene.children.find(o => o.isHemisphereLight); hemi.color.set(0xfff0dc); hemi.groundColor.set(0xd0a868); hemi.intensity = 0.85;
-  scene.add(world(['#e3c58c', ['216,186,128', '232,204,150', '204,174,118']]));
-  // stepped pyramid under construction + ramp
-  const lim = canvasTex(256, 256, (g) => { g.fillStyle = '#e2cf9e'; g.fillRect(0, 0, 256, 256); g.strokeStyle = 'rgba(140,110,70,0.45)'; g.lineWidth = 3; for (let r = 0; r < 8; r++) for (let c = 0; c < 4; c++) g.strokeRect(c * 64 + (r % 2) * 32, r * 32, 64, 32); });
-  lim.wrapS = lim.wrapT = THREE.RepeatWrapping; lim.repeat.set(6, 1);
-  const pm = new THREE.MeshStandardMaterial({ map: lim, roughness: 0.95 });
-  const PY = V(10, 0, -16);
-  for (let i = 0; i < 9; i++) { const s = 22 - i * 2.3, h = 1.6; const m = new THREE.Mesh(new THREE.BoxGeometry(s, h, s), pm); m.position.set(PY.x, h / 2 + i * h, PY.z); m.castShadow = m.receiveShadow = true; scene.add(m); }
-  const ramp = new THREE.Mesh(new THREE.BoxGeometry(3, 0.6, 18), new THREE.MeshStandardMaterial({ color: 0xc9a46a, roughness: 1 })); ramp.position.set(PY.x - 12, 3.5, PY.z + 4); ramp.rotation.x = -0.4; ramp.rotation.y = 0.9; 
-  // village of mud-brick houses
-  const mud = new THREE.MeshStandardMaterial({ color: 0xc8a070, roughness: 1 });
-  [[4.5, -6], [7.8, -7.5], [11, -5.5], [6, -10], [13.8, -8.2], [1.5, -8.5]].forEach(([x, z], i) => { const g = new THREE.Group(); const b = new THREE.Mesh(new THREE.BoxGeometry(2.6 + (i % 2), 2.0, 2.4), mud); b.position.y = 1.0; g.add(b); const d = new THREE.Mesh(new THREE.PlaneGeometry(0.6, 1.1), new THREE.MeshStandardMaterial({ color: 0x3a2a1c })); d.position.set(0, 0.55, 1.21); g.add(d); const roof = new THREE.Mesh(new THREE.BoxGeometry(2.8 + (i % 2), 0.15, 2.6), new THREE.MeshStandardMaterial({ color: 0x8a6a44 })); roof.position.y = 2.05; g.add(roof); g.traverse(o => { if (o.isMesh) { o.castShadow = o.receiveShadow = true; } }); g.position.set(x, 0, z); g.rotation.y = (i % 3 - 1) * 0.3; scene.add(g); });
-  const palmM = new THREE.MeshStandardMaterial({ color: 0x3f7f35, side: THREE.DoubleSide });
-  [[3, -4.5], [9.5, -4.2], [15, -5], [-6, -6]].forEach(([x, z]) => { const g = new THREE.Group(); const tr = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.18, 4.5, 8), new THREE.MeshStandardMaterial({ color: 0x8a6a44 })); tr.position.y = 2.25; tr.rotation.z = 0.1; g.add(tr); for (let i = 0; i < 7; i++) { const l = new THREE.Mesh(new THREE.PlaneGeometry(0.4, 2.2), palmM); l.geometry.translate(0, 1.1, 0); l.position.set(0.2, 4.4, 0); l.rotation.set(1.0, i / 7 * 6.28, 0, 'YXZ'); g.add(l); } g.traverse(o => { if (o.isMesh) o.castShadow = true; }); g.position.set(x, 0, z); scene.add(g); });
-  // quarry wall
-  const qt = canvasTex(256, 256, (g) => { g.fillStyle = '#d8c49a'; g.fillRect(0, 0, 256, 256); g.strokeStyle = 'rgba(120,96,60,0.4)'; g.lineWidth = 2; for (let i = 0; i < 20; i++) { g.beginPath(); g.moveTo(0, i * 13); g.lineTo(256, i * 13 + 4); g.stroke(); } });
-  const qwall = new THREE.Mesh(new THREE.BoxGeometry(6, 3.2, 2), new THREE.MeshStandardMaterial({ map: qt, roughness: 1 })); qwall.position.set(QUARRY.x, 1.6, QUARRY.z - 1.4); qwall.castShadow = qwall.receiveShadow = true; scene.add(qwall);
-  const cutBlock = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.8, 0.9), new THREE.MeshStandardMaterial({ map: lim, roughness: 0.9 })); cutBlock.position.set(QUARRY.x + 0.5, 0.4, QUARRY.z - 0.1); cutBlock.castShadow = true; scene.add(cutBlock);
-  // sled + block
-  const sled = new THREE.Group(); scene.add(sled);
-  const wood = new THREE.MeshStandardMaterial({ color: 0x8a6a44, roughness: 0.9 });
-  for (const z of [-0.45, 0.45]) { const r = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.14, 0.16), wood); r.position.set(0, 0.07, z); sled.add(r); }
-  for (let i = 0; i < 5; i++) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.08, 1.1), wood); b.position.set(-1.0 + i * 0.5, 0.17, 0); sled.add(b); }
-  const big = new THREE.Mesh(new THREE.BoxGeometry(1.8, 1.2, 1.1), new THREE.MeshStandardMaterial({ map: lim, roughness: 0.9 })); big.position.y = 0.81; sled.add(big);
-  sled.traverse(o => { if (o.isMesh) { o.castShadow = o.receiveShadow = true; } });
-  const rope = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 1, 6), new THREE.MeshStandardMaterial({ color: 0xc9a46a })); scene.add(rope);
-  // workers
-  const SK = [0x8d5524, 0xc68642, 0xa0662a, 0x7a4a24, 0xb57a42];
-  const team = []; for (let i = 0; i < 8; i++) { const h = makeHuman('hide', { plain: true, shirt: 0xf2ecdc, belt: 0xb08a5a, skin: SK[i % 5], hair: 0x111111, beard: i % 3 === 0 }); scene.add(h.root); team.push(h); }
-  const pourer = makeHuman('hide', { plain: true, shirt: 0xf2ecdc, belt: 0x2a6f9a, skin: 0xa0662a, hair: 0x111111, beard: false }); scene.add(pourer.root);
-  const jar = amphora(0.5, 0xb35e32); scene.add(jar);
-  const hero = makeHuman('hide', { plain: true, shirt: 0x2a6f9a, belt: 0xe9c46a, skin: 0xc68642, chestText: 'MR. CLOUD' }); scene.add(hero.root);
-  const chisel = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.016, 0.25, 8), new THREE.MeshStandardMaterial({ color: 0xc87533, metalness: 0.8, roughness: 0.3 })); scene.add(chisel);
-  const mallet = new THREE.Group(); mallet.add(new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.35, 8), wood)); const mh = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.16, 12), wood); mh.rotation.z = Math.PI / 2; mh.position.y = 0.17; mallet.add(mh); scene.add(mallet);
-  // water + wet sand
-  const water = []; for (let i = 0; i < 24; i++) { const s = glowSprite(0x5ab8ff, 0.06); s.userData.ph = i / 24; scene.add(s); water.push(s); }
-  const wet = []; for (let i = 0; i < 8; i++) { const m = new THREE.Mesh(new THREE.CircleGeometry(0.5, 20), new THREE.MeshStandardMaterial({ color: 0xa88a5a, roughness: 0.4, transparent: true, opacity: 0 })); m.rotation.x = -Math.PI / 2; m.position.set(0, 0.006, SLED_Z); scene.add(m); wet.push(m); }
-  // pay table
-  const table = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.08, 0.9), wood); table.position.copy(TABLE).add(V(0, 0.75, 0)); table.castShadow = true; scene.add(table);
-  for (const [x, z] of [[-1.1, -0.4], [1.1, -0.4], [-1.1, 0.4], [1.1, 0.4]]) { const l = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.75, 0.08), wood); l.position.copy(TABLE).add(V(x, 0.375, z)); scene.add(l); }
-  const breads = [], beers = [];
-  for (let i = 0; i < 6; i++) { const b = new THREE.Mesh(new THREE.SphereGeometry(0.11, 14, 10), new THREE.MeshStandardMaterial({ color: 0xc8843a, roughness: 0.8 })); b.scale.set(1.3, 0.7, 1); b.position.copy(TABLE).add(V(-0.9 + (i % 3) * 0.25, 0.86, -0.2 + Math.floor(i / 3) * 0.3)); b.castShadow = true; scene.add(b); breads.push(b); }
-  for (let i = 0; i < 5; i++) { const j = amphora(0.42, 0xa0522d); j.position.copy(TABLE).add(V(0.15 + i * 0.22, 0.79, (i % 2) * 0.2 - 0.1)); scene.add(j); beers.push(j); }
-  const heroJug = amphora(0.38, 0xa0522d); scene.add(heroJug);
-  const noChain = iconBubble(canvasTex(512, 512, (g) => { g.strokeStyle = '#8a8f96'; g.lineWidth = 28; for (let i = 0; i < 4; i++) { g.beginPath(); g.ellipse(120 + i * 90, 256, 55, 32, 0, 0, 7); g.stroke(); } })); scene.add(noChain);
-  const ton = new THREE.Sprite(new THREE.SpriteMaterial({ map: canvasTex(512, 220, (g) => { g.shadowColor = 'rgba(0,0,0,0.9)'; g.shadowBlur = 16; g.font = "400 120px Brand, sans-serif"; g.fillStyle = '#ffd23f'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('2+ TONS', 256, 116); }), transparent: true, depthWrite: false })); scene.add(ton);
-  const counter = new THREE.Sprite(new THREE.SpriteMaterial({ transparent: true, depthTest: false, depthWrite: false, toneMapped: false })); counter.renderOrder = 31; scene.add(counter);
-  const cTex = {}; const cnt = (n) => cTex[n] || (cTex[n] = canvasTex(512, 200, (g) => { g.shadowColor = 'rgba(0,0,0,0.9)'; g.shadowBlur = 16; g.font = "400 110px Brand, sans-serif"; g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(`TEAM × ${n}`, 256, 104); }));
-  const sunS = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTexture('rgba(255,250,220,1)', 'rgba(255,170,60,0)'), color: 0xffd090, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, toneMapped: false, fog: false })); scene.add(sunS);
-  const fx = { chip: [burst(0xe2cf9e, 30, 1), burst(0xe2cf9e, 30, 2), burst(0xe2cf9e, 30, 3)], crack: burst(0xffffff, 60, 4), pay: burst(0xffd23f, 110, 5) };
-  for (const v of Object.values(fx)) (Array.isArray(v) ? v : [v]).forEach(f => scene.add(f));
-  const payday = stamp('PAYDAY!', '#ffd23f', 0.5); scene.add(payday);
-  const card = infoCard(); scene.add(card);
-  const c = cam(38);
-
+  const sand = new THREE.Mesh(new THREE.PlaneGeometry(600, 600), texMat('sand_01', 120, 120, { color: 0xe8d2a8 })); sand.rotation.x = -Math.PI / 2; sand.receiveShadow = true; scene.add(sand);
+  // pyramid under construction: stepped courses of limestone with the top missing
+  const pyr = new THREE.Group(); for (let i = 0; i < 10; i++) { const w = 150 - i * 13; const c = new THREE.Mesh(new THREE.BoxGeometry(w, 7.5, w), texMat('sandstone_cracks', w / 6, 1.2, { color: 0xf0e2c4 })); c.position.y = 3.75 + i * 7.5; c.castShadow = c.receiveShadow = true; pyr.add(c); }
+  pyr.position.set(-40, 0, -230); pyr.rotation.y = 0.5; scene.add(pyr);
+  // workers' village: small mud-brick houses
+  const mud = texMat('beige_wall_001', 1, 1, { color: 0xc9a87c });
+  const village = new THREE.Group(); for (let i = 0; i < 9; i++) { const h = new THREE.Mesh(new THREE.BoxGeometry(3 + (i % 3), 2.4, 3), mud); h.position.set(14 + (i % 3) * 5, 1.2, -18 - Math.floor(i / 3) * 5); h.rotation.y = (i % 2) * 0.1; h.castShadow = h.receiveShadow = true; village.add(h); } scene.add(village);
+  // limestone block on a wooden sled
+  const block = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.0, 1.8), texMat('sandstone_cracks', 1, 1, { color: 0xf4ead2 })); block.castShadow = block.receiveShadow = true;
+  const sled = new THREE.Group(); const wood = texMat('rough_wood', 1, 1);
+  for (const x of [-0.5, 0.5]) { const r = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.18, 2.4), wood); r.position.set(x, 0.09, 0); r.castShadow = true; sled.add(r); }
+  for (const z of [-0.8, 0, 0.8]) { const r = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.08, 0.2), wood); r.position.set(0, 0.22, z); sled.add(r); }
+  block.position.y = 0.76; sled.add(block); scene.add(sled);
+  const ropes = new THREE.Group(); for (let i = 0; i < 4; i++) { const r = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 1, 6), new THREE.MeshStandardMaterial({ color: 0x8a6a40 })); ropes.add(r); } scene.add(ropes);
+  const hammer = prop('cross_pein_hammer', 2.2); hammer.traverse(m => { if (m.isMesh) { m.material = m.material.clone(); m.material.color.set(0xd08850); m.material.metalness = 0.9; m.material.roughness = 0.35; } }); scene.add(hammer);
+  const chips = stream(120, 0xf4ead2, 0.05); scene.add(chips);
+  const water = stream(200, 0x5fb0ff, 0.05); scene.add(water);
+  const jug = prop('jug_01', 1.6); scene.add(jug);
+  const bread = prop('hamburger_buns', 2.0); scene.add(bread);
+  const jars = []; for (let i = 0; i < 12; i++) { const j = prop('antique_ceramic_vase_01', 1.0); j.traverse(m => { if (m.isMesh) { m.material = m.material.clone(); m.material.map = null; m.material.color.set(0xb0683a); m.material.roughness = 0.85; } }); scene.add(j); jars.push(j); }
+  const hero = person('hero'); scene.add(hero.root);
+  // ghost workers from the past (golden holograms)
+  const kinds = ['manuel', 'eric']; const workers = [];
+  for (let i = 0; i < 20; i++) { const w = person(kinds[i % 2], { print: false }); ghost(w.root, 0xbfe6ff, { inPlace: true }); w.root.traverse(m => { if (m.isMesh) m.material.blending = THREE.NormalBlending; }); scene.add(w.root); workers.push(w); }
+  const L = { slaves: label('NOT SLAVES', 0.9), paid: label('PAID WORKERS', 1.0), vill: label("WORKERS' VILLAGE", 2.4), sun: label('SUNRISE', 0.8), team: label('TEAMS OF ~20', 1.0), copper: label('COPPER TOOLS', 0.9), lime: label('LIMESTONE', 0.8), tons: label('2+ TONS', 0.8), sledL: label('WOODEN SLED', 0.9), waterL: label('WATER = LESS FRICTION', 1.3), breadL: label('BREAD', 0.7), beerL: label('BEER', 0.7), lots: label('LOTS OF BEER!', 1.0) };
+  Object.values(L).forEach(l => scene.add(l));
+  const cam = new THREE.PerspectiveCamera(42, 720 / 1280, 0.05, 2000);
+  const KEYS = [[0, [3.5, 2.2, 9.5], [-1, 5.0, -10]], [3.2, [2.2, 1.6, 6.0], [0, 1.2, 0]], [4.8, [2.2, 1.6, 6.0], [0, 1.2, 0]], [5.8, [-2.0, 2.6, 7.0], [10, 1.8, -14]], [8.6, [-2.0, 2.6, 7.0], [10, 1.8, -14]],
+    [9.6, [4.0, 3.4, 11.0], [0, 1.0, -2]], [12.8, [4.0, 3.4, 11.0], [0, 1.0, -2]], [13.6, [1.9, 1.6, 4.0], [0.6, 1.0, 0]], [18.6, [1.9, 1.6, 4.0], [0.6, 1.0, 0]],
+    [19.6, [4.6, 2.4, 7.2], [0.6, 0.8, -1.4]], [24.0, [4.6, 2.4, 7.2], [1.2, 0.8, -1.4]], [24.8, [1.3, 1.5, 3.6], [0.4, 1.0, 0]], [28.9, [1.3, 1.5, 3.6], [0.4, 1.0, 0]]];
   return {
-    scene, camera: c,
+    scene, camera: cam,
     update(t) {
-      // sunrise at 9.2: warm dawn sky that settles into day
-      const dawn = smooth(range(t, 8.9, 9.6)) * (1 - smooth(range(t, 12.6, 14.0)));
-      u.top.value.set(0x3a8ad6).lerp(new THREE.Color(0x4a3a6a), dawn); u.mid.value.set(0x8ac0ea).lerp(new THREE.Color(0xf29a6b), dawn); u.horizon.value.set(0xf2e2c0).lerp(new THREE.Color(0xffc27a), dawn); u.floorC.value.set(0xe0c58a);
-      key.color.set(0xfff0d8).lerp(new THREE.Color(0xff9a50), dawn); key.intensity = 2.6 - dawn * 1.0;
-      // sled moves slowly
-      const sx = sledX(t); sled.position.set(sx, 0, SLED_Z);
-      const ropeEnd = V(sx + 1.3, 0.25, SLED_Z), ropeFar = V(sx + 1.3 + 7.6, 0.95, SLED_Z);
-      const rd = ropeFar.clone().sub(ropeEnd); rope.position.copy(ropeEnd).addScaledVector(rd, 0.5); rope.scale.set(1, rd.length(), 1); rope.quaternion.setFromUnitVectors(V(0, 1, 0), rd.clone().normalize());
-      team.forEach((h, i) => { const k = (i + 1) / 9; h.root.position.copy(ropeEnd.clone().lerp(ropeFar, k)).setY(0).add(V(0, 0, (i % 2 ? 0.28 : -0.28))); h.root.rotation.y = Math.PI / 2; h.setPose(PULL(t * 4 + i * 0.7)); h.setMouth(0.15); });
-      // water pourer in front of the sled
-      pourer.root.position.set(sx + 1.6, 0, SLED_Z + 0.75); pourer.root.rotation.y = -Math.PI / 2 - 0.4;
-      const pour = smooth(range(t, 21.4, 21.8)) * (1 - smooth(range(t, 24.4, 24.8)));
-      pourer.setPose(over(STAND(t, 3), { spine: [0.35 * pour, 0, 0], lSh: [-1.2 * pour, 0, 0.1], rSh: [-1.0 * pour, 0, -0.1], lEl: [-0.4, 0, 0], rEl: [-0.5, 0, 0] }));
+      // sunrise light during "woke up at sunrise"
+      const sr = sm(9.4, 10.0, t) * (1 - sm(12.6, 13.4, t)); key.color.setRGB(1, lerp(0.94, 0.62, sr), lerp(0.82, 0.38, sr)); key.intensity = lerp(2.6, 1.6, sr);
+      key.position.set(lerp(-6, -12, sr), lerp(8, 2.5, sr), 5);
+      // sled moves when dragged (19.4 - 24)
+      const drag = sm(19.6, 23.8, t); const sx = lerp(0, 2.4, drag);
+      sled.position.set(sx, 0, -1.4); sled.rotation.y = Math.PI / 2;
+      // workers: idle team in a grid (teams of 20), then 8 pull the sled ropes, 1 pours water, 2 cut stone
+      const vis = sm(0.0, 0.3, t);
+      workers.forEach((w, i) => {
+        let pos, ry = 0, pose = {}, wts = { idle: 1 };
+        if (t > 19.0 && t < 24.4 && i < 8) { const row = i % 2, n = Math.floor(i / 2); pos = V(sx + 1.9 + n * 0.8, 0, -1.4 + (row ? 0.45 : -0.45)); ry = Math.PI / 2; pose = { lean: 0.7, point: 0.6, pointL: 0.6 }; wts = { walk: 1 }; }
+        else if (t > 12.8 && t < 19.0 && i < 2) { pos = V(-0.9 + i * 0.1, 0, -1.4 + (i ? 1.2 : -1.2)); ry = i ? Math.PI : 0; pose = { lean: 0.5, point: Math.abs(Math.sin(t * 4 + i)) }; }
+        else { const r = Math.floor(i / 5), c = i % 5; pos = V(-3.4 + c * 1.0, 0, -3.2 - r * 1.0); ry = 0.2; }
+        w.update(t + i * 0.37, wts, 1, pose); w.root.position.copy(pos); w.root.rotation.y = ry;
+        const k = vis * ((t > 9.8 && t < 12.9) || (t > 19.0 && t < 24.4 && i < 8) || (t > 12.8 && t < 19.0 && i < 2) || t < 3.4 ? 1 : 0.0);
+        w.root.fade(0.7 * k);
+      });
+      hero.update(t, { idle: 1 }, 1, { point: sm(5.8, 6.2, t) * (1 - sm(8.2, 8.6, t)) + sm(25.0, 25.3, t) * (1 - sm(26.6, 27.0, t)) });
+      hero.root.position.set(0.9, 0, 0.8); hero.root.rotation.y = -0.3;
+      const k = keyCam(KEYS, t); cam.position.copy(k.pos); cam.lookAt(k.look); labelCam(cam);
       scene.updateMatrixWorld(true);
-      const jp = pourer.j.lWr.localToWorld(V(0, -0.08, 0)).lerp(pourer.j.rWr.localToWorld(V(0, -0.08, 0)), 0.5);
-      jar.position.copy(jp); jar.rotation.set(0, 0, 0); jar.rotateX(-1.6 * pour - 0.1); jar.rotation.y = pourer.root.rotation.y;
-      water.forEach((s, i) => { const u2 = (t * 1.8 + s.userData.ph) % 1; s.position.copy(jp).add(V(-0.25 - u2 * 0.1, -u2 * (jp.y - 0.02), 0)); s.material.opacity = pour * 0.85; });
-      wet.forEach((m, i) => { m.position.x = sx + 1.4 - i * 0.12 + (t > 21.6 ? 0 : 100); m.material.opacity = 0.55 * smooth(range(t, 21.8 + i * 0.1, 22.4 + i * 0.1)); });
-      // ---------- hero: hauls (hook), carves (quarry), drinks (pay) ----------
-      let hp, rot = 0, pose;
-      if (t < 4.5) { hp = ropeEnd.clone().lerp(ropeFar, 0.05).setY(0).add(V(0, 0, 0.34)); rot = Math.PI / 2; pose = PULL(t * 4 + 0.3); hero.setMouth(0.2); }
-      else if (t < 21.0) {
-        hp = QUARRY.clone().add(V(-0.4, 0, 0.6)); rot = Math.PI + 0.2;
-        const strikeP = Math.pow(0.5 - 0.5 * Math.cos((t - 13.6) * Math.PI * 2 / 0.6), 2);
-        pose = over(STAND(t), { spine: [0.15, 0, 0], neck: [0.15, 0, 0], lSh: [-1.35, 0, 0.2], lEl: [-0.35, 0, 0], rSh: [lerp(-2.4, -1.4, strikeP), 0, -0.2], rEl: [lerp(-1.4, -0.6, strikeP), 0, 0] }); hero.setMouth(0.1);
-      } else { hp = TABLE.clone().add(V(-0.2, 0, 1.0)); rot = 0.1; const cheer = smooth(range(t, 25.8, 26.2)); pose = over(STAND(t), { rSh: [-2.6 * cheer, 0, -0.3], rEl: [-0.3, 0, 0], lSh: [-0.8 * cheer, 0, 0.3], lEl: [-1.2 * cheer, 0, 0] }); hero.setMouth(0.4 * cheer); }
-      hero.root.position.copy(hp); hero.root.rotation.y = rot; hero.setPose(pose);
-      scene.updateMatrixWorld(true);
-      const qk = t > 13.4 && t < 19.4;
-      chisel.visible = mallet.visible = qk;
-      if (qk) { const lh = hero.j.lWr.localToWorld(V(0, -0.07, 0)), rh = hero.j.rWr.localToWorld(V(0, -0.07, 0)); chisel.position.copy(lh).add(V(0, 0, -0.1)); chisel.rotation.set(Math.PI / 2, 0, 0); mallet.position.copy(rh); mallet.quaternion.copy(hero.j.rWr.getWorldQuaternion(new THREE.Quaternion())); }
-      [14.1, 14.7, 15.3].forEach((s, i) => { fx.chip[i].position.copy(QUARRY).add(V(-0.3, 1.1, -0.35)); fx.chip[i].update(t - s); });
-      const split = smooth(range(t, 15.9, 16.5)); cutBlock.position.set(QUARRY.x + 0.5, 0.4, QUARRY.z - 0.1 + 0.6 * split); fx.crack.position.copy(cutBlock.position).add(V(0, 0.5, 0)); fx.crack.update(t - 16.2);
-      const tk = easeOut(range(t, 17.6, 17.9)) * (1 - smooth(range(t, 19.2, 19.5))); ton.position.copy(cutBlock.position).add(V(0, 1.0, 0.2)); ton.scale.set(0.9 * tk, 0.39 * tk, 1); ton.material.opacity = tk; ton.visible = tk > 0.01;
-      heroJug.visible = t > 25.8; heroJug.position.copy(hero.j.rWr.localToWorld(V(0, -0.1, 0))); heroJug.rotation.set(0, 0, 0.3);
-      beers.forEach((j, i) => j.visible = !(i === 2 && t > 25.8));
-      fx.pay.position.copy(TABLE).add(V(0, 1.4, 0)); fx.pay.update(t - 25.8);
-      // ---------- camera ----------
-      const S = (x, y, z) => V(x, y, z);
-      const KEYS = [
-        [0, S(sx + 3.4, 2.2, 8.6), S(sx + 2.6, 1.0, 0)], [3.4, S(sx + 3.0, 2.0, 7.6), S(sx + 2.4, 1.0, 0)],
-        [5.0, S(sx + 3.5, 3.0, 9.6), S(8, 1.4, -7)], [8.8, S(sx + 4.0, 3.8, 10.4), S(9, 3.0, -12)],
-        [10.2, S(sx + 9.5, 1.7, 5.4), S(sx + 4.5, 1.0, 0)], [12.6, S(sx + 9.0, 1.7, 5.0), S(sx + 4.6, 1.0, 0)],
-        [13.6, S(QUARRY.x + 1.4, 1.7, QUARRY.z + 4.2), S(QUARRY.x, 1.0, QUARRY.z)], [18.8, S(QUARRY.x + 1.0, 1.8, QUARRY.z + 4.4), S(QUARRY.x + 0.2, 1.0, QUARRY.z)],
-        [20.0, S(sx + 3.2, 1.8, 5.2), S(sx + 1.4, 0.7, 0.3)], [24.2, S(sx + 3.6, 1.8, 5.0), S(sx + 1.6, 0.7, 0.3)],
-        [25.4, S(TABLE.x + 0.6, 1.9, TABLE.z + 5.8), S(TABLE.x, 1.0, TABLE.z + 0.4)], [28.9, S(TABLE.x + 0.7, 1.9, TABLE.z + 5.6), S(TABLE.x, 1.0, TABLE.z + 0.4)],
-      ];
-      let i = 0; while (i < KEYS.length - 2 && KEYS[i + 1][0] < t) i++;
-      const k = smooth(range(t, KEYS[i][0], KEYS[i + 1][0]));
-      const cp = KEYS[i][1].clone().lerp(KEYS[i + 1][1], k), lk = KEYS[i][2].clone().lerp(KEYS[i + 1][2], k);
-      const sh = shake(t, 0.6, 3);
-      place(c, [cp.x + sh[0], cp.y + sh[1], cp.z + sh[2]], [lk.x, lk.y, lk.z]);
-      c.updateMatrixWorld(true);
-      key.target.position.copy(lk); key.position.copy(lk).add(V(-4, 9, 4));
-      sunS.position.copy(c.position).add(V(40, 6 + 20 * smooth(range(t, 9, 13)), -120)); sunS.scale.setScalar(30); sunS.material.opacity = dawn;
-      const fw = V(0, 0, 0); c.getWorldDirection(fw); const upv = V(0, 1, 0).applyQuaternion(c.quaternion), rt = V(1, 0, 0).applyQuaternion(c.quaternion);
-      noChain.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.1).addScaledVector(rt, 0.15); noChain.set(0.17 * easeOut(range(t, 3.6, 3.85)) * (1 - smooth(range(t, 4.9, 5.2))), smooth(range(t, 3.98, 4.12)));
-      noChain.renderOrder = 30;
-      const ck2 = smooth(range(t, 11.0, 11.3)) * (1 - smooth(range(t, 12.9, 13.2)));
-      const n = Math.max(1, Math.round(lerp(1, 20, easeOut(range(t, 11.2, 12.3))))); if (counter.material.map !== cnt(n)) { counter.material.map = cnt(n); counter.material.needsUpdate = true; }
-      counter.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.14); counter.scale.set(0.3 * ck2, 0.117 * ck2, 1); counter.material.opacity = ck2; counter.visible = ck2 > 0.01;
-      payday.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.12); payday.set(t > 27.0 ? easeOut(range(t, 27.0, 27.16)) : 0);
-      card.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.5);
-      const CARDS = [
-        [0.2, 3.4, 'PYRAMID WORKERS', 'A DAY?', '#ffd23f', ''],
-        [3.55, 4.95, 'WORKERS', 'NOT SLAVES', '#ff6b5b', ''], [4.95, 8.9, 'WORKERS', 'PAID + VILLAGE', '#ffd23f', 'next to the pyramid'],
-        [9.24, 10.57, 'EVERY DAY', 'SUNRISE', '#ffb36b', ''], [10.57, 13.3, 'EVERY DAY', 'TEAMS OF 20', '#ffd23f', ''],
-        [13.5, 16.9, 'QUARRY', 'COPPER TOOLS', '#c87533', 'cut limestone'], [16.9, 19.3, 'QUARRY', '2+ TONS', '#ffd23f', 'per block'],
-        [19.4, 21.52, 'HAULING', 'WOODEN SLEDS', '#c9a46a', ''], [21.52, 24.6, 'HAULING', 'WET THE SAND', '#5ab8ff', 'it slides easier'],
-        [24.77, 28.9, 'THE PAY', 'BREAD + BEER', '#ffd23f', 'lots of beer'],
-      ];
-      const cu = CARDS.find(([a2, b]) => t >= a2 && t < b); let ck = 0;
-      if (cu) { card.set(cu[2], cu[3], cu[4], null, cu[5]); const grp = CARDS.filter(x => x[2] === cu[2]); const ga = grp[0][0], gb = grp[grp.length - 1][1]; ck = smooth(range(t, ga, ga + 0.25)) * (1 - smooth(range(t, gb - 0.25, gb))); const pk = 1 + 0.09 * Math.exp(-(t - cu[0]) * 9); card.scale.set(0.72 * pk, 0.281 * pk, 1); }
-      card.material.opacity = ck; card.visible = false;
-      return { dof: { focus: 5, aperture: 0, maxblur: 0 }, bloom: 0.4, exposure: 1.0 };
+      // copper chisel/hammer striking the block
+      hammer.visible = t > 13.4 && t < 19.0; const hit = Math.abs(Math.sin(t * 4));
+      hammer.position.set(sx - 0.45, 1.5 + 0.25 * hit, -1.4 + 0.2); hammer.rotation.set(0, 0, -0.6 + 0.8 * hit);
+      chips.update(V(sx - 0.5, 1.25, -1.2), V(-0.4, 0.6, 0.3), 14.7, 18.6, t, 1.0, 0.6);
+      // water poured in front of the sled
+      jug.visible = t > 21.2 && t < 24.0; jug.position.set(sx + 1.4, 0.9, -0.5); jug.rotation.z = 1.4;
+      water.update(V(sx + 1.3, 0.85, -0.5), V(0, -1, 0), 21.5, 23.8, t, 1.4, 0.15);
+      // ropes from sled to the pullers
+      ropes.children.forEach((r, i) => { const vis2 = t > 19.0 && t < 24.4; r.visible = vis2; if (!vis2) return; const a = V(sx + 1.1, 0.4, -1.4 + (i % 2 ? 0.2 : -0.2)), b = V(sx + 1.9 + 3.2, 1.0, -1.4 + (i % 2 ? 0.45 : -0.45)); r.position.copy(a).lerp(b, 0.5); r.scale.y = a.distanceTo(b); r.lookAt(b); r.rotateX(Math.PI / 2); });
+      // pay: bread + jars of beer appear
+      bread.visible = t > 25.6; bread.position.set(0.2, 0.0, 1.2); bread.scale.setScalar(2.0 * sm(25.6, 25.9, t));
+      jars.forEach((j, i) => { const kk = sm(26.3 + i * 0.12, 26.5 + i * 0.12, t); j.visible = kk > 0.01; j.scale.setScalar(1.0 * kk); j.position.set(0.5 + (i % 6) * 0.2, 0, 1.0 + Math.floor(i / 6) * 0.25); });
+      const head = hero.headPos(); const up = (y) => V(0, y, 0);
+      showLabel(L.slaves, head.clone().add(up(0.42)), t, 3.6, 4.9); showLabel(L.paid, head.clone().add(up(0.42)), t, 5.0, 6.4); showLabel(L.vill, V(19, 5.5, -23), t, 6.6, 8.8);
+      showLabel(L.sun, V(-2, 4.5, -4), t, 9.8, 11.0); showLabel(L.team, V(-1.4, 2.8, -4), t, 11.1, 12.9);
+      showLabel(L.copper, V(sx - 0.3, 2.3, -1.2), t, 13.8, 15.5); showLabel(L.lime, V(sx, 2.0, -1.2), t, 15.6, 16.8); showLabel(L.tons, V(sx, 2.0, -1.2), t, 16.9, 18.6);
+      showLabel(L.sledL, V(sx, 2.2, -1.4), t, 20.2, 21.4); showLabel(L.waterL, V(sx + 1.2, 2.2, -0.8), t, 21.6, 24.0);
+      showLabel(L.breadL, V(0, 0.75, 1.4), t, 25.8, 26.4); showLabel(L.beerL, V(1.0, 0.95, 1.1), t, 26.4, 27.0); showLabel(L.lots, head.clone().add(V(0.2, 0.45, 0)), t, 27.0, 28.9);
+      return { bloom: 0.2, exposure: 1.0 };
     },
   };
 }
-export const SHOTS = [{ start: 0, end: DURATION + 1, build: oneTake }];
+export const SHOTS = [{ start: 0, end: 99, build }];

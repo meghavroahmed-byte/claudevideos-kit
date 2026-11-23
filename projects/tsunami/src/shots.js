@@ -44,7 +44,7 @@ function waveWall(width = 300) {
 }
 function build({ makeStage }) {
   const scene = world(makeStage({ shadowSize: 10, sunDir: [-5, 8, 4] }), 'spiaggia_di_mondello', { height: 2.5, radius: 90, sun: 1.8, env: 0.9 });
-  const sea = new THREE.Mesh(new THREE.PlaneGeometry(600, 200), waterMat(2.0)); sea.rotation.x = -Math.PI / 2; sea.position.set(20, 0.03, -112); scene.add(sea);
+  const sea = new THREE.Mesh(new THREE.PlaneGeometry(600, 200), waterMat(2.0)); sea.rotation.x = -Math.PI / 2; sea.position.set(20, 0.03, -112); scene.add(sea); scene.children.filter(o => o.material && o.material.isShadowMaterial).forEach(o => o.visible = false);
   const wave = waveWall(); scene.add(wave);
   const flood = new THREE.Mesh(new THREE.PlaneGeometry(300, 60, 1, 1), waterMat(2.0)); flood.rotation.x = -Math.PI / 2; scene.add(flood);
   const jet = fit(prop('sf/airliner'), 45, 'max', { ground: false }); scene.add(jet);

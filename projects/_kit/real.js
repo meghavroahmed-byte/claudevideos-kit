@@ -353,12 +353,13 @@ const WATER_FS = `uniform float time; uniform float foamTop; varying vec2 vUv; v
   void main(){ vec2 p = vW.xz*0.35 + vec2(time*0.3, time*0.2);
     float r = n(p) * 0.6 + n(p*2.7 - time*0.4) * 0.4;
     vec3 deep = vec3(0.02,0.16,0.22), shallow = vec3(0.05,0.36,0.42);
-    vec3 col = mix(deep, shallow, smoothstep(0.2, 0.9, vUv.y) * 0.8 + r * 0.25);
+    float gr = foamTop < 1.0 ? smoothstep(0.2, 0.9, vUv.y) * 0.8 : 0.3;
+    vec3 col = mix(deep, shallow, gr + r * 0.25);
     float crest = foamTop < 1.0 ? smoothstep(foamTop, foamTop + 0.08, vUv.y) : 0.0;
     float streak = foamTop < 1.0 ? smoothstep(0.55, 0.9, n(vec2(vW.x*0.6, vUv.y*3. - time*0.8))) * smoothstep(0.3, 0.8, vUv.y) * 0.5 : 0.0;
     float foam = crest + streak + smoothstep(0.8, 0.97, r) * 0.3;
     col = mix(col, vec3(0.92,0.96,0.97), clamp(foam, 0.0, 1.0));
-    gl_FragColor = vec4(col, 0.97);
+    gl_FragColor = vec4(col, 1.0);
     #include <colorspace_fragment>
   }`;
 const WATER_VS = `varying vec2 vUv; varying vec3 vW; void main(){ vUv = uv; vec4 w = modelMatrix*vec4(position,1.); vW = w.xyz; gl_Position = projectionMatrix*viewMatrix*w; }`;
