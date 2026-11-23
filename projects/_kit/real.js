@@ -348,7 +348,7 @@ export function lavaMaterial() {
 }
 
 // animated water surface (foamTop < 1 adds a foam crest along uv.y; use 2.0 for flat water)
-const WATER_FS = `uniform float time; uniform float foamTop; varying vec2 vUv; varying vec3 vW;
+const WATER_FS = `uniform float time; uniform float foamTop; uniform vec3 tint; varying vec2 vUv; varying vec3 vW;
   float h(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453); }
   float n(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f); return mix(mix(h(i),h(i+vec2(1,0)),f.x), mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x), f.y); }
   void main(){ vec2 p = vW.xz*0.35 + vec2(time*0.3, time*0.2);
@@ -360,9 +360,9 @@ const WATER_FS = `uniform float time; uniform float foamTop; varying vec2 vUv; v
     float streak = foamTop < 1.0 ? smoothstep(0.55, 0.9, n(vec2(vW.x*0.6, vUv.y*3. - time*0.8))) * smoothstep(0.3, 0.8, vUv.y) * 0.5 : 0.0;
     float foam = crest + streak + smoothstep(0.8, 0.97, r) * 0.3;
     col = mix(col, vec3(0.92,0.96,0.97), clamp(foam, 0.0, 1.0));
-    gl_FragColor = vec4(col, 1.0);
+    gl_FragColor = vec4(col * tint, 1.0);
     #include <colorspace_fragment>
   }`;
 const WATER_VS = `varying vec2 vUv; varying vec3 vW; void main(){ vUv = uv; vec4 w = modelMatrix*vec4(position,1.); vW = w.xyz; gl_Position = projectionMatrix*viewMatrix*w; }`;
-export const waterMat = (foamTop) => new THREE.ShaderMaterial({ uniforms: { time: { value: 0 }, foamTop: { value: foamTop } }, vertexShader: WATER_VS, fragmentShader: WATER_FS, transparent: true, side: THREE.DoubleSide });
+export const waterMat = (foamTop, tint = 0xffffff) => new THREE.ShaderMaterial({ uniforms: { time: { value: 0 }, foamTop: { value: foamTop }, tint: { value: new THREE.Color(tint) } }, vertexShader: WATER_VS, fragmentShader: WATER_FS, transparent: true, side: THREE.DoubleSide });
 
