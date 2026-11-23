@@ -14,7 +14,7 @@ ffmpeg -v error -y -i parts/video.mp4 \
   [0:v][f1]overlay=eof_action=pass[v1];[v1][f2]overlay=eof_action=pass[v2];[v2][f3]overlay=eof_action=pass,format=yuv420p[v];
   [4:a]volume=$VG,aformat=channel_layouts=stereo,asplit=2[vo][sc];
   [5:a]volume=$SG[sf];[sf][sc]sidechaincompress=threshold=0.05:ratio=2:attack=20:release=250[sfd];
-  [vo][sfd]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.89[a]" \
+  [vo][sfd]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.8:level=false[a]" \
   -map "[v]" -map "[a]" -c:v libx264 -preset medium -crf 16 -pix_fmt yuv420p -c:a aac -b:a 192k -ar 48000 -movflags +faststart -t 84.25 "$OUT.mp4"
 ffmpeg -v error -y -i "$OUT.mp4" -vf scale=720:-2 -c:v libx264 -crf 26 -preset medium -c:a aac -b:a 128k "$OUT-preview.mp4"
 ffmpeg -hide_banner -i "$OUT.mp4" -af ebur128=peak=true -f null - 2>&1 | grep -E "^\s+(I|Peak):" | tail -2
