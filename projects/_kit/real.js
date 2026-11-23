@@ -224,6 +224,7 @@ export const POSES = {
   handsThroat: [['LeftArm', [1, 0, 0], -0.9], ['RightArm', [1, 0, 0], -0.9], ['LeftForeArm', [0, 1, 0], -1.9], ['RightForeArm', [0, 1, 0], 1.9]],
   armsUp: [['LeftArm', [0, 0, 1], -2.6], ['RightArm', [0, 0, 1], 2.6]],
   spread: [['LeftArm', [0, 0, 1], -1.3], ['RightArm', [0, 0, 1], 1.3]],
+  elbow: [['RightArm', [1, 0, 0], -1.4], ['RightArm', [0, 1, 0], 1.0], ['RightForeArm', [0, 1, 0], 1.9], ['Neck', [1, 0, 0], 0.35], ['Spine', [1, 0, 0], 0.2]],
   shrug: [['LeftArm', [0, 0, 1], -0.4], ['RightArm', [0, 0, 1], 0.4], ['LeftForeArm', [0, 1, 0], -1.2], ['RightForeArm', [0, 1, 0], 1.2], ['Neck', [0, 0, 1], 0.15]],
   crouch: [['Spine', [1, 0, 0], 0.5], ['LeftUpLeg', [1, 0, 0], -1.1], ['RightUpLeg', [1, 0, 0], -1.1], ['LeftLeg', [1, 0, 0], 1.6], ['RightLeg', [1, 0, 0], 1.6]],
   lean: [['Spine', [1, 0, 0], 0.35]],
