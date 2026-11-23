@@ -28,3 +28,11 @@ Related: [[feedback-3d-ember-style-face]]
 - The ending MUST close on their face too.
 - In between, the face is ~15% of the runtime.
 - Edit like a top-class documentary, mixing max motion graphics: 3D plus some 2D.
+
+**2026-11-23 night (after viewing both GTA edits; "baje", "khyat"):**
+- No tilted text anywhere.
+- On face shots, put pro motion graphics on the chest area below the chin, not a sticky note.
+- No yellow or warm tint on the face footage; keep it natural.
+- 2D animation (characters acting) has to be inside every MG beat, as in the reference short.
+- Use real game trailers, screenshots and logos.
+- Re-edit both videos this way.

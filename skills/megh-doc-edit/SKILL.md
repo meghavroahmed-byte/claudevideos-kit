@@ -47,6 +47,18 @@ This file is everything the creator ("Megh", channel **Voice Of Megh**) taught o
 - Thin synthetic beeps as SFX, constant hiss beds, and pitched "eu eu" squeaks for body movement.
 - Full-screen cartoon worlds in place of motion graphics (an old rejection).
 
+
+## 2b. Feedback 2026-11-23 night (after the GTA edits; hard rules)
+- **Text is never tilted or rotated.** Stamps, labels and headlines all sit straight, clean and centred. Crooked or "bent" text looks amateur.
+- **Face shots need pro motion graphics on the chest area, below the chin.** Use a kinetic lower third (a line drawing on, a glowing keyword sliding in, a small icon), never a sticky note or cheap card, and never anything over the head.
+- **No colour cast on their face footage.** No yellow/warm overlay, no tint. Keep the camera colour natural (at most a tiny contrast or sharpness touch). Grade overlays apply only to graphics, never on top of the face.
+- **2D animation must live INSIDE the motion graphics, exactly like the reference short.** Every beat has an MG layout plus a framed, animated 2D scene with characters acting out the line (people working, walking, reacting, the creator's own hoodie character every few beats). Charts and text alone are "normal" and get rejected.
+- **For a game topic, use the REAL game:**
+  - Steam store trailers (DASH via yt-dlp) and screenshots.
+  - Wikipedia covers, logos and screenshots (fetch with a polite User-Agent and back off on 429).
+  - The official site for new games.
+  - Put them inside MG frames.
+
 ## 3. The look: documentary motion graphics, approved density
 The approved reference is their short "প্রাচীন যুগে শীতকালে মানুষ কীভাবে বেঁচে থাকত?" (YouTube `Q0xgugDSDwM`). Match its density and polish, with a new palette and theme per video:
 - **A new beat every ~2 s** (about 23 beats in 50 s). Something always moves; each beat pushes in slowly.
