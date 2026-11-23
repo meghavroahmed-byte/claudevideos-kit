@@ -26,3 +26,4 @@
 - [neon-3d-short skill](../skills/neon-3d-short/SKILL.md) — user asked (2026-11-09) to turn the anaros-dudh 3D short workflow into a reusable skill; use it for every voice+script Neon 3D video
 - [3D ref: House In Crisis](feedback-3d-reference-house-in-crisis.md) — 2026-11-22 raw Shorts as bright daytime three.js 3D (hero object, label pill, x-ray circle), face 2s start/mid/end, no captions
 - [3D ember style + face rules](feedback-3d-ember-style-face.md) — 2026-11-23: v2 Ice&Ember look BUILT IN 3D (headline/chip/neon/grid); face = original room bg, light grade, xfade transitions, no text over head
+- [Unique MG per video + pro sound](feedback-unique-mg-pro-sound.md) — 2026-11-23: each video its own bg/MG look, top-level MG, best sound design with SFX on every element; user cuts raw themselves now, wait for Drive link
