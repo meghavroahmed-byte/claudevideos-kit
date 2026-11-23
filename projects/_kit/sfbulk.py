@@ -1,10 +1,17 @@
 # sfbulk.py: fill _assets/sf with one good CC0/CC-BY model per entry (skips existing). Picks most-liked candidate with faceCount<200k and glb<=45MB.
-import json, os, sys, urllib.request, urllib.parse, subprocess, time
+import json, os, sys, urllib.request, urllib.error, urllib.parse, subprocess, time
 K = os.path.dirname(os.path.abspath(__file__)); A = f'{K}/../_assets/sf'
 OK = {'CC Attribution', 'CC0 Public Domain', 'Free Standard'}
 H = {'User-Agent': 'asset-fetch/1.0'}
-def get(u, auth=False):
-    h = dict(H); 
+def get(u, auth=False, tries=6):
+  for i in range(tries):
+    try: return _get(u, auth)
+    except urllib.error.HTTPError as e:
+        if e.code == 429: time.sleep(20 * (i + 1)); continue
+        raise
+  raise Exception('rate limited')
+def _get(u, auth=False):
+    time.sleep(1.5); h = dict(H); 
     if auth: h['Authorization'] = 'Token proxy-injected'
     return json.loads(urllib.request.urlopen(urllib.request.Request(u, headers=h), timeout=120).read())
 ANIMALS = 'hippo mosquito chameleon honey_bee great_white_shark grizzly_bear octopus african_elephant cheetah anaconda crocodile lion tiger wolf horse cow dog cat ant spider eagle humpback_whale dolphin gorilla chimpanzee deer camel penguin polar_bear frog goldfish jellyfish giraffe zebra rhinoceros kangaroo owl bat scorpion butterfly housefly cockroach sea_turtle chicken snake rabbit pig sheep goat squirrel parrot crow pigeon mouse hamster lizard tarantula'.split()
@@ -41,6 +48,7 @@ if len(sys.argv) > 1: todo = [t for t in todo if t[0] in sys.argv[1:]]
 os.makedirs(A, exist_ok=True)
 for name, q, anim in todo:
     if os.path.exists(f'{A}/{name}.glb'): continue
+    if sum(os.path.getsize(f'{A}/{f}') for f in os.listdir(A)) > 1.6e9: print('BUDGET reached'); break
     done = False
     for extra, minf in ([({'animated': 'true'}, 8000), ({}, 8000), ({'animated': 'true'}, 0)] if anim else [({}, 8000), ({}, 0)]):
         try:
@@ -51,7 +59,7 @@ for name, q, anim in todo:
             if lic not in OK or not (minf <= m.get('faceCount', 0) <= 200000): continue
             try:
                 dd = get(f"https://api.sketchfab.com/v3/models/{m['uid']}/download", True)
-                if 'glb' not in dd or dd['glb']['size'] > 45e6: continue
+                if 'glb' not in dd or dd['glb']['size'] > 25e6: continue
             except Exception as e: print('dl info fail', name, e); time.sleep(3); continue
             r = subprocess.run(['python3', f'{K}/getsf.py', 'get', m['uid'], name], capture_output=True, text=True)
             print(name, '<-', m['name'][:40], '|', r.stdout.strip()[:80], r.stderr.strip()[-120:]); done = True; break
