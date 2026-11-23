@@ -36,3 +36,4 @@ Related: [[feedback-3d-ember-style-face]]
 - 2D animation (characters acting) has to be inside every MG beat, as in the reference short.
 - Use real game trailers, screenshots and logos.
 - Re-edit both videos this way.
+- Hook: punch zoom-in on the face at the very start (snap zoom + shake + impact). Be proactive and add own best ideas (user: "tumi ki nije theke kichu korte paro na?").

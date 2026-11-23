@@ -53,6 +53,8 @@ This file is everything the creator ("Megh", channel **Voice Of Megh**) taught o
 - **Face shots need pro motion graphics on the chest area, below the chin.** Use a kinetic lower third (a line drawing on, a glowing keyword sliding in, a small icon), never a sticky note or cheap card, and never anything over the head.
 - **No colour cast on their face footage.** No yellow/warm overlay, no tint. Keep the camera colour natural (at most a tiny contrast or sharpness touch). Grade overlays apply only to graphics, never on top of the face.
 - **2D animation must live INSIDE the motion graphics, exactly like the reference short.** Every beat has an MG layout plus a framed, animated 2D scene with characters acting out the line (people working, walking, reacting, the creator's own hoodie character every few beats). Charts and text alone are "normal" and get rejected.
+- **Hook = a punch zoom-in on the face in the first second.** Use a fast snap zoom (~1.0→1.25 over 0.15 s with a slight shake and motion blur) and a heavy impact/boom hit, so the very first frame grabs attention. Add more punch-ins at key reveals.
+- **Be proactive.** Don't stop at what they listed; add your own best ideas (extra hooks, reveals, sound moments, smarter transitions) so the result is better than they asked for.
 - **For a game topic, use the REAL game:**
   - Steam store trailers (DASH via yt-dlp) and screenshots.
   - Wikipedia covers, logos and screenshots (fetch with a polite User-Agent and back off on 429).
