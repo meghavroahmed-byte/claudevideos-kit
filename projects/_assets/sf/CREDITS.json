@@ -28,18 +28,18 @@
   "url": "https://sketchfab.com/3d-models/hippopotamus-e3244268216244808d2603d23ef37310"
  },
  "mosquito": {
-  "uid": "b93eb160c5f049c5aeac1ac3e0c15b43",
-  "title": "Swamp - Low Poly Props and low poly characters",
-  "author": "micaelsampaio",
+  "uid": "d3d2216cddf54236bc4e138c3561c3b5",
+  "title": "Mosquito VFX",
+  "author": "rayray",
   "license": "CC Attribution",
-  "url": "https://sketchfab.com/3d-models/swamp-low-poly-props-and-low-poly-characters-b93eb160c5f049c5aeac1ac3e0c15b43"
+  "url": "https://sketchfab.com/3d-models/mosquito-vfx-d3d2216cddf54236bc4e138c3561c3b5"
  },
  "chameleon": {
-  "uid": "90c848ae8fdf4d02b5ccb378885a1afe",
-  "title": "Hue Unmasked",
-  "author": "caseynotjones",
+  "uid": "3877371976754df68d2b93a181bd4893",
+  "title": "Chameleon",
+  "author": "Trouvaille",
   "license": "CC Attribution",
-  "url": "https://sketchfab.com/3d-models/hue-unmasked-90c848ae8fdf4d02b5ccb378885a1afe"
+  "url": "https://sketchfab.com/3d-models/chameleon-3877371976754df68d2b93a181bd4893"
  },
  "rp_sophia": {
   "uid": "dc448c3be0e74f96a55fb475a13433cf",
@@ -481,5 +481,894 @@
   "author": "Neberkenezer",
   "license": "CC Attribution",
   "url": "https://sketchfab.com/3d-models/ccity-building-set-1-a2d5c7bfcc2148fb8994864c43dfcc97"
+ },
+ "octopus": {
+  "uid": "140785fd2d984e61b428ccc4eb0cf61a",
+  "title": "Marina (Off the Hook)",
+  "author": "chained_tan",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/marina-off-the-hook-140785fd2d984e61b428ccc4eb0cf61a"
+ },
+ "african_elephant": {
+  "uid": "436483857ce84c77bd0f6c76fb3d4d2d",
+  "title": "African Elephant Bull - Rigged & Animated",
+  "author": "Animal Animator",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/african-elephant-bull-rigged-animated-436483857ce84c77bd0f6c76fb3d4d2d"
+ },
+ "cow": {
+  "uid": "c5782e43dcf442718a25b49bed00f582",
+  "title": "Cow frame test",
+  "author": "Nyilonelycompany",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/cow-frame-test-c5782e43dcf442718a25b49bed00f582"
+ },
+ "gorilla": {
+  "uid": "3ba199e0a78546598f868e86d78495a0",
+  "title": "Simio Monkey dancing",
+  "author": "pepetrincado",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/simio-monkey-dancing-3ba199e0a78546598f868e86d78495a0"
+ },
+ "deer": {
+  "uid": "5d7c01aa2f304c238cc0df3711d998f7",
+  "title": "Almond",
+  "author": "AKM",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/almond-5d7c01aa2f304c238cc0df3711d998f7"
+ },
+ "camel": {
+  "uid": "99af7daa5baf450ea7b809937937e6d5",
+  "title": "Camel",
+  "author": "eb78",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/camel-99af7daa5baf450ea7b809937937e6d5"
+ },
+ "kangaroo": {
+  "uid": "9860e2270f1245698995adce759c187f",
+  "title": "Hologram",
+  "author": "KangaroOz 3D",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/hologram-9860e2270f1245698995adce759c187f"
+ },
+ "bat": {
+  "uid": "8719886cf8f645ca9d53d766976baf9c",
+  "title": "Bat",
+  "author": "ice9",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/bat-8719886cf8f645ca9d53d766976baf9c"
+ },
+ "scorpion": {
+  "uid": "60a474f1f87040f38e073f87a63b7548",
+  "title": "Pseudoscorpion",
+  "author": ".hapto GmbH",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/pseudoscorpion-60a474f1f87040f38e073f87a63b7548"
+ },
+ "butterfly": {
+  "uid": "80f8d9a6dadc411e89ca366cb0cfb0d9",
+  "title": "Animated Flying Fluttering Butterfly Loop",
+  "author": "LasquetiSpice",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/animated-flying-fluttering-butterfly-loop-80f8d9a6dadc411e89ca366cb0cfb0d9"
+ },
+ "cockroach": {
+  "uid": "cead55b8aa8643d48d67240bad028592",
+  "title": "Cockroach",
+  "author": "CK",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/cockroach-cead55b8aa8643d48d67240bad028592"
+ },
+ "sea_turtle": {
+  "uid": "442372b7f02b4730882d41d959726156",
+  "title": "Model 53A - Flatback Sea Turtle",
+  "author": "DigitalLife3D",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/model-53a-flatback-sea-turtle-442372b7f02b4730882d41d959726156"
+ },
+ "goat": {
+  "uid": "a7f1da7d317c4d8a800b61213df15ad7",
+  "title": "Good Boy",
+  "author": "kingcroco",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/good-boy-a7f1da7d317c4d8a800b61213df15ad7"
+ },
+ "squirrel": {
+  "uid": "2b9320dbc9f749fca4958cc78bd4a07d",
+  "title": "SCRAT ICE AGE",
+  "author": "BlueMesh",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/scrat-ice-age-2b9320dbc9f749fca4958cc78bd4a07d"
+ },
+ "crow": {
+  "uid": "bd836d81296442c0b53464b03abaa21b",
+  "title": "Cb_34 (Crowbar)",
+  "author": "three",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/cb-34-crowbar-bd836d81296442c0b53464b03abaa21b"
+ },
+ "pigeon": {
+  "uid": "f1397b88dc6744578767fa3253ac7bbc",
+  "title": "Animated-pigeon-3d-model",
+  "author": "xyina124",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/animated-pigeon-3d-model-f1397b88dc6744578767fa3253ac7bbc"
+ },
+ "astronaut": {
+  "uid": "d5a16f7ec11c4b1d876059cbf6adbf56",
+  "title": "Astronaut",
+  "author": "IvanPetrov",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/astronaut-d5a16f7ec11c4b1d876059cbf6adbf56"
+ },
+ "hamster": {
+  "uid": "041ff593cec544c19a2a37cc38c06194",
+  "title": "Hamster Walk",
+  "author": "Lada.Repina",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/hamster-walk-041ff593cec544c19a2a37cc38c06194"
+ },
+ "space_station": {
+  "uid": "813f5b296e584c26bf386ca39de6c3d4",
+  "title": "ISS",
+  "author": "uperesito",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/iss-813f5b296e584c26bf386ca39de6c3d4"
+ },
+ "jaguar": {
+  "uid": "91c61c329d2a4668816f81f08dfcd492",
+  "title": "jaguar",
+  "author": "Ear.Rodriguez",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/jaguar-91c61c329d2a4668816f81f08dfcd492"
+ },
+ "hyena": {
+  "uid": "4559fe724ecb47c1af735fe464044af7",
+  "title": "female Spotted hyena",
+  "author": "Robert_the_whale",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/female-spotted-hyena-4559fe724ecb47c1af735fe464044af7"
+ },
+ "buffalo": {
+  "uid": "52704a4f28eb437694affaed27dec3cb",
+  "title": "Water Buffalo",
+  "author": "kenchoo",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/water-buffalo-52704a4f28eb437694affaed27dec3cb"
+ },
+ "earth": {
+  "uid": "899b7a8202ed48f0a0903c33cb5501b6",
+  "title": "Realistic Earth 8K",
+  "author": "Shady Tex",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/realistic-earth-8k-899b7a8202ed48f0a0903c33cb5501b6"
+ },
+ "moose": {
+  "uid": "000d148dfb07452eb890dccd2b2552aa",
+  "title": "Chicken Character",
+  "author": "JordanBrayne",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/chicken-character-000d148dfb07452eb890dccd2b2552aa"
+ },
+ "bison": {
+  "uid": "d0f2ff31252a4c9cb084b1ac3a2e4d8b",
+  "title": "Bull",
+  "author": "stealth86",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/bull-d0f2ff31252a4c9cb084b1ac3a2e4d8b"
+ },
+ "koala": {
+  "uid": "03b92047105e40b8a70c7b4a609529a7",
+  "title": "Zoonomaly Monster 17 Rig",
+  "author": "NO DONT EAT ME CASEOH (Ferris wheel)",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/zoonomaly-monster-17-rig-03b92047105e40b8a70c7b4a609529a7"
+ },
+ "panda": {
+  "uid": "19605b53f8fe45bcbe167fab1bac43ed",
+  "title": "Sushi Restaurant Kit (100+ Models!)",
+  "author": "quaternius",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/sushi-restaurant-kit-100-models-19605b53f8fe45bcbe167fab1bac43ed"
+ },
+ "red_panda": {
+  "uid": "c003c2985e0e462684063a893a0e85ee",
+  "title": "Red Panda",
+  "author": "kenchoo",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/red-panda-c003c2985e0e462684063a893a0e85ee"
+ },
+ "sloth": {
+  "uid": "8e18fb1127a74d40a28f3e2ac08f2a18",
+  "title": "Cat",
+  "author": "Honey Sloth",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/cat-8e18fb1127a74d40a28f3e2ac08f2a18"
+ },
+ "otter": {
+  "uid": "3b3800d3fe4143c882dde553f9005666",
+  "title": "Otter-Chan",
+  "author": "AKM",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/otter-chan-3b3800d3fe4143c882dde553f9005666"
+ },
+ "beaver": {
+  "uid": "4f9358a91d284c5ea66b3169a485bc9c",
+  "title": "Beaver Inc, Global Game Jam 2020",
+  "author": "Edriviel",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/beaver-inc-global-game-jam-2020-4f9358a91d284c5ea66b3169a485bc9c"
+ },
+ "raccoon": {
+  "uid": "2b3b6a5abe784dfe816fec5bf62542c2",
+  "title": "Pots the Raccoon",
+  "author": "Lemon Leon",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/pots-the-raccoon-2b3b6a5abe784dfe816fec5bf62542c2"
+ },
+ "fox": {
+  "uid": "c6365aa1a75b4b01992ecab01e7afa2f",
+  "title": "Anime fox girl",
+  "author": "darknessvoid403",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/anime-fox-girl-c6365aa1a75b4b01992ecab01e7afa2f"
+ },
+ "hedgehog": {
+  "uid": "c23cead36d9349988a4981b92eabf208",
+  "title": "Sonic-HD",
+  "author": "alexandelyt",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/sonic-hd-c23cead36d9349988a4981b92eabf208"
+ },
+ "seal": {
+  "uid": "fabe7df4946647baa760d53968720a35",
+  "title": "Sealife",
+  "author": "patrakeevasveta",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/sealife-fabe7df4946647baa760d53968720a35"
+ },
+ "walrus": {
+  "uid": "4deacb2218f9466cb88ef46a289e1ff7",
+  "title": "Rotor The Walrus (Modern)",
+  "author": "Zeztz777",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/rotor-the-walrus-modern-4deacb2218f9466cb88ef46a289e1ff7"
+ },
+ "sea_lion": {
+  "uid": "77a8392ebea940fcb1d5e2cfda2b1d47",
+  "title": "Ghoulmaw Sketchfab",
+  "author": "TylerBird",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/ghoulmaw-sketchfab-77a8392ebea940fcb1d5e2cfda2b1d47"
+ },
+ "orca": {
+  "uid": "8e429052939a4677861d0d550a0e27cd",
+  "title": "White Pointer",
+  "author": "VFX Stevenz",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/white-pointer-8e429052939a4677861d0d550a0e27cd"
+ },
+ "manta_ray": {
+  "uid": "3f56886ab5fe4c7b8b151ea0974bf5b3",
+  "title": "Cartoon Manta Ray (animated)",
+  "author": "Jungle Jim",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/cartoon-manta-ray-animated-3f56886ab5fe4c7b8b151ea0974bf5b3"
+ },
+ "stingray": {
+  "uid": "4d615971858940f38703a1f1ffb370be",
+  "title": "Eagle stingray",
+  "author": "kenchoo",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/eagle-stingray-4d615971858940f38703a1f1ffb370be"
+ },
+ "swordfish": {
+  "uid": "96dcb44283444d41bd51cc9b987a8fbf",
+  "title": "Swordfish II (Cowboy Bebop)",
+  "author": "amigacommodoreibm",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/swordfish-ii-cowboy-bebop-96dcb44283444d41bd51cc9b987a8fbf"
+ },
+ "piranha": {
+  "uid": "4c1c90e37f884ae6bd7f54f0b6099b69",
+  "title": "Beacon Piranha Plushtrap",
+  "author": "OrangeSauceu",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/beacon-piranha-plushtrap-4c1c90e37f884ae6bd7f54f0b6099b69"
+ },
+ "clownfish": {
+  "uid": "d2f8daa7e9a446aabe6b3716d2c7ef31",
+  "title": "Octopus's Garden",
+  "author": "Defne Tuncer",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/octopuss-garden-d2f8daa7e9a446aabe6b3716d2c7ef31"
+ },
+ "seahorse": {
+  "uid": "a803bd39df534becb587453c27a0a9a9",
+  "title": "Seahorse Sf",
+  "author": "kenchoo",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/seahorse-sf-a803bd39df534becb587453c27a0a9a9"
+ },
+ "starfish": {
+  "uid": "de65428a6da846a4b5f05ea4fb667b08",
+  "title": "Happy starfish",
+  "author": "systemmanager",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/happy-starfish-de65428a6da846a4b5f05ea4fb667b08"
+ },
+ "crab": {
+  "uid": "8e016bc1b79f4c6aa58d430daa299f1e",
+  "title": "Ultimate Platformer Pack (100+ Models)",
+  "author": "quaternius",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/ultimate-platformer-pack-100-models-8e016bc1b79f4c6aa58d430daa299f1e"
+ },
+ "lobster": {
+  "uid": "b6c410c5fc7044bc93a47ddf978697b0",
+  "title": "ZEFIRO",
+  "author": "angelo raffaele catalano",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/zefiro-b6c410c5fc7044bc93a47ddf978697b0"
+ },
+ "shrimp": {
+  "uid": "c52f367cf7ce449dbd8987bae6361fa9",
+  "title": "Shrimp Drone: MD - C9R2 Shrone",
+  "author": "Christian Rudorff",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/shrimp-drone-md-c9r2-shrone-c52f367cf7ce449dbd8987bae6361fa9"
+ },
+ "squid": {
+  "uid": "28b3e1a216904de7ad212368fb9d8f59",
+  "title": "Lurker - Rigged and Animated",
+  "author": "HighPolyDensity",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/lurker-rigged-and-animated-28b3e1a216904de7ad212368fb9d8f59"
+ },
+ "snail": {
+  "uid": "6f0127a9cd314d9aaa3ae93dab1aaf3d",
+  "title": "Basical_snail",
+  "author": "kenchoo",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/basical-snail-6f0127a9cd314d9aaa3ae93dab1aaf3d"
+ },
+ "earthworm": {
+  "uid": "1cc6b0d587ae4f4a9272d922d0a9b0d7",
+  "title": "Minecraft Ghast",
+  "author": "AbhinavRaj50",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/minecraft-ghast-1cc6b0d587ae4f4a9272d922d0a9b0d7"
+ },
+ "mantis": {
+  "uid": "dd631c02928540f49bab339c6adbd4ff",
+  "title": "Mantis",
+  "author": "Leyde",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/mantis-dd631c02928540f49bab339c6adbd4ff"
+ },
+ "grasshopper": {
+  "uid": "b61ec799f9d24df98872e1803f7d46ef",
+  "title": "little house tavern",
+  "author": "confused_yet_",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/little-house-tavern-b61ec799f9d24df98872e1803f7d46ef"
+ },
+ "ladybug": {
+  "uid": "aa664ec569f54e18be734c577a4f31a2",
+  "title": "Ladybugs made in Quill",
+  "author": "Ruxandragp",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/ladybugs-made-in-quill-aa664ec569f54e18be734c577a4f31a2"
+ },
+ "dragonfly": {
+  "uid": "a5ad5ec06f43461f95bb93e95fe7553b",
+  "title": "Chinese dragon",
+  "author": "MAXDESIGN-3D",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/chinese-dragon-a5ad5ec06f43461f95bb93e95fe7553b"
+ },
+ "wasp": {
+  "uid": "49d47ed316c24567953223fbc4d1700e",
+  "title": "Flying Hornet",
+  "author": "Damco",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/flying-hornet-49d47ed316c24567953223fbc4d1700e"
+ },
+ "hornet": {
+  "uid": "670a87a9234c40bc9c2a4f274f6d8cc1",
+  "title": "SHAW ! Hornet - Hollow Knight Silksong",
+  "author": "Seifert",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/shaw-hornet-hollow-knight-silksong-670a87a9234c40bc9c2a4f274f6d8cc1"
+ },
+ "beetle": {
+  "uid": "cb6e82e73386448fb3b4e2dd25255a5e",
+  "title": "Beetle/Fusca (Version 1)",
+  "author": "soujagah",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/beetlefusca-version-1-cb6e82e73386448fb3b4e2dd25255a5e"
+ },
+ "termite": {
+  "uid": "4bdfd0e244d04bf5a43de3edb759ba81",
+  "title": "PINHOLE - Wurmloch der Zukunft IX",
+  "author": "MWintersberger",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/pinhole-wurmloch-der-zukunft-ix-4bdfd0e244d04bf5a43de3edb759ba81"
+ },
+ "tick": {
+  "uid": "e6ac8d839b6b43cb887806269edf7fdf",
+  "title": "ship",
+  "author": "SP",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/ship-e6ac8d839b6b43cb887806269edf7fdf"
+ },
+ "flea": {
+  "uid": "3fd6f0c3d46a4768a03b4359a16641a8",
+  "title": "Sorry that title is too long",
+  "author": "mrpaulsbuck12",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/sorry-that-title-is-too-long-3fd6f0c3d46a4768a03b4359a16641a8"
+ },
+ "vulture": {
+  "uid": "fdc886b6b5ce47cbb611cdd769d7f3fe",
+  "title": "Chilli Model",
+  "author": "Koda Landers",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/chilli-model-fdc886b6b5ce47cbb611cdd769d7f3fe"
+ },
+ "hawk": {
+  "uid": "91e51367a3cf422c816a12462abf8f60",
+  "title": "Coffin of Pa-di-mut",
+  "author": "Harvard Museum of the Ancient Near East",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/coffin-of-pa-di-mut-91e51367a3cf422c816a12462abf8f60"
+ },
+ "flamingo": {
+  "uid": "a3efa3ff166f4c11a2c3caae895e5a8e",
+  "title": "Flaming Springtrap",
+  "author": "OrangeSauceu",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/flaming-springtrap-a3efa3ff166f4c11a2c3caae895e5a8e"
+ },
+ "peacock": {
+  "uid": "d0be1a7dd54143fab579d63e4f7cd4db",
+  "title": "Jikin goldfish",
+  "author": "somitsu",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/jikin-goldfish-d0be1a7dd54143fab579d63e4f7cd4db"
+ },
+ "ostrich": {
+  "uid": "0999e676453e4562a7777cd006125738",
+  "title": "African ostrich (Revised version)",
+  "author": "Andrey",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/african-ostrich-revised-version-0999e676453e4562a7777cd006125738"
+ },
+ "hummingbird": {
+  "uid": "d5a551f91f8345629f4ff8ab49ac07f4",
+  "title": "Red Tailed Comet Idle Animation",
+  "author": "burak.dag.u9",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/red-tailed-comet-idle-animation-d5a551f91f8345629f4ff8ab49ac07f4"
+ },
+ "duck": {
+  "uid": "3720b599cb80444890b1284a4ffc5dd1",
+  "title": "DAE Bazaar: Steampunk carnival game",
+  "author": "vervoortward",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/dae-bazaar-steampunk-carnival-game-3720b599cb80444890b1284a4ffc5dd1"
+ },
+ "swan": {
+  "uid": "415584bc3224484fba20a482592e2157",
+  "title": "Duck_Walk (Free)",
+  "author": "Nyilonelycompany",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/duck-walk-free-415584bc3224484fba20a482592e2157"
+ },
+ "goose": {
+  "uid": "361b3bd190d04c6e88d62632ebe0fddf",
+  "title": "Untitled Goose Game Goose Model",
+  "author": "Avocado",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/untitled-goose-game-goose-model-361b3bd190d04c6e88d62632ebe0fddf"
+ },
+ "toucan": {
+  "uid": "eb77223ebfd946e69fb58ffe9ad32adf",
+  "title": "Toucan Bird",
+  "author": "sevketkabatas",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/toucan-bird-eb77223ebfd946e69fb58ffe9ad32adf"
+ },
+ "woodpecker": {
+  "uid": "3520f70f6aae4c799648aa52d1f20917",
+  "title": "Doodle Dance (Clementine Woodpecker, video Link)",
+  "author": "Kirifuki",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/doodle-dance-clementine-woodpecker-video-link-3520f70f6aae4c799648aa52d1f20917"
+ },
+ "komodo_dragon": {
+  "uid": "93e30d889c264320a2a939e783b9e603",
+  "title": "Honolulu & Waikiki - Oahu, Hawaii, South Pacific",
+  "author": "Nate Loper  \ud83d\uddfa\ufe0f \u26cf\ud83c\udffa",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/honolulu-waikiki-oahu-hawaii-south-pacific-93e30d889c264320a2a939e783b9e603"
+ },
+ "iguana": {
+  "uid": "78d4fa569e4b43f9937b57f374a34222",
+  "title": "Iguana",
+  "author": "satishasc",
+  "license": "Free Standard",
+  "url": "https://sketchfab.com/3d-models/iguana-78d4fa569e4b43f9937b57f374a34222"
+ },
+ "gecko": {
+  "uid": "9397658152d243ab9f22c619fad0293e",
+  "title": "Monstergarden",
+  "author": "iKnewt",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/monstergarden-9397658152d243ab9f22c619fad0293e"
+ },
+ "cobra": {
+  "uid": "184fc6fab4424605a0a29baacef9c7af",
+  "title": "Cobra animation",
+  "author": "Lucluc lucia",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/cobra-animation-184fc6fab4424605a0a29baacef9c7af"
+ },
+ "python_snake": {
+  "uid": "598fc226b63b4e61a46788d81178244f",
+  "title": "A Moment Snake and Chess \u00b7 Kleiner Planet 2026",
+  "author": "MWintersberger",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/a-moment-snake-and-chess-kleiner-planet-2026-598fc226b63b4e61a46788d81178244f"
+ },
+ "rattlesnake": {
+  "uid": "bdf010862e92443d8af8f1054e9b9d31",
+  "title": "Titanoboa",
+  "author": "Tim",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/titanoboa-bdf010862e92443d8af8f1054e9b9d31"
+ },
+ "alligator": {
+  "uid": "c23101cf5b3349668ef320e94e041b4d",
+  "title": "Alligator walking upright",
+  "author": "Jungle Jim",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/alligator-walking-upright-c23101cf5b3349668ef320e94e041b4d"
+ },
+ "tortoise": {
+  "uid": "b6377a0d28cf45349dda4945669e4ec1",
+  "title": "CC0 \u30cb\u30db\u30f3\u30a4\u30b7\u30ac\u30e1 \ud83d\udc22 \u2642 Japanese Pond Turtle",
+  "author": "ffish.asia / floraZia.com",
+  "license": "CC0 Public Domain",
+  "url": "https://sketchfab.com/3d-models/cc0-japanese-pond-turtle-b6377a0d28cf45349dda4945669e4ec1"
+ },
+ "salamander": {
+  "uid": "e4a54d40a57d4c52b0610d51696d8ac5",
+  "title": "CSO Salamader (FlameThrower) First Person",
+  "author": "Amine.Elouneg",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/cso-salamader-flamethrower-first-person-e4a54d40a57d4c52b0610d51696d8ac5"
+ },
+ "axolotl": {
+  "uid": "d3507ae804604930b1b8534d2ac1c0da",
+  "title": "Ditch Dog - Rigged and Animated",
+  "author": "HighPolyDensity",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/ditch-dog-rigged-and-animated-d3507ae804604930b1b8534d2ac1c0da"
+ },
+ "dinosaur": {
+  "uid": "06cb55f941d94dc8b95ac46f92d89e7c",
+  "title": "Animated triceratops skeleton",
+  "author": "Zacxophone",
+  "license": "CC0 Public Domain",
+  "url": "https://sketchfab.com/3d-models/animated-triceratops-skeleton-06cb55f941d94dc8b95ac46f92d89e7c"
+ },
+ "t_rex": {
+  "uid": "5bbcadb7d9274843abb5ada35767dba1",
+  "title": "Animated T-Rex Dinosaur Biting Attack Loop",
+  "author": "LasquetiSpice",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/animated-t-rex-dinosaur-biting-attack-loop-5bbcadb7d9274843abb5ada35767dba1"
+ },
+ "mammoth": {
+  "uid": "5e0a1d6bb8a74c0f906bafa34cffa0c5",
+  "title": "MAMMOTH",
+  "author": "seth the yutyrannus",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/mammoth-5e0a1d6bb8a74c0f906bafa34cffa0c5"
+ },
+ "sabertooth": {
+  "uid": "fe7fd86f7966476e86a13085accc3ae9",
+  "title": "Meerinx",
+  "author": "tranb95",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/meerinx-fe7fd86f7966476e86a13085accc3ae9"
+ },
+ "human_skeleton": {
+  "uid": "aad392aff87246179789ac23063856a6",
+  "title": "skeleton",
+  "author": "sanik.pdo",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/skeleton-aad392aff87246179789ac23063856a6"
+ },
+ "lungs": {
+  "uid": "ce09f4099a68467880f46e61eb9a3531",
+  "title": "Realistic Human Lungs",
+  "author": "neshallads",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/realistic-human-lungs-ce09f4099a68467880f46e61eb9a3531"
+ },
+ "stomach": {
+  "uid": "56ffcd2330ae4b7ea6c7b8a08c82b4b7",
+  "title": "Stomach - Organ",
+  "author": "Trident.AI",
+  "license": "Free Standard",
+  "url": "https://sketchfab.com/3d-models/stomach-organ-56ffcd2330ae4b7ea6c7b8a08c82b4b7"
+ },
+ "red_blood_cells": {
+  "uid": "c3f0295dca6244e286a0b21999c2d0ce",
+  "title": "Red Blood Cells",
+  "author": "AK",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/red-blood-cells-c3f0295dca6244e286a0b21999c2d0ce"
+ },
+ "kidney": {
+  "uid": "686992c2a7fb456eaa8997b0366f4062",
+  "title": "Kidney",
+  "author": "cgmac",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/kidney-686992c2a7fb456eaa8997b0366f4062"
+ },
+ "neuron": {
+  "uid": "f4199d144003415690ad19eea6210e71",
+  "title": "Hippocampus CA1 Pyramidal Cell",
+  "author": "JustasB",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/hippocampus-ca1-pyramidal-cell-f4199d144003415690ad19eea6210e71"
+ },
+ "dna": {
+  "uid": "144ed9c527b3415b9bbc0418d0233fdc",
+  "title": "DNA Animation",
+  "author": "KageG",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/dna-animation-144ed9c527b3415b9bbc0418d0233fdc"
+ },
+ "gladiator_helmet": {
+  "uid": "0d09ee1dde8d419b83f8014292badc9f",
+  "title": "Gladiator",
+  "author": "maned",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/gladiator-0d09ee1dde8d419b83f8014292badc9f"
+ },
+ "samurai_armor": {
+  "uid": "73e67d7be4ec490fa6cfb1380748151f",
+  "title": "Samurai oni mask",
+  "author": "Aid",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/samurai-oni-mask-73e67d7be4ec490fa6cfb1380748151f"
+ },
+ "viking_ship": {
+  "uid": "01098ad7973647a9b558f41d2ebc5193",
+  "title": "Gislinge Viking Boat",
+  "author": "Opus Poly",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/gislinge-viking-boat-01098ad7973647a9b558f41d2ebc5193"
+ },
+ "viking_helmet": {
+  "uid": "bb6315c3500d4ffc84b68151b015621e",
+  "title": "Loki Helmet",
+  "author": "Edgar V\u00e1zquez",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/loki-helmet-bb6315c3500d4ffc84b68151b015621e"
+ },
+ "catapult": {
+  "uid": "03022ca891e3440d815178003a466302",
+  "title": "Balista",
+  "author": "Urizel",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/balista-03022ca891e3440d815178003a466302"
+ },
+ "battering_ram": {
+  "uid": "fcd2d09f9d62437da7ecd25eafde33df",
+  "title": "Siege Equipment - Medieval Fantasy Challenge",
+  "author": "Carrigan Raketic",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/siege-equipment-medieval-fantasy-challenge-fcd2d09f9d62437da7ecd25eafde33df"
+ },
+ "caveman": {
+  "uid": "c50cad592012473c970542d843d76e64",
+  "title": "Floral Skull",
+  "author": "FletchTech",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/floral-skull-c50cad592012473c970542d843d76e64"
+ },
+ "campfire": {
+  "uid": "1f6834effb514d4c8a0fd34accb88251",
+  "title": "Campfire",
+  "author": "Mandrake",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/campfire-1f6834effb514d4c8a0fd34accb88251"
+ },
+ "colosseum": {
+  "uid": "2a52366570204019b848f32baf9ac665",
+  "title": "Main gate",
+  "author": "local.yany",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/main-gate-2a52366570204019b848f32baf9ac665"
+ },
+ "plague_doctor": {
+  "uid": "5ed82127bfad41c3931bcab449b56a2e",
+  "title": "Steampunk plague doctor",
+  "author": "Domindik",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/steampunk-plague-doctor-5ed82127bfad41c3931bcab449b56a2e"
+ },
+ "stone_block": {
+  "uid": "10bc1bbec4c045f9b15fc2156b5e32ee",
+  "title": "Bath House inside Lincoln Castle's North wall",
+  "author": "Ashley.Push",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/bath-house-inside-lincoln-castles-north-wall-10bc1bbec4c045f9b15fc2156b5e32ee"
+ },
+ "airliner": {
+  "uid": "b6984cf34f894d3d9ca3b696dca1c77a",
+  "title": "Boeing787",
+  "author": "manilov.ap",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/boeing787-b6984cf34f894d3d9ca3b696dca1c77a"
+ },
+ "airplane_cabin": {
+  "uid": "4293edb2f4aa4cb3bac49c6afb8c0b86",
+  "title": "Airplane Cabin Pieces.",
+  "author": "drspalumbo",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/airplane-cabin-pieces-4293edb2f4aa4cb3bac49c6afb8c0b86"
+ },
+ "lifeboat": {
+  "uid": "11354f705e594d89a866eebf10571148",
+  "title": "Life Raft",
+  "author": "drcrazzie",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/life-raft-11354f705e594d89a866eebf10571148"
+ },
+ "submarine": {
+  "uid": "5ee0395054084a9b959e26fde1e63fe6",
+  "title": "Christ of the Abyss",
+  "author": "Lo\u00efc Norgeot",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/christ-of-the-abyss-5ee0395054084a9b959e26fde1e63fe6"
+ },
+ "rocket": {
+  "uid": "99c0af8a1803490a86edc48cd3bfc700",
+  "title": "RPG 7 ( Free Model )",
+  "author": "javadbayat",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/rpg-7-free-model-99c0af8a1803490a86edc48cd3bfc700"
+ },
+ "lunar_module": {
+  "uid": "4581bf090daa400a81156eef3936a981",
+  "title": "[Public Test Scan] Apollo 10 Capsule",
+  "author": "Thomas Flynn",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/public-test-scan-apollo-10-capsule-4581bf090daa400a81156eef3936a981"
+ },
+ "moon": {
+  "uid": "6b3e2a011f024ac6a6b123ed33d0ec28",
+  "title": "Stargazing through the attic window \u2606",
+  "author": "Moon",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/stargazing-through-the-attic-window-6b3e2a011f024ac6a6b123ed33d0ec28"
+ },
+ "sun": {
+  "uid": "c3d84ec0290c4a04a23913edb0db3c9a",
+  "title": "Hot sun",
+  "author": "leha_pu",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/hot-sun-c3d84ec0290c4a04a23913edb0db3c9a"
+ },
+ "black_hole": {
+  "uid": "74cbeaeae2174a218fe9455d77902b5c",
+  "title": "Blackhole",
+  "author": "rubykamen",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/blackhole-74cbeaeae2174a218fe9455d77902b5c"
+ },
+ "volcano": {
+  "uid": "c5da5675001f4bec9ecfbc8343453417",
+  "title": "Lowpoly Rocks - Free Download",
+  "author": "Lo\u00efc Norgeot",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/lowpoly-rocks-free-download-c5da5675001f4bec9ecfbc8343453417"
+ },
+ "iceberg": {
+  "uid": "463eef961fc643358a1929bec9f0f18f",
+  "title": "Icy Terrain Export",
+  "author": "josevega",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/icy-terrain-export-463eef961fc643358a1929bec9f0f18f"
+ },
+ "mount_everest": {
+  "uid": "e086183da4854416a606dc4f3bbea3ae",
+  "title": "Mount Everest and Mountains \u2013 Tibet & Nepal",
+  "author": "Nate Loper  \ud83d\uddfa\ufe0f \u26cf\ud83c\udffa",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/mount-everest-and-mountains-tibet-nepal-e086183da4854416a606dc4f3bbea3ae"
+ },
+ "house": {
+  "uid": "f4678340de204c829e79a01f216e1be0",
+  "title": "Suburban shabby house low poly",
+  "author": "Simlion",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/suburban-shabby-house-low-poly-f4678340de204c829e79a01f216e1be0"
+ },
+ "coffee_cup": {
+  "uid": "583deedf74ab4df4a3f102b123d3382e",
+  "title": "Choco Bunny",
+  "author": "Ergoni",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/choco-bunny-583deedf74ab4df4a3f102b123d3382e"
+ },
+ "sugar_cubes": {
+  "uid": "7d1ed9249cfa4af4a6206f93b35d6a0b",
+  "title": "Sugar Bunny in Choco",
+  "author": "zephyrin",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/sugar-bunny-in-choco-7d1ed9249cfa4af4a6206f93b35d6a0b"
+ },
+ "donut": {
+  "uid": "435df25a299a4b78a5f031960b9a6c6a",
+  "title": "Cartoon Building",
+  "author": "Tunnie",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/cartoon-building-435df25a299a4b78a5f031960b9a6c6a"
+ },
+ "chewing_gum": {
+  "uid": "afa3a4cf6247476a9bf66ce2bedf3e57",
+  "title": "Candy Bowl",
+  "author": "Yanez Designs",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/candy-bowl-afa3a4cf6247476a9bf66ce2bedf3e57"
+ },
+ "smartphone": {
+  "uid": "4328dea00e47497dbeac73c556121bc9",
+  "title": "Apple iPhone 13 Pro Max",
+  "author": "DatSketch",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/apple-iphone-13-pro-max-4328dea00e47497dbeac73c556121bc9"
+ },
+ "bed": {
+  "uid": "ae07a741be6944e8ba5e2657069d3aaf",
+  "title": "Sleeping Cat On The Bed 1 - 3D scan",
+  "author": "Alben Tan",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/sleeping-cat-on-the-bed-1-3d-scan-ae07a741be6944e8ba5e2657069d3aaf"
+ },
+ "toilet": {
+  "uid": "e192841259554d1cabb08c7a8180be9f",
+  "title": "TinyLivingPack",
+  "author": "Vlad",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/tinylivingpack-e192841259554d1cabb08c7a8180be9f"
+ },
+ "toothbrush": {
+  "uid": "3d334e0398ce44a598573a819e0daa79",
+  "title": "Toothbrush",
+  "author": "charlesmconard",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/toothbrush-3d334e0398ce44a598573a819e0daa79"
+ },
+ "bee": {
+  "uid": "aaf957992c1142bb8e3ad52c457ab014",
+  "title": "Honey Bee",
+  "author": "Tony's Classics",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/honey-bee-aaf957992c1142bb8e3ad52c457ab014"
+ },
+ "bear_brown": {
+  "uid": "4b374d39a3684287848721fd1eb41974",
+  "title": "The Elder Scrolls Blades Brown Bear",
+  "author": "OrangeSauceu",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/the-elder-scrolls-blades-brown-bear-4b374d39a3684287848721fd1eb41974"
  }
 }
