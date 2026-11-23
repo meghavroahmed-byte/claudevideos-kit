@@ -7,7 +7,7 @@ const { spawnSync } = require('child_process');
 const [edlF, outDir] = process.argv.slice(2);
 const E = JSON.parse(fs.readFileSync(edlF, 'utf8'));
 const sp = E.speed || 1, F = 0.012;
-const grade = "hqdn3d=2.5:2:4:3,eq=contrast=1.06:saturation=1.08:brightness=0.005,unsharp=5:5:0.6:5:5:0";
+const grade = process.env.GRADE || "eq=contrast=1.04:saturation=1.05:gamma=0.985,colorbalance=rh=0.015:bh=-0.015,unsharp=3:3:0.35:3:3:0,vignette=PI/7";
 const tl = []; let t = 0; const list = [];
 E.segs.forEach(([a, b, txt], i) => {
   const d = b - a, f = `${outDir}/seg_${String(i).padStart(2, '0')}.mov`;

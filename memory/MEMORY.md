@@ -25,3 +25,4 @@
 - [Neon Tech style](neon-tech-style.md) — dark 3D-grid tech shorts copied from a reference creator (2026-11-09); kit projects/neon-tech-short/kit; subtitles OFF (user said no)
 - [neon-3d-short skill](../skills/neon-3d-short/SKILL.md) — user asked (2026-11-09) to turn the anaros-dudh 3D short workflow into a reusable skill; use it for every voice+script Neon 3D video
 - [3D ref: House In Crisis](feedback-3d-reference-house-in-crisis.md) — 2026-11-22 raw Shorts as bright daytime three.js 3D (hero object, label pill, x-ray circle), face 2s start/mid/end, no captions
+- [3D ember style + face rules](feedback-3d-ember-style-face.md) — 2026-11-23: v2 Ice&Ember look BUILT IN 3D (headline/chip/neon/grid); face = original room bg, light grade, xfade transitions, no text over head

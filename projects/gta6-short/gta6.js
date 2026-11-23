@@ -87,6 +87,20 @@ const coverTex = K.canvasTex(512, 640, (g, w, h) => {
   g.fillStyle = 'rgba(0,0,0,0.8)'; g.fillRect(0, 0, w, 44); g.fillStyle = '#fff'; g.font = 'bold 26px Arial'; g.textAlign = 'left'; g.fillText('GAME', 20, 23);
 });
 
+// ---------------- EMBER NIGHT look (user's approved v2 style, in 3D) ----------------
+const NIGHT = !location.search.includes('day');
+if (NIGHT) {
+  ground.visible = false; path_.visible = false; K.scene.children.filter(o => o.isMesh && o.material === fenceM).forEach(o => o.visible = false);
+  K.scene.background = new THREE.Color(0x07040a); K.scene.backgroundIntensity = 1; K.scene.environmentIntensity = 0.35; K.scene.fog = new THREE.FogExp2(0x120806, 0.0105);
+  { const skyN = new THREE.Mesh(new THREE.SphereGeometry(600, 32, 16), new THREE.ShaderMaterial({ side: THREE.BackSide, depthWrite: false, fog: false, vertexShader: 'varying vec3 vp; void main(){ vp = normalize(position); gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }', fragmentShader: 'varying vec3 vp; void main(){ float h = clamp(vp.y,0.,1.); vec3 c = mix(vec3(0.20,0.07,0.03), vec3(0.015,0.01,0.02), pow(h,0.55)); gl_FragColor = vec4(c,1.); }' })); K.scene.add(skyN); window.__skyN = skyN; }
+  K.gridFloor(1400, 6, { bg: '#0a0605', line: 'rgba(255,140,60,0.55)', line2: 'rgba(255,140,60,0.16)' }).position.z = 200;
+  K.dust(1400, -40, 40, -20, 360, 22).material.color.set(0xffb070);
+  R.toneMappingExposure = 0.9; K.bloom.strength = 0.7; K.bloom.threshold = 0.86; K.bloom.radius = 0.5; M.steel.color.set(0x8fa3b8); M.steel.roughness = 0.35; M.white.color.set(0xb9b2ad); M.glass.opacity = 0.35;
+  K.hemi.color.set(0xffb27a); K.hemi.groundColor.set(0x1a0a06); K.hemi.intensity = 0.55; K.moon.color.set(0xffd2a0); K.moon.intensity = 2.2;
+  window.__rim = new THREE.DirectionalLight(0x6fd6ff, 1.6); window.__rim.position.set(30, 25, 60); K.scene.add(window.__rim);
+}
+// glowing neon outline around any object (edges as emissive lines -> bloom)
+function neonOutline(obj, color = 0xffb347, thresh = 30) { obj.updateMatrixWorld(true); const grp = new THREE.Group(); obj.traverse(m => { if (!m.isMesh || m.isInstancedMesh || m.isSkinnedMesh) return; const e = new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry, thresh), new THREE.LineBasicMaterial({ color, toneMapped: false, transparent: true, opacity: 0.95 })); e.position.copy(m.position); e.rotation.copy(m.rotation); e.scale.copy(m.scale).multiplyScalar(1.01); m.parent.add(e); grp.add(e); }); return grp; }
 // ---------------- stations ----------------
 const ST = {}; // groups by key
 const Z = { A: 0, B: 42, C: 84, D: 126, E: 170, F: 212, G: 254, H: 296, I: 336 };
@@ -218,9 +232,18 @@ ST.H.children.forEach(c => { if (c.children.length && c.position.x === 5) c.chil
 model('treasure_chest', ST.H, 5, 0, 0, 2.6, -0.3); model('alarm_clock_01', ST.H, -1.5, 0, 3, 0.9, 0.4);
 [-1, 1].forEach(sd => { model('street_lamp_01', ST.I, sd * 5.5, 0, -1, 7, sd > 0 ? Math.PI : 0); });
 // grass clumps + shrubs around every station (culled with the station)
-for (const k in ST) { const g = ST[k]; for (let i = 0; i < 7; i++) { const sd = i % 2 ? 1 : -1; model('grass_medium_01', g, sd * K.rnd(7, 12), 0, K.rnd(-6, 3), K.rnd(0.6, 1.1), K.rnd(0, 6)); } model('shrub_01', g, -11, 0, K.rnd(-6, 2), 2.2, K.rnd(0, 6)); model('shrub_01', g, 11.5, 0, K.rnd(-6, 2), 1.8, K.rnd(0, 6)); }
+if (!NIGHT) for (const k in ST) { const g = ST[k]; for (let i = 0; i < 7; i++) { const sd = i % 2 ? 1 : -1; model('grass_medium_01', g, sd * K.rnd(7, 12), 0, K.rnd(-6, 3), K.rnd(0.6, 1.1), K.rnd(0, 6)); } model('shrub_01', g, -11, 0, K.rnd(-6, 2), 2.2, K.rnd(0, 6)); model('shrub_01', g, 11.5, 0, K.rnd(-6, 2), 1.8, K.rnd(0, 6)); }
 Object.values(ST).forEach(g => g.traverse(m => { if (m.isMesh && m.castShadow === false && !m.material.transparent) m.receiveShadow = true; }));
 
+// neon outlines per station (section colours like the approved v2 short)
+if (NIGHT) {
+  neonOutline(ST.A.userData.case, 0xffc04a); neonOutline(ST.B.userData.tower, 0xffd27a, 20); ST.C.userData.stacks.forEach(s_ => neonOutline(s_.st, 0x5cff9d));
+  neonOutline(ST.D.children[0], 0x3de8ff); neonOutline(ST.E, 0xff3d9a, 40); neonOutline(ST.F.userData.chip, 0x3de8ff); neonOutline(ST.F.userData.mic, 0xffc04a);
+  neonOutline(ST.G, 0x8fe3ff, 40); neonOutline(ST.H.userData.clk, 0xff4d5a); neonOutline(ST.I.userData.phone, 0xff3d9a);
+  // a glowing ring pad under every station's hero object
+  const SEC = { A: 0xffc04a, B: 0xffd27a, C: 0x5cff9d, D: 0x3de8ff, E: 0xff3d9a, F: 0x3de8ff, G: 0x8fe3ff, H: 0xff4d5a, I: 0xff3d9a };
+  for (const k in ST) { const ring = new THREE.Mesh(new THREE.RingGeometry(9, 9.25, 96), new THREE.MeshBasicMaterial({ color: SEC[k], toneMapped: false, side: THREE.DoubleSide, transparent: true, opacity: 0.9 })); ring.rotation.x = -Math.PI / 2; ring.position.y = 0.05; ST[k].add(ring); const gl = K.glowSprite(SEC[k], 30, 0.25, ST[k]); gl.position.y = 0.3; }
+}
 // ---------------- realistic people (3D only, no 2D) ----------------
 ST.F.userData.man.visible = false;
 const PPL = [];   // {p, st, x, z, ry, s, fn(t)->{w, speed, ...}}
@@ -296,8 +319,8 @@ const RIGS = { // S: subject focus (local), h: hero (x,z local), cd: cam distanc
 const HP = {};
 for (const k in RIGS) { const r = RIGS[k], [a, b] = st(k), z0 = Z[k]; const S = V(r.S[0], r.S[1], r.S[2] + z0), Hh = V(r.h[0], 0, r.h[1] + z0); HP[k] = Hh;
   const dir = Hh.clone().sub(V(S.x, 0, S.z)).normalize(), side = V(dir.z, 0, -dir.x);
-  const at = (u, f) => { const ang = (u - 0.5) * 0.22; const d2 = dir.clone().applyAxisAngle(V(0, 1, 0), ang), s2 = V(d2.z, 0, -d2.x); const cd = r.cd * f; const p = Hh.clone().addScaledVector(d2, cd).addScaledVector(s2, r.so * f); p.y = r.ch + (r.up || 0) * Math.max(0, u - 0.6) / 0.4; const look = S.clone().lerp(V(Hh.x, 1.6, Hh.z), 0.18); look.y += (r.up || 0) * Math.max(0, u - 0.6) / 0.4 * 1.4; return [p.toArray(), look.toArray()]; };
-  const [p0, l0] = at(0, 1.22), [p1, l1] = at(0.5, 1.0), [p2, l2] = at(1, 0.86); addCam(a + 0.05, p0, l0, 44); addCam((a + b) / 2, p1, l1, 44); addCam(b - 0.05, p2, l2, 44); }
+  const at = (u, f) => { const ang = (u - 0.5) * 0.7; const d2 = dir.clone().applyAxisAngle(V(0, 1, 0), ang), s2 = V(d2.z, 0, -d2.x); const cd = r.cd * f; const p = Hh.clone().addScaledVector(d2, cd).addScaledVector(s2, r.so * f); p.y = r.ch + (r.up || 0) * Math.max(0, u - 0.6) / 0.4; const look = S.clone().lerp(V(Hh.x, 1.6, Hh.z), 0.18); look.y += (r.up || 0) * Math.max(0, u - 0.6) / 0.4 * 1.4; return [p.toArray(), look.toArray()]; };
+  const [p0, l0] = at(0, 1.45), [p1, l1] = at(0.5, 1.0), [p2, l2] = at(1, 0.8); addCam(a + 0.05, p0, l0, 44); addCam((a + b) / 2, p1, l1, 44); addCam(b - 0.05, p2, l2, 44); }
 { const F = st('F'); addCam(F[0] + 0.05, [-3, 4.5, Z.F + 15], [-2, 3.2, Z.F], 44); addCam(E('voice'), [5, 5, Z.F + 17], [3, 3.8, Z.F - 1], 44); addCam(F[1] - 0.05, [-2, 7, Z.F + 6], [-2, 2.6, Z.F - 9], 46); }
 camKeys.sort((a, b) => a.t - b.t);
 K.setCamKeys(camKeys);
@@ -348,7 +371,7 @@ function update(t) {
     if (r.phone) { P_.turn('RightArm', [1, 0, 0], -0.7).turn('RightForeArm', [0, 1, 0], -1.5); }
     P_.mouth(Math.min(1, r.mouth || 0)); P_.smile(0.15); }
   // labels
-  for (const [s_, pos, a0, a1] of LBL) { if (!s_.parent.visible) continue; showLabel(s_, pos, t, a0, a1); if (PLATE) s_.visible = false; }
+  for (const [s_, pos, a0, a1] of LBL) { if (!s_.parent.visible) continue; showLabel(s_, pos, t, a0, a1); if (PLATE || NIGHT) s_.visible = false; }
   // x-ray: render the inside from a close camera into the circle
   xrS.visible = xrR.visible = false;
   for (const [a0, a1, st_, sp, size, cp, lk] of XR) { if (t < a0 || t > a1) continue; const k = Math.max(0.001, (1 - Math.pow(1 - cl((t - a0) / 0.35), 3)) * cl((a1 - t) / 0.25)); const z0 = Z[st_];
