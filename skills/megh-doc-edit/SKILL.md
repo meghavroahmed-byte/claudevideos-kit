@@ -29,11 +29,12 @@ This file is everything the creator ("Megh", channel **Voice Of Megh**) taught o
    - Motion graphics may sit *around* the face (corner brackets, a lower-third keyword, edge light), but **never text over or above the head**.
 4. **No captions or subtitles.** Short keyword headlines that are part of the graphics are OK.
 5. **About 75% of the picture is self-made 2D animation and motion graphics.** You draw and animate everything yourself in code: icons, diagrams, characters, scenes, "motion capture" visuals and so on. Never pull animated graphics or templates from outside.
-6. **About 25% stock footage, used only inside motion graphics.** Put clips in framed windows, cards or circle windows, with labels, brackets and counters over them. Never drop them in randomly at full screen. Use 2–3 s per clip, each chosen to match the exact spoken line.
-7. **Each video must look different from every other video.** Change the world/background, palette, MG vocabulary, transition set and sound palette every time. When they send two videos, make the two styles completely different, and both best quality.
-8. **Ultra-level sound design.** Every on-screen event gets its own sound, down to a tiny glass shard falling (§6).
-9. Deliver a full-quality file **and** a phone preview under 30 MB.
-10. Never delete or overwrite the creator's original files.
+6. **When they talk about a specific game, movie, product or event, use real footage OF THAT THING** (official trailer or gameplay, 2–3 s clips), placed inside motion-graphics frames. Generic stock is only a fallback. YouTube is often not downloadable from a cloud sandbox; if so, ask them to put the trailer/gameplay files in their Drive folder.
+7. **About 25% stock footage, used only inside motion graphics.** Put clips in framed windows, cards or circle windows, with labels, brackets and counters over them. Never drop them in randomly at full screen. Use 2–3 s per clip, each chosen to match the exact spoken line.
+8. **Each video must look different from every other video.** Change the world/background, palette, MG vocabulary, transition set and sound palette every time. When they send two videos, make the two styles completely different, and both best quality.
+9. **Ultra-level sound design.** Every on-screen event gets its own sound, down to a tiny glass shard falling (§6).
+10. Deliver a full-quality file **and** a phone preview under 30 MB.
+11. Never delete or overwrite the creator's original files.
 
 ## 2. What they rejected (never repeat these)
 - **Bright, simple daylight 3D worlds** with one prop per shot: "akdom simple". Plain 3D renders without motion-graphics density.
