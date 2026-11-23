@@ -4,7 +4,13 @@ import sys, os, json, urllib.request, urllib.parse
 A = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '_assets', 'sf')
 H = {'Authorization': 'Token proxy-injected', 'User-Agent': 'asset-fetch/1.0'}
 OK = {'CC Attribution', 'CC0 Public Domain', 'Free Standard'}
-def get(u, auth=True): return urllib.request.urlopen(urllib.request.Request(u, headers=H if auth else {'User-Agent': 'asset-fetch/1.0'}), timeout=300).read()
+import time, urllib.error
+def get(u, auth=True):
+    for i in range(8):
+        try: return urllib.request.urlopen(urllib.request.Request(u, headers=H if auth else {'User-Agent': 'asset-fetch/1.0'}), timeout=300).read()
+        except urllib.error.HTTPError as e:
+            if e.code == 429 and i < 7: time.sleep(20 * (i + 1)); continue
+            raise
 if sys.argv[1] == 'search':
     q = {'type': 'models', 'q': sys.argv[2], 'downloadable': 'true', 'count': 24, 'sort_by': '-likeCount'}
     if len(sys.argv) > 3 and sys.argv[3] == 'animated': q['animated'] = 'true'

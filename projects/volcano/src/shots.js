@@ -1,167 +1,90 @@
 import * as THREE from 'three';
-import { makeHuman } from './human.js';
-import { glowSprite } from './props.js';
-import { lerp, smooth, easeOut, easeIn, easeInOut, range, clamp, V, cam, place, shake } from './anim.js';
-import { infoCard, burst } from './rare.js';
-import { rng, glowTexture } from './textures.js';
-import { iconBubble, stamp, flame } from './ancient.js';
-import { lavaLake, crater, boulder, thermo, densityChart, heatSuit, smokeColumn } from './volc.js';
+import { labelCam, loadKit, world, prop, fit, person, label, showLabel, xray, ghost, keyCam, stream, lavaMaterial, V } from './real.js';
+import { CAPTIONS as CAPS, CAP_END } from './caps.js';
 
 export const DURATION = 27.6;
-export const CAPTIONS = [
-  [0.0, 'What would happen'], [0.94, 'if you fell'], [1.58, 'into a volcano?'],
-  [3.11, 'First of all'], [4.01, "you wouldn't sink"], [5.36, 'Lava is about'], [6.2, 'three times denser'], [7.45, 'than water'],
-  [8.43, "so you'd land on top of it"], [9.77, 'like a rock on mud'],
-  [11.32, 'But at over'], [12.0, '1,000 degrees Celsius'], [14.04, 'the heat would hit you'], [15.3, 'long before'], [15.93, 'you touched it'],
-  [16.98, 'Your clothes'], [17.64, 'would catch fire'], [18.75, 'and toxic gases'], [19.78, 'would make it'], [20.31, 'almost impossible'], [21.49, 'to breathe'],
-  [22.44, "That's why"], [22.95, 'volcano scientists'], [24.22, 'wear heat-proof suits'], [25.52, 'and never'], [26.19, 'get too close', 27.4],
-];
+export const CAPTIONS = CAPS.map(([s, w], i) => [s, w, i === CAPS.length - 1 ? CAP_END : undefined]);
 export const FADES = [];
-
-const RIM = V(0, 9.3, 17.3);
-function heroPath(t) {
-  if (t < 1.25) return RIM.clone();
-  if (t < 3.1) { const k = (t - 1.25) / 1.85; return V(0, 9.3 + 0.4 * Math.sin(k * Math.PI * 0.5) - 3.2 * k * k, 17.3 - 3.4 * easeOut(k)); }
-  const k = range(t, 3.1, 22.4); return V(0, lerp(6.5, 3.4, k), lerp(13.9, 12.6, k));   // slow motion from here
+export const PRELOAD = (r) => loadKit(r, { models: ['rock_face_01', 'rock_face_02', 'namaqualand_boulder_02', 'namaqualand_boulder_03', 'boulder_01', 'sf/astronaut'], hdris: ['valley_of_desolation'], people: ['hero'] });
+const sm = (a, b, t) => { const u = Math.min(1, Math.max(0, (t - a) / (b - a))); return u * u * (3 - 2 * u); };
+const lerp = (a, b, k) => a + (b - a) * k;
+function drawGasLungs(g, k) {
+  g.save(); g.translate(256, 270);
+  g.beginPath(); g.moveTo(0, -170); g.lineTo(0, -60); g.lineTo(-40, -20); g.moveTo(0, -60); g.lineTo(40, -20); g.stroke();
+  for (const sx of [-1, 1]) { g.save(); g.translate(sx * 85, 30); g.beginPath(); g.ellipse(0, 0, 70, 120, sx * 0.15, 0, Math.PI * 2); g.fillStyle = 'rgba(255,140,150,0.6)'; g.fill(); g.clip();
+    g.fillStyle = 'rgba(190,220,40,0.85)'; g.fillRect(-80, 130 - 260 * k, 160, 260); g.restore();
+    g.save(); g.translate(sx * 85, 30); g.beginPath(); g.ellipse(0, 0, 70, 120, sx * 0.15, 0, Math.PI * 2); g.stroke(); g.restore(); }
+  g.restore();
 }
-const SCI = V(2.0, 9.25, -17.9);
-const K = [
-  [0.0, [2.6, 11.0, 23.2], [0, 10.0, 17.0]],
-  [1.2, [2.3, 10.9, 22.6], [0, 9.9, 16.8]],
-];
-const STAND = (t, ph = 0) => ({ lSh: [0.05, 0, 0.16], rSh: [0.05, 0, -0.16], lEl: [-0.25, 0, 0], rEl: [-0.25, 0, 0], lHip: [0, 0, 0.07], rHip: [0, 0, -0.07], lAn: [0, 0, -0.07], rAn: [0, 0, 0.07], chest: [Math.sin(t * 1.6 + ph) * 0.015, 0, 0], neck: [0.03, Math.sin(t * 0.5 + ph) * 0.12, 0] });
-const over = (a, b) => Object.assign({}, a, b);
-function o2Icon() {
-  const c = document.createElement('canvas'); c.width = c.height = 512; const g = c.getContext('2d');
-  g.fillStyle = '#7fd3ff'; g.beginPath(); g.arc(256, 256, 170, 0, 7); g.fill(); g.fillStyle = '#0d3b5c'; g.font = '900 170px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('O₂', 256, 270);
-  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
-}
-
-function oneTake({ makeStage }) {
-  const scene = makeStage({ shadowSize: 8, sunDir: [-6, 10, 4], sun: 1.4 });
-  const u = scene.userData.sky.material.uniforms; u.top.value.set(0x2a1e2e); u.mid.value.set(0x6a3a3e); u.horizon.value.set(0xd07a4a); u.floorC.value.set(0x3a2a24);
-  scene.children.filter(o => o.isMesh && o.material.isShadowMaterial).forEach(o => o.visible = false);
-  scene.fog = new THREE.FogExp2(0x6a4038, 0.012);
-  const key = scene.userData.key; key.color.set(0xffc9a0);
-  const hemi = scene.children.find(o => o.isHemisphereLight); hemi.color.set(0xd8a080); hemi.groundColor.set(0xff6a20); hemi.intensity = 0.7;
-  const lava = lavaLake(13.2); scene.add(lava);
-  scene.add(crater(13));
-  const LL = [[0, 2, 8], [-6, 2, -2], [6, 2, -3], [0, 2, -9]].map(([x, y, z]) => { const l = new THREE.PointLight(0xff6a20, 40, 22, 1.6); l.position.set(x, y, z); scene.add(l); return l; });
-  const plumes = [[-5, 0, -4], [5, 0, 2], [0, 0, -8]].map(([x, y, z], i) => { const s = smokeColumn(12, 0x8a7068, i + 2); s.position.set(x, y, z); scene.add(s); return s; });
-  const embers = []; for (let i = 0; i < 60; i++) { const s = glowSprite(0xff8a30, 0.12); s.userData = { x: (Math.random() - 0.5) * 22, z: (Math.random() - 0.5) * 22, ph: Math.random(), sp: 0.3 + Math.random() * 0.5 }; scene.add(s); embers.push(s); }
-  // cast
-  const hero = makeHuman('casual', { shirt: 0x3a86ff, jeans: 0x2b2b30, chestText: 'MR. CLOUD' }); scene.add(hero.root);
-  const phone = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.15, 0.012), new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.3 })); scene.add(phone);
-  const sci = makeHuman('casual', { shirt: 0xd8dde3, jeans: 0xd8dde3 }); const silver = heatSuit(sci); scene.add(sci.root);
-  sci.root.traverse(o => { if (o.isMesh && (o.material.color?.getHex?.() === 0x34507a || o.material.color?.getHex?.() === 0xd8dde3)) o.material = silver; });
-  const probe = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 2.4, 8), new THREE.MeshStandardMaterial({ color: 0xbfc6d0, metalness: 0.8, roughness: 0.3 })); scene.add(probe);
-  const rock = boulder(1.3, 7); scene.add(rock);
-  const flames = [0, 1, 2, 3, 4].map(() => { const f = flame(0.32); scene.add(f); return f; });
-  const gas = smokeColumn(14, 0xc8d050, 11); scene.add(gas);
-  const heatRings = []; for (let i = 0; i < 6; i++) { const r = new THREE.Mesh(new THREE.RingGeometry(0.6, 0.75, 48).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xff7a30, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false })); r.userData.ph = i / 6; scene.add(r); heatRings.push(r); }
-  const heatGlow = glowSprite(0xff4a10, 3.5); scene.add(heatGlow);
-  const o2 = iconBubble(o2Icon()); scene.add(o2);
-  const th = thermo(); scene.add(th);
-  const dens = densityChart(); scene.add(dens);
-  const fx = { rock: burst(0xffa040, 90, 1), fire: burst(0xffb347, 60, 2), safe: burst(0x5be37d, 70, 3) };
-  Object.values(fx).forEach(f => scene.add(f));
-  const safe = stamp('SAFE DISTANCE', '#5be37d', 0.66); scene.add(safe);
-  const card = infoCard(); scene.add(card);
-  const M = hero.M; const SKIN0 = M.skin.color.clone();
-  const c = cam(38);
-
+function build({ makeStage }) {
+  const scene = world(makeStage({ shadowSize: 9, sunDir: [-4, 7, 3] }), 'valley_of_desolation', { height: 8, radius: 80, sun: 1.2, sunColor: 0xffd2a8, env: 0.55 });
+  const C = V(0, 0, -3); // crater centre
+  const lavaM = lavaMaterial(); const lava = new THREE.Mesh(new THREE.CircleGeometry(6.6, 64), lavaM); lava.rotation.x = -Math.PI / 2; lava.position.set(C.x, 0.03, C.z); scene.add(lava);
+  const glow = new THREE.PointLight(0xff6a1a, 60, 14, 1.6); glow.position.set(0, 1.2, -1); scene.add(glow);
+  const glow2 = new THREE.PointLight(0xff4a10, 30, 10, 1.8); glow2.position.set(0, 0.6, 2); scene.add(glow2);
+  // crater wall: ring of rock faces (open towards the camera)
+  for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * Math.PI * 2; if (Math.cos(a) > 0.55) continue; // gap facing +z (camera side)
+    const r = prop(i % 2 ? 'rock_face_01' : 'rock_face_02', 1.5 + (i % 3) * 0.2); r.position.set(C.x + Math.sin(a) * 7.3, -0.2, C.z + Math.cos(a) * 7.3); r.rotation.y = a + Math.PI * 0.5 + (i % 2) * 0.4; scene.add(r);
+  }
+  const ledge = prop('namaqualand_boulder_03', 1.2); ledge.position.set(-3.7, -0.1, 0.8); ledge.rotation.y = 0.3; scene.add(ledge);
+  for (const [x, z, s, ry] of [[-4.8, 3.4, 1.3, 1], [4.8, 3.6, 1.1, 2], [5.4, 1.6, 1.2, 0.5]]) { const b = prop('namaqualand_boulder_02', s); b.position.set(x, -0.05, z); b.rotation.y = ry; scene.add(b); }
+  const rock = prop('boulder_01', 0.55); scene.add(rock);
+  const suit = fit(prop('sf/astronaut'), 1.9, 'y'); suit.traverse(m => { if (m.isMesh) { m.material = m.material.clone(); m.material.color = new THREE.Color(0xd9d4c8); m.material.metalness = 0.85; m.material.roughness = 0.25; } }); scene.add(suit);
+  const hero = person('hero'); scene.add(hero.root);
+  const heatGhost = ghost(hero.root, 0xff5030); scene.add(heatGhost);
+  const fire = stream(1100, 0xff6a10, 0.2); fire.material.blending = THREE.AdditiveBlending; scene.add(fire);
+  const fire2 = stream(700, 0xffc030, 0.12); fire2.material.blending = THREE.AdditiveBlending; scene.add(fire2);
+  const gas = stream(260, 0xc8e040, 0.16); gas.material.opacity = 0.35; scene.add(gas);
+  const heat = stream(200, 0xffb070, 0.05); heat.material.opacity = 0.5; scene.add(heat);
+  const xr = xray(0.5); scene.add(xr);
+  const L = { sink: label("DOESN'T SINK", 0.9), dense: label('3× DENSER THAN WATER', 1.3), rock: label('LIKE A ROCK ON MUD', 1.2), deg: label('1000°C', 0.8), first: label('HEAT HITS FIRST', 1.0), fire: label('CLOTHES CATCH FIRE', 1.1), gas: label('TOXIC GAS', 0.85), suit: label('HEAT-PROOF SUIT', 1.0), close: label('NEVER TOO CLOSE', 1.0) };
+  Object.values(L).forEach(l => scene.add(l));
+  const cam = new THREE.PerspectiveCamera(40, 720 / 1280, 0.05, 500);
+  const KEYS = [[0, [1.6, 2.6, 6.2], [-2.6, 1.3, 0.6]], [1.4, [1.6, 2.6, 6.2], [-2.4, 1.0, 0.7]], [3.0, [0.4, 2.1, 4.4], [-1.5, 0.3, 0.9]], [8.3, [0.4, 2.1, 4.4], [-1.4, 0.3, 0.9]],
+    [9.2, [0.9, 2.0, 4.4], [-1.0, 0.3, 1.1]], [11.0, [0.9, 2.0, 4.4], [-1.0, 0.3, 1.1]], [12.2, [1.4, 2.6, 6.0], [-1.7, 1.0, 0.8]], [16.6, [1.4, 2.6, 6.0], [-1.7, 1.0, 0.8]],
+    [17.4, [-0.1, 1.8, 3.5], [-1.5, 0.35, 0.9]], [21.9, [-0.1, 1.8, 3.5], [-1.5, 0.35, 0.9]], [23.2, [4.4, 2.6, 8.4], [0.6, 1.0, 2.0]], [27.6, [4.0, 2.3, 7.6], [1.0, 1.1, 2.2]]];
   return {
-    scene, camera: c,
+    scene, camera: cam,
     update(t) {
-      lava.update(t); plumes.forEach((p, i) => p.update(t + i * 3, 1, 9, 5));
-      embers.forEach(e => { const u2 = (t * e.userData.sp * 0.25 + e.userData.ph) % 1; e.position.set(e.userData.x + Math.sin(u2 * 6 + e.userData.ph * 9) * 0.5, u2 * 9, e.userData.z); e.material.opacity = Math.sin(u2 * Math.PI) * 0.9; });
-      // ================= HERO =================
-      const hp = heroPath(t), fall = smooth(range(t, 1.2, 2.2)), flail = t > 1.25 ? 1 : 0;
-      const heat = smooth(range(t, 12.0, 14.5)), fire = smooth(range(t, 17.6, 18.0)), cough = smooth(range(t, 19.0, 19.4));
-      hero.root.position.copy(hp);
-      hero.root.rotation.set(-1.25 * fall - 0.1 * Math.sin(t * 0.8) * flail, Math.sin(t * 0.3) * 0.2 * flail, Math.sin(t * 0.5) * 0.12 * flail, 'YXZ');
-      let pose;
-      if (t < 1.25) {
-        const selfie = smooth(range(t, 0.1, 0.4)), step = smooth(range(t, 0.9, 1.25));
-        pose = over(STAND(t), { rSh: [-1.55 * selfie, 0, -0.55 * selfie], rEl: [-0.35 * selfie, 0, 0], lSh: [0.05, 0, 0.16 + 0.2 * step], rHip: [0.35 * step, 0, -0.07], neck: [-0.08, -0.25 * selfie, 0] });
-        hero.setMouth(0.2 * selfie);
-      } else {
-        const w = Math.sin(t * (t < 3.1 ? 14 : 3.2));
-        pose = { lSh: [-2.0 + w * 0.4, 0, 0.8], rSh: [-2.1 - w * 0.4, 0, -0.8], lEl: [-0.5, 0, 0], rEl: [-0.5, 0, 0], lHip: [-0.6 + w * 0.3, 0, 0.15], rHip: [-0.3 - w * 0.3, 0, -0.15], lKn: [0.8, 0, 0], rKn: [0.6, 0, 0], neck: [0.35, 0, 0], spine: [0.2, 0, 0] };
-        if (cough > 0) pose = over(pose, { rSh: [lerp(-2.1, -2.4, cough), 0, lerp(-0.8, 0.3, cough)], rEl: [lerp(-0.5, -2.2, cough), 0, 0], neck: [0.35 + Math.sin(t * 18) * 0.08 * cough, 0, 0] });
-        hero.setMouth(0.7);
-      }
-      hero.setPose(pose);
-      M.skin.color.copy(SKIN0).lerp(new THREE.Color(0xe0503a), heat * 0.45);
+      lavaM.uniforms.time.value = t; glow.intensity = 60 + 8 * Math.sin(t * 3.1);
+      // ---- hero: stands on ledge, slips at 1.2, falls, lands on lava at 2.9 and lies on top ----
+      const fallK = Math.min(1, Math.max(0, (t - 1.25) / 1.6)); const fell = fallK >= 1;
+      const top = 1.62, landY = 0.1;
+      const y = t < 1.25 ? top : fell ? landY + 0.03 * Math.sin(t * 1.3) : lerp(top, landY, fallK * fallK) + Math.sin(fallK * Math.PI) * 0.4;
+      const z = 0.9; const x = t < 1.25 ? -3.3 : lerp(-3.3, -1.6, Math.min(1, fallK * 1.2));
+      const lie = sm(1.5, 2.9, t);
+      hero.root.position.set(x, y + 0.05 * lie, z); hero.root.rotation.set(-Math.PI / 2 * lie, 1.2 * (1 - lie), 0);
+      const gasK = sm(18.9, 19.4, t);
+      hero.update(t, { idle: 1 }, 1, { flinch: sm(1.1, 1.4, t) * (1 - sm(3.2, 3.8, t)), armsUp: 0.6 * sm(1.3, 1.6, t) * (1 - sm(2.8, 3.2, t)), handsThroat: gasK, lookUp: 0.2 * lie });
+      // ---- rock dropped on the lava: floats like his body ----
+      const rk = Math.min(1, Math.max(0, (t - 9.3) / 0.65)); rock.visible = t > 9.2;
+      rock.position.set(-0.45, rk < 1 ? lerp(4.5, 0.0, rk * rk) : -0.02 + 0.02 * Math.sin(t * 1.5), 1.3); rock.rotation.set(t * (rk < 1 ? 3 : 0), 0.6, 0);
+      // ---- heat aura replay: ghost of him mid-fall glowing red ----
+      const hk = sm(14.2, 14.5, t) * (1 - sm(16.4, 16.8, t)); heatGhost.fade(hk); heatGhost.position.set(-2.4, 1.1, 0.9); heatGhost.rotation.set(-0.5, 1.2, 0.3);
+      // ---- scientist in heat suit on the rim ----
+      suit.visible = t > 22.2; suit.position.set(2.4, 0.35, 3.2); suit.rotation.y = -2.2;
+      // ---- camera ----
+      const k = keyCam(KEYS, t); cam.position.copy(k.pos); cam.lookAt(k.look); labelCam(cam);
       scene.updateMatrixWorld(true);
-      phone.visible = t < 1.4; phone.position.copy(hero.j.rWr.localToWorld(V(0, -0.1, 0.03))); phone.quaternion.copy(hero.j.rWr.getWorldQuaternion(new THREE.Quaternion()));
-      // flames on the clothes
-      const fpts = [[hero.j.spine, V(0.12, -0.15, 0.12)], [hero.j.spine, V(-0.14, -0.12, 0.1)], [hero.j.lEl, V(0, -0.1, 0.05)], [hero.j.rEl, V(0, -0.1, 0.05)], [hero.j.lKn, V(0, 0.1, 0.06)]];
-      flames.forEach((f, i) => { f.position.copy(fpts[i][0].localToWorld(fpts[i][1].clone())); f.update(t + i, fire * (0.8 + 0.2 * Math.sin(t * 7 + i))); f.visible = fire > 0.01 && t < 23; });
-      fx.fire.position.copy(hero.j.spine.localToWorld(V(0, 0, 0.15))); fx.fire.update(t - 17.7);
-      gas.position.copy(hp).add(V(0, -1.5, 0)); gas.update(t, 0.5 * smooth(range(t, 18.7, 19.2)) * (1 - smooth(range(t, 22.2, 22.8))), 3, 1.6);
-      heatRings.forEach(r => { const u2 = ((t - 11.3) * 0.5 + r.userData.ph) % 1, k = heat * (t < 22.8 ? 1 : 0); r.position.set(hp.x, 0.1 + u2 * (hp.y - 0.3), hp.z); r.scale.setScalar(1.6 - u2); r.material.opacity = k * Math.sin(u2 * Math.PI) * 0.6; r.visible = k > 0.01; });
-      heatGlow.position.copy(hp).add(V(0, 0.9, 0)); heatGlow.material.opacity = 0.5 * heat * (t < 22.8 ? 1 : 0);
-      o2.position.copy(hero.j.chest.getWorldPosition(V(0, 0, 0))).add(V(0.5, 0.55, -0.3)); o2.set(0.55 * easeOut(range(t, 20.3, 20.55)) * (1 - smooth(range(t, 22.1, 22.4))), smooth(range(t, 20.75, 20.9)));
-      // rock on mud: falls 5.3, lands 6.15, floats on the lava
-      const RK0 = V(-1.3, 9.6, 16.4), RK1 = V(-1.0, 0.32, 12.6), rk = range(t, 5.3, 6.15);
-      if (t < 6.15) { rock.position.copy(RK0.clone().lerp(RK1, rk)); rock.position.y = lerp(RK0.y, RK1.y, rk * rk); rock.rotation.set(t * 3, t * 2, 0); }
-      else { const d = t - 6.15; rock.position.copy(RK1); rock.position.y += Math.exp(-d * 4) * Math.sin(d * 14) * 0.12 + Math.sin(t * 1.2) * 0.02; rock.rotation.set(18.45, 12.3, 0); }
-      rock.material.emissiveIntensity = 0.6 * smooth(range(t, 6.2, 9.0));
-      fx.rock.position.copy(RK1); fx.rock.update(t - 6.15);
-      // ================= SCIENTIST =================
-      const back = smooth(range(t, 25.9, 26.8));
-      sci.root.position.copy(SCI).add(V(0, 0, -0.7 * back)); sci.root.rotation.y = 0.1;
-      const wv = Math.sin((t - 25.9) * 7) * (t > 25.9 && t < 26.8 ? 1 : 0);
-      sci.setPose(over(STAND(t, 2), { rSh: [-0.9, 0, -0.2], rEl: [-0.6, 0, 0], lSh: [-0.9, 0, 0.2], lEl: [-0.7, 0, 0], lHip: [-0.3 * wv, 0, 0.07], rHip: [0.3 * wv, 0, -0.07] }));
-      scene.updateMatrixWorld(true);
-      { const a = sci.j.rWr.localToWorld(V(0, -0.07, 0)), d = V(0.05, -0.25, 1).normalize(); probe.position.copy(a).addScaledVector(d, 1.0); probe.quaternion.setFromUnitVectors(V(0, 1, 0), d); }
-      // ---------- camera ----------
-      let cp, lk;
-      const C = t < 1.2 ? hp.clone().add(V(0, 0.9, 0)) : hero.j.chest.getWorldPosition(V(0, 0, 0));
-      if (t < 1.2) { const k = range(t, 0, 1.2); cp = V(...K[0][1]).lerp(V(...K[1][1]), k); lk = V(...K[0][2]).lerp(V(...K[1][2]), k); }
-      else {
-        const OFF = [[1.2, [2.3, 1.2, 5.6]], [3.1, [3.6, 1.4, -3.4]], [5.3, [5.6, 0.2, -6.4]], [11.0, [5.4, -0.2, -6.2]], [12.0, [3.6, 1.0, -3.5]], [16.9, [3.0, 0.8, -3.0]], [20.3, [3.4, 1.0, -3.3]], [22.4, [3.8, 1.2, -3.6]]];
-        let oi = 0; while (oi < OFF.length - 2 && OFF[oi + 1][0] < t) oi++;
-        const ok = smooth(range(t, OFF[oi][0], OFF[oi + 1][0])), off = V(...OFF[oi][1]).lerp(V(...OFF[oi + 1][1]), ok);
-        cp = C.clone().add(off); lk = C.clone();
-        const rockView = smooth(range(t, 5.2, 6.0)) * (1 - smooth(range(t, 10.8, 11.8)));
-        lk.lerp(V(-0.5, 2.6, 13.0), rockView);
-        // fly up and over to the scientist on the far rim
-        const fly = smooth(range(t, 22.4, 23.9));
-        if (fly > 0) {
-          const mid = V(4, 15, 0), endP = V(3.2, 10.9, -12.9), endL = SCI.clone().add(V(0, 0.95, 0));
-          const q = fly, a = cp.clone().lerp(mid, q), b = mid.clone().lerp(endP, q);
-          cp = a.lerp(b, q); lk = lk.clone().lerp(endL, smooth(range(t, 22.6, 23.9)));
-          if (t > 23.9) { cp = endP.clone().add(V(0, 0, -0.35 * smooth(range(t, 24, 27.6)))); lk = endL.clone().add(V(0, 0, -0.5 * back)); }
-        }
-      }
-      const sh = shake(t, 0.8 + heat * 0.6, 7);
-      place(c, [cp.x + sh[0], cp.y + sh[1], cp.z + sh[2]], [lk.x, lk.y, lk.z]);
-      c.updateMatrixWorld(true);
-      key.target.position.copy(lk); key.position.copy(lk).add(V(-6, 10, 4));
-      const fw = V(0, 0, 0); c.getWorldDirection(fw); const upv = V(0, 1, 0).applyQuaternion(c.quaternion), rt = V(1, 0, 0).applyQuaternion(c.quaternion);
-      const dk = smooth(range(t, 6.0, 6.3)) * (1 - smooth(range(t, 8.6, 8.9)));
-      dens.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.18).addScaledVector(rt, 0.18); dens.scale.set(0.3 * dk, 0.246 * dk, 1); dens.material.opacity = dk; dens.visible = dk > 0.01;
-      const tk = smooth(range(t, 11.9, 12.2)) * (1 - smooth(range(t, 16.7, 17.0)));
-      th.set(lerp(20, 1170, easeInOut(range(t, 12.0, 13.9))));
-      th.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.22).addScaledVector(rt, 0.2); th.scale.set(0.32 * tk, 0.1875 * tk, 1); th.material.opacity = tk; th.visible = tk > 0.01;
-      safe.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, -0.1); safe.set(t > 26.0 ? easeOut(range(t, 26.0, 26.16)) : 0);
-      fx.safe.position.copy(c.position).addScaledVector(fw, 2.4).addScaledVector(upv, -0.1); fx.safe.update(t - 26.0);
-      card.position.copy(c.position).addScaledVector(fw, 2).addScaledVector(upv, 0.5);
-      const CARDS = [
-        [0.2, 3.0, 'WHAT IF', 'YOU FELL IN?', '#ffffff', 'into a volcano'],
-        [3.11, 5.36, 'FIRST', "YOU WON'T SINK", '#ffb36b', ''], [5.36, 8.43, 'LAVA', '3x DENSER', '#ff7a30', 'than water'], [8.43, 11.1, 'LAVA', 'LIKE MUD', '#ff9a5a', 'you land on top'],
-        [11.32, 14.04, 'TEMPERATURE', '1,000°C+', '#ff4a1f', ''], [14.04, 16.9, 'TEMPERATURE', 'HEAT HITS FIRST', '#ff4a1f', 'before you even touch it'],
-        [16.98, 18.75, 'THEN', 'CLOTHES IGNITE', '#ffb347', ''], [18.75, 22.3, 'THEN', 'TOXIC GAS', '#c8d050', 'impossible to breathe'],
-        [22.44, 25.9, 'VOLCANO SCIENTISTS', 'HEAT-PROOF SUITS', '#e6ebf2', ''], [25.9, 27.6, 'VOLCANO SCIENTISTS', 'STAY BACK', '#5be37d', 'never get too close'],
-      ];
-      const cur = CARDS.find(([a, b]) => t >= a && t < b); let ck = 0;
-      if (cur) { card.set(cur[2], cur[3], cur[4], null, cur[5]); const grp = CARDS.filter(x => x[2] === cur[2]); const ga = grp[0][0], gb = grp[grp.length - 1][1]; ck = smooth(range(t, ga, ga + 0.25)) * (1 - smooth(range(t, gb - 0.25, gb))); const pk = 1 + 0.09 * Math.exp(-(t - cur[0]) * 9); card.scale.set(0.72 * pk, 0.281 * pk, 1); }
-      card.material.opacity = ck; card.visible = false;
-      const fd = cp.distanceTo(lk);
-      return { dof: { focus: fd, aperture: 0.0006, maxblur: 0.004 }, bloom: 0.7, exposure: 1.0 };
+      const chest = hero.world('Spine2'), head = hero.headPos();
+      fire.update(chest, V(0, 1, 0), 17.6, 22.3, t, 0.7, 0.5); fire2.update(hero.world('Hips'), V(0, 1, 0), 17.8, 22.3, t, 0.7, 0.8);
+      gas.update(V(-1.6, 0.2, 0.6), V(0, 0.6, 0.6), 18.6, 22.0, t, 1.4, 2.6);
+      heat.update(V(-2.0, 0.1, 0.9), V(0, 1, 0), 11.5, 16.8, t, 1.6, 3.0);
+      const xk = sm(19.4, 19.7, t) * (1 - sm(21.8, 22.1, t));
+      if (xk > 0.01) xr.show(chest.clone().add(V(0.25, 0.5, 0.3)), xk, (g, kk) => drawGasLungs(g, kk), sm(19.6, 21.6, t), t); else xr.visible = false;
+      const up = (y) => V(0, y, 0);
+      showLabel(L.sink, chest.clone().add(up(0.7)), t, 4.0, 5.3);
+      showLabel(L.dense, V(-1.2, 1.0, 0.6), t, 6.1, 8.3);
+      showLabel(L.rock, V(-0.7, 1.0, 1.4), t, 9.8, 11.2);
+      showLabel(L.deg, V(-1.6, 2.2, 0.8), t, 12.0, 14.1);
+      showLabel(L.first, V(-1.6, 2.2, 0.8), t, 14.4, 16.7);
+      showLabel(L.fire, chest.clone().add(V(0.3, 0.8, 0)), t, 17.9, 18.9);
+      showLabel(L.gas, chest.clone().add(V(0.2, 0.8, 0)), t, 19.1, 21.8);
+      showLabel(L.suit, V(2.0, 2.4, 3.2), t, 24.2, 25.6);
+      showLabel(L.close, V(2.0, 2.4, 3.2), t, 25.8, 27.6);
+      return { bloom: 0.55, exposure: 0.95 };
     },
   };
 }
-export const SHOTS = [{ start: 0, end: DURATION + 1, build: oneTake }];
+export const SHOTS = [{ start: 0, end: 99, build }];

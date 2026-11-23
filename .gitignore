@@ -8,3 +8,4 @@ temp/
 *.aac
 parts/
 r[0-9].log
+.v2done

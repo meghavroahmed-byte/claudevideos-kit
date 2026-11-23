@@ -6,7 +6,7 @@ import { GroundedSkybox } from 'three/addons/objects/GroundedSkybox.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 
 export const A = './assets/';
-export const ASSETS = { models: {}, hdr: {}, env: {}, tex: {} };
+export const ASSETS = { models: {}, anims: {}, hdr: {}, env: {}, tex: {} };
 const Q = () => new THREE.Quaternion();
 export const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
 
@@ -15,7 +15,7 @@ export async function loadKit(renderer, { models = [], hdris = [], tex = [], peo
   const gl = new GLTFLoader();
   const pm = new THREE.PMREMGenerator(renderer);
   await Promise.all([
-    ...models.map(n => gl.loadAsync(`${A}${n}/${n}.gltf`).then(g => { ASSETS.models[n] = g.scene; })),
+    ...models.map(n => gl.loadAsync(n.startsWith('sf/') ? `${A}${n}.glb` : `${A}${n}/${n}.gltf`).then(g => { ASSETS.models[n] = g.scene; ASSETS.anims[n] = g.animations; })),
     ...hdris.map(n => new RGBELoader().loadAsync(`${A}hdri/${n}.hdr`).then(h => { h.mapping = THREE.EquirectangularReflectionMapping; ASSETS.hdr[n] = h; ASSETS.env[n] = pm.fromEquirectangular(h).texture; })),
     loadPeople(people),
   ]);
@@ -49,11 +49,30 @@ export function world(scene, hdri, { height = 6, radius = 60, env = 0.9, sun = 1
 }
 
 export function prop(n, s = 1) {
-  const o = ASSETS.models[n].clone(true); o.scale.setScalar(s);
+  const o = SkeletonUtils.clone(ASSETS.models[n]); o.scale.setScalar(s);
   o.traverse(m => { if (m.isMesh) { m.castShadow = true; m.receiveShadow = true; } });
   return o;
 }
 
+// scale an object so its size along axis ('x'|'y'|'z'|'max') equals `size` metres, put its lowest point on y=0 and centre it on x/z
+export function fit(o, size, axis = 'max', { ground = true, center = true } = {}) {
+  o.updateMatrixWorld(true); const b = new THREE.Box3().setFromObject(o, true); const d = b.getSize(V());
+  const cur = axis === 'max' ? Math.max(d.x, d.y, d.z) : d[axis]; if (cur > 1e-6) o.scale.multiplyScalar(size / cur);
+  o.updateMatrixWorld(true); const b2 = new THREE.Box3().setFromObject(o, true); const c = b2.getCenter(V());
+  const inner = new THREE.Group(); while (o.children.length) inner.add(o.children[0]);
+  inner.position.set(center ? -c.x / o.scale.x : 0, ground ? -b2.min.y / o.scale.y : 0, center ? -c.z / o.scale.z : 0);
+  inner.position.applyQuaternion(o.quaternion.clone().invert());
+  o.add(inner); return o;
+}
+// animated model (Sketchfab animals etc.): returns { root, play(t, clip=0, speed=1) , clips }
+export function creature(n, size = 1, axis = 'max') {
+  const root = fit(prop(n), size, axis);
+  const clips = ASSETS.anims[n] || []; const mixer = new THREE.AnimationMixer(root); let cur = null;
+  return { root, clips: clips.map(c => c.name), play(t, clip = 0, speed = 1) {
+    const c = typeof clip === 'number' ? clips[clip] : clips.find(x => x.name === clip) || clips.find(x => x.name.toLowerCase().includes(String(clip).toLowerCase()));
+    if (!c) return; if (cur !== c) { mixer.stopAllAction(); mixer.clipAction(c).play(); cur = c; }
+    mixer.setTime((t * speed) % c.duration + 1e-4 * Math.random()); } };
+}
 export function canvasTex(w, h, draw) { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; }
 
 // ---------- realistic person ----------
@@ -223,14 +242,27 @@ function applyPose(src, pose) {
 
 // plain label: white bold text, thick black outline, no panel
 export function label(text, w = 1.0) {
-  const t = canvasTex(1024, 256, (g) => { g.font = "900 120px Cap, sans-serif"; g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round'; g.lineWidth = 22; g.strokeStyle = '#000'; g.strokeText(text, 512, 128); g.fillStyle = '#fff'; g.fillText(text, 512, 128); });
+  // canvas sized to the text; w = world width for a ~10-character label (longer text gets proportionally wider)
+  const m = document.createElement('canvas').getContext('2d'); m.font = "900 120px Cap, sans-serif";
+  const tw = Math.ceil(m.measureText(text).width) + 60, W = Math.max(256, tw), H = 200;
+  const t = canvasTex(W, H, (g) => { g.font = "900 120px Cap, sans-serif"; g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round'; g.lineWidth = 22; g.strokeStyle = '#000'; g.strokeText(text, W / 2, H / 2 + 4); g.fillStyle = '#fff'; g.fillText(text, W / 2, H / 2 + 4); });
   const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, depthTest: false, depthWrite: false, toneMapped: false })); s.renderOrder = 40;
-  s.set = (k) => { s.visible = k > 0.01; s.scale.set(w * k, w * 0.25 * k, 1); }; s.set(0); return s;
+  const ww = Math.min(w * W / 1024 * 1.25, w * 1.6), hh = ww * H / W;
+  s.set = (k) => { s.visible = k > 0.01; s.scale.set(ww * k, hh * k, 1); }; s.set(0); return s;
 }
-// label shown between a0 and a1 at world position pos
+
+// set the camera labels should stay inside of (call once per frame before showLabel, after positioning the camera)
+export function labelCam(c) { ASSETS.cam = c; c.updateMatrixWorld(true); }
 export function showLabel(l, pos, t, a0, a1) {
   const k = Math.min(1, Math.max(0, (t - a0) / 0.15)) * (1 - Math.min(1, Math.max(0, (t - a1) / 0.15)));
   const e = 1 - Math.pow(1 - k, 3); l.position.copy(pos); l.set(e);
+  const c = ASSETS.cam; if (!c || !l.visible) return;
+  const ndc = pos.clone().project(c); const dist = c.position.distanceTo(pos);
+  const halfH = dist * Math.tan(THREE.MathUtils.degToRad(c.fov / 2)), halfW = halfH * c.aspect;
+  let hw = (l.scale.x / 2) / halfW; if (hw > 0.8) { l.scale.multiplyScalar(0.8 / hw); hw = 0.8; } const hh = (l.scale.y / 2) / halfH;
+  const mx = 0.97 - hw, my = 0.95 - hh;
+  const cx = Math.max(-mx, Math.min(mx, ndc.x)), cy = Math.max(-my, Math.min(my, ndc.y));
+  if (cx !== ndc.x || cy !== ndc.y) { ndc.x = cx; ndc.y = cy; l.position.copy(ndc.unproject(c)); }
 }
 
 // x-ray circle: dark inside, red ring; draw(g, k, t) paints the inside on a 512x512 canvas (centre 256,256, radius 236)
@@ -271,4 +303,41 @@ export function keyPath(P, t) {
   let j = 0; while (j < P.length - 2 && P[j + 1][0] < t) j++;
   const a = P[j], b = P[j + 1]; const u = Math.min(1, Math.max(0, (t - a[0]) / Math.max(1e-6, b[0] - a[0]))); const k = u * u * (3 - 2 * u);
   return { v: a[1].map((x, i) => x + (b[1][i] - x) * k), k, moving: k > 0.01 && k < 0.99 && a[1].some((x, i) => x !== b[1][i]) };
+}
+
+// simple particle stream: emits from origin along dir between t0..t1
+export function stream(n, color, size) {
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3));
+  const dot = canvasTex(64, 64, (c) => { const gr = c.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.5, 'rgba(255,255,255,0.6)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); c.fillStyle = gr; c.fillRect(0, 0, 64, 64); });
+  const p = new THREE.Points(g, new THREE.PointsMaterial({ color, size, map: dot, transparent: true, opacity: 0.85, depthWrite: false, sizeAttenuation: true }));
+  const seed = Array.from({ length: n }, (_, i) => [Math.sin(i * 12.9898) * 43758.5453 % 1, Math.sin(i * 78.233) * 12543.31 % 1, Math.sin(i * 39.425) * 9631.7 % 1].map(Math.abs));
+  p.update = (o, dir, t0, t1, t, speed = 1.2, spread = 0.25) => {
+    const a = g.attributes.position.array; let vis = false;
+    for (let i = 0; i < n; i++) {
+      const born = t0 + (t1 - t0) * seed[i][0]; const age = t - born;
+      if (age < 0 || age > 1.2) { a[i * 3 + 1] = -999; continue; } vis = true;
+      a[i * 3] = o.x + dir.x * age * speed + (seed[i][1] - 0.5) * spread * age; a[i * 3 + 1] = o.y + dir.y * age * speed + (seed[i][2] - 0.5) * spread * age; a[i * 3 + 2] = o.z + dir.z * age * speed + (seed[i][0] - 0.5) * spread * age;
+    }
+    g.attributes.position.needsUpdate = true; p.visible = vis; p.frustumCulled = false;
+  };
+  return p;
+}
+
+// animated glowing lava (ShaderMaterial); call mat.uniforms.time.value = t
+export function lavaMaterial() {
+  return new THREE.ShaderMaterial({ uniforms: { time: { value: 0 } }, vertexShader: `varying vec2 vUv; varying vec3 vP; void main(){ vUv = uv; vP = position; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
+    fragmentShader: `uniform float time; varying vec2 vUv; varying vec3 vP;
+      float h(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453); }
+      float n(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f); return mix(mix(h(i),h(i+vec2(1,0)),f.x), mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x), f.y); }
+      float fbm(vec2 p){ float s=0., a=.5; for(int i=0;i<5;i++){ s+=a*n(p); p*=2.03; a*=.5; } return s; }
+      void main(){ vec2 p = vP.xy*1.4; float t = time*0.12;
+        float c = fbm(p + vec2(fbm(p*0.7 + t), fbm(p*0.7 - t)));
+        float line = 1.0 - smoothstep(0.0, 0.05, abs(c - 0.5));
+        float pool = smoothstep(0.66, 0.8, c);
+        vec3 crust = vec3(0.045,0.035,0.032) * (0.7 + 0.8*fbm(p*6.));
+        vec3 hot = mix(vec3(1.0,0.28,0.03), vec3(1.0,0.72,0.25), pool);
+        vec3 col = crust + hot * (line*1.8 + pool*1.4 + 0.06);
+        gl_FragColor = vec4(col,1.);
+        #include <colorspace_fragment>
+      }`, toneMapped: true });
 }
