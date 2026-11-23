@@ -13,6 +13,7 @@ function counter(g, t, t0, t1, from, to, fmt, x, y, size = 120, col = '#ffffff')
   g.lineWidth = size * 0.2; g.strokeStyle = '#000'; g.strokeText(fmt(v), 0, 0); g.fillStyle = col; g.fillText(fmt(v), 0, 0); g.restore();
 }
 SCENE.ui = (g, t) => {
+  if (window.PLATE) return;
   const S = window.TL.st;
   counter(g, t, A.taka - 0.1, A.burj - 0.1, 0, 2000000000, v => '$' + Math.round(v).toLocaleString('en-US'), W / 2, 1180, 84);
   counter(g, t, A.b1, A.b2 - 0.05, 0, 1, v => '$' + BN(v.toFixed(0)) + ' বিলিয়ন', W / 2, 1240, 104);

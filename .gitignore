@@ -9,3 +9,5 @@ temp/
 parts/
 projects/gta6-short/out/
 projects/gta6-short/env.js
+projects/gta6-short/parts/
+projects/gta6-short/*.wav

@@ -17,7 +17,7 @@ def bell(f, d, k=5, inh=(1, 2.76, 5.4, 8.93), amps=(1, .5, .25, .12)):
     t = t_(d); return sum(a * np.sin(2 * np.pi * f * h * t) * ex(t, k * (1 + i * 0.8)) for i, (h, a) in enumerate(zip(inh, amps)))
 def verb(x, mix=0.25, length=1.2, damp=3.0):
     ir = noise(length) * ex(t_(length), damp); ir = fft_bp(ir, 200, 7000); ir /= np.abs(ir).sum() ** 0.5 * 8
-    y = np.convolve(x, ir)[:len(x) + int(length * SR)]; out = np.zeros(len(y)); out[:len(x)] += x; return out + y * mix
+    n = len(x) + len(ir) - 1; y = np.fft.irfft(np.fft.rfft(x, n) * np.fft.rfft(ir, n), n)[:len(x) + int(length * SR)]; out = np.zeros(len(y)); out[:len(x)] += x; return out + y * mix
 
 def chaching(v):  # register: mechanical clack + drawer roll + two bright bells
     d = 1.3; out = np.zeros(int(d * SR)); t = t_(0.05)

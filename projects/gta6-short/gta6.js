@@ -303,6 +303,8 @@ camKeys.sort((a, b) => a.t - b.t);
 K.setCamKeys(camKeys);
 // put each station's hero in the foreground of that station's middle camera key (never tiny, never out of frame)
 const HEROES = { A: HA, B: HB, C: HC, D: HD, E: HE, G: HG, H: HH, I: HI };
+const PLATE = location.search.includes('plate'); window.PLATE = PLATE;
+if (PLATE) { Object.values(HEROES).forEach(h => h.p.root.visible = false); }
 for (const k in HEROES) { const Hh = HP[k], o = HEROES[k].p.root; const c = camKeys.find(q => q.t >= TL.st[k][0]); o.position.set(Hh.x, 0, Hh.z - Z[k]); o.rotation.y = Math.atan2(c.p[0] - Hh.x, c.p[2] - Hh.z) + (RIGS[k].so < 0 ? 0.35 : -0.35); }
 // ---------------- animation ----------------
 const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _p = new THREE.Vector3(), _s = new THREE.Vector3();
@@ -340,13 +342,13 @@ function update(t) {
   H.userData.billP.forEach(([x, vy, zz, d, r], i) => { const age = ((t - E('money')) * 0.9 + d) % 1.6; const on = t > E('money'); const tt = age; _p.set(5 + x * 4 * tt, on ? 2 + vy * tt - 6 * tt * tt : -20, zz * 3 * tt); _q.setFromEuler(_e.set(r + t * 3, r, t * 2 + r)); _s.setScalar(on ? 1 : 0.001); _m.compose(_p, _q, _s); H.userData.bills.setMatrixAt(i, _m); }); H.userData.bills.instanceMatrix.needsUpdate = true;
   // I phone gently floats
   // people
-  for (const o of PPL) { if (!ST[o.st].visible) continue; const r = o.fn(t); const P_ = o.p; if (r.pos) { P_.root.position.x = r.pos[0]; P_.root.position.z = r.pos[1]; } if (r.ry != null) P_.root.rotation.y = r.ry; P_.update(t, r.w, r.speed || 1);
+  for (const o of PPL) { if (!ST[o.st].visible || !o.p.root.visible) continue; const r = o.fn(t); const P_ = o.p; if (r.pos) { P_.root.position.x = r.pos[0]; P_.root.position.z = r.pos[1]; } if (r.ry != null) P_.root.rotation.y = r.ry; P_.update(t, r.w, r.speed || 1);
     if (r.point) P_.point(r.point, 'Right'); if (r.flinch) P_.flinch(r.flinch); if (r.hands) P_.handsOn('head', r.hands); if (r.lookUp) P_.turn('Neck', [1, 0, 0], -0.5 * r.lookUp).turn('Head', [1, 0, 0], -0.3 * r.lookUp);
     if (r.type) { P_.turn('LeftArm', [1, 0, 0], -0.9).turn('RightArm', [1, 0, 0], -0.9).turn('LeftForeArm', [0, 1, 0], 0.9 + 0.08 * Math.sin(t * 23 + o.p.root.position.x)).turn('RightForeArm', [0, 1, 0], -0.9 - 0.08 * Math.sin(t * 19 + o.p.root.position.x)); }
     if (r.phone) { P_.turn('RightArm', [1, 0, 0], -0.7).turn('RightForeArm', [0, 1, 0], -1.5); }
     P_.mouth(Math.min(1, r.mouth || 0)); P_.smile(0.15); }
   // labels
-  for (const [s_, pos, a0, a1] of LBL) { if (!s_.parent.visible) continue; showLabel(s_, pos, t, a0, a1); }
+  for (const [s_, pos, a0, a1] of LBL) { if (!s_.parent.visible) continue; showLabel(s_, pos, t, a0, a1); if (PLATE) s_.visible = false; }
   // x-ray: render the inside from a close camera into the circle
   xrS.visible = xrR.visible = false;
   for (const [a0, a1, st_, sp, size, cp, lk] of XR) { if (t < a0 || t > a1) continue; const k = Math.max(0.001, (1 - Math.pow(1 - cl((t - a0) / 0.35), 3)) * cl((a1 - t) / 0.25)); const z0 = Z[st_];
@@ -356,7 +358,7 @@ function update(t) {
     if (st_ === 'D') ST.D.children[0].children.forEach(c => { if (c.material === M.glass) c.visible = false; });
     R.setRenderTarget(xrRT); R.render(K.scene, xrCam); R.setRenderTarget(null);
     K.scene.background = bg; LBL.forEach(l => l[0].visible = l[0].userData.v); if (hideCase) ST.A.userData.case.children.forEach(c => c.visible = true); if (st_ === 'D') ST.D.children[0].children.forEach(c => c.visible = true);
-    xrS.visible = xrR.visible = true; xrS.position.set(sp[0], sp[1], sp[2] + z0); xrR.position.copy(xrS.position); xrS.scale.setScalar(size * k); xrR.scale.setScalar(size * 1.04 * k); }
+    xrS.visible = xrR.visible = !PLATE; xrS.position.set(sp[0], sp[1], sp[2] + z0); xrR.position.copy(xrS.position); xrS.scale.setScalar(size * k); xrR.scale.setScalar(size * 1.04 * k); }
   ST.I.userData.phone.position.y = 0.2 * Math.sin(t * 1.4); ST.I.userData.phone.rotation.y = Math.sin(t * 0.6) * 0.25;
   // camera shake hooks
 }
