@@ -30,6 +30,13 @@ export function person(kind = 'hero', { print = kind === 'hero', shirt = null } 
   if (kind !== 'hero') root.scale.setScalar(1); // Michelle/Soldier are already ~1.7 m in their glb root transform
   root.traverse(m => { if (m.isMesh) { m.castShadow = true; m.receiveShadow = true; m.frustumCulled = false; } });
   const bone = {}; root.traverse(o => { if (o.isBone) bone[o.name.replace(/^mixamorig:?/, '')] = o; });
+  if (kind === 'hero' && print === false && shirt == null) { // the user's own character look: no hat, light-grey hoodie, dark jeans, black hair
+    root.traverse(m => { if (!m.isMesh) return; const mn = m.material && m.material.name || ''; if (/Headwear/.test(mn)) m.visible = false;
+      if (/Outfit_Top/.test(mn)) { m.material = m.material.clone(); m.material.color.set(0xc3c8d2); m.material.map = null; m.material.roughness = 0.9; }
+      if (/Outfit_Bottom/.test(mn)) { m.material = m.material.clone(); m.material.color.set(0x272b39); m.material.map = null; }
+      if (/Footwear/.test(mn)) { m.material = m.material.clone(); m.material.color.set(0x15161c); m.material.map = null; } });
+    if (bone.Head) { const ws = new THREE.Vector3(); bone.Head.getWorldScale(ws); const u = 1 / ws.y; // bone-local units
+      const hair = new THREE.Mesh(new THREE.SphereGeometry(0.098 * u, 24, 12, 0, Math.PI * 2, 0, Math.PI * 0.42), new THREE.MeshStandardMaterial({ color: 0x0e0b0a, roughness: 0.55 })); hair.scale.set(1.05, 0.9, 1.15); hair.position.set(0, 0.105 * u, -0.012 * u); hair.rotation.x = -0.32; bone.Head.add(hair); } }
   if (shirt != null) root.traverse(m => { if (m.isMesh && /Outfit_Top/.test(m.name)) { m.material = m.material.clone(); m.material.color.set(shirt); } });
   const faces = []; root.traverse(m => { if (m.isMesh && m.morphTargetDictionary && 'mouthOpen' in m.morphTargetDictionary) faces.push(m); });
   if (print && bone.Spine2) {

@@ -6,6 +6,7 @@ const { THREE } = K;
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 const PH = '../../assets/polyhaven/';
+import { neonIcon, ringGauge, dashRing, beam, word, xMark, badge, shotCam, eo, ob } from './mg3d.js';
 import { loadPeople, person, label, showLabel, V as PV } from './people3d.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 { const FB = '../neon-tech-short/kit/fonts/'; await Promise.all([new FontFace('Anek', `url(${FB}anek.woff2)`, { weight: '100 800' }), new FontFace('PJS', `url(${FB}plus-jakarta-sans-latin-800-normal.woff2)`, { weight: '800' }), new FontFace('Brand', 'url(../../node_modules/@fontsource/righteous/files/righteous-latin-400-normal.woff2)')].map(f => f.load().then(x => document.fonts.add(x)))); }
@@ -247,7 +248,7 @@ if (NIGHT) {
 // ---------------- realistic people (3D only, no 2D) ----------------
 ST.F.userData.man.visible = false;
 const PPL = [];   // {p, st, x, z, ry, s, fn(t)->{w, speed, ...}}
-function addP(kind, st, x, z, ry, s = 1.25, fn, opt = {}) { const p = person(kind, opt); p.root.position.set(x, 0, z); p.root.rotation.y = ry; p.root.scale.setScalar(s); ST[st].add(p.root); const o = { p, st, fn }; PPL.push(o); return o; }
+function addP(kind, st, x, z, ry, s = 1.25, fn, opt = {}) { if (kind === 'hero' && opt.print == null && opt.shirt == null) opt = Object.assign({ print: false }, opt); const p = person(kind, opt); p.root.position.set(x, 0, z); p.root.rotation.y = ry; p.root.scale.setScalar(s); ST[st].add(p.root); const o = { p, st, fn }; PPL.push(o); return o; }
 const VO = t => { const E_ = window.ENV || [], i = Math.round(t * 30); if (i < 1 || i >= E_.length - 1) return 0; const db = (E_[i - 1] + 2 * E_[i] + E_[i + 1]) / 4; return cl((db + 42) / 20) * (0.6 + 0.4 * Math.abs(Math.sin(t * 17))); };
 // hero (the user's avatar) per station; mouth follows the voice
 const HA = addP('hero', 'A', -2.3, 11, 0.25, 1.5, t => ({ w: { idle: 1 }, point: sm(2.2, 2.7, t), mouth: VO(t) }));
@@ -327,8 +328,38 @@ K.setCamKeys(camKeys);
 // put each station's hero in the foreground of that station's middle camera key (never tiny, never out of frame)
 const HEROES = { A: HA, B: HB, C: HC, D: HD, E: HE, G: HG, H: HH, I: HI };
 const PLATE = location.search.includes('plate'); window.PLATE = PLATE;
-if (PLATE) { Object.values(HEROES).forEach(h => h.p.root.visible = false); }
+if (PLATE || !location.search.includes('hero')) { Object.values(HEROES).forEach(h => h.p.root.visible = false); }
 for (const k in HEROES) { const Hh = HP[k], o = HEROES[k].p.root; const c = camKeys.find(q => q.t >= TL.st[k][0]); o.position.set(Hh.x, 0, Hh.z - Z[k]); o.rotation.y = Math.atan2(c.p[0] - Hh.x, c.p[2] - Hh.z) + (RIGS[k].so < 0 ? 0.35 : -0.35); }
+// ---------------- 3D motion graphics (v2 vocabulary in 3D) ----------------
+const G_ = (st, x, y, z) => { const g = new THREE.Group(); g.position.set(x, y, z); ST[st].add(g); return g; };
+const MG = {
+  aRing: dashRing(4.3, 0xffcf5a, G_('A', 0, 3.6, -0.7)), aBadge: badge('dollar', 1.1, 0xffcf5a, G_('A', -4.3, 7.0, 1.6)),
+  bDollar: neonIcon('dollar', 5, 0x5cff9d, G_('B', -4, 10.5, 1)), bRing: ringGauge(3.3, 0x5cff9d, G_('B', -4, 10.5, 1)), bTop: dashRing(3.2, 0xffd27a, G_('B', 4.5, 46, -2)),
+  cB: [-6, 0, 6].map((x, i) => badge('dollar', 0.9, 0x5cff9d, G_('C', x, [6.4, 8.6, 11][i] - 0.6, 1.5))),
+  cTower: badge('tower', 1.4, 0x8fe3ff, G_('C', -2.4, 4.2, 12)), cPad: badge('pad', 1.4, 0xff3d9a, G_('C', 2.4, 4.2, 12)), cR1: ringGauge(1.75, 0x8fe3ff, G_('C', -2.4, 4.2, 12)), cR2: ringGauge(1.75, 0xff3d9a, G_('C', 2.4, 4.2, 12)),
+  dQ: neonIcon('q', 3.2, 0xffcf5a, G_('D', -0.2, 6.6, 15)),
+  dHub: badge('dollar', 1.2, 0xffcf5a, G_('D', 0, 6, 10)), dSp: [['team', -3.2, 2.6], ['globe', 3.2, 2.6], ['cam', -3.2, -2.2], ['mic', 3.2, -2.2]].map(([n, x, y]) => ({ b: badge(n, 0.9, 0x8fe3ff, G_('D', x, 6 + y, 10)), l: beam(new THREE.Vector3(0, 0, 0), new THREE.Vector3(x * 0.72, y * 0.72, 0), 0xffcf5a, G_('D', 0, 6, 9.95), 0.05) })),
+  dCal: neonIcon('cal', 3, 0xff4d5a, G_('D', 9.5, 8.6, 3.3)), dCalR: ringGauge(2.2, 0xff4d5a, G_('D', 9.5, 8.6, 3.3)),
+  eGlobe: neonIcon('globe', 4, 0xff3d9a, G_('E', 0, 9.5, 0)), eRing: dashRing(3.4, 0xff3d9a, G_('E', 0, 9.5, 0)),
+  fCam: neonIcon('cam', 2.6, 0x8fe3ff, G_('F', -6.5, 5.4, 0.5)), fMic: neonIcon('mic', 2.4, 0xffcf5a, G_('F', 7, 8.4, -0.6)), fChip: neonIcon('chip', 3, 0x8fe3ff, G_('F', -2, 6.2, -9)), fChipR: ringGauge(2.2, 0x8fe3ff, G_('F', -2, 6.2, -9)),
+  gGlobe: neonIcon('globe', 4.6, 0x8fe3ff, G_('G', 0, 10.8, 0)), gRing: dashRing(7.2, 0x8fe3ff, G_('G', 0, 2.2, 0)),
+  hClock: ringGauge(3.35, 0xff4d5a, G_('H', -5, 6, -0.55), 0.12), hBadge: badge('dollar', 1.2, 0x5cff9d, G_('H', 5, 5.6, 1.8)), hChart: neonIcon('chart', 4.2, 0xffcf5a, G_('H', 0, 9.4, 2)),
+  iPad: badge('pad', 1.3, 0x5cff9d, G_('I', -3.6, 9.2, 1)), iEye: badge('eye', 1.3, 0xff3d9a, G_('I', 3.6, 9.2, 1)),
+};
+MG.gRing.rotation.x = -Math.PI / 2; MG.bTop.rotation.x = -Math.PI / 2;
+// ---------------- shot list (hard cuts every ~2-3 s, push-in/orbit inside each) ----------------
+const SH = []; const sh = (t, st_, p, l, o = {}) => SH.push(Object.assign({ t, p: [p[0], p[1], p[2] + Z[st_]], l: [l[0], l[1], l[2] + Z[st_]] }, o));
+sh(0, 'A', [0, 4, 15], [0, 4, 0]); sh(2.0, 'A', [3.5, 4.2, 15], [-0.5, 4.2, 0], { orbit: 0.35 });
+sh(4.2, 'B', [-10, 4, 18], [-4, 5, 1], { orbit: 0.3 }); sh(E('taka') - 0.3, 'B', [3, 7, 17], [-4, 8.5, 1], { push: 0.2 }); sh(E('dubai'), 'B', [-12, 3, 34], [3, 18, -2], { rise: 14, push: 0.05 }); sh(E('shunchen'), 'B', [-8, 12, 30], [4.5, 32, -2], { push: 0.15, orbit: 0.3 });
+sh(17.15, 'C', [0, 8, 34], [0, 5, 0], { push: 0.15 }); sh(E('b1') - 0.2, 'C', [-6, 5, 13], [-6, 4, 0]); sh(E('b2') - 0.2, 'C', [0, 6, 14], [0, 5.5, 0]); sh(E('b3') - 0.2, 'C', [7, 4, 15], [6, 8, 0], { rise: 4 });
+sh(E('cmp') - 0.2, 'C', [0, 4.3, 21], [0, 4.2, 12], { push: 0.2 }); sh(E('dami') - 0.3, 'C', [0, 6, 26], [0, 5, 6], { push: 0.2 });
+sh(32.95, 'D', [-0.2, 6.6, 23], [-0.2, 6.6, 15], { push: 0.25 }); sh(E('etotaka') - 0.2, 'D', [0, 6, 20], [0, 6, 10], { push: 0.1 }); sh(E('devs') - 0.1, 'D', [-6, 9, 30], [0, 8, -3], { orbit: 0.4 }); sh(E('years') - 0.1, 'D', [14, 7, 12], [9.5, 6.5, 3.3], { push: 0.2 });
+sh(E('open') - 0.2, 'E', [0, 16, 24], [0, 4, 0], { orbit: 0.5 });
+sh(E('chars') - 0.15, 'F', [-3, 3.5, 11], [-2, 3, 0], { orbit: 0.4 }); sh(E('mocap') - 0.1, 'F', [-10, 5, 9], [-4, 4, -2], { push: 0.15 }); sh(E('voice') - 0.1, 'F', [9, 6, 8], [6.5, 5.5, -0.5], { push: 0.2 }); sh(E('tech') - 0.1, 'F', [-2, 7, -1], [-2, 4.5, -9], { push: 0.25 });
+sh(51.2, 'G', [0, 8, 24], [0, 4, 0], { orbit: 0.5 }); sh(54.15, 'G', [-12, 6, 15], [0, 5, 0], { orbit: 0.4 }); sh(E('virtual') - 0.2, 'G', [0, 12, 20], [0, 7, 0], { push: 0.2 });
+sh(59.0, 'H', [-5, 6, 13], [-5, 6, -1], { push: 0.2 }); sh(62.4, 'H', [0, 6, 26], [0, 5, 0], { orbit: 0.3 }); sh(E('inc') - 0.1, 'H', [7, 4, 13], [5, 3.5, 0], { push: 0.2 }); sh(E('kolpona') - 0.1, 'H', [2, 6, 15], [5, 3, 0], { push: 0.2, orbit: 0.3 }); sh(E('labh') - 0.1, 'H', [0, 8, 24], [0, 7, 0], { rise: 3 });
+sh(73.6, 'I', [0, 6, 22], [0, 5.5, 0], { push: 0.2 }); sh(E('phone') - 0.2, 'I', [-1, 6.5, 16], [0, 7.5, 0], { orbit: 0.3 });
+shotCam(SH);
 // ---------------- animation ----------------
 const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _p = new THREE.Vector3(), _s = new THREE.Vector3();
 function curStation(t) { let best = 'A'; for (const k in TL.st) if (t >= TL.st[k][0] - 0.8) best = k; return best; }
@@ -364,6 +395,21 @@ function update(t) {
   H.userData.lid.rotation.x = -1.6 * mk;
   H.userData.billP.forEach(([x, vy, zz, d, r], i) => { const age = ((t - E('money')) * 0.9 + d) % 1.6; const on = t > E('money'); const tt = age; _p.set(5 + x * 4 * tt, on ? 2 + vy * tt - 6 * tt * tt : -20, zz * 3 * tt); _q.setFromEuler(_e.set(r + t * 3, r, t * 2 + r)); _s.setScalar(on ? 1 : 0.001); _m.compose(_p, _q, _s); H.userData.bills.setMatrixAt(i, _m); }); H.userData.bills.instanceMatrix.needsUpdate = true;
   // I phone gently floats
+  // 3D motion graphics timing
+  const w_ = (a, b) => cl((t - a) / Math.max(0.01, b - a));
+  MG.aRing.parent.rotation.z = t * 0.5; MG.aRing.visible = t > 2.0; MG.aBadge.set(w_(2.3, 3.0));
+  MG.bDollar.draw(w_(4.4, 5.6)); MG.bRing.set(w_(E('taka') - 0.1, E('burj')), 1); MG.bDollar.parent.rotation.y = Math.sin(t) * 0.3; MG.bTop.parent.rotation.y = t; MG.bTop.visible = t > E('burj') + 1.5;
+  MG.cB.forEach((b, i) => b.set(w_([E('b1'), E('b2'), E('b3')][i] + 0.2, [E('b1'), E('b2'), E('b3')][i] + 1.0)));
+  MG.cTower.set(w_(E('cmp'), E('cmp') + 0.6)); MG.cPad.set(w_(E('cmp') + 0.3, E('cmp') + 0.9)); MG.cR1.set(0.75 * eo(w_(E('cmp') + 0.5, E('cmp') + 1.5)), 1); MG.cR2.set(eo(w_(E('cmp') + 0.8, E('cmp') + 1.8)), 1);
+  MG.dQ.draw(w_(33.1, 34.2)); MG.dQ.parent.rotation.y = Math.sin(t * 2) * 0.3; MG.dQ.visible = t < E('etotaka');
+  MG.dHub.set(w_(E('etotaka'), E('etotaka') + 0.6)); MG.dSp.forEach((o, i) => { o.l.draw(w_(E('etotaka') + 0.5 + i * 0.35, E('etotaka') + 0.9 + i * 0.35)); o.b.set(w_(E('etotaka') + 0.8 + i * 0.35, E('etotaka') + 1.5 + i * 0.35)); });
+  MG.dCal.draw(w_(E('years'), E('years') + 0.8)); MG.dCalR.set((t - E('years')) * 0.6 % 1, t > E('years') ? 1 : 0);
+  MG.eGlobe.draw(w_(E('open') - 0.1, E('open') + 0.9)); MG.eGlobe.parent.rotation.y = t * 0.8; MG.eRing.parent.rotation.z = t;
+  MG.fCam.draw(w_(E('mocap'), E('mocap') + 0.7)); MG.fMic.draw(w_(E('voice'), E('voice') + 0.7)); MG.fChip.draw(w_(E('tech'), E('tech') + 0.8)); MG.fChipR.set(w_(E('tech') + 0.3, E('tech') + 1.8), t > E('tech') ? 1 : 0);
+  MG.gGlobe.draw(w_(E('virtual') - 0.1, E('virtual') + 1.0)); MG.gGlobe.parent.rotation.y = t * 0.6; MG.gRing.parent.rotation.y = t * 0.3; MG.gRing.visible = t > 51.2;
+  MG.hClock.set(w_(59.2, E('inc')), 1); MG.hBadge.set(w_(E('inc') + 0.2, E('inc') + 0.9)); MG.hChart.draw(w_(E('labh'), E('labh') + 1.2));
+  MG.iPad.set(w_(73.9, 74.6)); MG.iEye.set(w_(E('phone'), E('phone') + 0.7));
+  if (PLATE) Object.values(MG).flat().forEach(m => { const o = m.b || m; if (o.visible !== undefined) o.visible = false; });
   // people
   for (const o of PPL) { if (!ST[o.st].visible || !o.p.root.visible) continue; const r = o.fn(t); const P_ = o.p; if (r.pos) { P_.root.position.x = r.pos[0]; P_.root.position.z = r.pos[1]; } if (r.ry != null) P_.root.rotation.y = r.ry; P_.update(t, r.w, r.speed || 1);
     if (r.point) P_.point(r.point, 'Right'); if (r.flinch) P_.flinch(r.flinch); if (r.hands) P_.handsOn('head', r.hands); if (r.lookUp) P_.turn('Neck', [1, 0, 0], -0.5 * r.lookUp).turn('Head', [1, 0, 0], -0.3 * r.lookUp);
