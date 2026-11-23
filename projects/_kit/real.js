@@ -287,8 +287,8 @@ export function xray(size = 0.8) {
 }
 
 // ghost / hologram copy of any object (white-blue translucent)
-export function ghost(obj, color = 0xdff4ff) {
-  const gh = obj.isObject3D ? SkeletonUtils.clone(obj) : obj;
+export function ghost(obj, color = 0xdff4ff, { inPlace = false } = {}) {
+  const gh = inPlace ? obj : SkeletonUtils.clone(obj);
   const mats = [];
   gh.traverse(m => { if (m.isMesh) { m.castShadow = false; m.receiveShadow = false; m.material = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.5, depthWrite: false, blending: THREE.AdditiveBlending }); mats.push(m.material); } });
   gh.fade = (k) => { gh.visible = k > 0.01; mats.forEach(m => { m.opacity = 0.55 * k; }); };
