@@ -183,3 +183,8 @@ The approved reference is their short "প্রাচীন যুগে শী
   hook impact, soft alternating swishes on transitions (−19 dB), risers→hits only on real reveals, one gentle cue per checklist
   item, soft tv-on for footage windows, one era/character signature each. Low-pass every cue (≈8–9 kHz), short fades,
   cinematic music bed at −25…−31 dB with voice side-chain (threshold 0.03, ratio 3). Use `mixpro.py` with a cues JSON.
+- **ALWAYS a paper background on overlay / motion-graphics shots** (standing rule from the creator: "paper type background → more premium").
+  Use `paper.js`: `PT = buildPaper(1080, 1920, seed)` once, then `paperOn(g, PT, k, t)` right after drawing each non-face
+  background (k≈0.75–0.9). It adds pulp, fibres, two soft folds and lamp falloff while keeping the shot's colours. Don't let the
+  background gradient go near-black (overlay can't show texture on black): keep the base tone at the palette's mid/dark stop.
+  Never on the face footage.

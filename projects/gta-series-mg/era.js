@@ -67,7 +67,7 @@ function price(g, label, val, unit, x, y, e, k, o = {}) { if (k <= 0) return; co
   g.fillStyle = DINK; g.textBaseline = 'middle'; g.textAlign = 'left'; g.font = BNF(o.size || 120); g.fillText(s, -W_ / 2 + 45, 6); g.font = BNF((o.size || 120) * 0.5); g.fillText(' ' + unit, -W_ / 2 + 45 + w1, 12);
   g.font = BNF(34); const lw = g.measureText(label).width + 40; g.fillStyle = DINK; g.fillRect(-W_ / 2, -H_ / 2 - 54, lw, 54); g.fillStyle = E.ac; g.textAlign = 'left'; g.fillText(label, -W_ / 2 + 20, -H_ / 2 - 25); g.restore(); }
 // ---------- the creator's character in a flat panel ----------
-let WC, WG;
+let WC, WG, PT;
 function charPanel(g, act, t, t0, win, e, o = {}) { const E = ERA[e]; const k = clamp((t - t0) / 0.3); if (k <= 0) return; const u = easeOutBack(k);
   WG.setTransform(1, 0, 0, 1, 0, 0); WG.globalAlpha = 1; WG.clearRect(0, 0, W, H); const c = WG; const gr = c.createLinearGradient(0, 0, 0, 1080); gr.addColorStop(0, o.bg0 || E.bg[0]); gr.addColorStop(1, o.bg1 || E.bg[1]); c.fillStyle = gr; c.fillRect(0, 0, 1920, 1080);
   c.fillStyle = 'rgba(255,255,255,0.06)'; for (let i = 0; i < 14; i++) { c.beginPath(); c.arc(960, 560, 120 + i * 70, 0, 7); c.lineWidth = 3; c.strokeStyle = 'rgba(255,255,255,0.05)'; c.stroke(); } c.fillStyle = 'rgba(0,0,0,0.3)'; c.fillRect(0, 900, 1920, 180);
@@ -196,7 +196,7 @@ function drawBeat(g, bi, t) { const b = B[bi], d = t - b.t0, len = Math.max(0.5,
   if (face && b.t0 === 0) { z = lerp(1.0, 1.24, easeOut(clamp(t / 0.15))) + 0.03 * u; const sh = t > 0.1 ? Math.max(0, 1 - (t - 0.1) / 0.35) : 0; sx = Math.sin(t * 90) * 16 * sh; sy = Math.cos(t * 75) * 11 * sh; }
   else if (face) { z = lerp(1.0, 1.12, easeOut(clamp(d / 0.14))) + 0.03 * u; const sh = d > 0.08 ? Math.max(0, 1 - (d - 0.08) / 0.25) : 0; sx = Math.sin(d * 90) * 9 * sh; }
   g.save(); g.translate(PW / 2 + sx, PH * 0.4 + sy); g.scale(z, z); g.translate(-PW / 2, -PH * 0.4);
-  if (face) { const im = IMG['f' + b.e.slice(4)]; if (im) g.drawImage(im, 0, 0, PW, PH); } else bgEra(g, t, b.e);
+  if (face) { const im = IMG['f' + b.e.slice(4)]; if (im) g.drawImage(im, 0, 0, PW, PH); } else { bgEra(g, t, b.e); paperOn(g, PT, 0.75, t); }
   g.restore(); if (!face) hud(g, t, b.e);
   g.save(); if (face) { g.translate(sx * 0.3, sy * 0.3); } b.d(g, t, b); g.restore(); }
 function finish(dst, src, b, t) { dst.setTransform(1, 0, 0, 1, 0, 0); dst.globalAlpha = 1; dst.globalCompositeOperation = 'source-over'; dst.filter = 'none'; dst.drawImage(src, 0, 0);
@@ -216,7 +216,7 @@ function render(i) { const t = i / FPS; NOW = t; let bi = B.findIndex(b => t >= 
 (async () => {
   await new Promise(r => document.readyState === 'complete' ? r() : addEventListener('load', r));
   await Promise.all(['bold 40px "Nirmala UI"', '800 40px "Plus Jakarta Sans"'].map(f => document.fonts.load(f)));
-  const SHEET = await prepareSheet(); buildRig2(SHEET); buildPost(); WC = mk(W, H); WG = WC.getContext('2d'); OUTP = mk(PW, PH); OG = OUTP.getContext('2d'); PREVP = mk(PW, PH); PG2 = PREVP.getContext('2d'); FINP = mk(PW, PH); FG = FINP.getContext('2d');
+  PT = buildPaper(PW, PH, 29); const SHEET = await prepareSheet(); buildRig2(SHEET); buildPost(); WC = mk(W, H); WG = WC.getContext('2d'); OUTP = mk(PW, PH); OG = OUTP.getContext('2d'); PREVP = mk(PW, PH); PG2 = PREVP.getContext('2d'); FINP = mk(PW, PH); FG = FINP.getContext('2d');
   window.frame = async i => { const t = i / FPS; await preload(t); render(i); return FINP.toDataURL('image/jpeg', 0.92); };
   window.still = async arg => { const out = []; for (const t of String(arg).split(',').map(Number)) { await preload(t); try { render(Math.round(t * FPS)); } catch (e) { console.log('ERR ' + t + ' ' + e.message + ' | ' + (e.stack || '').split('\n')[1]); } out.push([`s_${String(t).replace('.', '_')}.jpg`, FINP.toDataURL('image/jpeg', 0.85)]); } return out; };
   window.ready = true;

@@ -76,6 +76,9 @@ function logoHook(g, t, t0, cx, cy, w, sub) { const vi = IMG['i_logo6_vi.png'], 
   const sweep = (a0) => { const q = clamp((lt - a0) / 0.5); if (q <= 0 || q >= 1) return; const [c, x] = tmpC('LOGOSH'); if (c.width !== Math.ceil(w)) { c.width = Math.ceil(w); c.height = Math.ceil(h); } x.globalCompositeOperation = 'source-over'; x.clearRect(0, 0, c.width, c.height); x.drawImage(vi, 0, 0, w, h); x.drawImage(gt, 0, 0, w, h); x.globalCompositeOperation = 'source-atop'; const sx = lerp(-w * 0.5, w * 1.5, easeIO(q)); const lg = x.createLinearGradient(sx - 120, 0, sx + 120, h); lg.addColorStop(0, 'rgba(255,255,255,0)'); lg.addColorStop(0.5, 'rgba(255,255,255,0.85)'); lg.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = lg; x.fillRect(0, 0, c.width, c.height); g.save(); g.globalCompositeOperation = 'screen'; g.globalAlpha = 0.75; g.drawImage(c, cx - w / 2, cy - h / 2); g.restore(); };
   sweep(0.55); sweep(1.9);
   if (sub) { const k = clamp((lt - 0.9) / 0.4); if (k > 0) { const yy = cy + h / 2 + 62, lw = 300 * easeOut(k); g.save(); g.strokeStyle = 'rgba(255,255,255,0.7)'; g.lineWidth = 3; g.beginPath(); g.moveTo(cx - lw, yy - 46); g.lineTo(cx + lw, yy - 46); g.stroke(); g.globalAlpha = k; g.font = 'bold 50px "Nirmala UI"'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.shadowColor = 'rgba(0,0,0,0.8)'; g.shadowBlur = 16; g.fillStyle = WHITE; g.fillText(sub, cx, yy + (1 - easeOut(k)) * 24); g.restore(); } } }
+// paper background for every overlay shot: deep toned paper (from the beat palette) + soft accent light + real paper texture
+let PT; function paperBG(g, t, name) { const P_ = BGPAL[name] || BGPAL.doc; const gr = g.createLinearGradient(0, 0, 0, PH); gr.addColorStop(0, P_.p[0]); gr.addColorStop(1, P_.p[1]); g.fillStyle = gr; g.fillRect(0, 0, PW, PH);
+  const rg = g.createRadialGradient(PW * 0.5, PH * 0.3, 0, PW * 0.5, PH * 0.3, PH * 0.6); rg.addColorStop(0, `rgba(${P_.ac},0.16)`); rg.addColorStop(1, `rgba(${P_.ac},0)`); g.fillStyle = rg; g.fillRect(0, 0, PW, PH); paperOn(g, PT, 0.9, t); }
 // ---------- beats ----------
 const B = []; const beat = (t0, bg, tr, d, o = {}) => B.push(Object.assign({ t0, bg, tr, d }, o));
 const ON = (t, a, b) => t >= a && t < b;
@@ -141,7 +144,7 @@ function drawBeat(g, bi, t) { const b = B[bi], d = t - b.t0, len = Math.max(0.5,
   const face = b.bg.startsWith('face'); const u = 1 - Math.pow(1 - clamp(d / Math.min(len, 5)), 2); let z = 1 + (face ? 0.04 : 0.03) * u, sx = 0, sy = 0; if (face && b.t0 === 0) { const pk = clamp(t / 0.16); z = lerp(1.0, 1.22, easeOut(pk)) + 0.03 * u; const sh = Math.max(0, 1 - (t - 0.12) / 0.35) * (t > 0.1 ? 1 : 0); sx = Math.sin(t * 90) * 14 * sh; sy = Math.cos(t * 75) * 10 * sh; } else if (face) { const pk = clamp(d / 0.14); z = lerp(1.0, 1.12, easeOut(pk)) + 0.03 * u; }
   g.save(); g.translate(PW / 2 + sx, PH * 0.4 + sy); g.scale(z, z); g.translate(-PW / 2, -PH * 0.4);
   if (face) { const im = IMG['f' + b.bg.slice(4)]; if (im) g.drawImage(im, 0, 0, PW, PH); const tg = g.createLinearGradient(0, PH - 700, 0, PH); tg.addColorStop(0, 'rgba(0,0,0,0)'); tg.addColorStop(1, 'rgba(0,0,0,0.55)'); g.fillStyle = tg; g.fillRect(0, PH - 700, PW, 700); }
-  else bgX(g, t, b.bg, {});
+  else paperBG(g, t, b.bg);
   b.d(g, t, b); g.restore(); }
 function finish(dst, src, b, t) { dst.setTransform(1, 0, 0, 1, 0, 0); dst.globalAlpha = 1; dst.globalCompositeOperation = 'source-over'; const face = b.bg.startsWith('face'); dst.filter = face ? 'none' : 'contrast(1.05) saturate(1.05)'; dst.drawImage(src, 0, 0); dst.filter = 'none';
   if (!face) { dst.globalCompositeOperation = 'screen'; dst.globalAlpha = 0.16; dst.filter = 'blur(22px) brightness(1.25)'; dst.drawImage(src, 0, 0); dst.filter = 'none'; dst.globalCompositeOperation = 'source-over'; dst.globalAlpha = 1; }
@@ -165,7 +168,7 @@ function render(i) { const t = i / FPS; NOW = t; let bi = B.findIndex(b => t >= 
 (async () => {
   await new Promise(r => document.readyState === 'complete' ? r() : addEventListener('load', r));
   await Promise.all(['bold 40px "Nirmala UI"', '40px "Nirmala UI"', '800 40px "Plus Jakarta Sans"'].map(f => document.fonts.load(f)));
-  const SHEET = await prepareSheet(); buildRig2(SHEET); buildPost(); WC = mk(W, H); WG = WC.getContext('2d'); OUTP = mk(PW, PH); OG = OUTP.getContext('2d'); PREVP = mk(PW, PH); PG2 = PREVP.getContext('2d'); FINP = mk(PW, PH); FG = FINP.getContext('2d');
+  PT = buildPaper(PW, PH, 11); const SHEET = await prepareSheet(); buildRig2(SHEET); buildPost(); WC = mk(W, H); WG = WC.getContext('2d'); OUTP = mk(PW, PH); OG = OUTP.getContext('2d'); PREVP = mk(PW, PH); PG2 = PREVP.getContext('2d'); FINP = mk(PW, PH); FG = FINP.getContext('2d');
   window.frame = async i => { const t = i / FPS; await preload(t); render(i); return FINP.toDataURL('image/jpeg', 0.92); };
   window.still = async arg => { const out = []; for (const t of String(arg).split(',').map(Number)) { await preload(t); try { render(Math.round(t * FPS)); } catch (e) { console.log('ERR ' + t + ' ' + e.message + ' | ' + (e.stack || '').split('\n')[1]); } out.push([`s_${String(t).replace('.', '_')}.jpg`, FINP.toDataURL('image/jpeg', 0.85)]); } return out; };
   window.ready = true;

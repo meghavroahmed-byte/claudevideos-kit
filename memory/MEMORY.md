@@ -27,3 +27,4 @@
 - [3D ref: House In Crisis](feedback-3d-reference-house-in-crisis.md) — 2026-11-22 raw Shorts as bright daytime three.js 3D (hero object, label pill, x-ray circle), face 2s start/mid/end, no captions
 - [3D ember style + face rules](feedback-3d-ember-style-face.md) — 2026-11-23: v2 Ice&Ember look BUILT IN 3D (headline/chip/neon/grid); face = original room bg, light grade, xfade transitions, no text over head
 - [Unique MG per video + pro sound](feedback-unique-mg-pro-sound.md) — 2026-11-23: each video its own bg/MG look, top-level MG, best sound design with SFX on every element; user cuts raw themselves now, wait for Drive link
+- 2026-11-23: Always paper-texture backgrounds on overlay/MG shots (skills/megh-doc-edit/paper.js). Sound must be clearly audible + premium (≈120–160 cues/min, SFX ≈ −21 LUFS), never sparse, never pop-spam. Named game = only that game's footage (GTA 6 → Rockstar official media). Hook: official game logo on chest.
