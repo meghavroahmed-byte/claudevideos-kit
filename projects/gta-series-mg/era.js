@@ -167,7 +167,7 @@ beat(38.4, 'lc4', 'push', (g, t, b) => { const lt = t - b.t0; pcard(g, 'gta4_sho
 beat(40.22, 'ls5', 'pixel', (g, t, b) => { const lt = t - b.t0; pcard(g, 'cg5', { x: 90, y: 330, w: 900, h: 620 }, 'ls5', clamp(lt / 0.3), { label: 'GTA V · লস সান্তোস', year: '2013', rec: true, still: false, zoom: 1.0 });
   head(g, 'এবার GTA 5', 540, 1170, 120, S(t, b.t0 + 0.15), ERA.ls5.ac, { bar: '#fff' }); });
 // 14 FACE middle — the Mac joke
-beat(41.6, 'face1', 'cut', (g, t, b) => { chestPlate(g, t, 42.75, 'ম্যাক ভাইরা 😅', 'আজও খেলতে পারে নাই', 'ls5'); });
+beat(41.6, 'face1', 'cut', (g, t, b) => { });
 // 15 GTA V gameplay + $15B
 beat(44.3, 'ls5', 'blocks', (g, t, b) => { const lt = t - b.t0; pcard(g, 'cg5e', { x: 90, y: 330, w: 900, h: 600 }, 'ls5', clamp(lt / 0.35), { label: 'GTA V গেমপ্লে', rec: true, still: false, zoom: 1.0 });
   if (t > A.r5) moneyRain(g, t, 34, 1, 1.3); head(g, 'এখন অবধি প্রায়', 540, 1070, 62, S(t, b.t0 + 0.6), '#fff'); price(g, 'মোট ব্যবসা', 15, 'বিলিয়ন', 540, 1300, 'ls5', clamp((t - A.r5) / 1.0), { size: 140 });

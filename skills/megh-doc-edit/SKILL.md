@@ -175,7 +175,11 @@ The approved reference is their short "প্রাচীন যুগে শী
   (logo_vi / logo_gta PNG, transparent) are in the /VI page's `_next/static/media`. YouTube/Reddit/Pinterest are blocked here.
 - **Hook = the game's official logo on the creator's chest** (below the chin), premium reveal: layer bloom + wordmark slam +
   shockwave + light sweep (or a flat poster rise for a flat-style video). Remember the face punch-zoom moves it: place it pre-zoom.
-- **Sound design must not be annoying.** No pop/ding/tick on every element. ~45–60 curated cues per minute-long video:
+- **Sound design: premium AND clearly audible, never annoying, never missing.** 45 quiet cues was rejected as "no sound design";
+  170 dense pops was rejected as annoying. Target ≈120–160 cues per minute-long video, SFX stem ≈ −21 LUFS, beds −17/−18 dB,
+  ducking threshold 0.06 ratio 2, low-pass ≈13 kHz. Layer each reveal (riser → boom/stamp → cash/money), whoosh + card-thud on every
+  transition, a sound for every window/character/footage entrance. Never write text from an unclear transcript guess
+  ("ম্যাক ভাইরা" was wrong); if a line is unclear, leave that face shot clean. Earlier guidance, now superseded:
   hook impact, soft alternating swishes on transitions (−19 dB), risers→hits only on real reveals, one gentle cue per checklist
   item, soft tv-on for footage windows, one era/character signature each. Low-pass every cue (≈8–9 kHz), short fades,
   cinematic music bed at −25…−31 dB with voice side-chain (threshold 0.03, ratio 3). Use `mixpro.py` with a cues JSON.
