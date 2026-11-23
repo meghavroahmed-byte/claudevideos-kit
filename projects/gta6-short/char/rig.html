@@ -1,0 +1,15 @@
+<!doctype html><html><head><meta charset="utf-8"></head><body>
+<script src="common.js"></script><script src="rigcore.js"></script><script src="rig2.js"></script><script src="anim2.js"></script>
+<script>
+// Draws the user's full-body character into an offscreen canvas for the parent page.
+let CV, CG;
+window.drawChar = (w, h, X, Y, s, act, lt, o = {}) => {
+  if (!CV || CV.width !== w || CV.height !== h) { CV = document.createElement('canvas'); CV.width = w; CV.height = h; CG = CV.getContext('2d'); }
+  CG.setTransform(1, 0, 0, 1, 0, 0); CG.clearRect(0, 0, w, h);
+  const pose = Object.assign({ t: o.t || lt, mouth: o.mouth || 0, flip: o.flip }, ACT[act](lt, o), o.pose || {}); if (o.face) pose.face = o.face;
+  CG.save(); CG.fillStyle = 'rgba(0,0,0,0.25)'; CG.beginPath(); CG.ellipse(X, Y + 4, 170 * s, 26 * s, 0, 0, 7); CG.fill(); CG.restore();
+  if (pose.view === 'B') drawCharB(CG, X, Y, s, pose); else if (pose.view === 'S') drawCharS(CG, X, Y, s, pose); else drawCharF(CG, X, Y, s, pose);
+  return CV;
+};
+(async () => { const S = await prepareSheet(); buildRig2(S); window.rigReady = true; })();
+</script></body></html>

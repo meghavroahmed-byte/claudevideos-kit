@@ -7,3 +7,5 @@ temp/
 *.mov
 *.aac
 parts/
+projects/gta6-short/out/
+projects/gta6-short/env.js

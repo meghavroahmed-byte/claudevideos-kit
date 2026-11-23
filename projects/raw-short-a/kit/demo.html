@@ -1,0 +1,82 @@
+<!doctype html><html><head><meta charset="utf-8"></head><body style="margin:0">
+<script src="common.js"></script><script src="rigcore.js"></script><script src="rig2.js"></script><script src="anim2.js"></script>
+<script>
+const PW = 1920, PH = 1080, FPS = 30, GY = 960, SC = 0.66;
+// segments: [t0, t1, act, view-specific opts]
+const SEG = []; let T0 = 0; const seg2 = (d, act, o = {}) => { SEG.push(Object.assign({ t0: T0, t1: T0 + d, act }, o)); T0 += d; };
+const WV = 504 * SC, RV = 1335 * SC; // walk / run speed px per second (matches stride)
+let X = 420;
+seg2(1.6, 'idle', { x: X, label: 'দাঁড়িয়ে থাকা' });
+seg2(2.2, 'waveF', { x: X, label: 'হাত নাড়ানো' });
+seg2(0.3, 'turn', { x: X, to: 'R' });
+seg2(3.0, 'walkS', { x0: X, x1: X + 3.0 * WV, dir: 'R', label: 'হাঁটা', cyc: 1.0 }); X += 3.0 * WV;
+seg2(0.3, 'turn', { x: X, to: 'L' });
+seg2(1.15, 'runS', { x0: X, x1: X - 1.15 * RV, dir: 'L', label: 'দৌড়', cyc: 0.62 }); X -= 1.15 * RV;
+seg2(0.3, 'turn', { x: X, to: 'F' });
+seg2(1.4, 'jumpF', { x: X, label: 'লাফ' });
+seg2(2.0, 'point', { x: X, label: 'দেখানো' });
+seg2(2.8, 'talk', { x: X, label: 'কথা বলা' });
+seg2(2.4, 'think', { x: X, label: 'চিন্তা করা' });
+seg2(1.6, 'shrug', { x: X, label: 'কাঁধ ঝাঁকানো' });
+seg2(2.0, 'clap', { x: X, label: 'হাততালি' });
+seg2(1.8, 'thumbsUp', { x: X, label: 'থাম্বস আপ' });
+seg2(2.6, 'count', { x: X, label: 'আঙুলে গোনা' });
+seg2(1.8, 'fistPump', { x: X, label: 'জয়ের মুঠি' });
+seg2(2.0, 'angry', { x: X, label: 'রাগ' });
+seg2(2.2, 'sad', { x: X, label: 'দুঃখ' });
+seg2(1.6, 'surprised', { x: X, label: 'অবাক' });
+seg2(1.8, 'confused', { x: X, label: 'বিভ্রান্ত' });
+seg2(0.3, 'turn', { x: X, to: 'R' });
+seg2(1.0, 'walkS', { x0: X, x1: X + 1.0 * WV, dir: 'R', label: 'হাঁটা', cyc: 1.0 }); X += 1.0 * WV;
+seg2(0.3, 'turn', { x: X, to: 'F' });
+seg2(4.6, 'eat', { x: X, label: 'আপেল খাওয়া' });
+seg2(3.8, 'drink', { x: X, label: 'পানি খাওয়া' });
+seg2(0.3, 'turn', { x: X, to: 'R' });
+const CHX = 1330; const dw = (CHX - X) / WV; seg2(dw, 'walkS', { x0: X, x1: CHX, dir: 'R', label: 'হাঁটা', cyc: 1.0 }); X = CHX;
+seg2(3.6, 'sitS', { x: X, dir: 'R', label: 'চেয়ারে বসা', down: 0.8, up: 2.6, chair: true });
+seg2(0.3, 'turn', { x: X, to: 'L' });
+seg2(1.2, 'walkS', { x0: X, x1: X - 1.2 * WV, dir: 'L', label: 'হাঁটা', cyc: 1.0 }); X -= 1.2 * WV;
+seg2(0.3, 'turn', { x: X, to: 'F' });
+seg2(3.6, 'dance', { x: X, label: 'নাচ' });
+seg2(2.0, 'cheer', { x: X, label: 'খুশি' });
+seg2(2.4, 'walkF', { x: X, grow: 0.25, label: 'সামনে হেঁটে আসা' });
+seg2(0.3, 'turn', { x: X, to: 'B', scale0: 1.25 });
+seg2(3.2, 'walkB', { x: X, shrink: [1.25, 0.6], label: 'পেছন ফিরে হেঁটে যাওয়া' });const DUR = T0;
+function bg(g, t) { const gr = g.createLinearGradient(0, 0, 0, PH); gr.addColorStop(0, '#fde9d4'); gr.addColorStop(1, '#f7d6bd'); g.fillStyle = gr; g.fillRect(0, 0, PW, PH);
+  for (let i = 0; i < 14; i++) { const x = (hash(i) * PW + t * 6 * (hash(i + 3) - 0.5)) % PW, y = hash(i + 9) * 700, r = 40 + hash(i + 5) * 110; g.fillStyle = `rgba(255,255,255,${0.12 + hash(i + 2) * 0.15})`; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); }
+  g.fillStyle = '#e9c2a3'; g.fillRect(0, GY, PW, PH - GY); g.fillStyle = 'rgba(0,0,0,0.06)'; g.fillRect(0, GY, PW, 10);
+  // window
+  g.fillStyle = '#bfe3f5'; g.strokeStyle = '#a4785a'; g.lineWidth = 14; g.beginPath(); g.roundRect(1480, 150, 300, 260, 18); g.fill(); g.stroke(); g.beginPath(); g.moveTo(1630, 150); g.lineTo(1630, 410); g.moveTo(1480, 280); g.lineTo(1780, 280); g.stroke(); }
+function chair(g, x, front) { g.save(); g.fillStyle = '#b5774a'; g.strokeStyle = '#3b2416'; g.lineWidth = 6; const sy = GY - 210; g.beginPath(); g.roundRect(x - 20, sy, 150, 26, 8); g.fill(); g.stroke(); for (const lx of [x - 10, x + 110]) { g.beginPath(); g.rect(lx, sy + 24, 16, GY - sy - 24); g.fill(); g.stroke(); } if (!front) { g.beginPath(); g.rect(x - 20, sy - 220, 20, 246); g.fill(); g.stroke(); } g.restore(); }
+function label(g, s, k) { if (k <= 0) return; g.save(); g.globalAlpha = k; g.font = '700 64px "Nirmala UI"'; const w = g.measureText(s).width + 70; g.fillStyle = '#ffffff'; g.shadowColor = 'rgba(0,0,0,0.15)'; g.shadowBlur = 20; g.beginPath(); g.roundRect(PW / 2 - w / 2, 50, w, 100, 50); g.fill(); g.shadowBlur = 0; g.fillStyle = '#e2574c'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(s, PW / 2, 103); g.restore(); }
+let FACING = 'F';
+function poseAt(t) {
+  let si = SEG.findIndex(s => t >= s.t0 && t < s.t1); if (si < 0) si = SEG.length - 1; const s = SEG[si], lt = t - s.t0, u = clamp(lt / (s.t1 - s.t0));
+  // facing before this segment
+  let face = 'F'; for (let j = 0; j < si; j++) { if (SEG[j].act === 'turn') face = SEG[j].to; else if (SEG[j].dir) face = SEG[j].dir; }
+  let x = s.x != null ? s.x : lerp(s.x0, s.x1, u), pose, view = face === 'F' ? 'F' : face === 'B' ? 'B' : 'S', flip = face === 'R', sx = 1, scale = SC * (s.scale0 || 1), gy = GY;
+  if (s.act === 'turn') { const k = u < 0.5 ? 1 - u * 2 : (u - 0.5) * 2; sx = Math.max(0.08, k); const cur = u < 0.5 ? face : s.to; view = cur === 'F' ? 'F' : cur === 'B' ? 'B' : 'S'; flip = cur === 'R'; pose = view === 'S' ? ACT.standS(t) : view === 'B' ? { legL: { a: 9 }, legR: { a: 9 } } : ACT.idle(t); }
+  else { if (s.dir) { view = 'S'; flip = s.dir === 'R'; } pose = ACT[s.act](lt, s); view = pose.view; if (s.act === 'walkF') scale = SC * (1 + (s.grow || 0) * u); if (s.shrink) { scale = SC * lerp(s.shrink[0], s.shrink[1], u); gy = GY - 150 * u; } }
+  return { s, si, lt, u, x, view, flip, sx, pose, scale, gy };
+}
+function render(i) {
+  const t = i / FPS, g = OG, P = poseAt(t); g.setTransform(1, 0, 0, 1, 0, 0); bg(g, t);
+  if (P.s.chair || (P.si > 0 && SEG[P.si - 1].chair && P.s.act === 'turn')) chair(g, 1330 - 70, false); else chair(g, 1330 - 70, false);
+  // shadow
+  g.save(); g.fillStyle = 'rgba(80,40,20,0.18)'; g.beginPath(); g.ellipse(P.x, P.gy + 4, 120 * P.scale / SC, 18 * P.scale / SC, 0, 0, 7); g.fill(); g.restore();
+  const p = Object.assign({ t, flip: P.flip }, P.pose); g.save(); g.translate(P.x, GY); g.scale(P.sx, 1); g.translate(-P.x, -GY);
+  if (P.view === 'F') drawCharF(g, P.x, P.gy, P.scale, p); else if (P.view === 'B') drawCharB(g, P.x, P.gy, P.scale, p); else drawCharS(g, P.x, P.gy, P.scale, p);
+  g.restore();
+  if (P.s.label) label(g, P.s.label, clamp(P.lt / 0.25) * clamp((P.s.t1 - P.s.t0 - P.lt) / 0.2 + 0.0001 > 0 ? 1 : 1));
+  const fin = 1 - clamp(t / 0.3); if (fin > 0) { g.fillStyle = `rgba(0,0,0,${fin})`; g.fillRect(0, 0, PW, PH); }
+}
+let OUT, OG;
+(async () => {
+  const S = await prepareSheet(); buildRig2(S); OUT = mk(PW, PH); OG = OUT.getContext('2d'); await document.fonts.load('700 64px "Nirmala UI"');
+  window.DUR = DUR;
+  window.frame = i => { render(i); return OUT.toDataURL('image/jpeg', 0.9); };
+  window.still = arg => arg.split(',').map(Number).map(t => { try { render(Math.round(t * FPS)); } catch (e) { console.log('ERR ' + t + ' ' + e.message + ' ' + (e.stack || '').split('\n')[1]); } return [`d_${t}.jpg`, OUT.toDataURL('image/jpeg', 0.8)]; });
+  console.log('DUR ' + DUR.toFixed(2));
+  window.ready = true;
+})();
+</script></body></html>
