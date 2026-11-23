@@ -167,3 +167,15 @@ The approved reference is their short "প্রাচীন যুগে শী
 - `projects/raw-short-a/kit/build_cut.js` (cut raw footage, voice untouched) and `assemble.py` (xfade face↔graphics, voice gain, ducked SFX).
 - `projects/gta6-doc/mixdoc.py`: places the per-event SFX palette and the looped music beds.
 - `memory/*.md`: the dated feedback history behind these rules.
+
+## 2026-11 feedback (must follow)
+- **Named game = that game's own footage.** A GTA 6 video uses ONLY GTA 6 clips. Never substitute another game's footage.
+  Official source that works from the cloud box: rockstargames.com/VI/media lists direct MP4s and zips on
+  media-rockstargames-com.akamaized.net (Launch Trailer 4K, screenshot pack of ~138 images). The logo layers
+  (logo_vi / logo_gta PNG, transparent) are in the /VI page's `_next/static/media`. YouTube/Reddit/Pinterest are blocked here.
+- **Hook = the game's official logo on the creator's chest** (below the chin), premium reveal: layer bloom + wordmark slam +
+  shockwave + light sweep (or a flat poster rise for a flat-style video). Remember the face punch-zoom moves it: place it pre-zoom.
+- **Sound design must not be annoying.** No pop/ding/tick on every element. ~45–60 curated cues per minute-long video:
+  hook impact, soft alternating swishes on transitions (−19 dB), risers→hits only on real reveals, one gentle cue per checklist
+  item, soft tv-on for footage windows, one era/character signature each. Low-pass every cue (≈8–9 kHz), short fades,
+  cinematic music bed at −25…−31 dB with voice side-chain (threshold 0.03, ratio 3). Use `mixpro.py` with a cues JSON.
