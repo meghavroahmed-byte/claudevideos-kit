@@ -22,7 +22,11 @@ def put(t, n, db=0, var=True, maxlen=None, fade=0.03):
 a = A
 TR = {'zoom': 'whoosh2', 'bars': 'whoosh1', 'whip': 'whip', 'circle': 'whoosh1', 'glitch': 'glitch', 'flash': 'impact'}
 BEATS = [(2.6, 'zoom'), (4.0, 'bars'), (6.6, 'whip'), (8.6, 'circle'), (11.0, 'zoom'), (14.6, 'bars'), (20.5, 'whip'), (23.0, 'glitch'), (29.6, 'flash'), (33.6, 'zoom'), (35.9, 'whip'), (38.4, 'bars'), (41.5, 'circle'), (49.8, 'zoom'), (56.6, 'bars'), (65.6, 'whip'), (67.6, 'glitch'), (69.8, 'zoom'), (72.4, 'zoom')]
-C = [(0.0, 'boom', -5), (0.95, 'pop', -9), (1.0, 'impact', -12)]
+C = [(0.0, 'punch', -3), (0.0, 'boom', -7), (0.02, 'impact', -8), (0.95, 'pop', -9),
+     # face punch-ins + character / real game cues
+     (33.6, 'punch', -8), (72.4, 'punch', -8),
+     (2.75, 'tvsw', -11), (2.9, 'cpop', -8), (3.0, 'whoosh1', -14), (6.7, 'cpop', -9), (6.9, 'gasp', -9), (15.0, 'cpop', -10), (29.75, 'cpop', -9), (30.3, 'huh', -8),
+     (42.9, 'tvsw', -10), (43.36, 'tvsw', -11), (51.0, 'tvsw', -12), (52.0, 'tvsw', -11), (63.25, 'cpop', -10), (63.4, 'gasp', -10), (65.6, 'tvsw', -10), (67.7, 'cpop', -10), (68.0, 'shrug', -10), (69.9, 'tvsw', -11)]
 for t, tr in BEATS: C.append((t - 0.06, TR[tr], -7))
 C += [
  # title card
