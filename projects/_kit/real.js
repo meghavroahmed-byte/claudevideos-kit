@@ -160,14 +160,14 @@ export function person(kind = 'hero', { print = kind === 'hero', shirt = null, h
     p.position.copy(sp.lerp(ne, 0.15)).addScaledVector(fwd, 0.125 * hs).add(V(0, -0.03 * hs, 0)); p.quaternion.copy(gq); p.scale.setScalar(hs);
     g.add(p); g.updateMatrixWorld(true); bone.Spine2.attach(p); g.userData.print = p;
   }
-  const hipsY0 = bone.Hips ? bone.Hips.position.y : 0; const hipsS = bone.Hips ? 1 / bone.Hips.parent.getWorldScale(V()).y : 1;
+  const jawRest = bone.Jaw ? bone.Jaw.quaternion.clone() : null; const hipsY0 = bone.Hips ? bone.Hips.position.y : 0; const hipsS = bone.Hips ? 1 / bone.Hips.parent.getWorldScale(V()).y : 1;
   const P = {
     root: g, bone, faces,
     // weights: clip name -> weight. t: time in seconds (clip time = t*speed)
     // pose: object of canned pose weights {flinch, point, pointL, handsHead, handsChest, handsBelly, handsThroat, armsUp, shrug, crouch, lean, lookUp, lookDown, nod, headTilt}
     update(t, weights = { idle: 1 }, speed = 1, pose = null) {
       for (const n in src.sb) { src.sb[n].position.copy(src.rest[n][0]); src.sb[n].quaternion.copy(src.rest[n][1]); }
-      sampleClips(src, weights, t * speed);
+      sampleClips(src, weights, t * speed); if (jawRest) bone.Jaw.quaternion.copy(jawRest);
       src.root.updateMatrixWorld(true);
       if (pose) applyPose(src, pose);
       src.root.updateMatrixWorld(true); g.updateMatrixWorld(true);
@@ -189,7 +189,7 @@ export function person(kind = 'hero', { print = kind === 'hero', shirt = null, h
       b.quaternion.premultiply(new THREE.Quaternion().setFromAxisAngle(localAxis, ang)); b.updateMatrixWorld(true);
       return P;
     },
-    mouth(k) { faces.forEach(m => { m.morphTargetInfluences[m.morphTargetDictionary.mouthOpen] = k; }); if (bone.Jaw && !faces.length) { P.turn('Jaw', [1, 0, 0], 0.25 * k); } return P; },
+    mouth(k) { faces.forEach(m => { m.morphTargetInfluences[m.morphTargetDictionary.mouthOpen] = k; }); if (bone.Jaw && !faces.length && jawRest) { bone.Jaw.quaternion.copy(jawRest); P.turn('Jaw', [1, 0, 0], 0.32 * k); } return P; },
     smile(k) { faces.forEach(m => { const i = m.morphTargetDictionary.mouthSmile; if (i != null) m.morphTargetInfluences[i] = k; }); return P; },
     // canned bone poses on top of the clip (k = 0..1)
     flinch(k) { if (k < 0.01) return P; return P.turn('Spine', [1, 0, 0], -0.25 * k).turn('LeftArm', [1, 0, 0], -1.3 * k).turn('RightArm', [1, 0, 0], -1.3 * k).turn('LeftForeArm', [0, 1, 0], 1.4 * k).turn('RightForeArm', [0, 1, 0], -1.4 * k); },
