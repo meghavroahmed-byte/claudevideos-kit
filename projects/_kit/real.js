@@ -110,11 +110,12 @@ for (const [s, S] of [['l', 'Left'], ['r', 'Right']]) {
     [`upperleg_${s}`]: `${S}UpLeg`, [`lowerleg_${s}`]: `${S}Leg`, [`foot_${s}`]: `${S}Foot`, [`ball_${s}`]: `${S}ToeBase` });
   for (const [f, F] of [['thumb', 'Thumb'], ['index', 'Index'], ['middle', 'Middle'], ['ring', 'Ring'], ['pinky', 'Pinky']]) for (const k of [1, 2, 3]) RPMAP[`${f}_0${k}_${s}`] = `${S}Hand${F}${k}`;
 }
+const boneKey = (n) => rpName(n) || n.replace(/^mixamorig:?/, '').replace(/_\d+$/, '');
 const rpName = (n) => { const m = n.match(/(hip|spine_0\d|neck|head|jaw|shoulder_[lr]|upperarm_[lr]|lowerarm_[lr]|hand_[lr]|upperleg_[lr]|lowerleg_[lr]|foot_[lr]|ball_[lr]|(?:thumb|index|middle|ring|pinky)_0\d_[lr])_\d+$/); return m ? RPMAP[m[1]] : null; };
 const CHILD = { Hips: 'Spine', Spine: 'Spine1', Spine1: 'Spine2', Spine2: 'Neck', Neck: 'Head', LeftShoulder: 'LeftArm', LeftArm: 'LeftForeArm', LeftForeArm: 'LeftHand', LeftUpLeg: 'LeftLeg', LeftLeg: 'LeftFoot', LeftFoot: 'LeftToeBase',
   RightShoulder: 'RightArm', RightArm: 'RightForeArm', RightForeArm: 'RightHand', RightUpLeg: 'RightLeg', RightLeg: 'RightFoot', RightFoot: 'RightToeBase', LeftHand: 'LeftHandMiddle1', RightHand: 'RightHandMiddle1' };
 // kinds: 'hero' (RenderPeople Nathan, T-shirt + MR. CLOUD), 'eric','carla','claudia','sophia','manuel' (RenderPeople), 'rpm','michelle','soldier'
-const KIND = { hero: 'sf/rp_nathan', nathan: 'sf/rp_nathan', eric: 'sf/rp_eric', carla: 'sf/rp_carla', claudia: 'sf/rp_claudia', sophia: 'sf/rp_sophia', manuel: 'sf/rp_manuel', rpm: 'people/readyplayer.me', michelle: 'people/Michelle', soldier: 'people/Soldier' };
+const KIND = { hero: 'sf/rp_nathan', nathan: 'sf/rp_nathan', eric: 'sf/rp_eric', carla: 'sf/rp_carla', claudia: 'sf/rp_claudia', sophia: 'sf/rp_sophia', manuel: 'sf/rp_manuel', rpm: 'people/readyplayer.me', knight: 'sf/knight_armor', michelle: 'people/Michelle', soldier: 'people/Soldier' };
 export async function loadPeople(kinds = ['hero']) {
   const gl = new GLTFLoader();
   await Promise.all([...new Set(kinds.map(k => KIND[k]))].map(p => ASSETS.models['@' + p] ? null : gl.loadAsync(`${A}${p}.glb`).then(g => { ASSETS.models['@' + p] = g; })));
@@ -125,7 +126,7 @@ export function person(kind = 'hero', { print = kind === 'hero', shirt = null, h
   const root = SkeletonUtils.clone(ASSETS.models[key].scene);
   const g = new THREE.Group(); g.add(root);
   root.traverse(m => { if (m.isMesh) { m.castShadow = true; m.receiveShadow = true; m.frustumCulled = false; if (m.material) { m.material.envMapIntensity = 0.8; } } });
-  const bone = {}; root.traverse(o => { if (o.isBone) { const n = rpName(o.name) || o.name.replace(/^mixamorig:?/, ''); if (!bone[n]) bone[n] = o; } });
+  const bone = {}; root.traverse(o => { if (o.isBone) { const n = boneKey(o.name); if (!bone[n]) bone[n] = o; } });
   // normalise height to `height` metres, feet on y=0
   root.updateMatrixWorld(true); { const b = new THREE.Box3().setFromObject(root, true); const h = b.max.y - b.min.y; if (h > 0.01) { root.scale.multiplyScalar(height / h); root.updateMatrixWorld(true); const b2 = new THREE.Box3().setFromObject(root, true); root.position.y -= b2.min.y; } }
   if (shirt != null) root.traverse(m => { if (m.isMesh && /Outfit_Top/.test(m.name)) { m.material = m.material.clone(); m.material.color.set(shirt); } });
@@ -135,7 +136,7 @@ export function person(kind = 'hero', { print = kind === 'hero', shirt = null, h
   const restPose = {}; Object.keys(src.sb).forEach(n => { restPose[n] = src.sb[n].quaternion.clone(); });
   // rest model-space quats (both in bind pose)
   root.updateMatrixWorld(true); Object.keys(src.sb).forEach(n => src.sb[n].quaternion.copy(restPose[n])); src.root.updateMatrixWorld(true);
-  const names = []; (bone.Hips || root).traverse(o => { if (!o.isBone) return; const n = rpName(o.name) || o.name.replace(/^mixamorig:?/, ''); if (src.sb[n] && bone[n] === o && !names.includes(n)) names.push(n); });
+  const names = []; (bone.Hips || root).traverse(o => { if (!o.isBone) return; const n = boneKey(o.name); if (src.sb[n] && bone[n] === o && !names.includes(n)) names.push(n); });
   // calibrate target into the source's rest pose (A-pose -> T-pose): align each bone->child direction in model space
   g.updateMatrixWorld(true);
   const wp = (o) => { const v = V(); o.getWorldPosition(v); return v; };
