@@ -188,3 +188,18 @@ The approved reference is their short "প্রাচীন যুগে শী
   background (k≈0.75–0.9). It adds pulp, fibres, two soft folds and lamp falloff while keeping the shot's colours. Don't let the
   background gradient go near-black (overlay can't show texture on black): keep the base tone at the palette's mid/dark stop.
   Never on the face footage.
+
+## Backgrounds + motion (2026-11-24, creator's exact wishes — highest priority)
+- **Background = PAPER first, GLASS on top.** Every non-face scene: a LIGHT paper base (never dark/black/red fills) +
+  real paper fibres (`paperOn`) + a glass layer over it (`glossFinish`: curved reflection, drifting specular, sharp glint line,
+  glass-slab bevel). Use `paperGlass`-style composition from `bgkit.js`. References the creator shows are IDEAS of the type
+  (white embossed paper, crumpled paper) — never copy the reference's pattern itself.
+- **Each scene gets its own background, chosen from what that scene says/shows** (money → dollar emboss / kraft crumple;
+  Dubai → sand paper-cut layers; data → linen; tech → circuit emboss; time → clock emboss; question → crumpled sheet;
+  gaming → controller emboss; era videos → era-tinted papers). No two scenes alike, no two videos alike. Light tints only.
+- **Subtly animated:** layers drift, the glass glint sweeps, crumple light orbits — slow, never distracting.
+- **Text on paper prints dark** (paper.js PAPERMODE ink); text on its own dark/red tag stays light (`PAPER_KEEP`).
+- **No generic motion** (`motion.js`): no back-ease pops, RGB glitch, shock rings. Use expo easing, mask reveals from the
+  centre line, blur→sharp, tracking that tightens (`kinetic`), soft rises, one light sweep; parallax (bg slower than fg).
+  Transitions: video A = card-stack / glass edge wipe / zoom-blur; video B = slide with motion blur / rounded iris / split /
+  light leak. Each video uses its own transition family.
