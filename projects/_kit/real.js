@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import { GroundedSkybox } from 'three/addons/objects/GroundedSkybox.js';
+import { Sky } from 'three/addons/objects/Sky.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 
 export const A = './assets/';
@@ -384,3 +385,39 @@ const WATER_FS = `uniform float time; uniform float foamTop; uniform vec3 tint; 
 const WATER_VS = `varying vec2 vUv; varying vec3 vW; void main(){ vUv = uv; vec4 w = modelMatrix*vec4(position,1.); vW = w.xyz; gl_Position = projectionMatrix*viewMatrix*w; }`;
 export const waterMat = (foamTop, tint = 0xffffff) => new THREE.ShaderMaterial({ uniforms: { time: { value: 0 }, foamTop: { value: foamTop }, tint: { value: new THREE.Color(tint) } }, vertexShader: WATER_VS, fragmentShader: WATER_FS, transparent: true, side: THREE.DoubleSide });
 
+
+// Fully 3D world: HDRI only lights the scene (never visible); a physical 3D sky dome + a textured 3D ground.
+// opts: { sunElev (deg), sunAz (deg), turbidity, ground: tex name|null, groundRepeat, groundColor, sun, env, fog: [color, near, far] }
+export function world3d(scene, hdri, o = {}) {
+  scene.children.filter(m => m.isMesh && !m.material.isShadowMaterial && m.geometry && m.geometry.type === 'PlaneGeometry').forEach(m => m.visible = false);
+  scene.environment = ASSETS.env[hdri]; scene.environmentIntensity = o.env ?? 0.8;
+  // gradient sky dome (follows the camera); colours can be overridden
+  const sk = scene.userData.sky; sk.visible = true; const su = sk.material.uniforms;
+  su.top.value.set(o.skyTop ?? 0x2a6fc9); su.mid.value.set(o.skyMid ?? 0x6aa9e6); su.horizon.value.set(o.skyHorizon ?? 0xd6e8f5); su.floorC.value.set(o.skyFloor ?? 0x8a8a82);
+  const phi = THREE.MathUtils.degToRad(90 - (o.sunElev ?? 40)), th = THREE.MathUtils.degToRad(o.sunAz ?? 200);
+  const sunV = new THREE.Vector3().setFromSphericalCoords(1, phi, th);
+  const key = scene.userData.key; key.intensity = o.sun ?? 2.2; key.color.set(o.sunColor ?? 0xfff1dd);
+  if (key.position && o.alignSun !== false) { key.position.copy(sunV).multiplyScalar(40); }
+  const h = scene.children.find(m => m.isHemisphereLight); if (h) h.intensity = o.hemi ?? 0.35;
+  if (o.ground !== null) {
+    const gm = o.ground ? texMat(o.ground, o.groundRepeat ?? 60, o.groundRepeat ?? 60, { roughness: 0.95 }) : new THREE.MeshStandardMaterial({ color: o.groundColor ?? 0x6b8f4a, roughness: 1 });
+    if (o.groundColor && o.ground) gm.color.set(o.groundColor);
+    const g = new THREE.Mesh(new THREE.CircleGeometry(o.groundRadius ?? 400, 96), gm); g.rotation.x = -Math.PI / 2; g.receiveShadow = true; scene.add(g); scene.userData.ground = g;
+  }
+  scene.background = null;
+  if (o.fog) scene.fog = new THREE.Fog(o.fog[0], o.fog[1], o.fog[2]); else scene.fog = null;
+  return scene;
+}
+
+// light instanced grass: n tufts of thin blades over a w x d area centred at (cx, cz); ~30 tris per tuft
+export function grassTufts(n, cx, cz, w, d, { h = 0.28, col = 0x5f8f3a, seed = 7 } = {}) {
+  const blade = new THREE.ConeGeometry(0.012, 1, 3); blade.translate(0, 0.5, 0);
+  const parts = []; for (let k = 0; k < 9; k++) { const b = blade.clone(); b.scale(1, 0.7 + (k % 4) * 0.12, 1); b.rotateZ((k - 4) * 0.13); b.rotateY(k * 0.7); b.translate((k - 4) * 0.012, 0, ((k * 37) % 5 - 2) * 0.01); parts.push(b); }
+  const pos = [], idxs = []; let off = 0; for (const p of parts) { const a = p.attributes.position.array; pos.push(...a); const ix = p.index ? p.index.array : [...Array(a.length / 3).keys()]; idxs.push(...Array.from(ix, v => v + off)); off += a.length / 3; }
+  const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setIndex(idxs); geo.computeVertexNormals();
+  const mat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 });
+  const m = new THREE.InstancedMesh(geo, mat, n); let r = seed; const rnd = () => (r = (r * 16807) % 2147483647) / 2147483647;
+  const M = new THREE.Matrix4(), q = new THREE.Quaternion(), c = new THREE.Color(), base = new THREE.Color(col);
+  for (let i = 0; i < n; i++) { const s = h * (0.6 + rnd() * 0.8); q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), rnd() * 6.28); M.compose(new THREE.Vector3(cx + (rnd() - 0.5) * w, 0, cz + (rnd() - 0.5) * d), q, new THREE.Vector3(s * 1.4, s, s * 1.4)); m.setMatrixAt(i, M); c.copy(base).offsetHSL((rnd() - 0.5) * 0.05, (rnd() - 0.5) * 0.15, (rnd() - 0.5) * 0.12); m.setColorAt(i, c); }
+  m.receiveShadow = true; return m;
+}

@@ -1,0 +1,47 @@
+def rexroar(d=2.2, f=70, seed=3):  # big growl: low saw + throat noise, pitch rises then falls
+    tt = t_(d); r = np.random.default_rng(seed)
+    pitch = f * (1 + 0.5 * np.sin(np.pi * np.clip(tt / d, 0, 1)))
+    ph = 2 * np.pi * np.cumsum(pitch) / SR
+    saw = 2 * (ph / (2 * np.pi) % 1) - 1
+    grit = lp(r.standard_normal(len(tt)), 900, 2) * (0.6 + 0.4 * np.sin(2 * np.pi * 23 * tt))
+    x = lp(saw * 0.7 + grit * 0.6, 1400, 2) + 0.4 * np.sin(ph * 0.5)
+    return norm(x * env(len(tt), 0.15, 0.7), 0.9)
+def raptorcall(d=0.6, f=900, seed=5):  # short raspy shriek
+    tt = t_(d); r = np.random.default_rng(seed)
+    ph = 2 * np.pi * np.cumsum(f * (1.3 - 0.6 * tt / d) + 40 * np.sin(2 * np.pi * 31 * tt)) / SR
+    x = np.sin(ph) * 0.5 + bp(r.standard_normal(len(tt)), 1200, 3200, 2) * 0.6
+    return norm(x * env(len(tt), 0.02, 0.3), 0.7)
+
+# ---- timeline
+put(0.0, 'night', city(2.9), -24)
+put(0.7, 'roar1', rexroar(2.1, 62, 3), -9)
+put(0.75, 'thud1', boom(1.2, 38), -14)
+put(2.85, 'city', city(5.5), -24)
+for n, a in enumerate([2.9 + 0.5 * k for k in range(6)]): put(a, f'heel{n}', step(0.12, 180), -22)
+put(5.6, 'brake', screech(1.0), -15)
+put(5.9, 'honk', horn(0.5, 330), -18)
+for n, a in enumerate([4.9, 5.75, 6.6, 7.45]): put(a, f'stomp{n}', thud(0.7, 45), -12)
+put(6.1, 'gasp', gasps(1.4, 3), -18)
+put(7.0, 'growl', rexroar(1.2, 55, 7), -16)
+put(8.35, 'wind', gust(2.8), -24)
+for n, a in enumerate([8.6, 9.8, 11.0]): put(a, f'sau{n}', boom(1.0, 32), -15)
+put(9.4, 'sauhorn', horn(1.6, 72), -18)
+put(11.15, 'park', birdsfree_breeze(3.0), -26)
+put(11.2, 'raptor1', raptorcall(0.55, 950, 5), -14)
+put(12.2, 'raptor2', raptorcall(0.5, 1100, 6), -16)
+put(11.15, 'paws', footrun(2.9, 9, 2, 120), -18)
+put(14.1, 'engine', engine(3.2, 64), -17)
+put(16.0, 'clang', metalclang(0.9, 900), -16)
+put(16.2, 'rattle', metalclang(0.7, 1300), -20)
+for n, a in enumerate([17.4 + 0.5 * k for k in range(7)]): put(a, f'alarm{n}', alarm(0.45), -13)
+put(17.6, 'run', footrun(3.0, 7, 4, 100), -20)
+put(19.2, 'growl2', rexroar(1.3, 58, 9), -17)
+put(20.85, 'wallwind', gust(1.8), -22)
+put(21.1, 'wallboom', boom(1.2, 36), -17)
+put(22.6, 'ruin', wind(3.2), -22)
+put(23.4, 'sniff', raptorcall(0.35, 700, 11), -19)
+put(25.85, 'drop', darkdrop(2.0), -12)
+put(26.2, 'breath', rexroar(1.4, 40, 13), -18)
+put(27.8, 'squeak', ratsqueak(0.3, 3000), -18)
+for n, a in enumerate([28.4, 29.3, 30.2, 31.1]): put(a, f'step{n}', thud(0.7, 42), -13)
+put(29.6, 'q', riser(1.8), -22)

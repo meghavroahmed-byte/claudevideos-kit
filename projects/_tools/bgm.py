@@ -12,7 +12,7 @@ MOOD = {  # style per video
  'moon-jump':'space','shark':'tension','bear':'adventure','avalanche':'tension','desert-lost':'desert','plane-door':'lofi','ice-lake':'ice','caffeine':'lofi','sugar':'playful',
  'phone-sleep':'night','hair-growth':'lofi','fingernails':'lofi','ears-pop':'lofi','eye-blink':'lofi','heart-beats':'adventure','castle-siege':'epic','viking-ship':'epic',
  'samurai-armor':'asian','mummy':'ancient','caveman-fire':'tribal','medieval-doctor':'medieval','ant-strength':'playful','octopus':'ocean','elephant-memory':'safari',
- 'cheetah':'adventure','everest':'ice','earthquake':'tension','tornado':'tension','sun-stare':'mystery','giant-rat':'tension','duck-float':'playful','baby-memory':'mystery'}[P]
+ 'cheetah':'adventure','everest':'ice','earthquake':'tension','tornado':'tension','sun-stare':'mystery','giant-rat':'tension','duck-float':'playful','baby-memory':'mystery','dino-world':'epic','how-rare':'playful'}[P]
 ST = { # bpm range, scale, wave, pad, drums
  'night':(70,'minor',1,1,0),'space':(64,'lydian',3,1,0),'tension':(92,'phrygian',2,1,2),'adventure':(108,'major',2,0,1),'ocean':(68,'dorian',1,1,0),'playful':(116,'major',0,0,1),
  'desert':(84,'hijaz',2,1,3),'ancient':(88,'hijaz',2,1,3),'medieval':(96,'dorian',2,0,3),'epic':(96,'minor',2,1,2),'safari':(104,'mixolydian',0,0,3),'jungle':(100,'pent',0,0,3),

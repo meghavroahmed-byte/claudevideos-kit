@@ -1,6 +1,4 @@
 node_modules
-*.mp4
-stills/
 *.log
-l.txt
-audio/*.wav
+st*/
+sfx/

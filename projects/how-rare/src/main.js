@@ -5,7 +5,8 @@ import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-import { SHOTS, CAPTIONS, DURATION, FADES } from './shots.js';
+import { SHOTS, CAPTIONS, DURATION, FADES, PRELOAD } from './shots.js';
+export { THREE };
 
 const W = 720, H = 1280;
 const renderer = new THREE.WebGLRenderer({ antialias: false, preserveDrawingBuffer: true, powerPreference: 'high-performance' });
@@ -80,7 +81,7 @@ export function makeStage({ shadowSize = 3, sunDir = [-3, 6, 4], sun = 2.3 } = {
 }
 
 // ---------- post ----------
-const rt = new THREE.WebGLRenderTarget(W, H, { samples: 4, type: THREE.HalfFloatType });
+const rt = new THREE.WebGLRenderTarget(W, H, { samples: 2, type: THREE.HalfFloatType });
 const composer = new EffectComposer(renderer, rt);
 const dummyScene = new THREE.Scene(), dummyCam = new THREE.PerspectiveCamera();
 const renderPass = new RenderPass(dummyScene, dummyCam);
@@ -127,7 +128,7 @@ window.renderAt = (t) => {
   renderPass.scene = bokeh.scene = shot.scene;
   renderPass.camera = bokeh.camera = cam;
   const dof = r.dof || { focus: 3, aperture: 0, maxblur: 0 };
-  bokeh.enabled = dof.aperture > 0;
+  bokeh.enabled = false;
   bokeh.uniforms.focus.value = dof.focus;
   bokeh.uniforms.aperture.value = dof.aperture;
   bokeh.uniforms.maxblur.value = dof.maxblur ?? 0.012;
@@ -138,7 +139,7 @@ window.renderAt = (t) => {
   composer.render();
   // captions + fades
   const c = CAPTIONS.filter(c => t >= c[0]).pop();
-  capEl.textContent = c && (c[2] == null || t < c[2]) ? c[1] : '';
+  const ctext = c && (c[2] == null || t < c[2]) ? c[1] : ''; if (capEl.textContent !== ctext) capEl.textContent = ctext; const pk = c ? Math.min(1, (t - c[0]) / 0.08) : 1; capEl.style.transform = `scale(${0.8 + 0.2 * pk})`;
   let f = 0;
   for (const [a, b, c2, d] of FADES) if (t >= a && t < d) f = Math.max(f, t < b ? (t - a) / (b - a) : t < c2 ? 1 : (d - t) / (d - c2));
   fadeEl.style.opacity = f;
@@ -148,7 +149,7 @@ window.renderAt = (t) => {
 
 // interactive preview: ?t=12.3 for a still, otherwise realtime playback
 const qs = new URLSearchParams(location.search);
-window.ready = document.fonts.ready.then(() => true);
+window.ready = Promise.all([document.fonts.ready, PRELOAD ? PRELOAD(renderer) : null]).then(() => true);
 if (qs.has('t')) window.ready.then(() => window.renderAt(parseFloat(qs.get('t'))));
 else if (!qs.has('render')) {
   const audio = new Audio('./audio.m4a');
