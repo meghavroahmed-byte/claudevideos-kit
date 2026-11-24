@@ -61,11 +61,20 @@ function head(g, s, x, y, size, k, col = '#fff', o = {}) { if (k <= 0) return; i
   g.lineJoin = 'round'; g.lineWidth = size * 0.16; g.strokeStyle = DINK; g.strokeText(s, x, yy); g.fillStyle = col; g.fillText(s, x, yy); g.restore();
   if (o.bar) { g.save(); g.fillStyle = o.bar; g.fillRect(x - (w / 2) * u, y + size * 0.62, w * u, 10); g.restore(); } }
 // price plate: count-up with tick digits
-function price(g, label, val, unit, x, y, e, k, o = {}) { if (k <= 0) return; const E = ERA[e], u = 0.88 + 0.12 * expoOut(clamp(k * 1.4)), c = clamp((k - 0.15) / 0.7); g.save(); g.globalAlpha = clamp(k * 4); if (k < 0.5) g.filter = `blur(${((0.5 - k) * 16).toFixed(1)}px)`; const num = val < 10 ? (val * easeOut(c)).toFixed(o.dec || 0) : Math.round(val * easeOut(c)); const s = '$' + BN(num) + (o.plus && c >= 1 ? '+' : '');
-  g.save(); g.translate(x, y); g.scale(u, u); g.font = BNF(o.size || 120); const w1 = g.measureText(s).width; g.font = BNF((o.size || 120) * 0.5); const w2 = g.measureText(' ' + unit).width; const W_ = w1 + w2 + 90, H_ = (o.size || 120) * 1.35;
-  g.fillStyle = DINK; g.fillRect(-W_ / 2 + 16, -H_ / 2 + 16, W_, H_); g.fillStyle = E.ac; g.fillRect(-W_ / 2, -H_ / 2, W_, H_);
-  g.fillStyle = DINK; g.textBaseline = 'middle'; g.textAlign = 'left'; g.font = BNF(o.size || 120); g.fillText(s, -W_ / 2 + 45, 6); g.font = BNF((o.size || 120) * 0.5); g.fillText(' ' + unit, -W_ / 2 + 45 + w1, 12);
-  g.font = BNF(34); const lw = g.measureText(label).width + 40; g.fillStyle = DINK; g.fillRect(-W_ / 2, -H_ / 2 - 54, lw, 54); g.fillStyle = E.ac; g.textAlign = 'left'; g.fillText(label, -W_ / 2 + 20, -H_ / 2 - 25); g.restore(); g.restore(); }
+function price(g, label, val, unit, x, y, e, k, o = {}) { if (k <= 0) return; const E = ERA[e], ek = expoOut(clamp(k * 1.3)), c = clamp((k - 0.12) / 0.75);
+  const num = val < 10 ? (val * expoOut(c)).toFixed(o.dec || 0) : Math.round(val * expoOut(c)); const s = '$' + BN(num) + (o.plus && c >= 1 ? '+' : ''); const sz = o.size || 150;
+  g.save(); g.font = `800 ${sz}px "Nirmala UI"`; const w1 = g.measureText(s).width; g.font = `600 ${Math.round(sz * 0.34)}px "Nirmala UI"`; const w2 = g.measureText(unit).width; const W_ = w1 + w2 + 150, H_ = sz * 1.45, X = x - W_ / 2, Y = y - H_ / 2 + (1 - ek) * 70;
+  g.globalAlpha = clamp(k * 4);
+  // frosted glass card: blurred copy of what is behind it, white tint, edge light, soft shadow
+  g.save(); g.shadowColor = 'rgba(40,25,20,0.28)'; g.shadowBlur = 60; g.shadowOffsetY = 24; g.beginPath(); g.roundRect(X, Y, W_, H_, 46); g.fillStyle = 'rgba(255,255,255,0.01)'; g.fill(); g.restore();
+  g.save(); g.beginPath(); g.roundRect(X, Y, W_, H_, 46); g.clip(); g.filter = 'blur(18px)'; g.drawImage(g.canvas, 0, 0); g.filter = 'none'; g.fillStyle = 'rgba(255,255,255,0.5)'; g.fillRect(X, Y, W_, H_);
+  const hl = g.createLinearGradient(0, Y, 0, Y + H_); hl.addColorStop(0, 'rgba(255,255,255,0.75)'); hl.addColorStop(0.45, 'rgba(255,255,255,0.08)'); hl.addColorStop(1, 'rgba(255,255,255,0.2)'); g.fillStyle = hl; g.fillRect(X, Y, W_, H_ * 0.5);
+  const sw = clamp((k - 0.85) / 0.5); if (sw > 0 && sw < 1) { const sx = X - 200 + (W_ + 400) * expoIO(sw); const lg = g.createLinearGradient(sx - 120, 0, sx + 120, 0); lg.addColorStop(0, 'rgba(255,255,255,0)'); lg.addColorStop(0.5, 'rgba(255,255,255,0.6)'); lg.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = lg; g.fillRect(X, Y, W_, H_); }
+  g.restore(); g.save(); g.beginPath(); g.roundRect(X + 1, Y + 1, W_ - 2, H_ - 2, 45); g.strokeStyle = 'rgba(255,255,255,0.95)'; g.lineWidth = 2.5; g.stroke(); g.restore();
+  // the number, its unit, and an era-coloured hairline that draws under it
+  g.textBaseline = 'middle'; g.textAlign = 'left'; g.font = `800 ${sz}px "Nirmala UI"`; g.fillStyle = '#16120f'; g.fillText(s, X + 70, Y + H_ * 0.5 + 4); g.font = `600 ${Math.round(sz * 0.34)}px "Nirmala UI"`; g.fillStyle = E.ac; g.fillText(unit, X + 80 + w1, Y + H_ * 0.5 + sz * 0.2);
+  const lk = expoOut(clamp((k - 0.3) / 0.7)); g.fillStyle = E.ac; g.fillRect(X + 70, Y + H_ - 34, (W_ - 140) * lk, 5); g.restore(); }
+
 // ---------- the creator's character in a flat panel ----------
 let WC, WG, PT;
 function charPanel(g, act, t, t0, win, e, o = {}) { const E = ERA[e]; const k = clamp((t - t0) / 0.5); if (k <= 0) return; const u = 1;
@@ -83,12 +92,12 @@ function totalAt(t) { let v = 0, pv = 0, ta = -9; for (const [a, x] of TOT) { if
 function hud(g, t, e) { const idx = YEARS.indexOf(e); g.save(); const y = 120, x0 = 110, x1 = 970, n = YEARS.length; g.strokeStyle = window.PAPERMODE ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.25)'; g.lineWidth = 4; g.beginPath(); g.moveTo(x0, y); g.lineTo(x1, y); g.stroke();
   const pos = i => x0 + (x1 - x0) * i / (n - 1); const cur = idx < 0 ? -1 : idx; g.strokeStyle = ERA[e] ? ERA[e].ac : '#fff'; g.lineWidth = 6; if (cur >= 0) { g.beginPath(); g.moveTo(x0, y); g.lineTo(pos(cur), y); g.stroke(); }
   YEARS.forEach((k, i) => { const on = i === cur, past = i < cur; g.fillStyle = on ? ERA[k].ac : past ? '#fff' : 'rgba(255,255,255,0.35)'; g.beginPath(); g.arc(pos(i), y, on ? 13 : 8, 0, 7); g.fill(); if (on) { g.strokeStyle = DINK; g.lineWidth = 4; g.stroke(); } g.font = JAK(on ? 30 : 22); g.textAlign = 'center'; g.fillStyle = on ? ERA[k].ac : 'rgba(255,255,255,0.55)'; g.fillText(ERA[k].yr, pos(i), y - 30); });
-  const [v, live] = totalAt(t); if (t > A.r3) { const s = '$' + (v * 1e9).toLocaleString('en-US', { maximumFractionDigits: 0 }); g.font = JAK(46); const w = g.measureText(s).width; const bx = 540 - (w + 230) / 2; g.fillStyle = 'rgba(12,10,12,0.86)'; g.fillRect(bx, 170, w + 230, 70); g.fillStyle = live ? CASH : '#fff'; g.fillRect(bx, 170, 8, 70); g.font = BNF(28); g.fillStyle = '#fffffe'; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillText('সিরিজের মোট', bx + 26, 207); g.font = JAK(46); g.fillStyle = live ? CASH : '#fffffe'; g.fillText(s, bx + 200, 208); }
+  const [v, live] = totalAt(t); if (false) { const s = '$' + (v * 1e9).toLocaleString('en-US', { maximumFractionDigits: 0 }); g.font = JAK(46); const w = g.measureText(s).width; const bx = 540 - (w + 230) / 2; g.fillStyle = 'rgba(12,10,12,0.86)'; g.fillRect(bx, 170, w + 230, 70); g.fillStyle = live ? CASH : '#fff'; g.fillRect(bx, 170, 8, 70); g.font = BNF(28); g.fillStyle = '#fffffe'; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillText('সিরিজের মোট', bx + 26, 207); g.font = JAK(46); g.fillStyle = live ? CASH : '#fffffe'; g.fillText(s, bx + 200, 208); }
   g.restore(); }
 // ---------- small self-made pieces ----------
-function redacted(g, t, x, y, w, k, e) { if (k <= 0) return; const E = ERA[e]; g.save(); g.globalAlpha = clamp(k * 3); g.fillStyle = PAPER; g.fillRect(x, y, w, 420); g.fillStyle = DINK; g.font = JAK(30); g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillText('SALES REPORT · GTA / GTA 2', x + 30, y + 44); g.fillRect(x + 30, y + 72, w - 60, 4);
+function redacted(g, t, x, y, w, k, e) { if (k <= 0) return; const E = ERA[e]; g.save(); g.globalAlpha = clamp(k * 3); g.fillStyle = PAPER; g.fillRect(x, y, w, 420); g.fillStyle = DINK; g.font = JAK(30); g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillText('SALES REPORT', x + 30, y + 44); g.fillRect(x + 30, y + 72, w - 60, 4);
   for (let i = 0; i < 6; i++) { const kk = clamp((k - 0.15 - i * 0.08) / 0.2); g.fillStyle = 'rgba(11,11,13,0.35)'; g.fillRect(x + 30, y + 110 + i * 48, 160, 16); g.fillStyle = DINK; g.fillRect(x + 220, y + 104 + i * 48, (w - 260) * kk * (0.6 + hash(i) * 0.4), 30); }
-  const mk = clamp((k - 0.7) / 0.2); if (mk > 0) { g.font = BNF(64); const s = 'তথ্য নেই'; const tw = g.measureText(s).width + 60; g.globalAlpha = mk; g.fillStyle = '#e8413a'; g.fillRect(x + w / 2 - tw / 2, y + 330, tw, 84); g.fillStyle = '#fff'; g.textAlign = 'center'; g.fillText(s, x + w / 2, y + 374); }
+  const mk = clamp((k - 0.7) / 0.25); if (mk > 0) { const e2 = expoOut(mk), cx2 = x + w / 2, cy2 = y + 240, L = 120; g.save(); g.strokeStyle = '#d8262e'; g.lineWidth = 22; g.lineCap = 'round'; g.globalAlpha = 0.92; g.beginPath(); g.moveTo(cx2 - L, cy2 - L); g.lineTo(cx2 - L + 2 * L * e2, cy2 - L + 2 * L * e2); g.stroke(); const e3 = expoOut(clamp((mk - 0.35) / 0.65)); if (e3 > 0) { g.beginPath(); g.moveTo(cx2 + L, cy2 - L); g.lineTo(cx2 + L - 2 * L * e3, cy2 - L + 2 * L * e3); g.stroke(); } g.restore(); }
   const sx = x + 60 + (Math.sin(t * 2.2) * 0.5 + 0.5) * (w - 140), sy = y + 200 + Math.cos(t * 1.7) * 60; g.globalAlpha = 1; g.strokeStyle = E.ac; g.lineWidth = 10; g.beginPath(); g.arc(sx, sy, 46, 0, 7); g.stroke(); g.beginPath(); g.moveTo(sx + 32, sy + 32); g.lineTo(sx + 80, sy + 80); g.lineWidth = 16; g.stroke(); g.restore(); }
 function qmarks(g, t, cx, cy, r, k, col) { for (let i = 0; i < 7; i++) { const kk = clamp((k - i * 0.08) / 0.25); if (kk <= 0) continue; const a = i / 7 * 6.28 + 0.3, b = Math.sin(t * 3 + i) * 10; g.save(); g.translate(cx + Math.cos(a) * r, cy + Math.sin(a) * r * 0.8 + b); g.scale(easeOutBack(kk), easeOutBack(kk)); g.font = JAK(60 + hash(i) * 50); g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineWidth = 10; g.strokeStyle = DINK; g.strokeText('?', 0, 0); g.fillStyle = col; g.fillText('?', 0, 0); g.restore(); } }
 function scramble(g, t, x, y, k, e) { if (k <= 0) return; const E = ERA[e]; g.save(); g.globalAlpha = clamp(k * 3); g.fillStyle = DINK; g.fillRect(x - 190, y - 60, 380, 120); g.strokeStyle = E.ac; g.lineWidth = 5; g.strokeRect(x - 190, y - 60, 380, 120); g.font = JAK(70); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = E.ac; let s = '$'; for (let i = 0; i < 5; i++) s += '0123456789?'[Math.floor(hash(i * 7 + x + Math.floor(t * 18)) * 11)]; g.fillText(s, x, y + 4); g.restore(); }
@@ -137,77 +146,77 @@ const SCENE2 = {
   18: { light: true, f: PAP2((g, t) => bgEmboss(g, t, { c0: '#fbefe9', c1: '#f1dcd2', kind: 'clock' })) },                                               // $3B in one day: clock emboss
   19: { light: true, f: PAP2((g, t) => drawFolds(g, FD2, t, { base: [248, 234, 230], k: 85 })) },                                                       // comment: blush folded sheet
 };
+// top-down pixel road with little pixel cars (the 1997 look, drawn by us)
+function pixelRoad(g, t, x, y, w, h, k) { if (k <= 0) return; g.save(); g.globalAlpha = clamp(k * 3); revealClip(g, { x, y, w, h }, k); const q = 20; g.fillStyle = '#1f2a22'; g.fillRect(x, y, w, h);
+  for (let yy = y; yy < y + h; yy += q) for (let xx = x; xx < x + w; xx += q) { const i = ((xx - x) / q) | 0, j = ((yy - y) / q) | 0; const road = j % 6 === 2 || j % 6 === 3 || i % 9 === 4 || i % 9 === 5; g.fillStyle = road ? '#4a4f55' : (hash(i * 31 + j) > 0.5 ? '#2e5a37' : '#6b4b3a'); g.fillRect(xx + 1, yy + 1, q - 2, q - 2); if (road && (j % 6 === 2) && i % 2 === 0) { g.fillStyle = '#d9c84a'; g.fillRect(xx + 6, yy + q - 3, 8, 3); } }
+  const car = (cx, cy, col, horiz) => { g.fillStyle = col; if (horiz) { g.fillRect(cx - 24, cy - 12, 48, 24); g.fillStyle = '#9fd3ff'; g.fillRect(cx + 6, cy - 9, 10, 18); } else { g.fillRect(cx - 12, cy - 24, 24, 48); g.fillStyle = '#9fd3ff'; g.fillRect(cx - 9, cy - 16, 18, 10); } };
+  for (let r = 0; r * q * 6 < h; r++) { const cy = y + (r * 6 + 3) * q; car(x + ((t * 260 + r * 400) % (w + 100)) - 50, cy - 10 + (r % 2) * 20, ['#e8413a', '#2f7ff0', '#f2c230'][r % 3], true); }
+  for (let c = 0; c * q * 9 < w; c++) { const cx = x + (c * 9 + 5) * q; car(cx - 10, y + h - ((t * 200 + c * 300) % (h + 100)) + 50, ['#f0f0f0', '#33c26a'][c % 2], false); }
+  g.restore(); g.save(); g.strokeStyle = '#ffffff'; g.lineWidth = 8; g.globalAlpha = clamp(k * 3); g.strokeRect(x - 4, y - 4, w + 8, h + 8); g.restore(); }
+// a crowd that lights up person by person (everyone knows him)
+function crowd(g, t, x0, y0, cols, rows, sz, k, col) { const n = cols * rows, m = Math.floor(n * expoOut(clamp(k))); for (let i = 0; i < n; i++) { const cx = x0 + (i % cols) * sz + ((Math.floor(i / cols)) % 2) * sz * 0.5, cy = y0 + Math.floor(i / cols) * sz * 0.9, on = i < m, b = on ? Math.sin(t * 5 + i) * 2 : 0; g.fillStyle = on ? (i % 7 === 0 ? '#e07a1f' : col) : 'rgba(60,60,60,0.22)'; g.beginPath(); g.arc(cx, cy - sz * 0.2 + b, sz * 0.17, 0, 7); g.fill(); g.beginPath(); g.roundRect(cx - sz * 0.24, cy + b, sz * 0.48, sz * 0.34, sz * 0.14); g.fill(); if (on && hash(i) > 0.8) { g.fillStyle = '#fff'; g.beginPath(); g.arc(cx + sz * 0.22, cy - sz * 0.42 + b, sz * 0.12, 0, 7); g.fill(); g.fillStyle = col; g.font = `bold ${Math.round(sz * 0.16)}px "Plus Jakarta Sans"`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('!', cx + sz * 0.22, cy - sz * 0.42 + b); } } }
+// a gold crown dropping onto the cover (richest game)
+function crown(g, t, cx, cy, s, k) { if (k <= 0) return; const e = expoOut(clamp(k)); g.save(); g.translate(cx, cy - (1 - e) * 260); g.globalAlpha = clamp(k * 3); g.scale(s, s); g.rotate(Math.sin(t * 2) * 0.03); const gr = g.createLinearGradient(0, -90, 0, 60); gr.addColorStop(0, '#ffe38a'); gr.addColorStop(0.5, '#f2b52c'); gr.addColorStop(1, '#b97a10'); g.fillStyle = gr; g.strokeStyle = '#7a4a05'; g.lineWidth = 5; g.beginPath(); g.moveTo(-130, 50); g.lineTo(-150, -60); g.lineTo(-70, 0); g.lineTo(0, -95); g.lineTo(70, 0); g.lineTo(150, -60); g.lineTo(130, 50); g.closePath(); g.fill(); g.stroke(); g.fillRect(-135, 50, 270, 34); g.strokeRect(-135, 50, 270, 34); ['#e23d55', '#2f7ff0', '#33c26a'].forEach((c, i) => { g.fillStyle = c; g.beginPath(); g.arc(-80 + i * 80, 67, 11, 0, 7); g.fill(); }); [[-150, -60], [0, -95], [150, -60]].forEach(([x, y]) => { g.fillStyle = '#fff6d0'; g.beginPath(); g.arc(x, y, 12, 0, 7); g.fill(); }); const sw = (t * 0.8) % 1; g.globalCompositeOperation = 'source-atop'; const lg = g.createLinearGradient(-200 + 400 * sw, 0, -120 + 400 * sw, 0); lg.addColorStop(0, 'rgba(255,255,255,0)'); lg.addColorStop(0.5, 'rgba(255,255,255,0.7)'); lg.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = lg; g.fillRect(-160, -100, 320, 190); g.restore(); }
 // ---------- beats ----------
 const B = []; const beat = (t0, e, tr, d) => B.push({ t0, e, tr, d });
 // 0 FACE hook (punch zoom)
 beat(0, 'face0', 'none', (g, t, b) => { logoFlat(g, t, 0.05, 540, 1190, 360); chestPlate(g, t, 0.6, 'GTA সিরিজ', 'কোন গেম কত কামাইছে?', 'vi6'); });
 // 1 1997: GTA 1 + GTA 2 box art
-beat(2.9, 'pix', 'pixel', (g, t, b) => { const lt = t - b.t0; head(g, '১৯৯৭', 540, 380, 170, S(t, b.t0 + 0.05, 0.4), ERA.pix.ac);
-  pcard(g, 'GTA_-_Box_Front.jpg', { x: 90, y: 560, w: 420, h: 560 }, 'pix', clamp(lt / 0.35), { label: 'GTA', t0: b.t0, retro: true });
-  pcard(g, 'GTA2_Box_art.jpg', { x: 570, y: 560, w: 420, h: 560 }, 'pix', clamp((t - 4.3) / 0.35), { label: 'GTA 2', t0: 4.3, retro: true, shadow: ERA.pix.ac2 });
-  head(g, 'GTA আর GTA 2', 540, 1330, 92, S(t, 4.4), '#fff', { bar: ERA.pix.ac }); });
+beat(2.9, 'pix', 'pixel', (g, t, b) => { const lt = t - b.t0;
+  pcard(g, 'GTA_-_Box_Front.jpg', { x: 90, y: 300, w: 420, h: 560 }, 'pix', clamp(lt / 0.35), { label: 'GTA', t0: b.t0, retro: true });
+  pcard(g, 'GTA2_Box_art.jpg', { x: 570, y: 300, w: 420, h: 560 }, 'pix', clamp((t - 4.3) / 0.35), { label: 'GTA 2', t0: 4.3, retro: true, shadow: ERA.pix.ac2 }); pixelRoad(g, t, 90, 1010, 900, 560, clamp((t - b.t0 - 0.2) / 0.5)); });
 // 2 income report never published
-beat(5.6, 'pix', 'push', (g, t, b) => { const lt = t - b.t0; pcard(g, 'GTA1_PC_in-game_screenshot.png', { x: 90, y: 300, w: 900, h: 520 }, 'pix', clamp(lt / 0.35), { label: 'GTA (১৯৯৭) গেমপ্লে', t0: b.t0, retro: true });
-  redacted(g, t, 90, 900, 600, clamp((lt - 0.3) / 1.6), 'pix'); charPanel(g, 'confused', t, b.t0 + 0.6, { x: 720, y: 960, w: 290, h: 360 }, 'pix', { face: 'confused', z: 1.6, fy: 560 });
-  head(g, 'আয়ের হিসাব প্রকাশ হয়নি', 540, 1490, 70, S(t, 6.8), '#fff', { bar: '#e8413a' }); });
+beat(5.6, 'pix', 'push', (g, t, b) => { const lt = t - b.t0; pcard(g, 'GTA1_PC_in-game_screenshot.png', { x: 90, y: 300, w: 900, h: 520 }, 'pix', clamp(lt / 0.35), { label: 'GTA', t0: b.t0, retro: true });
+  redacted(g, t, 90, 900, 600, clamp((lt - 0.3) / 1.6), 'pix'); charPanel(g, 'confused', t, b.t0 + 0.6, { x: 720, y: 960, w: 290, h: 360 }, 'pix', { face: 'confused', z: 1.6, fy: 560 }); });
 // 3 "so I can't tell you either"
 beat(8.6, 'pix', 'blocks', (g, t, b) => { const lt = t - b.t0; charPanel(g, 'shrug', t, b.t0, { x: 140, y: 360, w: 800, h: 820 }, 'pix', { z: 1.1, fy: 600, talk: true });
-  qmarks(g, t, 540, 770, 470, clamp(lt / 1.2), ERA.pix.ac); head(g, 'সঠিক হিসাব কেউ জানে না', 540, 1350, 74, S(t, b.t0 + 0.4), '#fff', { bar: ERA.pix.ac }); });
+  qmarks(g, t, 540, 770, 470, clamp(lt / 1.2), ERA.pix.ac); });
 // 4 how much did GTA 1 & 2 make? scrambling price tags
 beat(11.38, 'pix', 'push', (g, t, b) => { const lt = t - b.t0; pcard(g, 'GTA_-_Box_Front.jpg', { x: 110, y: 380, w: 380, h: 500 }, 'pix', clamp(lt / 0.3), { label: 'GTA', t0: b.t0, retro: true });
   pcard(g, 'GTA2_Box_art.jpg', { x: 590, y: 380, w: 380, h: 500 }, 'pix', clamp((lt - 0.15) / 0.3), { label: 'GTA 2', t0: b.t0, retro: true, shadow: ERA.pix.ac2 });
-  scramble(g, t, 300, 1040, clamp((lt - 0.5) / 0.3), 'pix'); scramble(g, t, 780, 1040, clamp((lt - 0.7) / 0.3), 'pix');
-  head(g, 'মোট কত কামাইছে?', 540, 1290, 96, S(t, b.t0 + 0.5), '#fff'); charPanel(g, 'think', t, b.t0 + 1.2, { x: 340, y: 1420, w: 400, h: 330 }, 'pix', { z: 1.5, fy: 520 }); });
+  scramble(g, t, 300, 1040, clamp((lt - 0.5) / 0.3), 'pix'); scramble(g, t, 780, 1040, clamp((lt - 0.7) / 0.3), 'pix'); charPanel(g, 'think', t, b.t0 + 1.2, { x: 340, y: 1420, w: 400, h: 330 }, 'pix', { z: 1.5, fy: 520 }); });
 // 5 GTA III — Liberty City, $508M
-beat(15.94, 'lib', 'rise', (g, t, b) => { const lt = t - b.t0; pcard(g, t < 18.3 ? 'gta3_shot05.jpg' : 'gta3_shot03.jpg', { x: 90, y: 330, w: 900, h: 620 }, 'lib', clamp(lt / 0.35), { label: 'GTA III · লিবার্টি সিটি', year: '2001', t0: t < 18.3 ? b.t0 : 18.3 });
-  head(g, 'GTA 3', 540, 1110, 120, S(t, b.t0 + 0.2), ERA.lib.ac, { lat: true }); price(g, 'আনুমানিক আয়', 508, 'মিলিয়ন', 540, 1380, 'lib', clamp((t - A.r3) / 0.9));
+beat(15.94, 'lib', 'rise', (g, t, b) => { const lt = t - b.t0; pcard(g, t < 18.3 ? 'gta3_shot05.jpg' : 'gta3_shot03.jpg', { x: 90, y: 330, w: 900, h: 620 }, 'lib', clamp(lt / 0.35), { label: 'GTA III', t0: t < 18.3 ? b.t0 : 18.3 }); price(g, 'আনুমানিক আয়', 508, 'মিলিয়ন', 540, 1380, 'lib', clamp((t - A.r3) / 0.9));
   charPanel(g, 'point', t, A.r3 + 0.4, { x: 700, y: 1560, w: 300, h: 280 }, 'lib', { z: 1.6, fy: 520 }); });
 // 6 Vice City — childhood emotion
-beat(19.92, 'vice', 'vhs', (g, t, b) => { const lt = t - b.t0; pcard(g, t < 21.4 ? 'vc_shot04.jpg' : 'vcde_shot01.jpg', { x: 90, y: 320, w: 900, h: 560 }, 'vice', clamp(lt / 0.35), { label: 'Vice City', year: '2002', t0: t < 21.4 ? b.t0 : 21.4 });
-  charPanel(g, 'cheer', t, A.emo - 0.1, { x: 230, y: 990, w: 620, h: 460 }, 'vice', { face: 'happy', z: 1.15, cy: 470, tag: 'ছোটবেলা' }); hearts(g, t, 540, 1150, clamp((t - A.emo) / 0.5));
-  head(g, 'ছোটবেলার ইমোশন', 540, 1590, 92, S(t, A.emo + 0.1), '#fff', { bar: ERA.vice.ac }); });
+beat(19.92, 'vice', 'vhs', (g, t, b) => { const lt = t - b.t0; pcard(g, t < 21.4 ? 'vc_shot04.jpg' : 'vcde_shot01.jpg', { x: 90, y: 320, w: 900, h: 560 }, 'vice', clamp(lt / 0.35), { label: 'Vice City', t0: t < 21.4 ? b.t0 : 21.4 });
+  charPanel(g, 'cheer', t, A.emo - 0.1, { x: 230, y: 990, w: 620, h: 460 }, 'vice', { face: 'happy', z: 1.15, cy: 470 }); hearts(g, t, 540, 1150, clamp((t - A.emo) / 0.5)); });
 // 7 Vice City revenue $613M
-beat(22.9, 'vice', 'push', (g, t, b) => { const lt = t - b.t0; pcard(g, 'vc_shot01.jpg', { x: 90, y: 330, w: 900, h: 640 }, 'vice', clamp(lt / 0.35), { label: 'ভাইস সিটি · মায়ামি', t0: b.t0, shadow: ERA.vice.ac2 });
+beat(22.9, 'vice', 'push', (g, t, b) => { const lt = t - b.t0; pcard(g, 'vc_shot01.jpg', { x: 90, y: 330, w: 900, h: 640 }, 'vice', clamp(lt / 0.35), { label: 'Vice City', t0: b.t0, shadow: ERA.vice.ac2 });
   price(g, 'আনুমানিক আয়', 613, 'মিলিয়ন', 540, 1270, 'vice', clamp((t - A.r_vc) / 0.9)); cashStack(g, 300, 1640, 1.3, 16, clamp((t - A.r_vc - 0.2) / 1.0)); cashStack(g, 540, 1640, 1.3, 22, clamp((t - A.r_vc - 0.3) / 1.0)); cashStack(g, 780, 1640, 1.3, 18, clamp((t - A.r_vc - 0.4) / 1.0)); });
 // 8 San Andreas
-beat(25.98, 'sa', 'rise', (g, t, b) => { const lt = t - b.t0; pcard(g, 'sa_shot03.jpg', { x: 90, y: 330, w: 900, h: 640 }, 'sa', clamp(lt / 0.35), { label: 'San Andreas', year: '2004', t0: b.t0 });
-  head(g, 'স্যান অ্যান্ড্রিয়াস', 540, 1150, 100, S(t, b.t0 + 0.2), ERA.sa.ac2, { bar: ERA.sa.ac }); });
+beat(25.98, 'sa', 'rise', (g, t, b) => { const lt = t - b.t0; pcard(g, 'sa_shot03.jpg', { x: 90, y: 330, w: 900, h: 640 }, 'sa', clamp(lt / 0.35), { label: 'San Andreas', t0: b.t0 }); });
 // 9 CJ — everyone knows him
-beat(27.58, 'sa', 'push', (g, t, b) => { const lt = t - b.t0; pcard(g, 'sade_shot01.jpg', { x: 80, y: 330, w: 560, h: 820 }, 'sa', clamp(lt / 0.3), { label: 'CJ ভাই', t0: b.t0, dx: 40 });
-  charPanel(g, 'point', t, b.t0 + 0.3, { x: 680, y: 560, w: 330, h: 520 }, 'sa', { z: 1.25, fy: 560, s: 0.95, pose: {}, tag: 'আমরা' });
-  head(g, 'CJ ভাই', 540, 1330, 120, S(t, A.cj + 0.1), ERA.sa.ac, { bar: ERA.sa.ac2 }); head(g, 'কমবেশি সবাই চিনে', 540, 1490, 64, S(t, A.cj + 0.6), '#fff'); });
+beat(27.58, 'sa', 'push', (g, t, b) => { const lt = t - b.t0; pcard(g, 'sade_shot01.jpg', { x: 80, y: 330, w: 560, h: 820 }, 'sa', clamp(lt / 0.3), { label: 'CJ', t0: b.t0, dx: 40 });
+  charPanel(g, 'point', t, b.t0 + 0.3, { x: 680, y: 560, w: 330, h: 520 }, 'sa', { z: 1.25, fy: 560, s: 0.95, pose: {} }); crowd(g, t, 130, 1310, 8, 4, 112, clamp((t - A.cj - 0.2) / 1.6), '#2f8f45'); });
 // 10 SA revenue $923M
-beat(30.3, 'sa', 'blocks', (g, t, b) => { const lt = t - b.t0; pcard(g, 'sa_shot08.jpg', { x: 90, y: 330, w: 900, h: 600 }, 'sa', clamp(lt / 0.35), { label: 'গ্রোভ স্ট্রিট', t0: b.t0, shadow: ERA.sa.ac2 });
-  head(g, 'CJ ভাইয়ের গেম কামাইছে…', 540, 1080, 66, S(t, b.t0 + 0.3), '#fff'); price(g, 'আনুমানিক আয়', 923, 'মিলিয়ন', 540, 1330, 'sa', clamp((t - A.r_sa) / 0.9));
+beat(30.3, 'sa', 'blocks', (g, t, b) => { const lt = t - b.t0; pcard(g, 'sa_shot08.jpg', { x: 90, y: 330, w: 900, h: 600 }, 'sa', clamp(lt / 0.35), { label: 'San Andreas', t0: b.t0, shadow: ERA.sa.ac2 }); price(g, 'আনুমানিক আয়', 923, 'মিলিয়ন', 540, 1330, 'sa', clamp((t - A.r_sa) / 0.9));
   if (t > A.r_sa) moneyRain(g, t, 18, 0.9, 1); charPanel(g, 'surprised', t, A.r_sa + 0.3, { x: 380, y: 1560, w: 320, h: 280 }, 'sa', { face: 'surprised', z: 1.6, fy: 520 }); });
 // 11 GTA IV — trailer footage, $2B
-beat(35.3, 'lc4', 'rise', (g, t, b) => { const lt = t - b.t0; pcard(g, 'cg4', { x: 90, y: 330, w: 900, h: 620 }, 'lc4', clamp(lt / 0.35), { label: 'GTA IV · লিবার্টি সিটি', year: '2008', rec: true, still: false, zoom: 1.0 });
-  head(g, 'GTA 4', 540, 1110, 120, S(t, b.t0 + 0.15), ERA.lc4.ac, { lat: true }); price(g, 'আনুমানিক আয়', 2, 'বিলিয়ন', 540, 1380, 'lc4', clamp((t - A.r4) / 0.9)); });
+beat(35.3, 'lc4', 'rise', (g, t, b) => { const lt = t - b.t0; pcard(g, 'cg4', { x: 90, y: 330, w: 900, h: 620 }, 'lc4', clamp(lt / 0.35), { label: 'GTA IV', rec: true, still: false, zoom: 1.0 }); price(g, 'আনুমানিক আয়', 2, 'বিলিয়ন', 540, 1380, 'lc4', clamp((t - A.r4) / 0.9)); });
 // 12 Niko + the race so far
-beat(38.4, 'lc4', 'push', (g, t, b) => { const lt = t - b.t0; pcard(g, 'gta4_shot02.jpg', { x: 90, y: 330, w: 900, h: 560 }, 'lc4', clamp(lt / 0.35), { label: 'নিকো বেলিচ', t0: b.t0 });
+beat(38.4, 'lc4', 'push', (g, t, b) => { const lt = t - b.t0; pcard(g, 'gta4_shot02.jpg', { x: 90, y: 330, w: 900, h: 560 }, 'lc4', clamp(lt / 0.35), { label: 'GTA IV', t0: b.t0 });
   const games = [['GTA 3', 0.508, 'lib'], ['VC', 0.613, 'vice'], ['SA', 0.923, 'sa'], ['GTA 4', 2.0, 'lc4']]; games.forEach(([n, v, ee], i) => { const y = 1010 + i * 120, kk = easeOut(clamp((lt - 0.3 - i * 0.15) / 0.5)), w = 560 * v / 2 * kk; g.font = JAK(36); g.fillStyle = '#fff'; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillText(n, 100, y); g.fillStyle = DINK; g.fillRect(290 + 10, y - 30 + 10, w, 60); g.fillStyle = ERA[ee].ac; g.fillRect(290, y - 30, w, 60); g.font = BNF(34); g.fillStyle = '#fff'; if (kk > 0.95) g.fillText('$' + (v < 1 ? BN(Math.round(v * 1000)) + 'M' : BN(v) + 'B'), 300 + w + 20, y); }); });
 // 13 "now GTA 5"
-beat(40.22, 'ls5', 'pixel', (g, t, b) => { const lt = t - b.t0; pcard(g, 'cg5', { x: 90, y: 330, w: 900, h: 620 }, 'ls5', clamp(lt / 0.3), { label: 'GTA V · লস সান্তোস', year: '2013', rec: true, still: false, zoom: 1.0 });
-  head(g, 'এবার GTA 5', 540, 1170, 120, S(t, b.t0 + 0.15), ERA.ls5.ac, { bar: '#fff' }); });
+beat(40.22, 'ls5', 'pixel', (g, t, b) => { const lt = t - b.t0; pcard(g, 'cg5', { x: 90, y: 330, w: 900, h: 620 }, 'ls5', clamp(lt / 0.3), { label: 'GTA V', rec: true, still: false, zoom: 1.0 }); });
 // 14 FACE middle — the Mac joke
 beat(41.6, 'face1', 'cut', (g, t, b) => { });
 // 15 GTA V gameplay + $15B
-beat(44.3, 'ls5', 'blocks', (g, t, b) => { const lt = t - b.t0; pcard(g, 'cg5e', { x: 90, y: 330, w: 900, h: 600 }, 'ls5', clamp(lt / 0.35), { label: 'GTA V গেমপ্লে', rec: true, still: false, zoom: 1.0 });
-  if (t > A.r5) moneyRain(g, t, 34, 1, 1.3); head(g, 'এখন অবধি প্রায়', 540, 1070, 62, S(t, b.t0 + 0.6), '#fff'); price(g, 'মোট ব্যবসা', 15, 'বিলিয়ন', 540, 1300, 'ls5', clamp((t - A.r5) / 1.0), { size: 140 });
-  charPanel(g, 'surprised', t, A.r5 + 0.2, { x: 300, y: 1520, w: 480, h: 330 }, 'ls5', { face: 'surprised', z: 1.5, fy: 520, tag: 'কী!' }); });
+beat(44.3, 'ls5', 'blocks', (g, t, b) => { const lt = t - b.t0; pcard(g, 'cg5e', { x: 90, y: 330, w: 900, h: 600 }, 'ls5', clamp(lt / 0.35), { label: 'GTA V', rec: true, still: false, zoom: 1.0 });
+  if (t > A.r5) moneyRain(g, t, 34, 1, 1.3); price(g, 'মোট ব্যবসা', 15, 'বিলিয়ন', 540, 1300, 'ls5', clamp((t - A.r5) / 1.0), { size: 140 });
+  charPanel(g, 'surprised', t, A.r5 + 0.2, { x: 300, y: 1520, w: 480, h: 330 }, 'ls5', { face: 'surprised', z: 1.5, fy: 520 }); });
 // 16 bar race — GTA V breaks the chart
-beat(47.6, 'ls5', 'rise', (g, t, b) => { barRace(g, t, b.t0, 'ls5'); head(g, 'সবাইকে ছাড়িয়ে GTA 5', 540, 330, 74, S(t, b.t0 + 0.9), '#fff', { bar: ERA.ls5.ac });
+beat(47.6, 'ls5', 'rise', (g, t, b) => { barRace(g, t, b.t0, 'ls5');
   pcard(g, 'cg5fp', { x: 640, y: 1560, w: 360, h: 260 }, 'ls5', clamp((t - b.t0 - 0.2) / 0.3), { still: false, zoom: 1.0 }); });
 // 17 GTA VI
-beat(50.62, 'vi6', 'vhs', (g, t, b) => { const lt = t - b.t0; pcard(g, 'Grand_Theft_Auto_VI.png', { x: 230, y: 300, w: 620, h: 830 }, 'vi6', clamp(lt / 0.35), { label: 'GTA VI', t0: b.t0, contain: false });
-  head(g, 'আমাদের ধনী গেম', 540, 1300, 92, S(t, b.t0 + 0.4), '#fff', { bar: ERA.vi6.ac }); head(g, 'GTA 6', 540, 1460, 120, S(t, b.t0 + 0.7), ERA.vi6.ac2, { lat: true }); });
+beat(50.62, 'vi6', 'vhs', (g, t, b) => { const lt = t - b.t0; pcard(g, 'Grand_Theft_Auto_VI.png', { x: 230, y: 420, w: 620, h: 830 }, 'vi6', clamp(lt / 0.35), { label: 'GTA VI', t0: b.t0, contain: false }); crown(g, t, 540, 400, 1.15, clamp((t - b.t0 - 0.9) / 0.6)); if (t > b.t0 + 1.3) moneyRain(g, t, 14, 0.7, 0.8); });
 // 18 $3B+ in ONE day ... "nake?"
-beat(53.0, 'vi6', 'push', (g, t, b) => { const lt = t - b.t0; pcard(g, 'cg6e', { x: 90, y: 300, w: 900, h: 480 }, 'vi6', clamp(lt / 0.35), { label: 'GTA VI · লঞ্চ ট্রেইলার', rec: true, still: false, zoom: 1.0 });
-  clock1d(g, t, 250, 1010, 150, clamp((t - A.r6 + 0.5) / 1.2), 'vi6'); head(g, 'মাত্র ১ দিনে', 700, 1010, 66, S(t, A.r6 - 0.2), '#fff');
+beat(53.0, 'vi6', 'push', (g, t, b) => { const lt = t - b.t0; pcard(g, 'cg6e', { x: 90, y: 300, w: 900, h: 480 }, 'vi6', clamp(lt / 0.35), { label: 'GTA VI', rec: true, still: false, zoom: 1.0 });
+  clock1d(g, t, 250, 1010, 150, clamp((t - A.r6 + 0.5) / 1.2), 'vi6');
   if (t > A.r6 + 0.4) moneyRain(g, t, 26, 0.9, 1.2); price(g, 'আয় (শোনা যায়)', 3, 'বিলিয়ন', 540, 1340, 'vi6', clamp((t - A.r6 - 0.3) / 0.9), { plus: true });
-  charPanel(g, 'think', t, A.nak - 0.1, { x: 320, y: 1540, w: 440, h: 300 }, 'vi6', { z: 1.5, fy: 520, tag: 'নাকি?' }); });
+  charPanel(g, 'think', t, A.nak - 0.1, { x: 320, y: 1540, w: 440, h: 300 }, 'vi6', { z: 1.5, fy: 520 }); });
 // 19 comment box
-beat(57.0, 'vi6', 'blocks', (g, t, b) => { const lt = t - b.t0; head(g, 'আপনার কী মনে হয়?', 540, 400, 84, S(t, b.t0 + 0.1), '#fff', { bar: ERA.vi6.ac }); commentBox(g, t, A.comment - 0.3, 'vi6', clamp((t - A.comment + 0.6) / 0.4));
+beat(57.0, 'vi6', 'blocks', (g, t, b) => { const lt = t - b.t0; commentBox(g, t, A.comment - 0.3, 'vi6', clamp((t - A.comment + 0.6) / 0.4));
   charPanel(g, 'point', t, b.t0 + 0.2, { x: 260, y: 1150, w: 560, h: 520 }, 'vi6', { z: 1.2, fy: 580, talk: true }); });
 // 20 FACE end
 beat(59.8, 'face2', 'cut', (g, t, b) => chestPlate(g, t, 60.0, 'কমেন্টে জানান', 'GTA 6 মোট কত কামাবে?', 'vi6'));

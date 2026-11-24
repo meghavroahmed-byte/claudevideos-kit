@@ -203,3 +203,8 @@ The approved reference is their short "প্রাচীন যুগে শী
   centre line, blur→sharp, tracking that tightens (`kinetic`), soft rises, one light sweep; parallax (bg slower than fg).
   Transitions: video A = card-stack / glass edge wipe / zoom-blur; video B = slide with motion blur / rounded iris / split /
   light leak. Each video uses its own transition family.
+- **Minimal text (creator: "too much text looks busy").** Show ideas with motion graphics, not headlines: drop a headline whenever
+  an MG/animation already says it (question marks, hearts, clock, crowd lighting up, crown, pixel road...). Keep only the
+  key number, the game name and tiny UI labels. **Never show the same number twice on screen** (no running total HUD plus a
+  price card). Numbers go in ONE premium frosted-glass card (backdrop blur of the paper, white edge light, soft shadow,
+  count-up, era hairline, one light sweep) — no flat stickers, no "আনুমানিক আয়"-type captions.
