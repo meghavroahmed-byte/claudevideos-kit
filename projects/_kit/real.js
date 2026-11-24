@@ -119,7 +119,7 @@ const rpName = (n) => { const m = n.match(/(hip|spine_0\d|neck|head|jaw|shoulder
 const CHILD = { Hips: 'Spine', Spine: 'Spine1', Spine1: 'Spine2', Spine2: 'Neck', Neck: 'Head', LeftShoulder: 'LeftArm', LeftArm: 'LeftForeArm', LeftForeArm: 'LeftHand', LeftUpLeg: 'LeftLeg', LeftLeg: 'LeftFoot', LeftFoot: 'LeftToeBase',
   RightShoulder: 'RightArm', RightArm: 'RightForeArm', RightForeArm: 'RightHand', RightUpLeg: 'RightLeg', RightLeg: 'RightFoot', RightFoot: 'RightToeBase', LeftHand: 'LeftHandMiddle1', RightHand: 'RightHandMiddle1' };
 // kinds: 'hero' (RenderPeople Nathan, T-shirt + MR. CLOUD), 'eric','carla','claudia','sophia','manuel' (RenderPeople), 'rpm','michelle','soldier'
-const KIND = { hero: 'sf/rp_nathan', nathan: 'sf/rp_nathan', eric: 'sf/rp_eric', carla: 'sf/rp_carla', claudia: 'sf/rp_claudia', sophia: 'sf/rp_sophia', manuel: 'sf/rp_manuel', baby: 'sf/baby_b', baby2: 'sf/baby_rigged', rpm: 'people/readyplayer.me', knight: 'sf/knight_armor', michelle: 'people/Michelle', soldier: 'people/Soldier' };
+const KIND = { hero: 'sf/rp_nathan', nathan: 'sf/rp_nathan', eric: 'sf/rp_eric', carla: 'sf/rp_carla', claudia: 'sf/rp_claudia', sophia: 'sf/rp_sophia', manuel: 'sf/rp_manuel', baby2: 'sf/baby_rigged', rpm: 'people/readyplayer.me', knight: 'sf/knight_armor', michelle: 'people/Michelle', soldier: 'people/Soldier' };
 export async function loadPeople(kinds = ['hero']) {
   const gl = new GLTFLoader();
   await Promise.all([...new Set(kinds.map(k => KIND[k]))].map(p => ASSETS.models['@' + p] ? null : gl.loadAsync(`${A}${p}.glb`).then(g => { ASSETS.models['@' + p] = g; })));
