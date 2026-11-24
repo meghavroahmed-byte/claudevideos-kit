@@ -31,3 +31,4 @@
 - [ElevenLabs voice](reference-elevenlabs.md) — api.elevenlabs.io key via proxy, voice_id DDBVyamqcjlSuvNUZLUH
 - [No glass top card](feedback-no-glass-card.md) — never use the top glass info card (label/value/note) in any video
 - [No labels, Zack captions](feedback-no-labels-zack-captions.md) — 2026-11-24: all 58 v2 shorts rejected; never put 3D text labels in the scene; captions = toilet-paper/Zack style (2-4 word phrases, small white, soft shadow)
+- [Variety: people, scenes, camera](feedback-variety-people-scenes.md) — 2026-11-24: same 'hero' man in every video looks cheap; use new people each video, multiple scenes, moving camera + cuts, busy living scenes
