@@ -1426,5 +1426,54 @@
   "author": "TriSams",
   "license": "CC Attribution",
   "url": "https://sketchfab.com/3d-models/golden-retriever-dog-996d7f56b3e64a4cbeca0434b5811632"
+ },
+ "trex_walk": {
+  "uid": "3f39bdd3b5ee4e9494700c6addf51c23",
+  "title": "Tyrannosaurus rex \u2013 Animated, Science-Based",
+  "author": "Animal Animator",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/tyrannosaurus-rex-animated-science-based-3f39bdd3b5ee4e9494700c6addf51c23"
+ },
+ "velociraptor": {
+  "uid": "8f1744af7b0847a2aabe3df90be802f0",
+  "title": "PBR Velociraptor (Animated)",
+  "author": "Ferocious Industries",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/pbr-velociraptor-animated-8f1744af7b0847a2aabe3df90be802f0"
+ },
+ "sauropod": {
+  "uid": "e5f130a58bb04eb18520bc25f9f01576",
+  "title": "Animated Argentinosaurus (Free)",
+  "author": "Anees Animates",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/animated-argentinosaurus-free-e5f130a58bb04eb18520bc25f9f01576"
+ },
+ "armored_car": {
+  "uid": "ed875358ba4d458d9761ada7821497b7",
+  "title": "SISU GTP 4x4 Armored Vehicle",
+  "author": "tamminen",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/sisu-gtp-4x4-armored-vehicle-ed875358ba4d458d9761ada7821497b7"
+ },
+ "car_abandoned": {
+  "uid": "32498418a32d43a78d0847ce4c55fcb0",
+  "title": "Abandoned Car - BMW E30 Sedan",
+  "author": "ROH3D",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/abandoned-car-bmw-e30-sedan-32498418a32d43a78d0847ce4c55fcb0"
+ },
+ "taxi": {
+  "uid": "7da68ec2677f4abd8e31e9998b497a67",
+  "title": "Fairheaven LT '80 Taxi - Low poly model",
+  "author": "Daniel Zhabotinsky",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/fairheaven-lt-80-taxi-low-poly-model-7da68ec2677f4abd8e31e9998b497a67"
+ },
+ "car_small": {
+  "uid": "67c84e4d30ae42fda22c0a0c7526df26",
+  "title": "Small price car",
+  "author": "Oliv1e",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/small-price-car-67c84e4d30ae42fda22c0a0c7526df26"
  }
 }

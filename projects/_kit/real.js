@@ -11,8 +11,15 @@ const Q = () => new THREE.Quaternion();
 export const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
 
 // models: Poly Haven names; hdris: names; people: always loaded (rpm avatar + Xbot clips [+ michelle, soldier])
+// legacy KHR_materials_pbrSpecularGlossiness (dropped from three.js): use its diffuse texture/colour so such models aren't white
+function specGloss(parser) { return { name: 'KHR_materials_pbrSpecularGlossiness', extendMaterialParams(mi, params) {
+  const ext = parser.json.materials[mi] && parser.json.materials[mi].extensions && parser.json.materials[mi].extensions.KHR_materials_pbrSpecularGlossiness; if (!ext) return Promise.resolve();
+  if (ext.diffuseFactor) { params.color = new THREE.Color().setRGB(ext.diffuseFactor[0], ext.diffuseFactor[1], ext.diffuseFactor[2]); if (ext.diffuseFactor[3] < 1) { params.opacity = ext.diffuseFactor[3]; params.transparent = true; } }
+  params.roughness = 1 - 0.7 * (ext.glossinessFactor ?? 0.5); params.metalness = 0;
+  return ext.diffuseTexture ? parser.assignTexture(params, 'map', ext.diffuseTexture, THREE.SRGBColorSpace) : Promise.resolve();
+} }; }
 export async function loadKit(renderer, { models = [], hdris = [], tex = [], people = ['hero'] } = {}) {
-  const gl = new GLTFLoader();
+  const gl = new GLTFLoader(); gl.register(specGloss);
   const pm = new THREE.PMREMGenerator(renderer);
   await Promise.all([
     ...models.map(n => gl.loadAsync(n.startsWith('sf/') ? `${A}${n}.glb` : `${A}${n}/${n}.gltf`).then(g => { ASSETS.models[n] = g.scene; ASSETS.anims[n] = g.animations; })),
@@ -121,7 +128,7 @@ const CHILD = { Hips: 'Spine', Spine: 'Spine1', Spine1: 'Spine2', Spine2: 'Neck'
 // kinds: 'hero' (RenderPeople Nathan, T-shirt + MR. CLOUD), 'eric','carla','claudia','sophia','manuel' (RenderPeople), 'rpm','michelle','soldier'
 const KIND = { hero: 'sf/rp_nathan', nathan: 'sf/rp_nathan', eric: 'sf/rp_eric', carla: 'sf/rp_carla', claudia: 'sf/rp_claudia', sophia: 'sf/rp_sophia', manuel: 'sf/rp_manuel', baby2: 'sf/baby_rigged', rpm: 'people/readyplayer.me', knight: 'sf/knight_armor', michelle: 'people/Michelle', soldier: 'people/Soldier' };
 export async function loadPeople(kinds = ['hero']) {
-  const gl = new GLTFLoader();
+  const gl = new GLTFLoader(); gl.register(specGloss);
   await Promise.all([...new Set(kinds.map(k => KIND[k]))].map(p => ASSETS.models['@' + p] ? null : gl.loadAsync(`${A}${p}.glb`).then(g => { ASSETS.models['@' + p] = g; })));
   if (!ASSETS.xbot) ASSETS.xbot = await gl.loadAsync(`${A}people/Xbot.glb`);
 }
