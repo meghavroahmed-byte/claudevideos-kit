@@ -32,3 +32,4 @@
 - [No glass top card](feedback-no-glass-card.md) — never use the top glass info card (label/value/note) in any video
 - [No labels, Zack captions](feedback-no-labels-zack-captions.md) — 2026-11-24: all 58 v2 shorts rejected; never put 3D text labels in the scene; captions = toilet-paper/Zack style (2-4 word phrases, small white, soft shadow)
 - [Variety: people, scenes, camera](feedback-variety-people-scenes.md) — 2026-11-24: same 'hero' man in every video looks cheap; use new people each video, multiple scenes, moving camera + cuts, busy living scenes
+- [SFX quieter](feedback-sfx-quieter.md) — 2026-11-24: SFX was louder than the voice; bed now −2 dB with hard ducking (was +11 dB)

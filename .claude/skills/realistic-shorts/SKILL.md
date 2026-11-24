@@ -27,7 +27,8 @@ This repo alone is enough to rebuild every video. Nothing else is needed except 
 - **Voice:**
   - Never process or filter the user's own voice.
   - Generated ElevenLabs VO is used as-is: no EQ, no denoise.
-- **Audio master (#3 onward):**
+- **NEW 2026-11-24: SFX must stay clearly below the voice.** The SFX bed is now −2 dB with hard ducking (ratio 6) in `render.sh`; it was +11 dB. Keep `put()` gains around −14..−20 dB.
+- **Audio master (#3 onward, old values):**
   - Loud master: `volume=7.5dB` plus `alimiter 0.8`.
   - SFX bed at +11 dB, sidechain-ducked under the voice.
   - Soft mood BGM at −6 dB, also ducked.
