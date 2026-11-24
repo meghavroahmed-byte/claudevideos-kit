@@ -1398,5 +1398,33 @@
   "author": "Idmenthal",
   "license": "CC Attribution",
   "url": "https://sketchfab.com/3d-models/birds-feather-c50b22cb34f9491db008618d7b935e24"
+ },
+ "teddy_bear": {
+  "uid": "f7f6c575184e4b95b43f2e5fd9cebe4c",
+  "title": "Teddy Bear",
+  "author": "Schmoldt5000",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/teddy-bear-f7f6c575184e4b95b43f2e5fd9cebe4c"
+ },
+ "toy_blocks": {
+  "uid": "5f8dfddbbc7d468784ca014378f7e5fe",
+  "title": "Wooden Alphabet Blocks",
+  "author": "Cherryvania",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/wooden-alphabet-blocks-5f8dfddbbc7d468784ca014378f7e5fe"
+ },
+ "baby_rigged": {
+  "uid": "7de8127f2fef4db69f71d0f748e58fe3",
+  "title": "Baby (Fully Rigged)",
+  "author": "omermedia",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/baby-fully-rigged-7de8127f2fef4db69f71d0f748e58fe3"
+ },
+ "baby_b": {
+  "uid": "452ee1d9783e49f2a480fca806014b91",
+  "title": "Baby",
+  "author": "darksoundlab",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/baby-452ee1d9783e49f2a480fca806014b91"
  }
 }

@@ -110,12 +110,16 @@ for (const [s, S] of [['l', 'Left'], ['r', 'Right']]) {
     [`upperleg_${s}`]: `${S}UpLeg`, [`lowerleg_${s}`]: `${S}Leg`, [`foot_${s}`]: `${S}Foot`, [`ball_${s}`]: `${S}ToeBase` });
   for (const [f, F] of [['thumb', 'Thumb'], ['index', 'Index'], ['middle', 'Middle'], ['ring', 'Ring'], ['pinky', 'Pinky']]) for (const k of [1, 2, 3]) RPMAP[`${f}_0${k}_${s}`] = `${S}Hand${F}${k}`;
 }
-const boneKey = (n) => rpName(n) || n.replace(/^mixamorig:?/, '').replace(/_\d+$/, '');
+const CC = { Hip: 'Hips', Waist: 'Spine', Spine01: 'Spine1', Spine02: 'Spine2', NeckTwist01: 'Neck', Head: 'Head', L_Clavicle: 'LeftShoulder', L_Upperarm: 'LeftArm', L_Forearm: 'LeftForeArm', L_Hand: 'LeftHand', L_Mid1: 'LeftHandMiddle1', R_Clavicle: 'RightShoulder', R_Upperarm: 'RightArm', R_Forearm: 'RightForeArm', R_Hand: 'RightHand', R_Mid1: 'RightHandMiddle1', L_Thigh: 'LeftUpLeg', L_Calf: 'LeftLeg', L_Foot: 'LeftFoot', L_ToeBase: 'LeftToeBase', R_Thigh: 'RightUpLeg', R_Calf: 'RightLeg', R_Foot: 'RightFoot', R_ToeBase: 'RightToeBase' };
+const ccName = (n) => { const m = n.match(/^CC_Base_([A-Za-z_]+?\d?\d?)_\d+$/); return m && CC[m[1]] ? CC[m[1]] : null; };
+const MH = { root: 'Hips', spine04: 'Spine', spine02: 'Spine1', spine01: 'Spine2', neck01: 'Neck', head: 'Head', clavicle_L: 'LeftShoulder', upperarm01_L: 'LeftArm', lowerarm01_L: 'LeftForeArm', wrist_L: 'LeftHand', 'finger3-1_L': 'LeftHandMiddle1', clavicle_R: 'RightShoulder', upperarm01_R: 'RightArm', lowerarm01_R: 'RightForeArm', wrist_R: 'RightHand', 'finger3-1_R': 'RightHandMiddle1', upperleg01_L: 'LeftUpLeg', lowerleg01_L: 'LeftLeg', foot_L: 'LeftFoot', 'toe1-1_L': 'LeftToeBase', upperleg01_R: 'RightUpLeg', lowerleg01_R: 'RightLeg', foot_R: 'RightFoot', 'toe1-1_R': 'RightToeBase' };
+const mhName = (n) => { const k = n.replace(/_\d+$/, ''); return MH[k] || null; };
+const boneKey = (n) => ccName(n) || mhName(n) || rpName(n) || n.replace(/^mixamorig:?/, '').replace(/_\d+$/, '');
 const rpName = (n) => { const m = n.match(/(hip|spine_0\d|neck|head|jaw|shoulder_[lr]|upperarm_[lr]|lowerarm_[lr]|hand_[lr]|upperleg_[lr]|lowerleg_[lr]|foot_[lr]|ball_[lr]|(?:thumb|index|middle|ring|pinky)_0\d_[lr])_\d+$/); return m ? RPMAP[m[1]] : null; };
 const CHILD = { Hips: 'Spine', Spine: 'Spine1', Spine1: 'Spine2', Spine2: 'Neck', Neck: 'Head', LeftShoulder: 'LeftArm', LeftArm: 'LeftForeArm', LeftForeArm: 'LeftHand', LeftUpLeg: 'LeftLeg', LeftLeg: 'LeftFoot', LeftFoot: 'LeftToeBase',
   RightShoulder: 'RightArm', RightArm: 'RightForeArm', RightForeArm: 'RightHand', RightUpLeg: 'RightLeg', RightLeg: 'RightFoot', RightFoot: 'RightToeBase', LeftHand: 'LeftHandMiddle1', RightHand: 'RightHandMiddle1' };
 // kinds: 'hero' (RenderPeople Nathan, T-shirt + MR. CLOUD), 'eric','carla','claudia','sophia','manuel' (RenderPeople), 'rpm','michelle','soldier'
-const KIND = { hero: 'sf/rp_nathan', nathan: 'sf/rp_nathan', eric: 'sf/rp_eric', carla: 'sf/rp_carla', claudia: 'sf/rp_claudia', sophia: 'sf/rp_sophia', manuel: 'sf/rp_manuel', rpm: 'people/readyplayer.me', knight: 'sf/knight_armor', michelle: 'people/Michelle', soldier: 'people/Soldier' };
+const KIND = { hero: 'sf/rp_nathan', nathan: 'sf/rp_nathan', eric: 'sf/rp_eric', carla: 'sf/rp_carla', claudia: 'sf/rp_claudia', sophia: 'sf/rp_sophia', manuel: 'sf/rp_manuel', baby: 'sf/baby_b', baby2: 'sf/baby_rigged', rpm: 'people/readyplayer.me', knight: 'sf/knight_armor', michelle: 'people/Michelle', soldier: 'people/Soldier' };
 export async function loadPeople(kinds = ['hero']) {
   const gl = new GLTFLoader();
   await Promise.all([...new Set(kinds.map(k => KIND[k]))].map(p => ASSETS.models['@' + p] ? null : gl.loadAsync(`${A}${p}.glb`).then(g => { ASSETS.models['@' + p] = g; })));
@@ -162,7 +166,7 @@ export function person(kind = 'hero', { print = kind === 'hero', shirt = null, h
   }
   const jawRest = bone.Jaw ? bone.Jaw.quaternion.clone() : null; const hipsY0 = bone.Hips ? bone.Hips.position.y : 0; const hipsS = bone.Hips ? 1 / bone.Hips.parent.getWorldScale(V()).y : 1;
   const P = {
-    root: g, bone, faces,
+    root: g, bone, faces, height,
     // weights: clip name -> weight. t: time in seconds (clip time = t*speed)
     // pose: object of canned pose weights {flinch, point, pointL, handsHead, handsChest, handsBelly, handsThroat, armsUp, shrug, crouch, lean, lookUp, lookDown, nod, headTilt}
     update(t, weights = { idle: 1 }, speed = 1, pose = null) {
@@ -200,6 +204,8 @@ export function person(kind = 'hero', { print = kind === 'hero', shirt = null, h
     },
     hipsDrop(dy) { if (bone.Hips) bone.Hips.position.y = hipsY0 - dy * hipsS; return P; },
     headPos() { const v = V(); bone.Head.getWorldPosition(v); return v; },
+    // after update(): shift the body so the lowest foot/toe touches groundY (no floating or sinking feet)
+    plant(groundY = 0) { g.updateMatrixWorld(true); let lo = 1e9; for (const k of ['LeftFoot', 'RightFoot', 'LeftToeBase', 'RightToeBase']) if (bone[k]) { const v = V(); bone[k].getWorldPosition(v); lo = Math.min(lo, v.y); } if (lo < 1e8) { root.position.y += (groundY + 0.022 * P.height * g.scale.y) - lo; g.updateMatrixWorld(true); } return P; },
     world(name) { const v = V(); bone[name].getWorldPosition(v); return v; },
   };
   P.update(0);
