@@ -36,7 +36,7 @@ function plaza(makeStage) {
 // ---------- realistic procedural tongue (curls into a U with k) ----------
 function tongue(len = 0.085, wid = 0.05, th = 0.016) {
   const geo = new THREE.SphereGeometry(1, 64, 48); const p = geo.attributes.position; const base = Float32Array.from(p.array);
-  const tex = canvasTex(256, 256, (g) => { g.fillStyle = '#d9707a'; g.fillRect(0, 0, 256, 256); for (let i = 0; i < 2600; i++) { const x = Math.random() * 256, y = Math.random() * 256; g.fillStyle = `rgba(${240 + Math.random() * 15 | 0},${150 + Math.random() * 40 | 0},${160 + Math.random() * 30 | 0},0.55)`; g.beginPath(); g.arc(x, y, 0.8 + Math.random() * 1.4, 0, 7); g.fill(); } g.fillStyle = 'rgba(150,50,60,0.35)'; g.fillRect(124, 0, 8, 256); });
+  const tex = canvasTex(256, 256, (g) => { g.fillStyle = '#d9707a'; g.fillRect(0, 0, 256, 256); for (let i = 0; i < 2600; i++) { const x = Math.random() * 256, y = Math.random() * 256; g.fillStyle = `rgba(${235 + Math.random() * 15 | 0},${130 + Math.random() * 40 | 0},${140 + Math.random() * 30 | 0},0.28)`; g.beginPath(); g.arc(x, y, 0.8 + Math.random() * 1.4, 0, 7); g.fill(); } g.fillStyle = 'rgba(150,50,60,0.35)'; g.fillRect(124, 0, 8, 256); });
   const m = new THREE.Mesh(geo, new THREE.MeshPhysicalMaterial({ color: 0xffffff, map: tex, roughness: 0.32, clearcoat: 0.6, clearcoatRoughness: 0.25, sheen: 0.3, sheenColor: new THREE.Color(0xffc0c8) }));
   m.castShadow = true;
   m.curl = (k, ext = 1) => { // x: across, y: along (tip at +y), z: up
