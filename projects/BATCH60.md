@@ -90,3 +90,5 @@ Status: [x] delivered · [r] rendering · [b] built · [ ] to do
 | 58 | earthquake | What to do in an earthquake | b |
 | 59 | tornado | What if you got caught in a tornado? | b |
 | 60 | sun-stare | What if you stared at the Sun? | b |
+
+DONE (2026-11-24): all 60 delivered (#1-2 original, #3-60 v2 realistic). Delivery manifests: _tools/deliver.tsv, _tools/captions.txt. Recovery skill: .claude/skills/realistic-shorts/SKILL.md.
