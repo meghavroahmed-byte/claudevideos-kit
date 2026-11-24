@@ -16,11 +16,11 @@ export function dress(root, opts = {}) {
     const sl = opts.sleeve ?? 0.5, lg = opts.legs ?? 0.5;
     const clothMask = (i) => { const h = hN(i), x = xN(i), z = zN(i); if (h > 0.772) return false; if (h > 0.742) return Math.hypot(x, z * 1.2) > 0.052 && x < 0.13; if (h > 0.6) return x < 0.125 + 0.1 * sl * (h - 0.6) / 0.142 + 0.06 * sl; if (h > 0.45) return x < 0.118; return h > 0.43 - 0.13 * lg && x < 0.14; };
     const hairMask = (i) => { const h = hN(i), z = zN(i); if (h < 0.875) return false; if (z > 0.035 && h < 0.94) return false; return true; };
-    shell(m, clothMask, 0.02 * H, 70, clothMaterial(opts, { min, H, flip: opts.flip, up }));
+    shell(m, clothMask, 0.028 * H, 320, clothMaterial(opts, { min, H, flip: opts.flip, up }), 0);
     if (opts.hair !== null) shell(m, hairMask, 0.008 * H, 12, hairMaterial(opts.hair ?? 0x4a2c18));
   }
 }
-function shell(m, mask, offset, iters, material) {
+function shell(m, mask, offset, iters, material, shrinkIters = 0) {
   const g = m.geometry, P = g.attributes.position, N = P.count;
   const idx = g.index ? g.index.array : Array.from({ length: N }, (_, i) => i);
   // weld by position so UV seams don't tear
@@ -40,6 +40,7 @@ function shell(m, mask, offset, iters, material) {
     pos.set(tmp);
   };
   for (let i = 0; i < iters; i++) { step(0.55); step(-0.58); }
+  for (let i = 0; i < (shrinkIters || 0); i++) step(0.5);
   // smoothed normals (area weighted) on welded verts
   const nrm = new Float32Array(nc * 3); const va = new THREE.Vector3(), vb = new THREE.Vector3(), vc = new THREE.Vector3(), e1 = new THREE.Vector3(), e2 = new THREE.Vector3();
   for (let t = 0; t < tris.length; t += 3) { const a = canon[tris[t]], b = canon[tris[t + 1]], c = canon[tris[t + 2]]; va.fromArray(pos, a * 3); vb.fromArray(pos, b * 3); vc.fromArray(pos, c * 3); e1.subVectors(vb, va); e2.subVectors(vc, va); const n = e1.cross(e2); for (const q of [a, b, c]) { nrm[q * 3] += n.x; nrm[q * 3 + 1] += n.y; nrm[q * 3 + 2] += n.z; } }
