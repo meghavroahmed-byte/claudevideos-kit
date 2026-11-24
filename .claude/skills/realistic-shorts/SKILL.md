@@ -7,6 +7,8 @@ description: Recovery + production guide for the user's "realistic 3D" explainer
 
 This repo alone is enough to rebuild every video. Nothing else is needed except the API keys (ElevenLabs, Sketchfab), which the user adds again as secrets. The approved reference look is `projects/giant-rat`, the sample the user approved. The full list of 60 videos is in `projects/BATCH60.md`.
 
+> **2026-11-24: the user no longer wants this realistic v2 style.** The house style is the toilet-paper engine (`projects/toilet-paper`: `makeHuman` acting characters, rich hand-built props). See `memory/feedback-toilet-paper-style-is-house.md`. Use this skill only for restoring old v2 renders or for the asset library.
+
 ## 1. The user's rules (never break these)
 - **NEW 2026-11-24: variety.** A different main person in every video (don't default to `person('hero')`/Nathan; download more rigged RenderPeople/Mixamo humans when needed). Several locations per video, a constantly moving camera with cuts every ~2-4 s, people acting (walking, running, reacting, using props), and busy backgrounds (other people, animals, moving props, particles). Static "one man standing in one spot" videos are rejected.
 - **NEW 2026-11-24 (overrides older rules below): NO floating 3D text labels of any kind** (no `label()`/`showLabel()`, no words inside x-ray circles, no badges). The user rejected all 58 batch videos because every one had text in the scene. The picture must explain itself.
