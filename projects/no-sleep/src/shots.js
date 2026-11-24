@@ -52,7 +52,7 @@ function build({ makeStage }) {
   // hallucinations (day 3): ghost rat + ghost double
   const grat = ghost(prop('street_rat', 7)); scene.add(grat);
   const gman = ghost(hero.root, 0xcfe8ff); scene.add(gman);
-  const xr = xray(0.42); scene.add(xr);
+  const xr = xray(0.3); scene.add(xr);
   const L = { h24: label('24 HOURS', 0.75), drunk: label('LIKE DRUNK', 0.8), slow: label('SLOW REACTIONS', 0.8), mood: label('BAD MOOD', 0.75), day2: label('DAY 2', 0.6), micro: label('MICROSLEEP', 0.62), day3: label('DAY 3', 0.6), rec: label('WORLD RECORD', 0.9), d11: label('11 DAYS', 0.75), clean: label('BRAIN CLEANING', 0.62) };
   Object.values(L).forEach(l => scene.add(l));
   const cam = new THREE.PerspectiveCamera(38, 720 / 1280, 0.05, 200);
@@ -100,7 +100,7 @@ function build({ makeStage }) {
       const head = hero.headPos();
       // ---------- x-ray (brain) ----------
       const x1 = sm(10.6, 10.9, t) * (1 - sm(16.8, 17.1, t)), x2 = sm(26.6, 26.9, t);
-      if (x1 > 0.01) xr.show(head.clone().add(V(0.21, 0.16, 0.1)), x1, (g, kk, tt) => drawBrain(g, kk, tt, 0), sm(11.3, 11.8, t), t);
+      if (x1 > 0.01) xr.show(head.clone().add(V(0.26, 0.2, 0.1)), x1, (g, kk, tt) => drawBrain(g, kk, tt, 0), sm(11.3, 11.8, t), t);
       else if (x2 > 0.01) xr.show(head.clone().add(V(0.25, 0.35, 0.15)), x2, (g, kk, tt) => drawBrain(g, kk, tt, 1), sm(27.0, 29.2, t), t);
       else xr.visible = false;
       // ---------- labels ----------

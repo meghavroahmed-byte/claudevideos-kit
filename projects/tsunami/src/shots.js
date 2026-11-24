@@ -80,7 +80,7 @@ function build({ makeStage }) {
       const fl = sm(19.0, 22.5, t) * (1 - sm(31.3, 33.0, t));
       flood.visible = fl > 0.01; flood.position.set(30, -0.3 + 1.3 * fl, lerp(-30, 10, sm(19, 24, t)));
       const DX = HX(22.5);
-      debris.forEach(({ o, x, ph }, i) => { const drift = Math.max(0, t - 21); o.visible = t > 20.5 && fl > 0.05; o.position.set(DX + x * 1.4, flood.position.y - 0.15 + Math.sin(t * 1.4 + ph) * 0.08, -4 + (i % 3) * 0.8 + drift * 1.6); o.rotation.set(Math.sin(t + ph) * 0.15, ph + drift * 0.3, Math.sin(t * 0.8 + ph) * 0.12); });
+      debris.forEach(({ o, x, ph }, i) => { const drift = Math.max(0, t - 21); o.visible = t > 20.5 && t < 25.0 && fl > 0.05; o.position.set(DX + x * 1.4, flood.position.y - 0.15 + Math.sin(t * 1.4 + ph) * 0.08, -4 + (i % 3) * 0.8 + drift * 1.6); o.rotation.set(Math.sin(t + ph) * 0.15, ph + drift * 0.3, Math.sin(t * 0.8 + ph) * 0.12); });
       // ---- hero runs along the beach (+x), then is seen on the roof ----
       const runK = t < 26.8 ? 1 : 0;
       hero.update(t, { run: runK, idle: 1 - runK }, 1.0, {});
