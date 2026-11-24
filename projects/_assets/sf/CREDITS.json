@@ -1377,5 +1377,26 @@
   "author": "Giravolt",
   "license": "CC Attribution",
   "url": "https://sketchfab.com/3d-models/armadura-samurai-do-maru-bmvb-b35366f45556412d98b70276e03853af"
+ },
+ "mallard": {
+  "uid": "16c14682b3414f34b26bf4d558d40a0f",
+  "title": "Mallard Duck (Male)",
+  "author": "ucdavisterc",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/mallard-duck-male-16c14682b3414f34b26bf4d558d40a0f"
+ },
+ "mallard_static": {
+  "uid": "dd33cd2e30944a4aae2de1a06a828f4f",
+  "title": "Realistic Mallard Duck - Game Ready Asset",
+  "author": "3Dima",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/realistic-mallard-duck-game-ready-asset-dd33cd2e30944a4aae2de1a06a828f4f"
+ },
+ "feather": {
+  "uid": "c50b22cb34f9491db008618d7b935e24",
+  "title": "Birds feather",
+  "author": "Idmenthal",
+  "license": "CC Attribution",
+  "url": "https://sketchfab.com/3d-models/birds-feather-c50b22cb34f9491db008618d7b935e24"
  }
 }
