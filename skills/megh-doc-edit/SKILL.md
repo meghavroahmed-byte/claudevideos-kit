@@ -208,3 +208,6 @@ The approved reference is their short "প্রাচীন যুগে শী
   key number, the game name and tiny UI labels. **Never show the same number twice on screen** (no running total HUD plus a
   price card). Numbers go in ONE premium frosted-glass card (backdrop blur of the paper, white edge light, soft shadow,
   count-up, era hairline, one light sweep) — no flat stickers, no "আনুমানিক আয়"-type captions.
+- **Named characters must be the right person.** Verify a character screenshot really shows who the voice names (a Grove
+  Street screenshot of someone else was used as "CJ" — wrong). When the creator sends a character image, use it: the
+  cut-out (keep its own alpha) stands full-body on the paper with a glass disc behind, contact shadow, mask rise, light sweep.
