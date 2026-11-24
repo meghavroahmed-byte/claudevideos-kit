@@ -36,3 +36,4 @@
 - [Toilet-paper style = house style](feedback-toilet-paper-style-is-house.md) — 2026-11-24: realistic v2 rejected; build on the toilet-paper engine (makeHuman acting characters, rich A-Z props); 58 projects keep src/shots_v1.js in that engine
 - [Clean character animation](feedback-character-animation-quality.md) — 2026-11-24: no hands clipping into the body; walking/swimming/sitting etc. must look correct
 - 2026-11-24: for people, use REALISTIC 3D humans (library/RenderPeople, different person per video) + real 3D props from the library; nothing pointless or ugly in the frame; for brain/organ topics, zoom INTO the character (head/body turns see-through, real organ models inside)
+- [Full 3D worlds, no ghosts](feedback-full-3d-world-no-ghosts.md) — 2026-11-24: no photo/HDRI visible backgrounds; buildings/nature/sky all 3D; never white ghost people
