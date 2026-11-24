@@ -8,6 +8,9 @@ description: Recovery + production guide for the user's "realistic 3D" explainer
 This repo alone is enough to rebuild every video. Nothing else is needed except the API keys (ElevenLabs, Sketchfab), which the user adds again as secrets. The approved reference look is `projects/giant-rat`, the sample the user approved. The full list of 60 videos is in `projects/BATCH60.md`.
 
 ## 1. The user's rules (never break these)
+- **NEW 2026-11-24 (overrides older rules below): NO floating 3D text labels of any kind** (no `label()`/`showLabel()`, no words inside x-ray circles, no badges). The user rejected all 58 batch videos because every one had text in the scene. The picture must explain itself.
+- **Captions = Zack D. Films / toilet-paper style:** 2-4 word phrases, sentence case, Montserrat 700 46px, white, soft shadow, no thick outline, `top: 968px` (copy `#cap` CSS from `projects/toilet-paper/index.html`). Not one-word uppercase captions.
+- **Editing:** Zack-style close-ups and hard cuts are allowed (keyCam keys 0.02 s apart = cut); split above/below-water views; 3D x-ray cutaways with real organ models (body fades translucent), never 2D drawings. Reference: `projects/duck-float`.
 - **Style v2:**
   - Realistic 3D humans, never cartoons. Full body in frame.
   - **Humans must never look tiny next to animals.** Scale people to 1.78 m and the animal to its real size. Frame them together.
