@@ -138,7 +138,7 @@ function build({ makeStage }) {
     [0.0, [0.4, -0.03, 4.1], [-0.2, -0.62, 0]], [2.45, [0.32, -0.03, 3.6], [-0.2, -0.55, 0]],                          // 1 struggling next to the duck
     [2.47, [0.75, -0.05, 2.0], [0.0, -0.22, 0]], [6.40, [0.6, -0.1, 1.75], [0.0, -0.24, 0]],                          // 2 belly close-up
     [6.42, [2.3, 0.02, 2.9], [0.0, -0.35, 0]], [10.95, [2.0, 0.05, 2.6], [0.0, -0.3, 0]],                             // 3 profile: spine arches
-    [10.97, [2.1, -0.8, 3.0], [0.0, -0.95, -0.2]], [15.80, [1.8, -0.7, 2.7], [0.0, -0.9, -0.25]],                  // 4 under water: legs become paddles
+    [10.97, [2.6, -0.03, 3.4], [0.0, -0.82, -0.2]], [15.80, [2.35, -0.03, 3.1], [0.0, -0.8, -0.25]],                  // 4 under water: legs become paddles
     [15.82, [0.4, -0.05, 2.0], [0.0, -0.12, 0]], [21.20, [0.35, 0.0, 1.8], [0.0, -0.06, 0]],                          // 5 x-ray: air sacs
     [21.22, [0.8, 0.02, 1.6], [0.0, -0.12, 0]], [26.95, [0.95, 0.02, 2.3], [0.0, -0.2, 0]],                           // 6 feathers sprout
     [26.97, [0.45, -0.02, 3.0], [-0.25, -0.4, 0]], [31.6, [0.8, 0.0, 4.2], [-0.25, -0.45, 0]],                           // 7 floating like a duck
@@ -191,7 +191,7 @@ function build({ makeStage }) {
       sacMat.opacity = 0.38 * xr;
       // duck: always calm, half in the water
       duck.play(t, 0, 0.6); duck.root.position.set(-0.7, -0.17 + Math.sin(t * 1.6 + 1) * 0.015, -0.45); duck.root.rotation.y = 1.2 + 0.08 * Math.sin(t * 0.5);
-      duck.root.visible = !(t > 2.47 && t < 6.42) && !(t > 10.97 && t < 26.95);
+      duck.root.visible = t < 2.47 || t > 26.95;
       // water details
       const head = hero.headPos();
       ring.position.set(0, 0.012, 0); ring.scale.setScalar(1 + 0.35 * belly + 0.1 * Math.sin(t * 3));
