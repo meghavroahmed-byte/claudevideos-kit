@@ -1,7 +1,7 @@
 # mksfx.py <proj> <dur> <seed> <timeline_file>  -> writes projects/<proj>/sfx.py with all needed palette funcs pulled from other projects
 import ast, sys, glob, re, os
 proj, dur, seed, tlf = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
-P = '/home/user/claudevideos-kit/projects'
+P = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 base = open(f'{P}/hiccups/sfx.py').read()
 head = base[:base.index("# ---------------- timeline ----------------")]
 head = re.sub(r"DUR = [0-9.]+", f"DUR = {dur}", head); head = re.sub(r"default_rng\(\d+\)", f"default_rng({seed})", head)

@@ -1,6 +1,6 @@
 #!/bin/bash
 # usage: render.sh project duration
-P=$1; D=$2; cd /home/user/claudevideos-kit/projects/$P
+P=$1; D=$2; R="$(cd "$(dirname "$0")/.." && pwd)"; cd "$R/$P" || exit 1
 a=$(python3 -c "print(round($D/3,2))"); b=$(python3 -c "print(round(2*$D/3,2))")
 rm -f p1.mp4 p2.mp4 p3.mp4
 (GL=swiftshader node render.mjs video p1.mp4 30 0 $a > r1.log 2>&1 & GL=swiftshader node render.mjs video p2.mp4 30 $a $b > r2.log 2>&1 & GL=swiftshader node render.mjs video p3.mp4 30 $b $D > r3.log 2>&1 & wait)

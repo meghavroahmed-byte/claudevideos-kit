@@ -65,5 +65,5 @@ out = sosfilt(butter(2, 6000, 'low', fs=SR, output='sos'), out)
 out = out[:int(DUR * SR)]; out *= env(len(out), 1.2, 1.5)
 out = out / (np.sqrt(np.mean(out**2)) + 1e-9) * 0.05   # fixed RMS -> very soft after mix gain
 out = np.clip(out, -0.9, 0.9)
-wavfile.write(f'/home/user/claudevideos-kit/projects/{P}/audio/bgm.wav', SR, (out * 32767).astype(np.int16))
+wavfile.write(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', P, 'audio', 'bgm.wav'), SR, (out * 32767).astype(np.int16))
 print(P, MOOD, bpm, 'bpm root', root)
